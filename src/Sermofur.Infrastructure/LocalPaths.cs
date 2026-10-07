@@ -64,8 +64,7 @@ public static class LocalPaths
     /// Lexical normalization of a mapping: relative, without drive, contained in the root.
     /// Accepts both <c>/</c> and <c>\</c> as separators, so that a mapping typed on Windows, or a
     /// stored row holding backslashes, reads the same on every operating system (ADR 0009).
-    /// Does not require the directory to exist and does not check
-    /// links.
+    /// Does not require the directory to exist and does not check links.
     /// </summary>
     public static string NormalizeMapping(string root, string relative)
     {

@@ -22,7 +22,7 @@ public sealed class CommandRunner(TextWriter output, TextWriter error)
         smf retex list | show ID
         --help is recognized anywhere before -- and prints this help.
         -- ends options: every following argument is positional (text starting with --).
-        An option value cannot start with --; see https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md for values and exit codes.
+        An option value cannot start with --; see https://github.com/JoRouquette/sermofur/blob/v0.1.0/docs/cli.md for values and exit codes.
         """;
 
     public int Run(string[] arguments)
@@ -81,7 +81,8 @@ public sealed class CommandRunner(TextWriter output, TextWriter error)
         }
         if (command == "doctor")
         {
-            // An invalid .sermofur entry (foreign, damaged, unreadable) is reported by doctor rather than refused before inspection; a link is still refused.
+            // The doctor command reports an invalid .sermofur entry (foreign, damaged, unreadable)
+            // instead of failing before its report; a link is still refused.
             return RunInstanceCommand(args, manager.DiscoverForDiagnosis(path), json);
         }
         string root = manager.Discover(path);

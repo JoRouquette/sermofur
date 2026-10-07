@@ -18,4 +18,5 @@ Files as authority plus an index: needs an extra journal. Double write without a
 inconsistency.
 
 ## Consequences
-Boundary tests are required; changes go through a new ADR.
+Boundary tests are required; changes go through a new ADR. Completed by
+[ADR 0010](0010-fail-closed-instance-discovery.md) (instance discovery).

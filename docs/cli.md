@@ -76,7 +76,7 @@ Discovery fails closed ([ADR 0010](adr/0010-fail-closed-instance-discovery.md)):
 nearest `.sermofur` entry, whatever it is. If that entry is not a valid instance, every command
 except `doctor` fails with `invalid_instance` (exit 3) for a foreign entry (a file, or a folder
 holding none of `instance.json`, `memory.db`, `records/`), a **damaged instance** (`memory.db` or
-`records/` without `instance.json`) or an unreadable entry (attributes or content that cannot be
+`records/` without `instance.json`) or an unreadable entry (attributes or listing that cannot be
 read). A link or junction, even dangling, is refused with `unsafe_path` (exit 4) by every command,
 `doctor` included. Nothing is ever written into an instance higher up. For a damaged instance,
 run `smf doctor` from that folder, then restore `instance.json` from a backup; for a foreign

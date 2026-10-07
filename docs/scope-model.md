@@ -25,8 +25,9 @@ tie. Writing at the project level then requires a mapping distinct from the repo
 
 Known limit: mappings are compared lexically (normalized paths, no disk access). Windows 8.3
 aliases are not canonicalized, nor is case: the comparison ignores case on Windows but respects
-it elsewhere, including on a case-insensitive file system. Two spellings of the same folder can
-therefore escape the duplicate or overlap check.
+it elsewhere, including on a case-insensitive file system. Unicode normalization forms (NFC and
+NFD, as on macOS) are not unified either. Two spellings of the same folder can therefore escape
+the duplicate or overlap check.
 
 Example for an existing single-repository project, without creating folders:
 ```powershell

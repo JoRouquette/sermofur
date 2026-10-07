@@ -20,7 +20,7 @@ Empaqueter et installer l'outil localement, puis l'exécuter :
 
 ```powershell
 dotnet pack src/Sermofur.Cli -c Release -o artifacts/packages --no-restore
-dotnet tool install Sermofur --version 0.1.0 --tool-path artifacts/tools --add-source artifacts/packages
+dotnet tool install Sermofur --version 0.1.0 --tool-path artifacts/tools --configfile nuget.local.config
 ./artifacts/tools/smf --help      # attendu : exit 0, première ligne « Sermofur 0.1 »
 ```
 
@@ -61,7 +61,10 @@ livrées (daemon, laya, model, mcp, indexes, contradictions) sont signalées en 
   `.sermofur` illisible (ACE de refus, Windows seulement) qui arrête la découverte, lien
   `.sermofur` refusé, pendant ou non (une jonction sous Windows), y compris par `doctor`.
 - doctor sur une entrée invalide : `invalid_instance: foreign`, `invalid_instance: damaged` et
-  `invalid_instance: unreadable` dans le contrôle `instance`, exit 5, rien d'écrit.
+  `invalid_instance: unreadable` dans le contrôle `instance`, exit 5, rien d'écrit dans
+  l'instance ancêtre ; pour une entrée étrangère ou endommagée, rien d'écrit non plus dans
+  l'entrée ni dans le dossier de départ quand doctor part d'un sous-dossier du dossier qui
+  contient l'entrée.
 - CLI : vrais processus et exécutions en processus, sortie JSON et codes de sortie, `--origin`
   obligatoire, `--help` n'importe où, séparateur `--`, bornes de la ligne de commande
   (128 arguments, 16 384 caractères, NUL), entrées aléatoires bornées sur l'identifiant de
@@ -80,8 +83,11 @@ livrées (daemon, laya, model, mcp, indexes, contradictions) sont signalées en 
   Windows (cmd.exe, `chcp` avant et après). La restauration sur Ctrl+C n'a pas été vérifiée.
 - Découverte : une entrée `.sermofur` ne compte comme instance que si c'est un dossier contenant
   `instance.json` ; toute autre entrée bloque Sermofur en dessous d'elle. Le cas illisible n'est
-  testé que sous Windows. Les mappings sont comparés lexicalement (ni la casse ni les alias 8.3
-  ne sont canonisés).
+  testé que sous Windows. Les mappings sont comparés lexicalement (ni la casse, ni les alias 8.3,
+  ni la normalisation Unicode ne sont canonisés). La découverte ne vérifie pas le propriétaire
+  d'une entrée `.sermofur` (ADR 0010).
+- Sous Unix, le renommage de publication d'`init` ne détecte pas un `.sermofur` vide créé à
+  l'instant qui le précède ; Unix n'est pas vérifié.
 - Un lecteur réseau mappé est refusé par le code, mais ce refus n'a pas été testé faute d'un tel
   lecteur.
 - Non livré, donc non vérifié : protocole MCP, inférence Laya, IPC du daemon, UI, installateur

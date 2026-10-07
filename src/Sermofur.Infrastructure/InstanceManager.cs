@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Sermofur.Application;
 using Sermofur.Domain;
 
@@ -205,7 +206,7 @@ public sealed class InstanceManager
     /// <summary>
     /// Classifies the <c>.sermofur</c> entry of <paramref name="directory"/> without following
     /// links, so that a dangling link is seen as an entry and not as an absence. Any link is
-    /// refused, even for doctor. An entry whose attributes or content cannot be read is
+    /// refused, even for doctor. An entry whose attributes or listing cannot be read is
     /// unreadable, never absent nor foreign: when the attributes fail, even the presence of the
     /// entry is unknown, and failing closed is the only safe answer.
     /// </summary>
@@ -266,10 +267,13 @@ public sealed class InstanceManager
                 "A .sermofur entry, or whether one exists, cannot be read in this folder or a parent; check permissions, then run smf doctor.",
                 3
             ),
-            _ => new(
+            MarkerState.Foreign => new(
                 "invalid_instance",
                 "A .sermofur entry that is not a Sermofur instance stops the search for an instance; rename or move it away.",
                 3
+            ),
+            _ => throw new UnreachableException(
+                $"Marker state {state} does not describe an invalid entry."
             ),
         };
 

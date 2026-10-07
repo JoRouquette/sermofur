@@ -55,13 +55,15 @@ cd sermofur
 dotnet restore --locked-mode
 dotnet build --no-restore
 dotnet pack src/Sermofur.Cli -c Release -o artifacts/packages --no-restore
-dotnet tool install Sermofur --version 0.1.0 --tool-path artifacts/tools --add-source artifacts/packages
+dotnet tool install Sermofur --version 0.1.0 --tool-path artifacts/tools --configfile nuget.local.config
 ./artifacts/tools/smf --help
 ```
 
-`--global` à la place de `--tool-path artifacts/tools` place `smf` dans le `PATH`. L'outil exige
-le runtime .NET 10 ; une distribution autonome est prévue. Sans installation,
-`dotnet run --project src/Sermofur.Cli -- --help` exécute la CLI depuis les sources.
+`nuget.local.config` ne liste que le dossier de paquets local : l'installation ne prend jamais un
+paquet du même nom sur nuget.org. `--global` à la place de `--tool-path artifacts/tools` place
+`smf` dans le `PATH`. L'outil exige le runtime .NET 10 ; une distribution autonome est prévue.
+Sans installation, `dotnet run --project src/Sermofur.Cli -- --help` exécute la CLI depuis les
+sources.
 
 ## Démarrage rapide
 

@@ -15,24 +15,25 @@ is no universal machine memory.
 A directory holds an instance only if it contains a `.sermofur` **directory** with `instance.json`.
 Discovery walks up from the working directory and **stops at the nearest `.sermofur` entry, whatever
 it is** ([ADR 0010](adr/0010-fail-closed-instance-discovery.md)). Only a valid instance is used.
-Any other entry stops every command with `invalid_instance` (exit 3), with a message that names
-the case:
+Any other entry stops every command except `doctor` with `invalid_instance` (exit 3) and a
+message that names the case; `doctor` reports it in its `instance` check (exit 5):
 
 - foreign entry: a file, or a folder that holds none of `instance.json`, `memory.db`, `records/`
   (empty folder, another tool's data) — rename or move it away;
 - damaged instance: `memory.db` or `records/` without `instance.json` — restore `instance.json`;
-- unreadable entry: its attributes or content cannot be read (permissions), including when even
+- unreadable entry: its attributes or listing cannot be read (permissions), including when even
   its presence cannot be determined.
 
-A `.sermofur` link or junction, dangling or not, is refused with `unsafe_path` (exit 4). Discovery
-never goes on to an instance higher up: that would silently write into another memory. `doctor`
-is the only command that runs on an invalid entry (except a link), to report it. `init` never adopts nor
-overwrites an entry: it stops with the same error and leaves it untouched.
+A `.sermofur` link or junction, dangling or not, is refused with `unsafe_path` (exit 4) by every
+command, `doctor` included. Discovery never goes on to an instance higher up: that would silently
+write into another memory. `init` never adopts nor overwrites an entry: it stops with the same
+error and leaves it untouched.
 
-`init` builds the instance in an adjacent staging directory, then publishes it by an exclusive
-rename; it never replaces an incomplete instance. An interruption during staging may leave a
-`.sermofur-init-*` directory: do not publish nor ingest it by hand. No existing data is cleaned up
-implicitly.
+`init` builds the instance in an adjacent staging directory, then publishes it by a rename that
+refuses an existing destination. On Unix, a concurrent empty `.sermofur` created in the instant
+between that check and the rename is not detected. `init` never replaces an incomplete instance.
+An interruption during staging may leave a `.sermofur-init-*` directory: do not publish nor
+ingest it by hand. No existing data is cleaned up implicitly.
 
 Scope mappings are stored relative to the instance root, **with forward slashes** (`a/b`)
 whatever the operating system, so that an instance reads the same everywhere. Reading also

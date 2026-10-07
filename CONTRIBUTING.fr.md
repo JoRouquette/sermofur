@@ -7,8 +7,9 @@ Merci de votre intérêt. Les issues et les pull requests sont bienvenues.
 ## Developer Certificate of Origin
 
 Les contributions sont acceptées sous le [Developer Certificate of Origin 1.1](https://developercertificate.org/)
-(DCO). En ajoutant la ligne `Signed-off-by` (sign-off) à un commit, vous certifiez avoir écrit la modification ou avoir le droit de la
-soumettre sous la licence du projet, la [licence Apache, version 2.0](LICENSE).
+(DCO). En ajoutant la ligne `Signed-off-by` (sign-off) à un commit, vous certifiez avoir écrit
+la modification ou avoir le droit de la soumettre sous la licence du projet, la
+[licence Apache, version 2.0](LICENSE).
 
 Chaque commit porte une ligne `Signed-off-by` avec votre vrai nom et votre adresse :
 

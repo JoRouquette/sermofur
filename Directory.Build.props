@@ -9,6 +9,8 @@
              published PDB or package. -->
         <ContinuousIntegrationBuild Condition="'$(Configuration)' == 'Release'">true</ContinuousIntegrationBuild>
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+        <!-- Only the command-line tool is published; libraries and tests are not packages. -->
+        <IsPackable>false</IsPackable>
     </PropertyGroup>
 
     <PropertyGroup>

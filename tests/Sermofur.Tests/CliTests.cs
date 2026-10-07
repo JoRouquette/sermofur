@@ -412,6 +412,7 @@ public class CliTests
     [Fact]
     public async Task ConcurrentFirstInitPublishesOnlyOneCompleteIdentity()
     {
+        TestInstance.RequireNoEntryAboveTemp();
         string root = Path.Combine(
             Path.GetTempPath(),
             "sermofur-init-test-" + Guid.NewGuid().ToString("N")

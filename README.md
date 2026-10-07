@@ -3,7 +3,7 @@ English | [Français](https://github.com/JoRouquette/sermofur/blob/main/README.f
 # Sermofur
 
 Sermofur is a local cognitive runtime: a memory that an assistant, or you, can consult and
-**contest**. It does not store "facts"; it stores **claims** backed by **evidence**, lessons
+**contest**. It does not store "facts"; it stores **claims** backed by **evidence**, and lessons
 learned (**RETEX**, from the French *retour d'expérience*), each in an isolated **scope**, with
 their **provenance** and an **explained confidence**. The goal is to make future decisions better
 through experience without turning past mistakes into permanent truths.
@@ -53,13 +53,15 @@ cd sermofur
 dotnet restore --locked-mode
 dotnet build --no-restore
 dotnet pack src/Sermofur.Cli -c Release -o artifacts/packages --no-restore
-dotnet tool install Sermofur --version 0.1.0 --tool-path artifacts/tools --add-source artifacts/packages
+dotnet tool install Sermofur --version 0.1.0 --tool-path artifacts/tools --configfile nuget.local.config
 ./artifacts/tools/smf --help
 ```
 
-Use `--global` instead of `--tool-path artifacts/tools` to put `smf` on your `PATH`. The tool
-requires the .NET 10 runtime; a self-contained distribution is planned. Without installing,
-`dotnet run --project src/Sermofur.Cli -- --help` runs the CLI from the sources.
+`nuget.local.config` lists only the local package folder, so the install never takes a package of
+the same name from nuget.org. Use `--global` instead of `--tool-path artifacts/tools` to put `smf`
+on your `PATH`. The tool requires the .NET 10 runtime; a self-contained distribution is planned.
+Without installing, `dotnet run --project src/Sermofur.Cli -- --help` runs the CLI from the
+sources.
 
 ## Quickstart
 

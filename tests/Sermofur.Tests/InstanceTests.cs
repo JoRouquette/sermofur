@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.Versioning;
 using System.Security.AccessControl;
+using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text.Json;
 using Sermofur.Application;
@@ -106,7 +107,7 @@ public class InstanceTests
         {
             File.WriteAllText(Path.Combine(marker, artifact), string.Empty);
         }
-        AssertInvalidInstance(() => fixture.Manager.Discover(child), "smf doctor");
+        AssertInvalidInstance(() => fixture.Manager.Discover(child), "restore instance.json");
         Assert.Equal(before.OrderBy(x => x.Key), fixture.Snapshot().OrderBy(x => x.Key));
     }
 
@@ -138,26 +139,58 @@ public class InstanceTests
         {
             AssertInvalidInstance(() => fixture.Manager.Discover(child), "permissions");
             Assert.Equal(child, fixture.Manager.DiscoverForDiagnosis(child));
-            AssertDoctorReports(child, "invalid_instance: unreadable");
+            AssertDoctorReports(child, child, "invalid_instance: unreadable");
         }
         Assert.Equal(before.OrderBy(x => x.Key), fixture.Snapshot().OrderBy(x => x.Key));
     }
 
+    /// <summary>
+    /// Doctor runs from a subfolder of the folder that holds the invalid entry: it must report the
+    /// entry's folder, name the case, and write nothing in the entry, the start folder nor the
+    /// ancestor instance.
+    /// </summary>
     [Theory]
-    [InlineData("foreign")]
-    [InlineData("damaged")]
-    public void DoctorReportsTheCaseOfAnInvalidMarker(string kind)
+    [InlineData("empty folder", "foreign")]
+    [InlineData("file", "foreign")]
+    [InlineData(InstanceManager.RecordsDirectory, "damaged")]
+    [InlineData(InstanceManager.DatabaseFile, "damaged")]
+    public void DoctorReportsTheCaseOfAnInvalidMarkerAbove(string layout, string kind)
     {
         using TestInstance fixture = new TestInstance();
         Dictionary<string, string> before = fixture.Snapshot();
         string child = Path.Combine(fixture.Root, "child");
+        string below = Path.Combine(child, "below");
         string marker = Path.Combine(child, ".sermofur");
-        Directory.CreateDirectory(marker);
-        if (kind == "damaged")
+        Directory.CreateDirectory(below);
+        switch (layout)
         {
-            Directory.CreateDirectory(Path.Combine(marker, InstanceManager.RecordsDirectory));
+            case "file":
+                File.WriteAllText(marker, "another tool");
+                break;
+            case "empty folder":
+                Directory.CreateDirectory(marker);
+                break;
+            case InstanceManager.RecordsDirectory:
+                Directory.CreateDirectory(Path.Combine(marker, layout));
+                break;
+            case InstanceManager.DatabaseFile:
+                Directory.CreateDirectory(marker);
+                File.WriteAllText(Path.Combine(marker, layout), string.Empty);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(layout), layout, null);
         }
-        AssertDoctorReports(child, $"invalid_instance: {kind}");
+        string entryBefore = DescribeEntry(marker);
+        AssertDoctorReports(below, child, $"invalid_instance: {kind}");
+        Assert.Equal(entryBefore, DescribeEntry(marker));
+        Assert.Empty(Directory.GetFileSystemEntries(below));
+        Assert.Equal(
+            new[] { ".sermofur", "below" },
+            Directory
+                .GetFileSystemEntries(child)
+                .Select(Path.GetFileName)
+                .Order(StringComparer.Ordinal)
+        );
         Assert.Equal(before.OrderBy(x => x.Key), fixture.Snapshot().OrderBy(x => x.Key));
     }
 
@@ -210,7 +243,7 @@ public class InstanceTests
                 .Parse(result.Error)
                 .RootElement.GetProperty("message")
                 .GetString()!;
-            Assert.Contains("smf doctor", message);
+            Assert.Contains("restore instance.json", message);
             Assert.DoesNotContain("move it away", message);
             Assert.Equal(
                 ancestorBefore.OrderBy(x => x.Key),
@@ -235,7 +268,7 @@ public class InstanceTests
         {
             (string ancestor, string child) = DamagedChildLayout(top);
             Dictionary<string, string> ancestorBefore = TestInstance.SnapshotOf(ancestor);
-            AssertDoctorReports(child, "invalid_instance: damaged");
+            AssertDoctorReports(child, child, "invalid_instance: damaged");
             Assert.Equal(
                 ancestorBefore.OrderBy(x => x.Key),
                 TestInstance.SnapshotOf(ancestor).OrderBy(x => x.Key)
@@ -402,13 +435,38 @@ public class InstanceTests
         Assert.Contains(hint, error.Message);
     }
 
-    private static void AssertDoctorReports(string path, string expectedDetail)
+    /// <summary>
+    /// The content hash of <paramref name="entry"/> if it is a file; otherwise every path under
+    /// it, with the content hash of each file.
+    /// </summary>
+    private static string DescribeEntry(string entry)
+    {
+        if (File.Exists(entry))
+        {
+            return HashOf(entry);
+        }
+        return string.Join(
+            "\n",
+            Directory
+                .EnumerateFileSystemEntries(entry, "*", SearchOption.AllDirectories)
+                .Order(StringComparer.Ordinal)
+                .Select(path =>
+                    Path.GetRelativePath(entry, path)
+                    + (File.Exists(path) ? " " + HashOf(path) : "/")
+                )
+        );
+    }
+
+    private static string HashOf(string file) =>
+        Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(file)));
+
+    private static void AssertDoctorReports(string path, string expectedRoot, string expectedDetail)
     {
         CliResult result = TestInstance.Run("--path", path, "--json", "doctor");
         Assert.Equal(5, result.ExitCode);
         DoctorReport report = RecordJson.Read<DoctorReport>(result.Output);
         Assert.Equal("unhealthy", report.Overall);
-        Assert.Equal(path, report.Root);
+        Assert.Equal(expectedRoot, report.Root);
         DiagnosticCheck instance = report.Checks.Single(check => check.Name == "instance");
         Assert.Equal("error", instance.Status);
         Assert.Equal(expectedDetail, instance.Detail);

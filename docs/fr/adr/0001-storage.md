@@ -18,4 +18,5 @@ Fichiers autorité + index : journal supplémentaire nécessaire ; double écrit
 incohérence.
 
 ## Conséquences
-Tests de frontière requis ; toute évolution passe par un nouvel ADR.
+Tests de frontière requis ; toute évolution passe par un nouvel ADR. Complété par
+l'[ADR 0010](0010-fail-closed-instance-discovery.md) (découverte d'instance).

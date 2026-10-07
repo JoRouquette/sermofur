@@ -20,7 +20,7 @@ Package and install the tool locally, then run it:
 
 ```powershell
 dotnet pack src/Sermofur.Cli -c Release -o artifacts/packages --no-restore
-dotnet tool install Sermofur --version 0.1.0 --tool-path artifacts/tools --add-source artifacts/packages
+dotnet tool install Sermofur --version 0.1.0 --tool-path artifacts/tools --configfile nuget.local.config
 ./artifacts/tools/smf --help      # expected: exit 0, first line "Sermofur 0.1"
 ```
 
@@ -61,7 +61,9 @@ not delivered yet (daemon, laya, model, mcp, indexes, contradictions) are report
   (deny ACE, Windows only) stopping discovery, a `.sermofur` link refused, dangling or not (a
   junction on Windows), including by `doctor`.
 - doctor on an invalid entry: `invalid_instance: foreign`, `invalid_instance: damaged` and
-  `invalid_instance: unreadable` in the `instance` check, exit 5, nothing written.
+  `invalid_instance: unreadable` in the `instance` check, exit 5, nothing written in the ancestor
+  instance; for foreign and damaged entries, also nothing written in the entry nor in the start
+  folder when doctor starts from a subfolder of the folder that holds the entry.
 - CLI: real processes and in-process runs, JSON output and exit codes, mandatory `--origin`,
   `--help` anywhere, `--` separator, command-line bounds (128 arguments, 16,384 characters, NUL),
   bounded random input on the `claim show` identifier (fixed seed), UTF-8 stdout with non-ASCII
@@ -79,7 +81,10 @@ not delivered yet (daemon, laya, model, mcp, indexes, contradictions) are report
   after). Restoring on Ctrl+C was not checked.
 - Discovery: a `.sermofur` entry counts as an instance only if it is a directory holding
   `instance.json`; any other entry blocks Sermofur below it. The unreadable case is tested on
-  Windows only. Mappings are compared lexically (no canonicalization of case or 8.3 aliases).
+  Windows only. Mappings are compared lexically (no canonicalization of case, 8.3 aliases or
+  Unicode normalization). Discovery does not check who owns a `.sermofur` entry (ADR 0010).
+- On Unix, the publishing rename of `init` does not detect an empty `.sermofur` created in the
+  instant before it; Unix is not verified.
 - A mapped network drive is refused by the code but this was not tested, for lack of such a
   drive.
 - Not delivered, hence not verified: MCP protocol, Laya inference, daemon IPC, UI, self-contained

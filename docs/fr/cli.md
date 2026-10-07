@@ -84,7 +84,7 @@ s'arrête à l'entrée `.sermofur` la plus proche, quelle qu'elle soit. Si cette
 une instance valide, toute commande sauf `doctor` échoue en `invalid_instance` (exit 3) pour une
 entrée étrangère (un fichier, ou un dossier qui ne contient ni `instance.json`, ni `memory.db`, ni
 `records/`), une **instance endommagée** (`memory.db` ou `records/` sans `instance.json`) ou une
-entrée illisible (attributs ou contenu impossibles à lire). Un lien ou une jonction, même
+entrée illisible (attributs ou listage impossibles à lire). Un lien ou une jonction, même
 pendant, est refusé en `unsafe_path` (exit 4) par toutes les commandes, `doctor` compris. Rien
 n'est jamais écrit dans une instance plus haut. Pour une instance endommagée, lancer
 `smf doctor` depuis ce dossier, puis restaurer `instance.json` depuis une sauvegarde ; pour une

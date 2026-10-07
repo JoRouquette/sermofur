@@ -27,6 +27,7 @@ gagne l'égalité. Écrire au niveau du project exige alors un mapping distinct 
 Limite connue : la comparaison des mappings est lexicale (chemins normalisés sans accès disque).
 Les alias 8.3 de Windows ne sont pas canonisés, ni la casse : la comparaison l'ignore sous
 Windows mais la respecte ailleurs, y compris sur un système de fichiers insensible à la casse.
+Les formes de normalisation Unicode (NFC et NFD, comme sous macOS) ne sont pas unifiées non plus.
 Deux écritures d'un même dossier peuvent donc échapper au contrôle de doublon ou de
 chevauchement.
 

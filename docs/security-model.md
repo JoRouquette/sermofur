@@ -11,12 +11,19 @@ same scope. The service recomputes ancestors and does not trust a visibility for
 Parameterized SQL; bounded inputs; unknown options refused; errors carry no business payload.
 Declared sources are never opened: no traversal through an evidence reference.
 Reparse points and UNC paths are refused for storage and mappings; init uses adjacent temporary
-files and a rename. Any `.sermofur` entry that is not a valid instance (foreign,
-damaged, unreadable, or a link) is never adopted nor overwritten and stops discovery, so that no
-command ever writes into an ancestor instance
+files and a rename. Any `.sermofur` entry that is not a valid instance (foreign, damaged,
+unreadable, or a link) is never adopted nor overwritten and stops discovery, so that no command
+ever writes into an ancestor instance ([ADR 0010](adr/0010-fail-closed-instance-discovery.md)).
+Explicit limits: no protection against a concurrent path replacement by a malicious process of
+the same user (consider resolution through handles before allowing links); discovery does not
+check who owns a `.sermofur` entry, so on a machine shared with other users a writable ancestor
+(by default the root of a Windows drive, folders created at that root, an NTFS data volume,
+FAT/exFAT media, or `/tmp`) lets another user's entry block discovery and `init`, receive your
+memory or feed you theirs, and lets them read or change an instance placed there. Keeping files
+in your profile is not enough on its own: on such a machine, keep your instance in a folder only
+you can write to, run `smf` only from inside it after checking `smf root`, and remove any entry
+another user created at the root of the drive before `init`
 ([ADR 0010](adr/0010-fail-closed-instance-discovery.md)).
-Explicit limit: no protection against a concurrent path replacement by a malicious process of
-the same user; consider resolution through handles before allowing links.
 
 No technical log contains cognitive texts. stdout is an explicit output to the requester, to be
 handled as private data. `.sermofur` must stay out of auto-synchronized Git.
