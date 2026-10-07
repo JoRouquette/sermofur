@@ -1,0 +1,117 @@
+[English](README.md) | Français
+
+# Sermofur
+
+Sermofur est un runtime cognitif local : une mémoire qu'un assistant, ou vous-même, pouvez consulter
+et **contester**. Il ne stocke pas des « faits » ; il stocke des **claims** (affirmations)
+appuyées par des **preuves** (evidence) et des **RETEX** (retours d'expérience), chacun dans un
+**scope** isolé, avec leur **provenance** et une **confiance expliquée**. Le but est d'améliorer
+les décisions futures grâce à l'expérience, sans faire des erreurs passées des vérités
+permanentes.
+
+Sermofur fonctionne à côté du modèle de langage, jamais dedans : les poids du LLM hôte ne sont
+jamais modifiés. Sermofur est indépendant de tout fournisseur de LLM.
+
+Le nom vient du monde de jeu de rôle de l'auteur, où le Sermofur est une écriture gravée qui garde
+ce que l'on oublie : *« Quand l'œil oublie, la main se souvient. »*
+
+Identité technique : dépôt `sermofur`, projets .NET `Sermofur.*`, paquet d'outil NuGet
+`Sermofur`, commande `smf`, marqueur d'instance `.sermofur`.
+
+## Modèle cognitif
+
+USER ≠ TRUTH, LLM ≠ TRUTH, MEMORY ≠ TRUTH.
+
+- Un **claim** est une affirmation dans un scope. Sa confiance est calculée à la lecture, à partir
+  de ses preuves, et chaque niveau est accompagné de ses raisons.
+- Une **preuve** est un support déclaré d'un claim (code source, documentation, observation…).
+  Les preuves de même lignée comptent pour une seule origine : la répétition n'augmente pas la
+  confiance. Une preuve déclarée par un LLM ne renforce jamais un claim, et une preuve
+  `execution` déclarée ne suffit pas à vérifier un fait.
+- Un **RETEX** reste un brouillon tant qu'aucune décision d'apprentissage n'est prise.
+- Les **scopes** (workspace → client → project → repository → task) isolent les mémoires : un
+  contexte voit son scope et ses ancêtres, jamais ses frères ni ses descendants.
+- Chaque modification est conservée dans un **historique** auditable.
+
+## État : verticale 0.1
+
+Livré : la CLI `smf`, les instances locales, les scopes, le stockage Claim/Evidence/RETEX en
+SQLite, l'historique, les projections Markdown et les diagnostics (`doctor`).
+
+**Pas encore livré** : daemon d'arrière-plan, pont MCP, intégration Laya (modèle System 1),
+sources/recherche plein texte/recall/challenge, apprentissage et consolidation, interface
+desktop Inspector. La documentation les décrit comme conceptions seulement ; aucune commande ne
+prétend les fournir.
+
+Aucune télémétrie, synchronisation, connexion réseau ni ingestion de source à l'exécution.
+
+## Installer depuis les sources
+
+Prérequis : le [SDK .NET 10](https://dotnet.microsoft.com/download).
+
+```powershell
+git clone https://github.com/JoRouquette/sermofur.git
+cd sermofur
+dotnet restore --locked-mode
+dotnet build --no-restore
+dotnet pack src/Sermofur.Cli -c Release -o artifacts/packages --no-restore
+dotnet tool install Sermofur --version 0.1.0 --tool-path artifacts/tools --add-source artifacts/packages
+./artifacts/tools/smf --help
+```
+
+`--global` à la place de `--tool-path artifacts/tools` place `smf` dans le `PATH`. L'outil exige
+le runtime .NET 10 ; une distribution autonome est prévue. Sans installation,
+`dotnet run --project src/Sermofur.Cli -- --help` exécute la CLI depuis les sources.
+
+## Démarrage rapide
+
+```powershell
+cd ~/work                        # ce dossier devient la racine de l'instance
+smf init                         # crée ~/work/.sermofur
+mkdir acme
+smf scope add acme client workspace acme
+cd acme                          # le contexte est maintenant le scope « acme »
+smf claim add "The billing API paginates with cursors" --origin user --json
+smf evidence add <CLAIM_ID> source_code "src/Billing/Pagination.cs" --lineage billing-repo --origin user
+smf claim show <CLAIM_ID>        # claim, preuves, confiance expliquée, historique
+smf doctor                       # diagnostic en lecture seule
+smf export                       # reconstruit les projections Markdown des objets visibles
+```
+
+`<CLAIM_ID>` est l'`id` rendu par `claim add`. Le scope vient toujours du dossier de travail (ou
+de `--path`), jamais d'un argument : depuis le dossier d'un autre client, le claim d'`acme` est
+invisible. `--origin user|llm` est obligatoire sur chaque `add` qui enregistre de la mémoire.
+`--json` donne une sortie lisible par machine sur toute commande. Référence complète :
+[CLI](docs/fr/cli.md).
+
+## Documentation
+
+- [Architecture](docs/fr/architecture.md), [environnement de développement](docs/fr/developer-setup.md),
+  [vérification](docs/fr/verification.md).
+- [CLI](docs/fr/cli.md), [format d'instance](docs/fr/instance-format.md),
+  [modèle de scopes](docs/fr/scope-model.md).
+- [Modèle mémoire](docs/fr/memory-model.md), [modèle de sécurité](docs/fr/security-model.md).
+- [MCP](docs/fr/mcp-integration.md) et [Laya](docs/fr/laya-integration.md) : contrats futurs,
+  pas des implémentations.
+- Décisions d'architecture : [docs/fr/adr](docs/fr/adr/).
+
+Les spécifications sont rédigées dans un atelier Spec Kit tenu hors de ce dépôt ; les décisions
+durables en sont extraites sous forme d'ADR.
+
+## Encodage de la sortie
+
+stdout et stderr sont en UTF-8 sans BOM. `smf` ne bascule la page de code de la console que si
+stdout ou stderr atteint la console, et la restaure à la fin normale, sur erreur gérée et sur
+Ctrl+C ; la restauration n'est pas garantie si le processus est tué. Sous Windows PowerShell, un
+appelant qui capture la sortie exécute d'abord
+`[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)`. Détail : [CLI](docs/fr/cli.md).
+
+## Contribuer
+
+Les contributions sont bienvenues sous le Developer Certificate of Origin : chaque commit porte
+une ligne `Signed-off-by` (`git commit -s`). Voir [CONTRIBUTING.fr.md](CONTRIBUTING.fr.md).
+
+## Licence
+
+Sous [licence Apache, version 2.0](LICENSE) ; attribution dans [NOTICE](NOTICE).
+Le nom « Sermofur » n'est pas concédé sous Apache-2.0 (section 6).

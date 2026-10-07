@@ -1,0 +1,22 @@
+<Project>
+    <PropertyGroup>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+        <Deterministic>true</Deterministic>
+        <!-- Release builds map source paths to /_/: no local path of the build machine ends up in a
+             published PDB or package. -->
+        <ContinuousIntegrationBuild Condition="'$(Configuration)' == 'Release'">true</ContinuousIntegrationBuild>
+        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Authors>Jonathan Rouquette</Authors>
+        <Copyright>Copyright 2026 Jonathan Rouquette</Copyright>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/JoRouquette/sermofur</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/JoRouquette/sermofur</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+    </PropertyGroup>
+</Project>

@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="..\Sermofur.Infrastructure\Sermofur.Infrastructure.csproj" />
+    </ItemGroup>
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <PackAsTool>true</PackAsTool>
+        <ToolCommandName>smf</ToolCommandName>
+        <PackageId>Sermofur</PackageId>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <Description>Local cognitive runtime: isolated, contestable epistemic memory with a CLI and inspectable storage.</Description>
+        <Version>0.1.0</Version>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+    <ItemGroup>
+        <None Include="../../README.md" Pack="true" PackagePath="/" />
+        <None Include="../../LICENSE" Pack="true" PackagePath="/" />
+        <None Include="../../NOTICE" Pack="true" PackagePath="/" />
+    </ItemGroup>
+</Project>

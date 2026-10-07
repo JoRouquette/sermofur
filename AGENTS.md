@@ -1,0 +1,22 @@
+# Sermofur — instructions for coding agents
+
+Specifications live in a Spec Kit workshop outside this repository; this repository carries no
+`.specify` or `specs` folder and must not receive a copy of them. Durable decisions are recorded
+as ADRs under `docs/adr/`; read the relevant ones before changing behavior. Never replace an
+invariant by a prompt.
+
+Architecture: Domain has no external dependency; Application carries the controls and the
+ports (`IMemoryStore`, `IPathResolver`); Infrastructure implements the ports; the CLI composes.
+No implicit network access at run time. Hosts never choose scopes: the scope comes from the
+working directory.
+
+Contracts that do not change without an ADR: error codes, exit codes, JSON field names, the
+persisted format (SQLite schema, `instance.json`, Markdown projections).
+
+Language: code, identifiers, comments, CLI messages and commits in English; documentation in
+English (reference) and French (`README.fr.md`, `docs/fr/`), kept in sync.
+
+Commands: `dotnet restore --locked-mode`, `dotnet build`, `dotnet test`, `csharpier format .`,
+`csharpier check .`. Commits are signed off (`git commit -s`, see `CONTRIBUTING.md`).
+
+Future capabilities not delivered: daemon, MCP, Laya, UI, indexing/recall/consolidation.
