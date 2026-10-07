@@ -11,7 +11,6 @@
         <PackageId>Sermofur</PackageId>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <Description>Local cognitive runtime: isolated, contestable epistemic memory with a CLI and inspectable storage.</Description>
-        <Version>0.1.0</Version>
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>

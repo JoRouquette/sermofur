@@ -4,6 +4,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+        <!-- Development version: the release pipeline passes the released version to the build. -->
+        <Version>0.0.0-dev</Version>
         <Deterministic>true</Deterministic>
         <!-- Release builds map source paths to /_/: no local path of the build machine ends up in a
              published PDB or package. -->
