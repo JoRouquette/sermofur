@@ -10,8 +10,15 @@ namespace Sermofur.Tests;
 
 public sealed class TestInstance : IDisposable
 {
+    /// <summary>
+    /// The temporary directory with every link of its path resolved. Discovery refuses links on
+    /// purpose, and on macOS the temporary directory lives under <c>/var</c>, itself a link to
+    /// <c>/private/var</c>: tests start from the real path.
+    /// </summary>
+    public static string TempRoot { get; } = ResolveLinks(Path.GetTempPath());
+
     public string Root { get; } =
-        Path.Combine(Path.GetTempPath(), "sermofur-test-" + Guid.NewGuid().ToString("N"));
+        Path.Combine(TempRoot, "sermofur-test-" + Guid.NewGuid().ToString("N"));
     public InstanceManager Manager { get; } = new();
 
     public TestInstance()
@@ -28,9 +35,7 @@ public sealed class TestInstance : IDisposable
     /// </summary>
     public static void RequireNoEntryAboveTemp()
     {
-        Exception? error = Record.Exception(() =>
-            new InstanceManager().Discover(Path.GetTempPath())
-        );
+        Exception? error = Record.Exception(() => new InstanceManager().Discover(TempRoot));
         string found = error switch
         {
             null => "an instance was found",
@@ -88,12 +93,56 @@ public sealed class TestInstance : IDisposable
     {
         if (
             !Path.GetFileName(Root).StartsWith("sermofur-test-", StringComparison.Ordinal)
-            || !LocalPaths.Contains(Path.GetTempPath().TrimEnd(Path.DirectorySeparatorChar), Root)
+            || !LocalPaths.Contains(TempRoot, Root)
         )
         {
             throw new InvalidOperationException("Unsafe test cleanup");
         }
         Directory.Delete(Root, true);
+    }
+
+    /// <summary>Removes a directory link, a junction on Windows or a symbolic link elsewhere,
+    /// without touching its target, even when the target no longer exists.</summary>
+    public static void DeleteDirectoryLink(string link)
+    {
+        if (OperatingSystem.IsWindows())
+        {
+            Directory.Delete(link);
+            return;
+        }
+        // On Unix the link is a file entry: unlink it. Directory.Delete fails on a dangling link
+        // (DirectoryNotFoundException).
+        File.Delete(link);
+    }
+
+    private static string ResolveLinks(string path, int depth = 0)
+    {
+        if (depth > 32)
+        {
+            throw new IOException($"Too many levels of links while resolving {path}.");
+        }
+        string full = Path.TrimEndingDirectorySeparator(Path.GetFullPath(path));
+        string current = Path.GetPathRoot(full)!;
+        string relative = Path.GetRelativePath(current, full);
+        if (relative == ".")
+        {
+            return current;
+        }
+        foreach (
+            string part in relative.Split(
+                Path.DirectorySeparatorChar,
+                StringSplitOptions.RemoveEmptyEntries
+            )
+        )
+        {
+            string next = Path.Combine(current, part);
+            FileSystemInfo? target = new DirectoryInfo(next).ResolveLinkTarget(true);
+            // The parents of a link target may be links themselves: resolve them too.
+            current = target is null
+                ? next
+                : ResolveLinks(Path.TrimEndingDirectorySeparator(target.FullName), depth + 1);
+        }
+        return current;
     }
 
     /// <summary>In-process run of the CLI, for cases that do not require a real process.</summary>

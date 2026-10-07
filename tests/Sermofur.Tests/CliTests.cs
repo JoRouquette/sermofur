@@ -341,7 +341,7 @@ public class CliTests
     {
         // Directory without an instance: without help taking priority, the command would exit 2.
         string outside = Path.Combine(
-            Path.GetTempPath(),
+            TestInstance.TempRoot,
             "sermofur-help-" + Guid.NewGuid().ToString("N")
         );
         Directory.CreateDirectory(outside);
@@ -452,7 +452,7 @@ public class CliTests
     {
         TestInstance.RequireNoEntryAboveTemp();
         string root = Path.Combine(
-            Path.GetTempPath(),
+            TestInstance.TempRoot,
             "sermofur-init-test-" + Guid.NewGuid().ToString("N")
         );
         Directory.CreateDirectory(root);
