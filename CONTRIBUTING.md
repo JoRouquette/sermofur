@@ -24,18 +24,21 @@ the `Signed-off-by` line counts.
 ## Prerequisites
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download) (see `global.json`).
-- [CSharpier](https://csharpier.com/) for formatting.
+- [CSharpier](https://csharpier.com/) for formatting, pinned as a local tool
+  (`dotnet tool restore`).
 
 ## Build, test, format
 
 ```powershell
+dotnet tool restore
 dotnet restore --locked-mode
 dotnet build
 dotnet test
-csharpier format .
+dotnet csharpier format .
 ```
 
-Run `csharpier check .` before opening a pull request. Process tests launch the built CLI: do not
+Run `dotnet csharpier check .` before opening a pull request; the CI runs the same checks on
+Windows, Linux and macOS. Process tests launch the built CLI: do not
 use `dotnet test --no-build` after changing code. More: [developer setup](docs/developer-setup.md)
 and [verification](docs/verification.md).
 
@@ -57,9 +60,19 @@ discussion in an issue first: they are contracts.
 
 ## Commits and pull requests
 
-Use [Conventional Commits](https://www.conventionalcommits.org/): `feat:`, `fix:`, `docs:`,
-`test:`, `refactor:`, `chore:`… One topic per pull request, with a description of the change and
-of how it was verified.
+Use [Conventional Commits](https://www.conventionalcommits.org/). The commit types decide the
+next version when the commits reach `main` ([release process](docs/release.md)):
+
+| Commit | Effect on the version |
+|---|---|
+| `fix:`, `perf:`, `revert:` | patch (0.1.0 → 0.1.1) |
+| `feat:` | minor (0.1.0 → 0.2.0) |
+| `!` after the type, or a `BREAKING CHANGE:` footer | major |
+| `docs:`, `test:`, `refactor:`, `build:`, `ci:`, `style:`, `chore:` | no release |
+
+One topic per pull request, with a description of the change and of how it was verified. Pull
+requests are merged with a merge commit or a rebase, never squashed, so that each commit keeps
+its type.
 
 ## Documentation
 

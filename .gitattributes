@@ -1,0 +1,4 @@
+# Every text file is stored and checked out with LF, as .editorconfig requires. Without this,
+# a Windows checkout with core.autocrlf=true (the default on GitHub runners) turns files into
+# CRLF and the formatting check fails.
+* text=auto eol=lf

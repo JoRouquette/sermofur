@@ -9,3 +9,6 @@ TestResults/
 .env*
 
 **/.sermofur-init-*/
+
+# Release tooling (npm, CI only)
+node_modules/
