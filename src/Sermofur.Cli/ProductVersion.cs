@@ -21,7 +21,9 @@ public static class ProductVersion
 
     public static string Read(Assembly assembly) =>
         Normalize(
-            assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+            assembly
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                ?.InformationalVersion
         );
 
     /// <summary>
