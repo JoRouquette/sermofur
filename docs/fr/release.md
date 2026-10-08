@@ -11,8 +11,8 @@ workflow `.github/workflows/ci.yml` ([ADR 0011](adr/0011-release-pipeline.md)).
 
 | Événement | Jobs |
 |---|---|
-| Pull request vers `main` | `build` sous Windows, Linux et macOS : restauration verrouillée, vérification du formatage, build Release, tests, paquet (Linux) |
-| Push sur `main` | `build`, puis `plan` : simulation semantic-release qui dit si une release est due |
+| Pull request vers `main` | `build` sous Windows, Linux et macOS : restauration verrouillée, vérification du formatage, build Release, tests, paquet (Linux) ; `release-notes` : rend des notes de version d'exemple avec l'outillage semantic-release verrouillé |
+| Push sur `main` | `build` et `release-notes`, puis `plan` : simulation semantic-release qui dit si une release est due |
 | Release due | `release` attend l'approbation de l'environnement `release`, puis crée le tag `vX.Y.Z` et la GitHub Release ; `package` construit le tag, atteste le paquet et le joint à la release ; `publish` le pousse sur nuget.org |
 | Lancement manuel avec un tag | `republish` attend la même approbation ; `package` réutilise le paquet joint à cette release si ce workflow l'a attesté sur `main`, sinon construit le tag ; `publish` le pousse sur nuget.org |
 
@@ -43,9 +43,10 @@ le correctif.
 Ces réglages vivent hors du dépôt et se font une fois.
 
 1. **Protéger `main`** (Settings → Rules → Rulesets → New branch ruleset, cible `main`) : pull
-   request obligatoire ; checks requis `build (windows-latest)`, `build (ubuntu-latest)` et
-   `build (macos-latest)` ; force push et suppression interdits. Dans Settings → General,
-   autoriser le merge commit et le rebase, désactiver le squash.
+   request obligatoire (0 approbation pour un mainteneur seul, qui ne peut pas approuver sa propre
+   pull request) ; checks requis `build (windows-latest)`, `build (ubuntu-latest)`,
+   `build (macos-latest)` et `release-notes` ; force push et suppression interdits. Dans
+   Settings → General, autoriser le merge commit et le rebase, désactiver le squash.
 2. **Protéger les tags de release** (New tag ruleset, cible `v*`) : mise à jour et suppression
    interdites, pour qu'un tag publié ne puisse jamais être déplacé ni retiré.
 3. **Environnement `release`** (Settings → Environments → New environment) : relecteur requis =
@@ -55,7 +56,8 @@ Ces réglages vivent hors du dépôt et se font une fois.
    seulement. C'est le seul environnement auquel nuget.org fait confiance.
 5. **Trusted Publishing nuget.org** (nuget.org → votre nom d'utilisateur → Trusted Publishing →
    ajouter une politique) : propriétaire `JoRouquette`, dépôt `sermofur`, fichier de workflow
-   `ci.yml`, environnement `nuget`.
+   `ci.yml`, environnement `nuget` ; portée *Push new packages and package versions* (le premier
+   push crée le paquet), *Unlist or relist* décoché ; motifs et paquets : `Sermofur` seulement.
 6. **Secret `NUGET_USER`** (Settings → Secrets and variables → Actions, ou secret de
    l'environnement `nuget`) : le nom de profil nuget.org (pas l'adresse mail). Ce n'est pas un
    identifiant secret : nuget.org délivre au workflow une clé valable une heure en échange de son
