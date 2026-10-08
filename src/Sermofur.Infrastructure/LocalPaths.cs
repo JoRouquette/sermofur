@@ -116,9 +116,15 @@ public static class LocalPaths
             string name = part;
             if (part != "." && (File.Exists(candidate) || Directory.Exists(candidate)))
             {
-                // A folder that can be crossed but not listed keeps the given name.
-                string[]? listed = Listed(current, part);
-                if (listed is not null && !listed.Contains(part, StringComparer.Ordinal))
+                // A folder that can be crossed but not listed cannot tell the name on disk: the
+                // path would not have one stored form, so it is refused with its own reason.
+                string[] listed =
+                    Listed(current, part)
+                    ?? throw new SermofurException(
+                        "invalid_path",
+                        "A folder of the path cannot be listed; its names on disk cannot be checked."
+                    );
+                if (!listed.Contains(part, StringComparer.Ordinal))
                 {
                     // An entry opened under a name that no listed name reflects (a Windows 8.3
                     // short name) or that several names reflect cannot be given one stored path.

@@ -483,6 +483,35 @@ public class SourceTests
         );
     }
 
+    [Fact]
+    public void MappingsCompareAsNamedOnDiskForChildrenAndDuplicates()
+    {
+        using TestInstance fixture = new TestInstance();
+        using SqliteStore store = fixture.Open();
+        Directory.CreateDirectory(Path.Combine(fixture.Root, "client", "sub"));
+        if (!Directory.Exists(Path.Combine(fixture.Root, "CLIENT")))
+        {
+            // Case-sensitive file system: CLIENT is another folder, nothing to compare.
+            return;
+        }
+        fixture
+            .Scopes(store)
+            .Register(new Scope("c", ScopeKind.Client, ScopePolicy.WorkspaceScopeId, "CLIENT"));
+        // A child typed in the spelling the parent was typed with is still inside it.
+        Scope child = fixture
+            .Scopes(store, Path.Combine(fixture.Root, "client"))
+            .Register(new Scope("p", ScopeKind.Project, "c", "CLIENT/sub"));
+        Assert.Equal("client/sub", child.RelativePath);
+        // A mapping stored under another spelling by an earlier version still collides.
+        Tamper(fixture, "UPDATE scopes SET relative_path='CLIENT' WHERE id='c'");
+        SermofurException duplicate = Assert.Throws<SermofurException>(() =>
+            fixture
+                .Scopes(store)
+                .Register(new Scope("d", ScopeKind.Client, ScopePolicy.WorkspaceScopeId, "client"))
+        );
+        Assert.Equal(ScopeService.DuplicateMapping, duplicate.Code);
+    }
+
     [Theory]
     [InlineData(".SERMOFUR/instance.json")]
     [InlineData(".Sermofur/memory.db")]
