@@ -46,11 +46,6 @@ public static class CommandHelp
         "Idempotency key: the same key with the same content returns the same object."
     );
 
-    private static readonly HelpEntry Blank = new HelpEntry(
-        "invalid_input (1)",
-        "Empty or blank text, or text over the size bound."
-    );
-
     private static readonly HelpEntry Conflict = new HelpEntry(
         "idempotency_conflict (1)",
         "Key reused with another content."
@@ -217,7 +212,6 @@ public static class CommandHelp
                     "invalid_arguments (1)",
                     "Missing origin, bad value or unknown option."
                 ),
-                Blank,
                 new HelpEntry(
                     "user_choice_required (1)",
                     "preferences or decisions with --origin llm."
@@ -247,8 +241,7 @@ public static class CommandHelp
             ),
             Entries(
                 IdError,
-                new HelpEntry("scope_boundary (4)", "The claim belongs to an ancestor scope."),
-                Blank
+                new HelpEntry("scope_boundary (4)", "The claim belongs to an ancestor scope.")
             ),
             "smf claim invalidate 7f8c1a3e-0000-4000-8000-000000000001 --reason \"Replaced by cursors v2\""
         ),
@@ -285,7 +278,6 @@ public static class CommandHelp
                     "source_unavailable (1)",
                     "The source is missing, unreadable or rejected."
                 ),
-                Blank,
                 Conflict
             ),
             "smf evidence add 7f8c1a3e-0000-4000-8000-000000000001 source_code src/Billing/Pagination.cs --lineage billing-repo --origin user"
@@ -315,7 +307,6 @@ public static class CommandHelp
             ),
             Entries(
                 new HelpEntry("invalid_arguments (1)", "Missing option or unknown option."),
-                Blank,
                 Conflict
             ),
             "smf retex add --event \"Cache cleared on deploy\" --impact \"Slow start\" --next \"Warm the cache\" --origin user"
@@ -414,7 +405,7 @@ public static class CommandHelp
 
     /// <summary>Errors any command may give, kept out of the per-command lists.</summary>
     public const string CommonErrors =
-        "Any command: invalid_arguments (1) for a bad command line or a malformed ID. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).";
+        "Any command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).";
 
     /// <summary>Header shared by every help output.</summary>
     public static string Header => $"Sermofur {ProductVersion.Current}";
@@ -459,7 +450,7 @@ public static class CommandHelp
             }
             if (argument.StartsWith("--", StringComparison.Ordinal))
             {
-                if (!CommandArguments.IsFlag(argument[2..]))
+                if (CommandArguments.TakesValue(arguments, index))
                 {
                     index++;
                 }

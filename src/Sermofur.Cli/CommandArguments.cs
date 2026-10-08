@@ -87,7 +87,7 @@ public sealed class CommandArguments
             {
                 return true;
             }
-            if (argument.StartsWith("--", StringComparison.Ordinal) && !IsFlag(argument[2..]))
+            if (TakesValue(arguments, index))
             {
                 // The next argument is this option's value, not a shortcut.
                 index++;
@@ -95,6 +95,18 @@ public sealed class CommandArguments
         }
         return false;
     }
+
+    /// <summary>
+    /// True when the argument at <paramref name="index"/> is an option whose value is the next
+    /// argument, with the rule of the parser: an option that is not a flag, followed by an
+    /// argument that does not start with <c>--</c>.
+    /// </summary>
+    public static bool TakesValue(IReadOnlyList<string> arguments, int index) =>
+        arguments[index].StartsWith("--", StringComparison.Ordinal)
+        && arguments[index] != EndOfOptions
+        && !IsFlag(arguments[index][2..])
+        && index + 1 < arguments.Count
+        && !arguments[index + 1].StartsWith("--", StringComparison.Ordinal);
 
     /// <summary>
     /// Presence of a flag before the <c>--</c> separator, without parsing the line: used for

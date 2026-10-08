@@ -126,7 +126,11 @@ public class PropertyTests
                 for (int index = 0; index < arguments.Length && arguments[index] != "--"; index++)
                 {
                     heads.Add(arguments[index]);
-                    if (arguments[index] is "--path" or "--actor" or "--text" or "--x")
+                    if (
+                        arguments[index] is "--path" or "--actor" or "--text" or "--x"
+                        && index + 1 < arguments.Length
+                        && !arguments[index + 1].StartsWith("--", StringComparison.Ordinal)
+                    )
                     {
                         index++;
                     }

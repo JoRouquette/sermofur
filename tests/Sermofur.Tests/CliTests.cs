@@ -340,6 +340,7 @@ public class CliTests
     [InlineData("status", "--help")]
     [InlineData("claim", "add", "x", "--help", "--json")]
     [InlineData("--json", "--help", "--", "init")]
+    [InlineData("claim", "add", "x", "--origin", "--help")]
     public void HelpAnywhereShowsUsageBeforeInstanceResolution(params string[] arguments)
     {
         // Directory without an instance: without help taking priority, the command would exit 2.
