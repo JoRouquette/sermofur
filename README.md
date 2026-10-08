@@ -30,21 +30,32 @@ USER ≠ TRUTH, LLM ≠ TRUTH, MEMORY ≠ TRUTH.
   Evidence sharing the same lineage counts as one origin: repetition does not raise confidence.
   Evidence declared by an LLM never reinforces a claim, and declared `execution` evidence alone
   cannot verify a fact.
+- Evidence can **contradict** a claim: an independent contradiction caps its confidence at
+  medium; one declared by an LLM is noted but refutes nothing.
+- A **source** is a local text file you declare explicitly: Sermofur keeps its hash and indexes
+  its text, and knows when evidence relies on a file that has changed since.
+- **Recall** answers a question with at most 3 explained results; **challenge** confronts a
+  claim with what contradicts it, without ever deciding for you.
 - A **RETEX** stays a draft until a learning decision is made.
 - **Scopes** (workspace → client → project → repository → task) isolate memories: a context sees
   its own scope and its ancestors, never its siblings or descendants.
 - Every change is kept in an auditable **history**.
 
-## Status: 0.1 vertical slice
+## Status
 
 Delivered: the `smf` CLI, local instances, scopes, Claim/Evidence/RETEX storage in SQLite,
-history, Markdown projections and diagnostics (`doctor`).
+history, Markdown projections and diagnostics (`doctor`); since 0.2, declared sources with
+full-text indexing, recall, challenge and contradicting evidence (instance format 2).
 
 **Not delivered yet**: background daemon, MCP bridge, Laya integration (System 1 model),
-sources/full-text search/recall/challenge, learning and consolidation, desktop Inspector UI.
-These appear in the docs as designs only; no command pretends to provide them.
+learning and consolidation, desktop Inspector UI. These appear in the docs as designs only; no
+command pretends to provide them.
 
-No telemetry, synchronization, network connection or source ingestion at run time.
+No telemetry, synchronization or network connection at run time, and no implicit ingestion:
+only the files you add as sources are read.
+
+Upgrading from 0.1: the instance format changed. Other commands refuse a 0.1 instance until you
+run `smf migrate`, which first backs up the database under `.sermofur/backups/`.
 
 ## Install
 
@@ -90,6 +101,9 @@ cd acme                          # the context is now the "acme" scope
 smf claim add "The billing API paginates with cursors" --origin user --json
 smf evidence add <CLAIM_ID> source_code "src/Billing/Pagination.cs" --lineage billing-repo --origin user
 smf claim show <CLAIM_ID>        # claim, evidence, explained confidence, history
+smf source add notes/billing.md --origin user    # declared source, hashed and indexed
+smf recall "billing pagination"  # at most 3 explained results, this scope and its ancestors
+smf challenge <CLAIM_ID>         # contradictions, changed sources, close claims to confront
 smf doctor                       # read-only health check
 smf export                       # rebuilds the Markdown projections of visible objects
 ```

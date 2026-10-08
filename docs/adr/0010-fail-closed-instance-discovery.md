@@ -41,6 +41,8 @@ A `.sermofur` entry that belongs to another tool blocks Sermofur below it, with 
 message; the user renames or moves it, or works from another directory. No command ever falls
 through to an ancestor instance.
 
+Since 0.2, discovery refuses an entry owned by another account
+([ADR 0014](0014-instance-owner.md)); the paragraphs below describe the 0.1 limit it closes.
 Discovery walks up to the root of the volume and does not check who owns the entry it finds.
 Sermofur assumes a single operating-system user. On a machine shared with other users, another
 user can create a `.sermofur` entry in any folder above your working directory that they can

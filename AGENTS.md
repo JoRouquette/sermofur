@@ -6,7 +6,7 @@ as ADRs under `docs/adr/`; read the relevant ones before changing behavior. Neve
 invariant by a prompt.
 
 Architecture: Domain has no external dependency; Application carries the controls and the
-ports (`IMemoryStore`, `IPathResolver`); Infrastructure implements the ports; the CLI composes.
+ports (`IMemoryStore`, `IPathResolver`, `ISearchIndex`, `ISourceReader`, `ITokenizer`); Infrastructure implements the ports; the CLI composes.
 No implicit network access at run time. Hosts never choose scopes: the scope comes from the
 working directory.
 
@@ -21,4 +21,4 @@ Commands: `dotnet tool restore`, `dotnet restore --locked-mode`, `dotnet build`,
 decide the version, see `docs/release.md`) and are signed off (`git commit -s`, see
 `CONTRIBUTING.md`).
 
-Future capabilities not delivered: daemon, MCP, Laya, UI, indexing/recall/consolidation.
+Future capabilities not delivered: daemon, MCP, Laya, UI, learning and consolidation.

@@ -4,15 +4,17 @@ English | [Français](fr/architecture.md)
 
 ## Delivered
 Domain: business types, the scope tree, the hierarchy of kinds and visibility. Application:
-MemoryService, ScopeService (all scope registration rules), validation, scoped access,
-explained confidence, storage port (`IMemoryStore`) and path port (`IPathResolver`).
-Infrastructure: discovery, paths, bootstrap, SQLite, schema, projections and doctor. CLI:
-parsing, commands and composition. The `IMemoryStore` port is synchronous in 0.1
+MemoryService, ScopeService (all scope registration rules), SourceService, RecallService (BM25 on
+visible statistics), ChallengeService, validation, scoped access, explained confidence, and the
+ports `IMemoryStore` (storage), `IPathResolver` (paths), `ISearchIndex` and `ITokenizer` (full-text
+index), `ISourceReader` (source files). Infrastructure: discovery and owner check, paths,
+bootstrap, SQLite, schema and migration, FTS5 index, file reader, projections and doctor. CLI:
+parsing, commands and composition. The `IMemoryStore` port is synchronous
 ([ADR 0008](adr/0008-synchronous-store.md)).
 
 ```text
 CLI → Application → Domain
-  ↘ Infrastructure (implements IMemoryStore, IPathResolver)
+  ↘ Infrastructure (implements IMemoryStore, ISearchIndex, ITokenizer, IPathResolver, ISourceReader)
 ```
 `IMemoryStore.AddScope` receives a precondition supplied by ScopeService: the store opens its
 immediate transaction, reads the scopes again and calls it before inserting. Duplicate and
@@ -25,8 +27,9 @@ its caller. SQL reads are filtered before objects are loaded. Evidence stays in 
 claim. Choosing an ID grants no additional right.
 
 ## Storage
-SQLite is the single authority. Object, history and idempotency key are committed in one short
-immediate transaction; foreign keys are enforced; waiting is bounded to 5 seconds. DELETE
+SQLite is the single authority. Object, history, idempotency key and full-text index entries are
+committed in one short immediate transaction (sources: `SaveSource` reads the current state and
+applies the decision of SourceService under that transaction); foreign keys are enforced; waiting is bounded to 5 seconds. DELETE
 journal mode in this vertical slice. Markdown is written afterwards by rename. If the projection
 fails, `projection_pending` states that the object is saved; `export` rebuilds it. A race between
 projections may leave an older revision: doctor detects it, export repairs it. There is no

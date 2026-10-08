@@ -3,7 +3,7 @@
 # Vérification
 
 Comment vérifier soi-même une build de Sermofur, ce que couvrent les tests automatiques, et les
-limites connues de la version 0.1.
+limites connues de la version 0.2.
 
 ## Vérifier soi-même
 
@@ -35,8 +35,8 @@ mkdir $env:TEMP/sermofur-check; cd $env:TEMP/sermofur-check
 <chemin-vers>/smf doctor          # Overall: healthy_with_warnings, exit 0
 ```
 
-`healthy_with_warnings` est l'état attendu d'une instance 0.1 saine : les capacités pas encore
-livrées (daemon, laya, model, mcp, indexes, contradictions) sont signalées en warning.
+`healthy_with_warnings` est l'état attendu d'une instance saine : les capacités pas encore livrées
+(daemon, laya, model, mcp) sont signalées en warning.
 `artifacts/` et `TestResults/` sont ignorés par Git.
 
 ## Ce que couvrent les tests
@@ -73,7 +73,48 @@ livrées (daemon, laya, model, mcp, indexes, contradictions) sont signalées en 
   `claim show` (graine fixe), stdout UTF-8 avec texte non ASCII et stderr sans BOM (messages
   ASCII) dans un vrai processus, accents littéraux tandis que l'accent grave et le HTML restent
   échappés.
-- doctor : lecture seule, `scope_overlap`, `scope_mappings`, identité incohérente.
+- doctor : lecture seule, `scope_overlap`, `scope_mappings`, identité incohérente, `search_index`
+  désynchronisé, FTS5 disponible.
+- Migration (ADR 0012) : une instance au format 1 construite par l'outil 0.1.1 publié (fixture de
+  test) garde chaque enregistrement, ligne d'historique, clé d'idempotence, scope et projection ;
+  claims et RETEX sont indexés ; la sauvegarde est une base au format 1 cohérente ; les autres
+  commandes refusent le format 1 sans écrire ; une interruption après la sauvegarde, dans la
+  transaction ou avant `instance.json` laisse une instance utilisable que `migrate` termine ;
+  `migrate` est idempotent.
+- Sources : empreinte des seuls octets lus, BOM accepté, fichier vide, binaire, Latin-1, trop gros,
+  absent ou dossier refusé avec un code stable ; fichier d'un scope plus précis, d'un autre client,
+  hors de l'instance ou dans `.sermofur` refusé ; ajout idempotent ; réindexation qui rend
+  inchangée, modifiée (empreinte précédente dans l'historique), absente et restaurée, l'index
+  suivant ; réindexation qui ne lit que les sources déclarées du scope courant ; preuve qui fige
+  l'empreinte de sa source ; reconstruction après un index désynchronisé ; FIFO refusée (Linux et
+  macOS).
+- Recall (ADR 0013) : au plus 3 résultats expliqués dans un ordre stable ; du contenu ajouté à un
+  scope frère ne change ni la présence, ni l'ordre, ni le score des résultats visibles ; claims
+  invalidés jamais en tête, comptés comme écartés ; meilleur passage et fraîcheur des sources ;
+  syntaxe de requête traitée comme du texte ; bornes de la limite ; vrai processus sur une base en
+  lecture seule sans rien écrire. Les termes de la question égalent ceux de l'index (accents, CJC,
+  emoji, séparateurs).
+- Challenge : contradiction indépendante qui plafonne la confiance à medium, contradiction d'un LLM
+  notée sans réfuter, preuve du format 1 lue comme soutien, source modifiée puis disparue, claim
+  invalidé et revue dépassée, au plus 3 claims proches jamais qualifiés de contradictions sans
+  rien écrire, claim d'un autre client qui répond comme un inconnu.
+- Propriétaire (ADR 0014) : entrée d'un autre compte refusée à la découverte et nommée par doctor,
+  entrées propres reconnues, `instance.json` de plus de 64 Kio endommagé ; sous Linux et macOS,
+  vraie entrée détenue par root via sudo sans mot de passe (échoue si sudo n'est pas disponible).
+- Propriétés (FsCheck) : la normalisation des mappings reste dans la racine, est stable et
+  portable d'un séparateur à l'autre ; la grammaire de la ligne de commande garde positionnel tout
+  argument après `--` et ne prend jamais une valeur d'option qui commence par `--`.
+
+## Performance du recall
+
+Mesure de référence de la spec (SC-004), `RecallPerformanceTests`, lancée par
+`SERMOFUR_PERFORMANCE=1 dotnet test -c Release --filter Category=Performance` : 10 000 claims et
+RETEX plus 1 000 sources d'environ 20 Kio (11 000 objets, 20 000 passages indexés), 30 questions de
+trois termes fréquents, base en lecture seule. Le 2026-10-08, Windows 11, Intel Core i7-1255U,
+32 Go : **p50 329 ms, p95 411 ms, max 420 ms**, sous le plafond de 1 s de la spec. L'objectif de
+300 ms au p95 fixé par le plan de la 0.1 n'est pas atteint : environ la moitié du temps va à la
+lecture des fréquences de termes dans la table de vocabulaire, le reste aux passages visibles et
+aux résumés des objets.
 
 ## Limites connues
 
@@ -87,13 +128,14 @@ livrées (daemon, laya, model, mcp, indexes, contradictions) sont signalées en 
 - Découverte : une entrée `.sermofur` ne compte comme instance que si c'est un dossier contenant
   `instance.json` ; toute autre entrée bloque Sermofur en dessous d'elle. Le cas illisible n'est
   testé que sous Windows. Les mappings sont comparés lexicalement (ni la casse, ni les alias 8.3,
-  ni la normalisation Unicode ne sont canonisés). La découverte ne vérifie pas le propriétaire
-  d'une entrée `.sermofur` (ADR 0010).
+  ni la normalisation Unicode ne sont canonisés). Le contrôle du propriétaire est vérifié sous
+  Windows, Linux x64 et macOS arm64 ; macOS x64 ne l'est pas.
 - Sous Unix, le renommage de publication d'`init` ne détecte pas un `.sermofur` vide créé à
   l'instant qui le précède ; cette course n'est pas testée.
 - Un lecteur réseau mappé est refusé par le code, mais ce refus n'a pas été testé faute d'un tel
   lecteur.
 - Non livré, donc non vérifié : protocole MCP, inférence Laya, IPC du daemon, UI, installateur
-  autonome, indexation/FTS/recall/challenge, consolidation, migrations de schéma au-delà de v1.
-  Aucune coupure électrique simulée.
+  autonome, consolidation, similarité sémantique. Aucune coupure électrique simulée.
+- La performance du recall (SC-004) est une mesure de référence, pas une garantie : voir plus bas.
+  Elle ne tourne qu'avec `SERMOFUR_PERFORMANCE=1` et ne fait pas partie de la CI.
 - Le paquet d'outil exige le runtime .NET 10.
