@@ -35,7 +35,7 @@ public sealed class CommandRunner(TextWriter output, TextWriter error, string mo
         smf daemon install | uninstall | start | stop | restart | status
         smf daemon register | unregister | instances
         smf daemon run [--supervise]
-        smf mcp install | uninstall | serve
+        smf mcp install | uninstall | serve [--host claude-code|codex] [--scope project|user]
         smf COMMAND -h | smf GROUP -h       help of one command, or the subcommands of a group
         smf --version | -v                  version
         --help (-h) and --version (-v) are recognized anywhere before --, except as an option value; --help wins.
@@ -205,16 +205,16 @@ public sealed class CommandRunner(TextWriter output, TextWriter error, string mo
                     ProductVersion.Current
                 ),
             instanceRoot =>
-                McpDeclaration.IsDeclared(instanceRoot)
+                McpDeclaration.Declarations(instanceRoot) is { Count: > 0 } declared
                     ? new DiagnosticCheck(
                         "mcp",
                         "ok",
-                        "Declared to Claude Code in .mcp.json at the root of the instance."
+                        $"Declared to {string.Join(", ", declared)}."
                     )
                     : new DiagnosticCheck(
                         "mcp",
                         "warning",
-                        "Not declared at the root of the instance: smf mcp install."
+                        "Not declared to an MCP host: smf mcp install, or smf mcp install --host codex."
                     )
         ).Inspect(root);
         Write(report, json);

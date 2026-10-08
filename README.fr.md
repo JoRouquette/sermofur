@@ -50,10 +50,11 @@ sources déclarées avec index plein texte, le recall, le challenge et les preuv
 (format d'instance 2) ; depuis la 0.4, un [daemon](docs/fr/daemon.md) facultatif par
 utilisateur, installé comme service de votre session (`smf daemon install`), qui sert les
 instances que vous enregistrez à toutes les commandes `smf`, et un
-[serveur MCP pour Claude Code](docs/fr/mcp-integration.md) (`smf mcp install`) dont les huit
-outils rappellent, confrontent et enregistrent à travers ce daemon.
+[serveur MCP pour Claude Code et Codex](docs/fr/mcp-integration.md) (`smf mcp install`, avec
+`--host codex` pour Codex) dont les huit outils rappellent, confrontent et enregistrent à travers
+ce daemon.
 
-**Pas encore livré** : intégration Codex, intégration Laya (modèle System 1),
+**Pas encore livré** : intégration Laya (modèle System 1),
 apprentissage et consolidation, interface desktop Inspector. La documentation les décrit comme
 conceptions seulement ; aucune commande ne prétend les fournir.
 

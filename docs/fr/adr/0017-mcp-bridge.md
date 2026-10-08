@@ -27,8 +27,13 @@ auditables. L'ADR 0003 interdit un moteur par host.
 - `sermofur_feedback` vérifie que sa cible est visible, puis enregistre un RETEX brouillon
   `feedback <verdict> on <kind> <id>` : aucun changement de format, aucun effet sur la confiance
   ni sur le classement ; le lot Reflect/Learn lira ces brouillons.
-- `smf mcp install` modifie `.mcp.json` en remplaçant, en insérant ou en retirant les seuls octets
-  de l'entrée `sermofur`, pour que les autres serveurs restent identiques octet par octet.
+- `smf mcp install` ne modifie que l'entrée Sermofur de la configuration du host, pour que tout le
+  reste demeure identique octet par octet : l'entrée `sermofur` de `.mcp.json` pour Claude Code
+  (scope projet ; son scope utilisateur, `~/.claude.json`, est réécrit par Claude Code et laissé à
+  `claude mcp add`), la table `[mcp_servers.sermofur]` et ses sous-tables pour Codex, dans le
+  `.codex/config.toml` du projet ou dans la configuration utilisateur. La modification du TOML se
+  passe d'un parseur complet : elle repère les en-têtes de table hors des chaînes et refuse ce
+  qu'elle ne peut pas modifier sans risque.
 
 ## Alternatives
 De nouveaux messages IPC par outil (un second chemin vers le moteur, à garder identique). Un
@@ -38,4 +43,5 @@ Claude Code et réécrit tout le fichier). Une implémentation maison du protoco
 
 ## Conséquences
 Le protocole est testé pour de vrai avec le client du SDK contre `smf mcp serve` sur les trois
-systèmes. Le marqueur de feedback reste textuel jusqu'à ce que Reflect/Learn lui donne un modèle.
+systèmes, et avec Claude Code et Codex sur un poste Windows.
+Le marqueur de feedback reste textuel jusqu'à ce que Reflect/Learn lui donne un modèle.

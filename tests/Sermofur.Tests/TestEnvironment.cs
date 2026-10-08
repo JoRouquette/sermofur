@@ -15,9 +15,16 @@ internal static class TestEnvironment
 #pragma warning disable CA2255
     [ModuleInitializer]
 #pragma warning restore CA2255
-    internal static void IsolateFromTheRealDaemon() =>
+    internal static void IsolateFromTheRealDaemon()
+    {
         Environment.SetEnvironmentVariable(
             DaemonPaths.HomeVariable,
             Path.Combine(Path.GetTempPath(), $"smfd-run-{Environment.ProcessId}")
         );
+        // The user configuration of Codex of the developer is never read nor written by tests.
+        Environment.SetEnvironmentVariable(
+            Sermofur.Mcp.CodexConfigFile.HomeVariable,
+            Path.Combine(Path.GetTempPath(), $"smf-codex-{Environment.ProcessId}")
+        );
+    }
 }

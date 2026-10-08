@@ -25,15 +25,17 @@ public sealed class McpCommands(Action<object, bool> write)
             return Serve(workingDirectory);
         }
         string target = Path.GetFullPath(args.Option("path", workingDirectory)!, workingDirectory);
+        string host = args.Option("host", McpDeclaration.ClaudeCode)!;
+        string scope = args.Option("scope", McpDeclaration.ProjectScope)!;
         args.RequireCount(2);
         args.ValidateUsed();
         switch (subcommand)
         {
             case "install":
-                write(McpDeclaration.Install(target), json);
+                write(McpDeclaration.Install(target, host, scope), json);
                 return 0;
             case "uninstall":
-                write(McpDeclaration.Uninstall(target), json);
+                write(McpDeclaration.Uninstall(target, host, scope), json);
                 return 0;
             default:
                 throw new SermofurException(

@@ -57,6 +57,13 @@ public sealed class McpBridge(ICommandChannel channel, string version, DaemonLog
                     Name = tool.Name,
                     Description = tool.Description,
                     InputSchema = tool.InputSchema(),
+                    // Hosts may skip approval for read-only tools (Codex: approval mode "writes").
+                    Annotations = new ToolAnnotations
+                    {
+                        ReadOnlyHint = tool.ReadOnly,
+                        DestructiveHint = false,
+                        OpenWorldHint = false,
+                    },
                 }),
             ],
         };

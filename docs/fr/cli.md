@@ -51,7 +51,7 @@ grave restent échappés, si bien qu'un texte ne peut pas fermer le bloc JSON d'
 | daemon install / uninstall / start / stop / restart / status | Le service daemon de votre session ; voir [daemon.md](daemon.md) |
 | daemon register / unregister / instances | Instances que le daemon peut servir |
 | daemon run [--supervise] | Le daemon au premier plan |
-| mcp install / uninstall | L'entrée sermofur de `.mcp.json` pour Claude Code ; voir [mcp-integration.md](mcp-integration.md) |
+| mcp install / uninstall [--host claude-code\|codex] [--scope project\|user] | L'entrée sermofur de la configuration du host : `.mcp.json` (Claude Code), `.codex/config.toml` ou la configuration utilisateur de Codex ; voir [mcp-integration.md](mcp-integration.md) |
 | mcp serve | Le serveur MCP sur stdio, lancé par le host |
 
 Quand le daemon tourne et sert l'instance, toute commande sauf `daemon …`, `mcp …`, `init`,

@@ -24,8 +24,12 @@ no scope chosen by the model, writes as auditable candidates. ADR 0003 forbids a
 - `sermofur_feedback` checks that its target is visible, then records a draft RETEX
   `feedback <verdict> on <kind> <id>`: no format change, no effect on confidence or ranking;
   the Reflect/Learn lot will read these drafts.
-- `smf mcp install` edits `.mcp.json` by replacing, inserting or removing only the bytes of the
-  `sermofur` entry, so that the other servers stay byte for byte.
+- `smf mcp install` edits only the Sermofur entry of the host configuration, so that everything
+  else stays byte for byte: the `sermofur` entry of `.mcp.json` for Claude Code (project scope;
+  its user scope, `~/.claude.json`, is rewritten by Claude Code and left to `claude mcp add`), the
+  `[mcp_servers.sermofur]` table and its sub-tables for Codex, in `.codex/config.toml` of the
+  project or in the user configuration. The TOML edit has no full parser: it finds table headers
+  outside strings and refuses what it cannot change safely.
 
 ## Alternatives
 New IPC messages per tool (a second path to the engine to keep identical). An engine in the
@@ -34,5 +38,6 @@ migration for every instance). `claude mcp add` (requires the Claude Code CLI an
 whole file). An in-house protocol implementation (declined).
 
 ## Consequences
-The protocol is tested for real with the SDK client against `smf mcp serve` on the three systems.
+The protocol is tested for real with the SDK client against `smf mcp serve` on the three systems,
+and with Claude Code and Codex on a Windows workstation.
 The feedback marker is textual until Reflect/Learn gives it a model.

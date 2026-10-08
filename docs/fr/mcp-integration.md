@@ -2,10 +2,10 @@
 
 # Intégration MCP
 
-`smf mcp serve` est un serveur MCP sur stdio pour Claude Code. Il n'a aucun moteur de mémoire
-propre : chaque outil s'exécute comme une commande `smf` via le [daemon](daemon.md), dans le scope
-du dossier du projet, avec les règles, les sorties et les erreurs de la CLI. Conception :
-[ADR 0017](adr/0017-mcp-bridge.md). Codex vient ensuite.
+`smf mcp serve` est un serveur MCP sur stdio pour Claude Code et Codex. Il n'a aucun moteur de
+mémoire propre : chaque outil s'exécute comme une commande `smf` via le [daemon](daemon.md), dans
+le scope du dossier du projet, avec les règles, les sorties et les erreurs de la CLI. Conception :
+[ADR 0017](adr/0017-mcp-bridge.md).
 
 ## Le déclarer à Claude Code
 
@@ -30,6 +30,42 @@ Claude Code demande d'approuver un serveur déclaré dans `.mcp.json` la premiè
 dans le projet. Le scope de la session est la racine du projet, que Claude Code transmet dans
 `CLAUDE_PROJECT_DIR` ; les autres hosts utilisent le dossier dans lequel ils démarrent le serveur.
 
+Le scope utilisateur de Claude Code vit dans `~/.claude.json`, que Claude Code réécrit sans cesse :
+`smf` ne l'écrit pas. Pour déclarer Sermofur dans tous vos projets, lancer
+`claude mcp add --scope user sermofur -- smf mcp serve`.
+
+## Le déclarer à Codex
+
+```text
+smf mcp install --host codex                 # .codex/config.toml du projet
+smf mcp install --host codex --scope user    # votre configuration Codex, tous projets
+```
+
+La commande ajoute la table `[mcp_servers.sermofur]`, ou n'en met à jour que les lignes `command`
+et `args` : les clés et sous-tables que vous y ajoutez (un mode d'approbation,
+`[mcp_servers.sermofur.env]`) restent. Toutes les autres lignes, commentaires compris, restent
+identiques octet par octet, et les fins de ligne du fichier sont conservées. Relancée, elle n'écrit
+rien quand la table est à jour. La configuration utilisateur est `~/.codex/config.toml`, ou
+`config.toml` dans `CODEX_HOME` quand il est défini.
+
+Codex ne charge `.codex/config.toml` que dans un projet auquel il fait confiance : démarrer `codex`
+une fois dans le projet et lui faire confiance. Avec le scope utilisateur, le scope de chaque
+session est le dossier où Codex démarre.
+
+Codex demande une approbation avant chaque appel d'outil MCP, et `codex exec` (approbation `never`)
+les refuse. Sermofur marque ses quatre outils de lecture en lecture seule et aucun outil comme
+destructeur : pour que Codex appelle les lectures sans demander et demande toujours pour les
+écritures, ajouter `default_tools_approval_mode = "writes"` à la table `[mcp_servers.sermofur]`
+(`"approve"` laisse passer tous les outils), ou passer
+`-c mcp_servers.sermofur.default_tools_approval_mode="writes"` à `codex`.
+
+Aucun parseur TOML complet n'est derrière la modification : la commande repère les en-têtes de
+table hors des chaînes et refuse, en `invalid_mcp_config` et sans toucher au fichier, ce qu'elle ne
+peut pas modifier sans risque : une chaîne multiligne jamais fermée, `sermofur` écrit comme clé
+(`sermofur = { … }` dans `[mcp_servers]`, ou une clé pointée `mcp_servers.sermofur…`), ou la table
+déclarée deux fois. `smf mcp uninstall --host codex [--scope user]` retire la table et ses
+sous-tables.
+
 ## Outils
 
 Les entrées sont des objets JSON fermés (aucun champ en plus), avec des chaînes d'au plus
@@ -48,12 +84,12 @@ texte ; les erreurs arrivent comme résultats d'erreur `code: message`.
 | `sermofur_record_retex` | `event`, `impact`, `next`, `key` | `smf retex add` |
 | `sermofur_feedback` | `targetId`, `verdict` (helpful, not_applicable, wrong), `comment`, `key` | vérifie que la cible est visible, puis enregistre un RETEX brouillon `feedback <verdict> on <kind> <id>` |
 
-Toute écriture porte l'origine `llm` et un acteur tiré du nom que déclare le host (Claude Code :
-`claude-code`) : une preuve déclarée par un LLM ne renforce jamais un claim, un RETEX reste
-brouillon, et un feedback ne change ni la confiance ni le classement. Les claims `preferences` et
-`decisions` exigent l'origine de l'utilisateur et ne sont pas proposés. Les valeurs passées comme
-valeurs d'options de la CLI (`event`, `impact`, `next`, `lineage`, `comment`, `key`, le `text`
-d'un challenge) ne peuvent pas commencer par `--`.
+Toute écriture porte l'origine `llm` et un acteur tiré du nom que déclare le host (par exemple
+`claude-code`, ou le nom de client que donne Codex) : une preuve déclarée par un LLM ne renforce
+jamais un claim, un RETEX reste brouillon, et un feedback ne change ni la confiance ni le
+classement. Les claims `preferences` et `decisions` exigent l'origine de l'utilisateur et ne sont
+pas proposés. Les valeurs passées comme valeurs d'options de la CLI (`event`, `impact`, `next`,
+`lineage`, `comment`, `key`, le `text` d'un challenge) ne peuvent pas commencer par `--`.
 
 ## Erreurs
 
@@ -72,7 +108,8 @@ argument ni aucun résultat.
 
 ## Limites
 
-- Un seul host pour l'instant : Claude Code. Codex est la prochaine spec du lot.
+- Deux hosts : Claude Code et Codex. Les autres peuvent lancer `smf mcp serve` à la main depuis
+  leur propre configuration ; `smf mcp install` ne l'écrit pas.
 - Ni ressources, ni prompts, ni sampling : des outils seulement.
 - Un host qui garde le serveur ouvert pendant une mise à jour de `smf` reçoit
   `daemon_version_mismatch` après `smf daemon restart`, jusqu'à ce qu'il redémarre le serveur.

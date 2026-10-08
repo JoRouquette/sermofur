@@ -141,6 +141,15 @@ serveur MCP quand la racine de l'instance ne le déclare pas.
   sous le même pont, dix appels en parallèle ; `.mcp.json` modifié en gardant toute autre entrée
   identique octet par octet (FsCheck : installer puis retirer rend les mêmes octets), fichiers
   invalides laissés intacts, contrôle `mcp` de doctor.
+- Déclaration à Codex : la table `[mcp_servers.sermofur]` ajoutée, ses lignes `command` et `args`
+  mises à jour en gardant les clés et sous-tables ajoutées par l'utilisateur, la table retirée avec
+  ses sous-tables, toute autre ligne gardée identique octet par octet, commentaires, profils, tableaux
+  de tables, chaînes multilignes contenant une ligne qui ressemble à un en-tête et valeurs de
+  tableaux laissés intacts, fichiers CRLF gardés en CRLF, chemins Windows écrits en chaînes
+  littérales TOML ; refus (clé en ligne ou pointée, chaîne multiligne non fermée, table déclarée
+  deux fois) ; FsCheck : installer puis retirer rend le même texte ; `--host`, `--scope`, la
+  configuration utilisateur sous `CODEX_HOME`, doctor par host. Les tests utilisent leur propre
+  `CODEX_HOME`.
 
 ## Mesures du daemon
 
@@ -181,8 +190,8 @@ vocabulaire et des passages visibles.
   l'instant qui le précède ; cette course n'est pas testée.
 - Un lecteur réseau mappé est refusé par le code, mais ce refus n'a pas été testé faute d'un tel
   lecteur.
-- Non livré, donc non vérifié : Codex comme host MCP, inférence Laya, UI, installateur autonome,
-  consolidation, similarité sémantique. Aucune coupure électrique simulée.
+- Non livré, donc non vérifié : inférence Laya, UI, installateur autonome, consolidation,
+  similarité sémantique. Aucune coupure électrique simulée.
 - La performance du recall (SC-004) est une mesure de référence, pas une garantie : voir [Performance du recall](#performance-du-recall).
   Elle ne tourne qu'avec `SERMOFUR_PERFORMANCE=1` et ne fait pas partie de la CI.
 - Le paquet d'outil exige le runtime .NET 10.

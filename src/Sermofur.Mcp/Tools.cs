@@ -19,7 +19,8 @@ public sealed record ToolDefinition(
     string Name,
     string Description,
     IReadOnlyList<ToolField> Fields,
-    Func<ToolCall, CancellationToken, Task<JsonNode>> Execute
+    Func<ToolCall, CancellationToken, Task<JsonNode>> Execute,
+    bool ReadOnly = false
 )
 {
     /// <summary>JSON Schema of the input: closed object, from the fields.</summary>
@@ -82,13 +83,15 @@ public static class Tools
             "sermofur_status",
             "Identity of the Sermofur instance of this project, current scope and counts of the visible objects.",
             [],
-            (call, cancellation) => Json(call, ["status", "--json"], cancellation)
+            (call, cancellation) => Json(call, ["status", "--json"], cancellation),
+            ReadOnly: true
         ),
         new(
             "sermofur_context",
             "Context of this session: instance, current scope with its visible ancestors, and counts. No content.",
             [],
-            Context
+            Context,
+            ReadOnly: true
         ),
         new(
             "sermofur_recall",
@@ -108,7 +111,8 @@ public static class Tools
                     "Number of results, 1 to 3. Default: 3."
                 ),
             ],
-            Recall
+            Recall,
+            ReadOnly: true
         ),
         new(
             "sermofur_challenge",
@@ -122,7 +126,8 @@ public static class Tools
                     "A statement to confront; cannot start with --."
                 ),
             ],
-            Challenge
+            Challenge,
+            ReadOnly: true
         ),
         new(
             "sermofur_claim",

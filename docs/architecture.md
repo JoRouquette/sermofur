@@ -52,14 +52,14 @@ smf ──→ CliRouter ──(no daemon / not served)──→ CommandRunner �
 
 ## MCP bridge
 `Sermofur.Mcp` holds `smf mcp serve`, an MCP server on stdio built with the official C# SDK, and
-the editing of `.mcp.json`. Each tool becomes one or two `smf` commands sent to the daemon through
+the editing of the host configurations (`.mcp.json` for Claude Code, TOML for Codex). Each tool becomes one or two `smf` commands sent to the daemon through
 `DaemonClient`; the bridge has no engine ([ADR 0017](adr/0017-mcp-bridge.md)).
 
 ```text
-Claude Code ──stdio──→ McpBridge ──(protocol 1)──→ DaemonServer ──→ CommandRunner → Application
+Claude Code / Codex ──stdio──→ McpBridge ──(protocol 1)──→ DaemonServer ──→ CommandRunner → Application
 ```
 
 ## Target, not delivered
-Codex as a second MCP host. Laya managed, lazy and optional. An Angular/Tauri Inspector exposing
+Laya managed, lazy and optional. An Angular/Tauri Inspector exposing
 evidence, conflicts and history. No Anthropic/OpenAI dependency in Domain or Application.
 Planning lives in a Spec Kit workshop outside the repository; see [AGENTS.md](../AGENTS.md).

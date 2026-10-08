@@ -134,6 +134,14 @@ and the MCP server when the instance root does not declare it.
   the same bridge, ten parallel calls; `.mcp.json` edited with every other entry kept byte for byte
   (FsCheck: install then remove gives back the same bytes), invalid files left untouched, the
   `mcp` check of doctor.
+- Codex declaration: the `[mcp_servers.sermofur]` table added, its `command` and `args` lines
+  updated while keys and sub-tables added by the user stay, the table removed with its
+  sub-tables, every other line kept byte for byte, comments, profiles, array tables, multi-line
+  strings holding a header-like line and array values left alone, CRLF files kept CRLF, Windows
+  paths written as TOML literal strings; refusals (inline or dotted key, unclosed multi-line
+  string, table twice); FsCheck: install then remove gives back the same text; `--host`,
+  `--scope`, the user configuration under `CODEX_HOME`, doctor per host. The test run uses its own
+  `CODEX_HOME`.
 
 ## Daemon measures
 
@@ -171,7 +179,7 @@ frequencies of the vocabulary table and the visible passages.
   instant before it; this race is not tested.
 - A mapped network drive is refused by the code but this was not tested, for lack of such a
   drive.
-- Not delivered, hence not verified: Codex as an MCP host, Laya inference, UI, self-contained
+- Not delivered, hence not verified: Laya inference, UI, self-contained
   installer, consolidation, semantic similarity. No power loss was simulated.
 - Recall performance (SC-004) is a reference measure, not a guarantee: see [Recall performance](#recall-performance). It runs only
   with `SERMOFUR_PERFORMANCE=1` and is not part of the CI.

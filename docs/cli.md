@@ -49,7 +49,7 @@ escaped, so a text cannot close the JSON block of a projection.
 | daemon install / uninstall / start / stop / restart / status | The daemon service of your session; see [daemon.md](daemon.md) |
 | daemon register / unregister / instances | Instances the daemon may serve |
 | daemon run [--supervise] | The daemon in the foreground |
-| mcp install / uninstall | The sermofur entry of `.mcp.json` for Claude Code; see [mcp-integration.md](mcp-integration.md) |
+| mcp install / uninstall [--host claude-code\|codex] [--scope project\|user] | The Sermofur entry of the host configuration: `.mcp.json` (Claude Code), `.codex/config.toml` or the Codex user configuration; see [mcp-integration.md](mcp-integration.md) |
 | mcp serve | The MCP server on stdio, started by the host |
 
 When the daemon runs and serves the instance, every command except `daemon …`, `mcp …`, `init`,

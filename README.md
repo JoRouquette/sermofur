@@ -48,10 +48,10 @@ history, Markdown projections and diagnostics (`doctor`); since 0.2, declared so
 full-text indexing, recall, challenge and contradicting evidence (instance format 2); since 0.4,
 an optional [daemon](docs/daemon.md) per user, installed as a service of your session
 (`smf daemon install`), that serves the instances you register to every `smf` command, and an
-[MCP server for Claude Code](docs/mcp-integration.md) (`smf mcp install`) whose eight tools
-recall, challenge and record through that daemon.
+[MCP server for Claude Code and Codex](docs/mcp-integration.md) (`smf mcp install`, with
+`--host codex` for Codex) whose eight tools recall, challenge and record through that daemon.
 
-**Not delivered yet**: Codex integration, Laya integration (System 1 model),
+**Not delivered yet**: Laya integration (System 1 model),
 learning and consolidation, desktop Inspector UI. These appear in the docs as designs only; no
 command pretends to provide them.
 

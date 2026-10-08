@@ -56,6 +56,16 @@ public static class CommandHelp
         "Unknown identifier, or one of a scope that is not visible."
     );
 
+    private static readonly HelpEntry McpHost = new HelpEntry(
+        "--host claude-code|codex",
+        "MCP host. Default: claude-code."
+    );
+
+    private static readonly HelpEntry McpScope = new HelpEntry(
+        "--scope project|user",
+        "Codex only: configuration of the project (.codex/config.toml, loaded when the project is trusted) or of the user. Default: project."
+    );
+
     private static IReadOnlyList<HelpEntry> Entries(params HelpEntry[] entries) => entries;
 
     private static HelpEntry Id(string name, string what) =>
@@ -523,27 +533,27 @@ public static class CommandHelp
         new(
             "mcp install",
             "",
-            "Declares the Sermofur MCP server to Claude Code in .mcp.json of the context directory, changing only the sermofur entry. Idempotent; says what remains to do (daemon, registration).",
+            "Declares the Sermofur MCP server to a host, changing only its own entry: .mcp.json of the context directory for Claude Code, the [mcp_servers.sermofur] table of .codex/config.toml (or of the Codex user configuration) for Codex. Idempotent; says what remains to do (daemon, registration, trust).",
             [],
-            [],
+            Entries(McpHost, McpScope),
             Entries(
                 new HelpEntry(
                     "invalid_mcp_config (3)",
-                    "The file is not a JSON object, or its mcpServers is not one; it is left untouched."
+                    "The file cannot be changed safely (not a JSON object, mcpServers not an object, TOML the edit cannot handle); it is left untouched."
                 )
             ),
-            "smf mcp install"
+            "smf mcp install --host codex"
         ),
         new(
             "mcp uninstall",
             "",
-            "Removes the sermofur entry from .mcp.json of the context directory, and nothing else.",
+            "Removes the Sermofur entry of the host configuration, and nothing else.",
             [],
-            [],
+            Entries(McpHost, McpScope),
             Entries(
                 new HelpEntry(
                     "invalid_mcp_config (3)",
-                    "The file cannot be read as JSON; it is left untouched."
+                    "The file cannot be read safely; it is left untouched."
                 )
             ),
             "smf mcp uninstall"

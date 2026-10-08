@@ -2,10 +2,10 @@ English | [Français](fr/mcp-integration.md)
 
 # MCP integration
 
-`smf mcp serve` is an MCP server on stdio for Claude Code. It has no memory engine of its own:
-every tool runs as an `smf` command through the [daemon](daemon.md), in the scope of the project
-folder, with the rules, outputs and errors of the CLI. Design:
-[ADR 0017](adr/0017-mcp-bridge.md). Codex comes next.
+`smf mcp serve` is an MCP server on stdio for Claude Code and Codex. It has no memory engine of
+its own: every tool runs as an `smf` command through the [daemon](daemon.md), in the scope of the
+project folder, with the rules, outputs and errors of the CLI. Design:
+[ADR 0017](adr/0017-mcp-bridge.md).
 
 ## Declare it to Claude Code
 
@@ -29,6 +29,39 @@ Claude Code asks you to approve a server declared in `.mcp.json` the first time 
 project. The scope of the session is the project root, which Claude Code passes in
 `CLAUDE_PROJECT_DIR`; other hosts use the folder they start the server in.
 
+The user scope of Claude Code lives in `~/.claude.json`, which Claude Code rewrites constantly:
+`smf` does not write it. To declare Sermofur for all your projects, run
+`claude mcp add --scope user sermofur -- smf mcp serve`.
+
+## Declare it to Codex
+
+```text
+smf mcp install --host codex                 # .codex/config.toml of the project
+smf mcp install --host codex --scope user    # your Codex configuration, all projects
+```
+
+The command adds the `[mcp_servers.sermofur]` table, or updates only its `command` and `args`
+lines: keys and sub-tables you add to it (an approval mode, `[mcp_servers.sermofur.env]`) stay.
+Every other line, comments included, stays byte for byte, and the line endings of the file are
+kept. Run again, it writes nothing when the table is current. The user
+configuration is `~/.codex/config.toml`, or `config.toml` in `CODEX_HOME` when it is set.
+
+Codex loads `.codex/config.toml` only in a project it trusts: start `codex` in the project once and
+trust it. With the user scope, the scope of each session is the folder where Codex starts.
+
+Codex asks for approval before each MCP tool call, and `codex exec` (approval `never`) refuses
+them. Sermofur marks its four read tools as read-only and none of its tools as destructive: to let
+Codex call the read tools without asking and still ask for writes, add
+`default_tools_approval_mode = "writes"` to the `[mcp_servers.sermofur]` table (`"approve"` lets
+every tool run), or pass `-c mcp_servers.sermofur.default_tools_approval_mode="writes"` to
+`codex`.
+
+There is no full TOML parser behind the edit: the command finds table headers outside strings and
+refuses, with `invalid_mcp_config` and the file untouched, what it cannot change safely: a
+multi-line string that is never closed, `sermofur` written as a key (`sermofur = { … }` in
+`[mcp_servers]`, or a dotted `mcp_servers.sermofur…` key), or the table declared twice.
+`smf mcp uninstall --host codex [--scope user]` removes the table and its sub-tables.
+
 ## Tools
 
 Inputs are closed JSON objects (no extra field), strings of at most 16,384 characters without
@@ -47,8 +80,8 @@ output of the `smf` command, as structured content and as text; errors come as e
 | `sermofur_record_retex` | `event`, `impact`, `next`, `key` | `smf retex add` |
 | `sermofur_feedback` | `targetId`, `verdict` (helpful, not_applicable, wrong), `comment`, `key` | checks that the target is visible, then records a draft RETEX `feedback <verdict> on <kind> <id>` |
 
-Every write carries the origin `llm` and an actor taken from the name the host declares (Claude
-Code: `claude-code`): evidence declared by an LLM never reinforces a claim, a RETEX stays a draft,
+Every write carries the origin `llm` and an actor taken from the name the host declares (for
+example `claude-code`, or the client name Codex gives): evidence declared by an LLM never reinforces a claim, a RETEX stays a draft,
 and feedback changes neither confidence nor ranking. `preferences` and `decisions` claims need
 the user's origin and are not offered. Values passed as CLI option values (`event`, `impact`,
 `next`, `lineage`, `comment`, `key`, the `text` of a challenge) cannot start with `--`.
@@ -70,7 +103,8 @@ result.
 
 ## Limits
 
-- One host for now: Claude Code. Codex is the next spec of the lot.
+- Two hosts: Claude Code and Codex. Others can launch `smf mcp serve` by hand from their own
+  configuration; `smf mcp install` does not write it.
 - No resources, prompts or sampling: tools only.
 - A host that keeps the server open across an update of `smf` gets `daemon_version_mismatch`
   after `smf daemon restart`, until it restarts the server.
