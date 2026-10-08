@@ -268,7 +268,10 @@ public class CliTests
         Assert.Contains("smf claim list | show ID | invalidate ID --reason TEXT", result.Output);
         Assert.Contains("smf evidence list | show ID", result.Output);
         Assert.Contains("smf retex list | show ID", result.Output);
-        Assert.Contains("--help is recognized anywhere before --", result.Output);
+        Assert.Contains(
+            "--help (-h) and --version (-v) are recognized anywhere before --",
+            result.Output
+        );
         Assert.DoesNotContain("llm|list", result.Output);
         Assert.DoesNotContain("tree|add", result.Output);
     }
@@ -359,6 +362,135 @@ public class CliTests
         {
             Directory.Delete(outside, true);
         }
+    }
+
+    [Theory]
+    [InlineData("-v")]
+    [InlineData("--version")]
+    [InlineData("status", "-v")]
+    [InlineData("claim", "add", "x", "--origin", "user", "--version")]
+    public void VersionAnywhereBeforeTheSeparatorPrintsTheVersion(params string[] arguments)
+    {
+        CliResult text = TestInstance.Run(arguments);
+        Assert.Equal(0, text.ExitCode);
+        Assert.Equal($"Sermofur {ProductVersion.Current}", text.Output.Trim());
+        Assert.Empty(text.Error);
+        CliResult json = TestInstance.Run(arguments.Append("--json").ToArray());
+        Assert.Equal(
+            ProductVersion.Current,
+            JsonDocument.Parse(json.Output).RootElement.GetProperty("version").GetString()
+        );
+    }
+
+    [Fact]
+    public void HelpWinsOverVersionAndShortcutsAreTextAfterTheSeparator()
+    {
+        Assert.Contains("Global options", TestInstance.Run("-v", "-h").Output);
+        using TestInstance fixture = new();
+        foreach (string word in new[] { "-h", "-v" })
+        {
+            CliResult created = TestInstance.Run(
+                "--path",
+                fixture.Root,
+                "--json",
+                "claim",
+                "add",
+                "--origin",
+                "user",
+                "--",
+                word
+            );
+            Assert.Equal(0, created.ExitCode);
+            Assert.Equal(
+                word,
+                RecordJson
+                    .Read<ClaimContent>(RecordJson.Read<MemoryRecord>(created.Output).ContentJson)
+                    .Text
+            );
+        }
+    }
+
+    [Fact]
+    public void EveryCommandHasItsOwnHelp()
+    {
+        string usage = TestInstance.Run("-h").Output;
+        foreach (CommandTopic topic in CommandHelp.Topics)
+        {
+            // The general usage names every command form of the catalogue.
+            string[] words = topic.Command.Split(' ');
+            Assert.Contains(words[^1], usage);
+            CliResult help = TestInstance.Run(
+                new[] { "--path", TestInstance.TempRoot }.Concat(words).Append("-h").ToArray()
+            );
+            Assert.Equal(0, help.ExitCode);
+            Assert.StartsWith($"Sermofur {ProductVersion.Current}", help.Output);
+            Assert.Contains(
+                $"Usage: smf [--path DIRECTORY] [--json] {topic.Synopsis}",
+                help.Output
+            );
+            Assert.Contains(topic.Summary, help.Output);
+            Assert.Contains(topic.Example, help.Output);
+            Assert.StartsWith("smf ", topic.Example);
+            Assert.All(topic.Options, option => Assert.Contains(option.Name, help.Output));
+            Assert.All(topic.Parameters, parameter => Assert.Contains(parameter.Name, help.Output));
+        }
+        string[] expected =
+        [
+            "init",
+            "root",
+            "status",
+            "doctor",
+            "export",
+            "migrate",
+            "scope current",
+            "scope list",
+            "scope tree",
+            "scope add",
+            "claim add",
+            "claim list",
+            "claim show",
+            "claim invalidate",
+            "evidence add",
+            "evidence list",
+            "evidence show",
+            "retex add",
+            "retex list",
+            "retex show",
+            "source add",
+            "source list",
+            "source show",
+            "source reindex",
+            "index rebuild",
+            "recall",
+            "challenge",
+        ];
+        Assert.Equal(
+            expected.Order(StringComparer.Ordinal),
+            CommandHelp.Topics.Select(topic => topic.Command).Order(StringComparer.Ordinal)
+        );
+    }
+
+    [Theory]
+    [InlineData("claim")]
+    [InlineData("source")]
+    [InlineData("scope")]
+    [InlineData("index")]
+    public void GroupHelpListsItsSubcommands(string group)
+    {
+        CliResult help = TestInstance.Run(group, "-h");
+        Assert.Equal(0, help.ExitCode);
+        Assert.Contains($"Usage: smf [--path DIRECTORY] [--json] {group} SUBCOMMAND", help.Output);
+        Assert.All(
+            CommandHelp.Topics.Where(topic => topic.Group == group),
+            topic => Assert.Contains(topic.Synopsis, help.Output)
+        );
+    }
+
+    [Fact]
+    public void UnknownCommandHelpFallsBackToTheGeneralUsage()
+    {
+        Assert.Contains("Global options", TestInstance.Run("nothing", "-h").Output);
+        Assert.Contains("Global options", TestInstance.Run("--path", ".", "-h").Output);
     }
 
     [Fact]

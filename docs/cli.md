@@ -66,8 +66,14 @@ Command-line bounds: at most 128 arguments, each at most 16,384 characters and w
 They are checked before any command, hence before any service and any write; exceeding them
 gives `invalid_arguments` (exit 1).
 
-`--help` is recognized anywhere **before** `--` and prints the usage (exit 0) before any instance
-lookup and before the bounds check; after `--`, it is a positional argument like any other.
+`--help` (`-h`) and `--version` (`-v`) are recognized anywhere **before** `--` and answer (exit 0)
+before any instance lookup and before the bounds check; after `--`, they are positional arguments
+like any other, so a text that is `-h` or `-v` goes after `--`. `--help` wins when both are given.
+`smf -h` prints the general usage; `smf COMMAND -h` (`smf claim add -h`, `smf recall -h`…) prints
+the help of that command: synopsis, description, arguments, options with their values and
+defaults, its own error codes and an example; `smf GROUP -h` (`smf source -h`) lists the
+subcommands of a group. `--version` prints `Sermofur <version>`, or `{"version": "<version>"}`
+with `--json`.
 `--` ends options: every following argument is positional, which allows a text starting with
 `--` (`smf claim add --origin user -- "--text"`).
 An option value cannot start with `--`: `--actor --x` gives `invalid_arguments` (exit 1). Only a

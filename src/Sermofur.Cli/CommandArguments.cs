@@ -58,6 +58,32 @@ public sealed class CommandArguments
         used.Add("json");
     }
 
+    /// <summary>True for an option that takes no value, help and version included.</summary>
+    public static bool IsFlag(string name) => Flags.Contains(name) || name is "help" or "version";
+
+    /// <summary>The single-dash shortcuts: <c>-h</c> for help, <c>-v</c> for version.</summary>
+    public static bool IsShortcut(string argument) => argument is "-h" or "-v";
+
+    /// <summary>
+    /// Help or version asked anywhere before <c>--</c>, as <c>--NAME</c> or as its shortcut,
+    /// without parsing the line: answered before the bounds check and any instance lookup.
+    /// </summary>
+    public static bool Asks(IReadOnlyList<string> arguments, string name, string shortcut)
+    {
+        foreach (string argument in arguments)
+        {
+            if (argument == EndOfOptions)
+            {
+                return false;
+            }
+            if (argument == shortcut || argument == "--" + name)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /// <summary>
     /// Presence of a flag before the <c>--</c> separator, without parsing the line: used for
     /// help and for the error format before any validation.

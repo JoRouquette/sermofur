@@ -28,7 +28,9 @@ public sealed class CommandRunner(TextWriter output, TextWriter error)
         smf index rebuild
         smf recall QUESTION [--limit 1-3]
         smf challenge CLAIM_ID | challenge --text TEXT
-        --help is recognized anywhere before -- and prints this help.
+        smf COMMAND -h | smf GROUP -h       help of one command, or the subcommands of a group
+        smf --version | -v                  version
+        --help (-h) and --version (-v) are recognized anywhere before --; --help is recognized first.
         -- ends options: every following argument is positional (text starting with --).
         An option value cannot start with --; see {CliDocumentation} for values and exit codes.
         """;
@@ -39,9 +41,18 @@ public sealed class CommandRunner(TextWriter output, TextWriter error)
         bool json = CommandArguments.HasFlag(arguments, "json");
         try
         {
-            if (arguments.Length == 0 || CommandArguments.HasFlag(arguments, "help"))
+            if (arguments.Length == 0 || CommandArguments.Asks(arguments, "help", "-h"))
             {
-                output.WriteLine(Usage);
+                output.WriteLine(CommandHelp.Find(arguments) ?? Usage);
+                return 0;
+            }
+            if (CommandArguments.Asks(arguments, "version", "-v"))
+            {
+                output.WriteLine(
+                    json
+                        ? RecordJson.Write(new { version = ProductVersion.Current })
+                        : CommandHelp.Header
+                );
                 return 0;
             }
             return Execute(new CommandArguments(arguments), json);

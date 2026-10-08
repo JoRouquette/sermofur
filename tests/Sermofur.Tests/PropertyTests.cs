@@ -43,6 +43,9 @@ public class PropertyTests
         "add",
         "value",
         "-v",
+        "-h",
+        "--help",
+        "--version",
         string.Empty,
     ];
 
@@ -109,6 +112,38 @@ public class PropertyTests
                         value is null || !value.StartsWith("--", StringComparison.Ordinal)
                     );
                 return tailKept && headPlain && valuesPlain;
+            }
+        );
+
+    [Property(MaxTest = 500)]
+    public Property HelpAndVersionAnswerWheneverAskedBeforeTheSeparator() =>
+        Prop.ForAll(
+            CommandLines(),
+            arguments =>
+            {
+                bool help = arguments.Length == 0 || CommandArguments.Asks(arguments, "help", "-h");
+                bool version = CommandArguments.Asks(arguments, "version", "-v");
+                if (!help && !version)
+                {
+                    // Would run a real command: outside the scope of this property.
+                    return true;
+                }
+                using StringWriter output = new();
+                using StringWriter error = new();
+                int exit = new CommandRunner(output, error).Run(arguments);
+                string text = output.ToString();
+                bool json = CommandArguments.HasFlag(arguments, "json");
+                bool expected =
+                    help || !json
+                        ? text.StartsWith(
+                            $"Sermofur {ProductVersion.Current}",
+                            StringComparison.Ordinal
+                        )
+                        : text.Contains(
+                            $"\"version\": \"{ProductVersion.Current}\"",
+                            StringComparison.Ordinal
+                        );
+                return exit == 0 && error.ToString().Length == 0 && expected;
             }
         );
 }

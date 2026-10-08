@@ -72,9 +72,14 @@ sans caractère NUL. Elles sont contrôlées avant toute commande, donc avant to
 écriture ; un dépassement donne `invalid_arguments` (exit 1). Le message, en anglais, écrit
 « 16,384 ».
 
-`--help` est reconnu n'importe où **avant** `--` et affiche l'usage (exit 0) avant toute
-recherche d'instance et avant le contrôle des bornes ; après `--`, c'est un argument positionnel
-comme un autre.
+`--help` (`-h`) et `--version` (`-v`) sont reconnus n'importe où **avant** `--` et répondent
+(exit 0) avant toute recherche d'instance et avant le contrôle des bornes ; après `--`, ce sont
+des arguments positionnels comme les autres : un texte qui vaut `-h` ou `-v` se place donc après
+`--`. `--help` l'emporte si les deux sont donnés. `smf -h` affiche l'usage général ;
+`smf COMMANDE -h` (`smf claim add -h`, `smf recall -h`…) affiche l'aide de cette commande :
+forme d'appel, description, arguments, options avec leurs valeurs et défauts, codes d'erreur
+propres et un exemple ; `smf GROUPE -h` (`smf source -h`) liste les sous-commandes d'un groupe.
+`--version` affiche `Sermofur <version>`, ou `{"version": "<version>"}` avec `--json`.
 `--` termine les options : tout argument qui suit est positionnel, ce qui permet un texte
 commençant par `--` (`smf claim add --origin user -- "--texte"`).
 Une valeur d'option ne peut pas commencer par `--` : `--actor --x` donne `invalid_arguments`
