@@ -184,7 +184,12 @@ public sealed class InstanceDoctor(IFileOwnership? ownership = null)
                 return false;
             }
             string relative = LocalPaths.RelativizeMapping(root, full);
-            return LocalPaths.CanonicalCase(root, relative) != relative;
+            // Only a difference the comparison does not absorb (case on Windows is absorbed).
+            return !string.Equals(
+                LocalPaths.CanonicalCase(root, relative),
+                relative,
+                LocalPaths.Comparison
+            );
         }
         catch (Exception exception)
             when (exception is SermofurException or IOException or UnauthorizedAccessException)

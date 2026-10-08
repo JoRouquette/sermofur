@@ -473,8 +473,9 @@ public class SourceTests
                 .Status
         );
         Tamper(fixture, "UPDATE scopes SET relative_path='CLIENT' WHERE id='c'");
+        // On Windows the comparison absorbs case: the stored variant still holds its folder.
         Assert.Equal(
-            "warning",
+            OperatingSystem.IsWindows() ? "ok" : "warning",
             new InstanceDoctor()
                 .Inspect(fixture.Root)
                 .Checks.Single(c => c.Name == "scope_mappings")
@@ -504,19 +505,23 @@ public class SourceTests
         using SqliteStore store = fixture.Open();
         string kept = fixture.WriteFile("kept.md", "texte conservé");
         string lost = fixture.WriteFile("lost.md", "texte perdu");
-        fixture.Sources(store).Add(kept, TestInstance.User);
+        MemoryRecord keptSource = fixture.Sources(store).Add(kept, TestInstance.User);
         MemoryRecord lostSource = fixture.Sources(store).Add(lost, TestInstance.User);
+        File.WriteAllText(kept, "texte conservé et révisé");
 
-        // A failure while reading the second source leaves registry and index untouched.
+        // Reading lost.md fails: whatever the order, the change of kept.md is rolled back too.
         Assert.Throws<IOException>(() =>
-            fixture.Sources(store, reader: new FailingReader(failAt: 2)).RebuildIndex()
+            fixture.Sources(store, reader: new FailingReader("lost.md")).RebuildIndex()
         );
+        Assert.Single(fixture.Sources(store).Show(keptSource.Id).History);
+        Assert.Empty(fixture.Recall(store).Recall("révisé").Results);
+        Assert.Single(fixture.Recall(store).Recall("conservé").Results);
         Assert.Single(fixture.Recall(store).Recall("perdu").Results);
-        Assert.Single(fixture.Sources(store).Show(lostSource.Id).History);
 
         File.Delete(lost);
-        Assert.Equal(new IndexRebuild(1, 1), fixture.Sources(store).RebuildIndex());
+        Assert.Equal(new IndexRebuild(1, 2), fixture.Sources(store).RebuildIndex());
         Assert.Empty(fixture.Recall(store).Recall("perdu").Results);
+        Assert.Single(fixture.Recall(store).Recall("révisé").Results);
         HistoryEntry entry = fixture.Sources(store).Show(lostSource.Id).History[^1];
         Assert.Equal(("missing", SourceService.SystemActor), (entry.Reason, entry.Actor));
         Assert.Equal(
@@ -528,15 +533,40 @@ public class SourceTests
         );
     }
 
-    private sealed class FailingReader(int failAt) : ISourceReader
+    private sealed class FailingReader(string failingPath) : ISourceReader
     {
         private readonly FileSourceReader inner = new FileSourceReader(new FileOwnership());
-        private int calls;
 
         public SourceSnapshot Read(string root, string relativePath) =>
-            ++calls == failAt
+            relativePath == failingPath
                 ? throw new IOException("simulated read failure")
                 : inner.Read(root, relativePath);
+    }
+
+    [Fact]
+    public void ReindexSkipsASourceChangedByAnotherCommandMeanwhile()
+    {
+        using TestInstance fixture = new TestInstance();
+        using SqliteStore store = fixture.Open();
+        string file = fixture.WriteFile("doc.md", "contenu");
+        MemoryRecord source = fixture.Sources(store).Add(file, TestInstance.User);
+        File.WriteAllText(file, "contenu modifié");
+        RacingStore racing = new(
+            store,
+            InstanceManager.DatabasePath(fixture.Root),
+            "UPDATE records SET revision=revision+1, payload=json_set(payload,'$.revision',revision+1) WHERE kind='Source'",
+            raceSaveSource: true
+        );
+        SourceService service = new(
+            racing,
+            new FileSourceReader(new FileOwnership()),
+            new LocalPathResolver(),
+            fixture.Context(store)
+        );
+        ReindexEntry entry = Assert.Single(service.Reindex(null, "tester"));
+        Assert.Equal(ReindexOutcome.Skipped, entry.Outcome);
+        Assert.Equal(SourceService.Content(source).Hash, entry.Hash);
+        Assert.Single(fixture.Sources(store).Show(source.Id).History);
     }
 
     [Fact]

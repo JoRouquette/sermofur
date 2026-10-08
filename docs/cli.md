@@ -177,7 +177,10 @@ of conflicting pairs) to detect an overlap entered outside the CLI.
 
 A mapped directory that was deleted does not prevent other contexts from working: only the
 mapping selected for the current path is checked physically. `doctor` reports it as a
-`scope_mappings` warning, with only the number of missing mappings.
+`scope_mappings` warning, with only the number of missing mappings. The same warning counts the
+mappings stored by an earlier version under a spelling that the file system resolves but that does
+not compare equal to the name on disk (case outside Windows, Unicode normalization): such a scope
+may not hold the sources of its folder, and Sermofur 0.2 offers no command to rewrite a mapping.
 
 | Exit | Meaning |
 |---|---|

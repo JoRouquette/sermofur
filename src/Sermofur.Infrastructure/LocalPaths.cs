@@ -116,8 +116,9 @@ public static class LocalPaths
             string name = part;
             if (part != "." && (File.Exists(candidate) || Directory.Exists(candidate)))
             {
-                string[] listed = Listed(current, part);
-                if (!listed.Contains(part, StringComparer.Ordinal))
+                // A folder that can be crossed but not listed keeps the given name.
+                string[]? listed = Listed(current, part);
+                if (listed is not null && !listed.Contains(part, StringComparer.Ordinal))
                 {
                     // An entry opened under a name that no listed name reflects (a Windows 8.3
                     // short name) or that several names reflect cannot be given one stored path.
@@ -138,21 +139,33 @@ public static class LocalPaths
     }
 
     /// <summary>Entries of <paramref name="directory"/> equal to <paramref name="name"/> without case and normalization.</summary>
-    private static string[] Listed(string directory, string name)
+    /// <returns>Null when the directory cannot be listed.</returns>
+    private static string[]? Listed(string directory, string name)
     {
         string folded = name.Normalize(NormalizationForm.FormC);
         // The pattern only filters: the whole directory is read either way. * and ? are
         // wildcards, and a non-ASCII name may be stored under another normalization, so those
         // names are compared one by one.
         string pattern = name.Any(c => c is '*' or '?' || c > 127) ? "*" : name;
-        return new DirectoryInfo(directory)
+        try
+        {
+            return Matches(directory, folded, pattern);
+        }
+        catch (Exception exception) when (exception is UnauthorizedAccessException or IOException)
+        {
+            return null;
+        }
+    }
+
+    private static string[] Matches(string directory, string folded, string pattern) =>
+        new DirectoryInfo(directory)
             .EnumerateFileSystemInfos(
                 pattern,
                 new EnumerationOptions
                 {
                     MatchCasing = MatchCasing.CaseInsensitive,
                     MatchType = MatchType.Simple,
-                    IgnoreInaccessible = true,
+                    IgnoreInaccessible = false,
                     AttributesToSkip = 0,
                 }
             )
@@ -165,7 +178,6 @@ public static class LocalPaths
                 )
             )
             .ToArray();
-    }
 
     private static bool IsNetworkDrive(string full)
     {

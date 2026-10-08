@@ -188,7 +188,11 @@ le seul nombre de paires en conflit) pour détecter un chevauchement entré hors
 
 Un dossier mappé supprimé n'empêche pas les autres contextes de fonctionner : seul le mapping
 retenu pour le chemin courant est contrôlé physiquement. `doctor` le signale en warning
-`scope_mappings`, avec le seul nombre de mappings absents.
+`scope_mappings`, avec le seul nombre de mappings absents. Le même avertissement compte les mappings
+enregistrés par une version antérieure sous une écriture que le système de fichiers résout mais
+qui ne se compare pas égale au nom sur le disque (casse hors Windows, normalisation Unicode) : un
+tel scope peut ne pas contenir les sources de son dossier, et Sermofur 0.2 n'offre aucune commande
+pour réécrire un mapping.
 
 | Exit | Signification |
 |---|---|
