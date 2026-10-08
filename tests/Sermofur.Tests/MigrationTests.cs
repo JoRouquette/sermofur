@@ -153,6 +153,45 @@ public class MigrationTests
     }
 
     [Fact]
+    public void MigrationThatLosesTheRaceKeepsNoBackupOfItsOwn()
+    {
+        using LegacyInstance legacy = new LegacyInstance();
+        MigrationResult? winner = null;
+        InstanceMigration.StepHook = name =>
+        {
+            if (name == "backup" && winner is null)
+            {
+                // A second migrate runs to completion between the backup and the lock.
+                InstanceMigration.StepHook = null;
+                winner = InstanceMigration.Migrate(legacy.Root);
+            }
+        };
+        MigrationResult loser;
+        try
+        {
+            loser = InstanceMigration.Migrate(legacy.Root);
+        }
+        finally
+        {
+            InstanceMigration.StepHook = null;
+        }
+        Assert.NotNull(winner);
+        Assert.True(winner.Migrated);
+        Assert.NotNull(winner.Backup);
+        Assert.Null(loser.Backup);
+        string backups = Path.Combine(
+            legacy.Root,
+            InstanceManager.Marker,
+            InstanceManager.BackupsDirectory
+        );
+        Assert.Equal(
+            Path.GetFileName(winner.Backup),
+            Path.GetFileName(Assert.Single(Directory.GetFiles(backups)))
+        );
+        Assert.Equal(2, legacy.UserVersion());
+    }
+
+    [Fact]
     public void InterruptionBeforeTheConfigurationIsAnUnfinishedMigrationThatMigrateCompletes()
     {
         using LegacyInstance legacy = new LegacyInstance();

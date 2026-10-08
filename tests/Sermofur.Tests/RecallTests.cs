@@ -50,6 +50,53 @@ public class RecallTests
     }
 
     [Fact]
+    public void ConfidenceCanLiftALessRelevantClaimAboveTheMostRelevantOne()
+    {
+        using TestInstance fixture = new TestInstance();
+        using SqliteStore store = fixture.Open();
+        MemoryService memory = fixture.Memory(store);
+        MemoryRecord relevant = memory.CreateClaim(
+            TestInstance.Fact("le cache se vide"),
+            TestInstance.User,
+            null
+        );
+        MemoryRecord confident = memory.CreateClaim(
+            TestInstance.Fact("le cache se vide au redémarrage"),
+            TestInstance.User,
+            null
+        );
+        for (int index = 0; index < 4; index++)
+        {
+            memory.CreateClaim(
+                TestInstance.Fact($"le cache {index} se vide rarement selon les mesures du lot"),
+                TestInstance.User,
+                null
+            );
+        }
+        memory.CreateEvidence(
+            new(confident.Id, EvidenceKind.SourceCode, "cache.cs", "code"),
+            TestInstance.User,
+            null
+        );
+
+        RecallAnswer all = fixture.Recall(store).Recall("cache vide");
+        // Without its evidence the shorter claim would come first; x1.2 lifts the other one.
+        Assert.Equal(new[] { confident.Id, relevant.Id }, all.Results.Take(2).Select(r => r.Id));
+        Assert.Equal(
+            all.Results.Select(r => r.Score).OrderByDescending(s => s),
+            all.Results.Select(r => r.Score)
+        );
+        // The lazy weighting stops early: each shorter list is a prefix of the full one.
+        for (int limit = 1; limit <= RecallService.MaxResults; limit++)
+        {
+            Assert.Equal(
+                all.Results.Take(limit).Select(r => r.Id),
+                fixture.Recall(store).Recall("cache vide", limit: limit).Results.Select(r => r.Id)
+            );
+        }
+    }
+
+    [Fact]
     public void ContentOfASiblingNeverChangesPresenceOrderOrScoreOfVisibleResults()
     {
         using TestInstance fixture = new TestInstance();

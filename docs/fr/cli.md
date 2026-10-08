@@ -45,7 +45,7 @@ grave restent échappés, si bien qu'un texte ne peut pas fermer le bloc JSON d'
 | source add FICHIER --origin user\|llm | Source déclarée du scope courant : hachée, indexée, idempotente |
 | source list / show ID | Sources visibles / la source avec son historique |
 | source reindex [ID] | Relit les sources du scope courant : unchanged, modified, missing, unreadable, rejected, restored |
-| index rebuild [--actor NOM] | Reconstruit l'index plein texte de l'instance et relit toutes les sources (mêmes issues et même historique que `source reindex`) ; la sortie `{indexed, changedSources}` ne compte que les objets visibles |
+| index rebuild | Reconstruit l'index plein texte de l'instance en une seule transaction d'écriture et relit toutes les sources (mêmes issues que `source reindex`, historique sous l'acteur système `sermofur`) ; les autres commandes qui écrivent attendent la fin ; la sortie `{indexed, changedSources}` ne compte que les objets visibles |
 | recall QUESTION [--limit 1-3] | Au plus 3 résultats expliqués parmi claims, RETEX et passages de sources visibles |
 | challenge CLAIM_ID / challenge --text TEXTE | Contradictions, sources modifiées, statut, date de revue, claims proches à confronter ; n'écrit rien |
 
@@ -134,8 +134,8 @@ jamais lu, et `recall`/`challenge` ne lisent aucun fichier. L'empreinte précéd
 l'historique. Quand `scope add` crée un scope dont le dossier contient des sources d'un ancêtre,
 ces sources passent au nouveau scope dans la même transaction (historique « rescoped »), pour ne
 jamais rester visibles de ses frères ; `doctor` signale une source rattachée à un scope plus large
-que son fichier (`source_scopes`). Les chemins se comparent sans tenir compte de la casse sous
-Windows seulement. Une source absente, illisible ou refusée sort de l'index, son enregistrement est
+que son fichier (`source_scopes`). Une source est enregistrée sous le nom de son fichier sur le disque : sur un système de fichiers
+insensible à la casse (Windows, macOS par défaut), `Doc.md` et `doc.md` sont une seule source. Une source absente, illisible ou refusée sort de l'index, son enregistrement est
 conservé.
 
 | Code | Exit | Cas |

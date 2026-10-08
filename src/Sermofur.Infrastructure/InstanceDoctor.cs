@@ -148,21 +148,14 @@ public sealed class InstanceDoctor(IFileOwnership? ownership = null)
         int misplaced = records
             .Where(record => record.Kind == RecordKind.Source)
             .Count(source =>
-            {
-                string path = RecordJson.Read<SourceContent>(source.ContentJson).RelativePath;
-                return scopes.Any(scope =>
-                    scope.Id != source.ScopeId
-                    && scope.RelativePath is not null
-                    && ScopePolicy.VisibleAncestors(scope.Id, scopes).Contains(source.ScopeId)
-                    && (
-                        string.Equals(path, scope.RelativePath.TrimEnd('/'), LocalPaths.Comparison)
-                        || path.StartsWith(
-                            scope.RelativePath.TrimEnd('/') + "/",
-                            LocalPaths.Comparison
-                        )
-                    )
-                );
-            });
+                SourcePlacement.NarrowerScope(
+                    RecordJson.Read<SourceContent>(source.ContentJson).RelativePath,
+                    source.ScopeId,
+                    scopes,
+                    LocalPaths.Comparison
+                )
+                    is not null
+            );
         checks.Add(
             new(
                 "source_scopes",

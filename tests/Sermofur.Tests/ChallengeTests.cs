@@ -140,6 +140,35 @@ public class ChallengeTests
     }
 
     [Fact]
+    public void EvidenceCitingASourceMovedToANarrowerScopeIsUnavailableWithoutItsPath()
+    {
+        using TestInstance fixture = new TestInstance();
+        using SqliteStore store = fixture.Open();
+        MemoryRecord source = fixture
+            .Sources(store)
+            .Add(fixture.WriteFile("a/plan.md", "le plan de a"), TestInstance.User);
+        MemoryService memory = fixture.Memory(store);
+        MemoryRecord claim = memory.CreateClaim(
+            TestInstance.Fact("le plan existe"),
+            TestInstance.User,
+            null
+        );
+        memory.CreateEvidence(
+            new(claim.Id, EvidenceKind.ProjectDecision, "plan", "plan", SourceId: source.Id),
+            TestInstance.User,
+            null
+        );
+        fixture.Client(store, "a");
+
+        ChallengeSignal signal = Assert.Single(
+            fixture.Challenge(store).Challenge(claim.Id).Signals
+        );
+        Assert.Equal("source_unavailable", signal.Type);
+        Assert.Contains("no longer visible", signal.Explanation);
+        Assert.DoesNotContain("plan.md", signal.Explanation);
+    }
+
+    [Fact]
     public void StatusAndReviewDateAreSignaled()
     {
         using TestInstance fixture = new TestInstance();

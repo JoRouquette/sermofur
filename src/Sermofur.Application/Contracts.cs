@@ -91,23 +91,27 @@ public interface IMemoryStore
     /// <summary>
     /// Creates or updates the source at <paramref name="relativePath"/> under an exclusive write
     /// transaction. <paramref name="decide"/> receives the source currently registered at that
-    /// path (whatever its scope), read inside the transaction, and returns the new state with the
-    /// history reason, or null to leave it unchanged; it throws to refuse. The search entries of
-    /// the source are replaced by <paramref name="passages"/> when the new state is indexed, and
-    /// removed otherwise.
+    /// path (whatever its scope) and the scopes, both read inside the transaction, and returns
+    /// the new state with the history reason, or null to leave it unchanged; it throws to refuse.
+    /// The search entries of the source are replaced by <paramref name="passages"/> when the new
+    /// state is indexed, and removed otherwise.
     /// </summary>
-    /// <remarks>With <paramref name="reindex"/>, the entries are written even when the state does
-    /// not change (index rebuild).</remarks>
     MemoryRecord? SaveSource(
         string relativePath,
-        Func<MemoryRecord?, SourceChange?> decide,
-        IReadOnlyList<SearchDocument> passages,
-        bool reindex = false
+        Func<MemoryRecord?, IReadOnlyList<Scope>, SourceChange?> decide,
+        IReadOnlyList<SearchDocument> passages
     );
 
-    /// <summary>Empties the search index and indexes again every claim and RETEX.</summary>
-    void ResetIndex();
+    /// <summary>
+    /// Rebuilds the whole index in one exclusive write transaction: claims and RETEX from the
+    /// registry, then each source of the instance, one at a time, through <paramref name="decide"/>
+    /// (new state, if any, and passages). Returns the sources whose state changed.
+    /// </summary>
+    IReadOnlyList<MemoryRecord> RebuildIndex(Func<MemoryRecord, SourceRebuild> decide);
 }
+
+/// <summary>Outcome of reading a source again during an index rebuild.</summary>
+public sealed record SourceRebuild(SourceChange? Change, IReadOnlyList<SearchDocument> Passages);
 
 /// <summary>What ranking needs to know of an object before describing it.</summary>
 public sealed record RecordSummary(
@@ -142,6 +146,15 @@ public interface IPathResolver
 
     /// <summary>True if <paramref name="child"/> equals <paramref name="parent"/> or lies below it.</summary>
     bool Contains(string parent, string child);
+
+    /// <summary>How paths compare on this system: without case on Windows only.</summary>
+    StringComparison Comparison { get; }
+
+    /// <summary>
+    /// <paramref name="relative"/> with the case of the entries found on disk, so that one file
+    /// always has one stored path, whatever the case it was typed with.
+    /// </summary>
+    string CanonicalCase(string root, string relative);
 }
 
 public sealed record MemoryContext(string Root, string ScopeId, IReadOnlySet<string> VisibleScopes);

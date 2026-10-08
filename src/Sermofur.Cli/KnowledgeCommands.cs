@@ -96,9 +96,8 @@ internal static class KnowledgeCommands
         {
             throw new SermofurException("invalid_arguments", "Unknown index subcommand.");
         }
-        string actor = args.Option("actor", "local-user")!;
         args.ValidateUsed();
-        return sources.RebuildIndex(actor);
+        return sources.RebuildIndex();
     }
 
     private static object Recall(CommandArguments args, RecallService recall)

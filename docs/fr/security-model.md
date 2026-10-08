@@ -17,7 +17,8 @@ scopes plus précis, sans lien, jonction, chemin réseau, fichier spécial ni fi
 son ouverture : un processus qui peut écrire dans le dossier peut substituer le fichier entre les
 deux, les sources doivent donc vivre dans des dossiers où vous seul pouvez écrire
 ([ADR 0014](adr/0014-instance-owner.md)). La question est
-découpée comme du texte et envoyée en termes entre guillemets : aucune syntaxe de requête
+découpée en termes par le tokenizer de l'index puis comparée au seul vocabulaire de l'index :
+aucune syntaxe de requête
 n'atteint le moteur, et les statistiques de classement ne viennent que des scopes visibles
 ([ADR 0013](adr/0013-filtered-ranking.md)).
 Points d'analyse (reparse points) et chemins UNC refusés pour le stockage et les mappings ; init

@@ -42,8 +42,11 @@ public static class InstanceMigration
                 StepHook?.Invoke("backup");
                 if (!MigrateDatabase(connection))
                 {
-                    // Another migrate committed first: nothing left to do on the database.
+                    // Another migrate committed first: nothing left to do on the database, and
+                    // this backup is not the one taken before the migration that ran.
                     version = InstanceManager.SchemaVersion;
+                    File.Delete(backup);
+                    backup = null;
                 }
             }
             else if (version != InstanceManager.SchemaVersion)

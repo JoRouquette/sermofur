@@ -116,7 +116,7 @@ Mesure de référence de la spec (SC-004), `RecallPerformanceTests`, lancée par
 RETEX (la moitié des claims avec des preuves, dont certaines contraires) plus 1 000 sources
 d'environ 20 Kio (11 000 objets, 20 000 passages indexés), 30 questions de trois termes fréquents,
 chacune sur une base en lecture seule ouverte à nouveau, comme le fait une commande CLI. Le
-2026-10-08, Windows 11, Intel Core i7-1255U, 32 Go : **p50 417 ms, p95 569 ms, max 587 ms**, sous
+2026-10-08, Windows 11, Intel Core i7-1255U, 32 Go : **p50 346 ms, p95 414 ms, max 443 ms**, sous
 le plafond de 1 s de la spec. L'objectif de 300 ms au p95 fixé par le plan de la 0.1 n'est pas
 atteint : l'essentiel du temps va à la lecture des fréquences de termes dans la table de
 vocabulaire et des passages visibles.

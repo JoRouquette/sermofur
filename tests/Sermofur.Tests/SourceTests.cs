@@ -371,19 +371,19 @@ public class SourceTests
             .CreateClaim(TestInstance.Fact("claim de b"), TestInstance.User, null);
         File.WriteAllText(inB, "texte de b modifié");
 
-        IndexRebuild rebuild = fixture.Sources(store, a).RebuildIndex("tester");
+        IndexRebuild rebuild = fixture.Sources(store, a).RebuildIndex();
         Assert.Equal(new IndexRebuild(1, 0), rebuild);
-        Assert.Equal(
-            new[] { "create", "modified" },
-            fixture.Sources(store, b).Show(sourceB.Id).History.Select(entry => entry.Reason)
-        );
+        IReadOnlyList<HistoryEntry> history = fixture.Sources(store, b).Show(sourceB.Id).History;
+        Assert.Equal(new[] { "create", "modified" }, history.Select(entry => entry.Reason));
+        // An instance operation: recorded under the system actor, not a user of one scope.
+        Assert.Equal(SourceService.SystemActor, history[^1].Actor);
         Assert.Contains(
             "modifié",
             Assert.Single(fixture.Recall(store, b).Recall("modifie").Results).Excerpt
         );
         DoctorReport report = new InstanceDoctor().Inspect(fixture.Root);
         Assert.Equal("ok", report.Checks.Single(c => c.Name == "search_index").Status);
-        Assert.Equal(new IndexRebuild(2, 0), fixture.Sources(store, b).RebuildIndex("tester"));
+        Assert.Equal(new IndexRebuild(2, 0), fixture.Sources(store, b).RebuildIndex());
     }
 
     [Fact]
@@ -407,28 +407,99 @@ public class SourceTests
         Assert.Equal("ok", report.Checks.Single(c => c.Name == "search_index").Status);
     }
 
-    [Fact]
-    public void PathsCompareLikeTheFileSystem()
+    [Theory]
+    [InlineData("Doc.md", "doc.md")]
+    [InlineData("Dossier/Été.md", "dossier/été.md")]
+    public void OneFileIsOneSourceWhateverTheCaseTyped(string onDisk, string typed)
     {
         using TestInstance fixture = new TestInstance();
         using SqliteStore store = fixture.Open();
-        string upper = fixture.WriteFile("Doc.md", "majuscule");
-        MemoryRecord first = fixture.Sources(store).Add(upper, TestInstance.User);
-        string lower = Path.Combine(fixture.Root, "doc.md");
-        if (OperatingSystem.IsWindows())
+        MemoryRecord first = fixture
+            .Sources(store)
+            .Add(fixture.WriteFile(onDisk, "contenu"), TestInstance.User);
+        string other = Path.Combine(fixture.Root, typed);
+        // The file system decides, not the operating system: macOS is case-insensitive by
+        // default, Linux is not.
+        bool caseInsensitive = File.Exists(other);
+        if (caseInsensitive)
         {
-            // Same file on a case-insensitive file system: the same source.
-            Assert.Equal(first.Id, fixture.Sources(store).Add(lower, TestInstance.User).Id);
+            MemoryRecord again = fixture.Sources(store).Add(other, TestInstance.User);
+            Assert.Equal(first.Id, again.Id);
+            Assert.Equal(onDisk, SourceService.Content(again).RelativePath);
+            Assert.Single(fixture.Sources(store).List());
             return;
         }
-        File.WriteAllText(lower, "minuscule");
-        MemoryRecord second = fixture.Sources(store).Add(lower, TestInstance.User);
+        Directory.CreateDirectory(Path.GetDirectoryName(other)!);
+        File.WriteAllText(other, "autre contenu");
+        MemoryRecord second = fixture.Sources(store).Add(other, TestInstance.User);
         Assert.NotEqual(first.Id, second.Id);
-        Assert.NotEqual(SourceService.Content(first).Hash, SourceService.Content(second).Hash);
+        Assert.Equal(typed, SourceService.Content(second).RelativePath);
         Assert.All(
             fixture.Sources(store).Reindex(null, "tester"),
             entry => Assert.Equal(ReindexOutcome.Unchanged, entry.Outcome)
         );
+    }
+
+    [Fact]
+    public void ScopeCreatedDuringASourceAddIsSeenUnderTheWriteLock()
+    {
+        using TestInstance fixture = new TestInstance();
+        using SqliteStore store = fixture.Open();
+        string file = fixture.WriteFile("a/notes.md", "secret de a");
+        // The service read the scopes before a concurrent scope add; the rival insertion
+        // happens just before the SaveSource transaction.
+        RacingStore racing = new(
+            store,
+            InstanceManager.DatabasePath(fixture.Root),
+            "INSERT INTO scopes VALUES('rival','Client','workspace','a')",
+            raceSaveSource: true
+        );
+        SourceService service = new(
+            racing,
+            new FileSourceReader(new FileOwnership()),
+            new LocalPathResolver(),
+            fixture.Context(store)
+        );
+        Assert.Equal("scope_boundary", Refusal(() => service.Add(file, TestInstance.User)));
+        Assert.True(racing.PreconditionSawRival);
+        Assert.Empty(
+            store.ReadRecords(new HashSet<string> { "workspace", "rival" }, RecordKind.Source)
+        );
+    }
+
+    [Fact]
+    public void DoctorFindsASourceLeftInABroaderScopeAndAMisplacedIndexEntry()
+    {
+        using TestInstance fixture = new TestInstance();
+        using (SqliteStore store = fixture.Open())
+        {
+            fixture.Client(store, "a");
+            fixture
+                .Sources(store, Path.Combine(fixture.Root, "a"))
+                .Add(fixture.WriteFile("a/notes.md", "secret de a"), TestInstance.User);
+        }
+        Tamper(fixture, "UPDATE search SET scope_id='workspace'");
+        DoctorReport index = new InstanceDoctor().Inspect(fixture.Root);
+        Assert.Equal("error", index.Checks.Single(c => c.Name == "search_index").Status);
+        Assert.Equal("ok", index.Checks.Single(c => c.Name == "source_scopes").Status);
+
+        Tamper(
+            fixture,
+            "UPDATE records SET scope_id='workspace', payload=json_set(payload,'$.scopeId','workspace') WHERE kind='Source'"
+        );
+        DoctorReport scopes = new InstanceDoctor().Inspect(fixture.Root);
+        Assert.Equal("error", scopes.Checks.Single(c => c.Name == "source_scopes").Status);
+    }
+
+    private static void Tamper(TestInstance fixture, string sql)
+    {
+        using Microsoft.Data.Sqlite.SqliteConnection connection = new(
+            $"Pooling=False;Data Source={InstanceManager.DatabasePath(fixture.Root)}"
+        );
+        connection.Open();
+        using Microsoft.Data.Sqlite.SqliteCommand command = connection.CreateCommand();
+        command.CommandText = sql;
+        Assert.True(command.ExecuteNonQuery() > 0);
     }
 
     [Fact]

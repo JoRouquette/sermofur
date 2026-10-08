@@ -14,8 +14,8 @@ reindexes it explicitly: inside the directory of the current scope and outside n
 no link, junction, network path, special file or file of `.sermofur`, at most 1 MiB, read once.
 Recall and challenge read no file. The type of a source is checked by path before it is
 opened: a process that can write to the directory may swap the file in between, so sources must
-live in folders only you can write to ([ADR 0014](adr/0014-instance-owner.md)). The full-text query is tokenized as text and sent as quoted
-terms, so no query syntax reaches the engine, and ranking statistics come from visible scopes only
+live in folders only you can write to ([ADR 0014](adr/0014-instance-owner.md)). The full-text query is split into terms by the index tokenizer and
+only compared with the index vocabulary, so no query syntax reaches the engine, and ranking statistics come from visible scopes only
 ([ADR 0013](adr/0013-filtered-ranking.md)).
 Reparse points and UNC paths are refused for storage and mappings; init uses adjacent temporary
 files and a rename. Any `.sermofur` entry that is not a valid instance (foreign, damaged,

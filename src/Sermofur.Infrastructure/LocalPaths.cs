@@ -1,3 +1,4 @@
+using System.Text;
 using Sermofur.Domain;
 
 namespace Sermofur.Infrastructure;
@@ -94,6 +95,66 @@ public static class LocalPaths
     /// </summary>
     public static string RelativizeMapping(string root, string absolute) =>
         Path.GetRelativePath(root, absolute).Replace(Path.DirectorySeparatorChar, MappingSeparator);
+
+    /// <summary>
+    /// Relative path (stored form) with each existing entry named as it is on disk. Only an entry
+    /// that the file system opens under the given name but lists under another one is renamed:
+    /// that is the same file on a case-insensitive (or normalization-insensitive) file system,
+    /// Windows and macOS by default. On a case-sensitive file system, or for a missing entry, the
+    /// given name is kept.
+    /// </summary>
+    public static string CanonicalCase(string root, string relative)
+    {
+        string current = root;
+        List<string> parts = new List<string>();
+        foreach (
+            string part in relative.Split(MappingSeparator, StringSplitOptions.RemoveEmptyEntries)
+        )
+        {
+            string candidate = Path.Combine(current, part);
+            string name = part;
+            if (File.Exists(candidate) || Directory.Exists(candidate))
+            {
+                string[] listed = Listed(current, part);
+                if (!listed.Contains(part, StringComparer.Ordinal) && listed.Length == 1)
+                {
+                    name = listed[0];
+                }
+            }
+            parts.Add(name);
+            current = Path.Combine(current, name);
+        }
+        return string.Join(MappingSeparator, parts);
+    }
+
+    /// <summary>Entries of <paramref name="directory"/> equal to <paramref name="name"/> without case and normalization.</summary>
+    private static string[] Listed(string directory, string name)
+    {
+        string folded = name.Normalize(NormalizationForm.FormC);
+        // A pattern narrows the listing; * and ? are wildcards, and a non-ASCII name may be
+        // stored under another normalization, so those names are matched one by one.
+        string pattern = name.Any(c => c is '*' or '?' || c > 127) ? "*" : name;
+        return new DirectoryInfo(directory)
+            .EnumerateFileSystemInfos(
+                pattern,
+                new EnumerationOptions
+                {
+                    MatchCasing = MatchCasing.CaseInsensitive,
+                    MatchType = MatchType.Simple,
+                    IgnoreInaccessible = true,
+                    AttributesToSkip = 0,
+                }
+            )
+            .Select(entry => entry.Name)
+            .Where(found =>
+                string.Equals(
+                    found.Normalize(NormalizationForm.FormC),
+                    folded,
+                    StringComparison.OrdinalIgnoreCase
+                )
+            )
+            .ToArray();
+    }
 
     private static bool IsNetworkDrive(string full)
     {

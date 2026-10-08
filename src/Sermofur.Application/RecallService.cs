@@ -194,14 +194,19 @@ public sealed class RecallService
             {
                 break;
             }
-            top.Add((candidate, candidate.Relevance * Weight(candidate, evidence)));
-            top = top.OrderByDescending(pair => pair.Score)
-                .ThenByDescending(pair => pair.Candidate.Record.CreatedAt)
-                .ThenBy(pair => pair.Candidate.Record.Id)
-                .ToList();
+            // Bounded insertion: the list never holds more than limit entries, in final order.
+            (Candidate Candidate, double Score) entry = (
+                candidate,
+                candidate.Relevance * Weight(candidate, evidence)
+            );
+            int position = top.FindIndex(other => Ranks(entry, other) < 0);
+            top.Insert(position < 0 ? top.Count : position, entry);
+            if (top.Count > limit)
+            {
+                top.RemoveAt(limit);
+            }
         }
-        List<RecallResult> shown = top.Take(limit)
-            .Select(pair => Describe(pair.Candidate, evidence, terms))
+        List<RecallResult> shown = top.Select(pair => Describe(pair.Candidate, evidence, terms))
             .ToList();
         Candidate[] notApplicable = candidates.Where(c => !c.Applicable).ToArray();
         if (fill)
@@ -212,6 +217,20 @@ public sealed class RecallService
         }
         int excluded = notApplicable.Length - shown.Count(result => !result.Applicable);
         return new Selection(shown, fill ? excluded : 0);
+    }
+
+    /// <summary>Final order: score, then most recent, then identifier. Negative when a comes first.</summary>
+    private static int Ranks(
+        (Candidate Candidate, double Score) a,
+        (Candidate Candidate, double Score) b
+    )
+    {
+        int order = b.Score.CompareTo(a.Score);
+        if (order == 0)
+        {
+            order = b.Candidate.Record.CreatedAt.CompareTo(a.Candidate.Record.CreatedAt);
+        }
+        return order != 0 ? order : a.Candidate.Record.Id.CompareTo(b.Candidate.Record.Id);
     }
 
     private double Weight(Candidate candidate, ILookup<Guid, MemoryRecord> evidence)

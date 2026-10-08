@@ -130,7 +130,17 @@ public sealed class ChallengeService(MemoryService memory, RecallService recall)
         }
         catch (SermofurException exception) when (exception.Code == "not_found")
         {
-            return null;
+            // The source moved to a narrower scope (or is otherwise out of reach): the evidence
+            // can no longer be checked from here. Its path is not revealed.
+            return new ChallengeSignal(
+                "source_unavailable",
+                claim.Id,
+                $"Source cited by evidence \"{proof.Reference}\" is no longer visible from this scope.",
+                evidence.Id,
+                sourceId,
+                proof.SourceHash,
+                null
+            );
         }
         SourceContent cited = RecordJson.Read<SourceContent>(source.ContentJson);
         if (cited.Status != SourceStatus.Indexed)

@@ -71,23 +71,24 @@ internal static class SqliteSearchIndex
     }
 
     /// <summary>Indexes every claim and RETEX of the registry: migration and rebuild.</summary>
-    public static int IndexRecords(SqliteConnection connection, SqliteTransaction transaction)
+    /// <remarks>Streams the registry: one record in memory at a time.</remarks>
+    public static int IndexRecords(
+        SqliteConnection connection,
+        SqliteTransaction transaction,
+        SqliteTokenizer? shared = null
+    )
     {
-        List<MemoryRecord> records = new List<MemoryRecord>();
-        using (SqliteCommand read = connection.CreateCommand())
+        SqliteTokenizer tokenizer =
+            shared ?? new SqliteTokenizer(connection) { Transaction = transaction };
+        int count = 0;
+        using SqliteCommand read = connection.CreateCommand();
+        read.Transaction = transaction;
+        read.CommandText =
+            "SELECT payload FROM records WHERE kind IN ('Claim','Retex') ORDER BY id";
+        using SqliteDataReader reader = read.ExecuteReader();
+        while (reader.Read())
         {
-            read.Transaction = transaction;
-            read.CommandText =
-                "SELECT payload FROM records WHERE kind IN ('Claim','Retex') ORDER BY id";
-            using SqliteDataReader reader = read.ExecuteReader();
-            while (reader.Read())
-            {
-                records.Add(RecordJson.Read<MemoryRecord>(reader.GetString(0)));
-            }
-        }
-        SqliteTokenizer tokenizer = new SqliteTokenizer(connection) { Transaction = transaction };
-        foreach (MemoryRecord record in records)
-        {
+            MemoryRecord record = RecordJson.Read<MemoryRecord>(reader.GetString(0));
             Insert(
                 connection,
                 transaction,
@@ -97,7 +98,8 @@ internal static class SqliteSearchIndex
                 SearchDocuments.For(record),
                 tokenizer
             );
+            count++;
         }
-        return records.Count;
+        return count;
     }
 }

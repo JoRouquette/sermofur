@@ -57,10 +57,13 @@ public sealed class SourceService
         RefuseUnindexable(snapshot);
         MemoryRecord? saved = store.SaveSource(
             relative,
-            existing =>
+            (existing, liveScopes) =>
             {
                 if (existing is null)
                 {
+                    // Checked again under the write lock: a scope created meanwhile on the
+                    // file's folder would otherwise leave the source in a broader scope.
+                    RefuseNarrower(relative, liveScopes);
                     SourceContent content = Indexed(relative, snapshot);
                     return new SourceChange(
                         new MemoryRecord(
@@ -88,12 +91,18 @@ public sealed class SourceService
             },
             snapshot.Passages
         );
-        return saved!;
+        return saved
+            ?? throw new SermofurException(
+                "storage_busy",
+                "Source changed concurrently; retry.",
+                3
+            );
     }
 
     /// <summary>
     /// Reads again the sources of the current scope (or one of them) and records what changed;
-    /// never reads a file that is not a declared source.
+    /// never reads a file that is not a declared source. A source changed by another command
+    /// since it was listed is left as that command wrote it.
     /// </summary>
     public IReadOnlyList<ReindexEntry> Reindex(Guid? id, string actor)
     {
@@ -119,15 +128,15 @@ public sealed class SourceService
             ReindexOutcome outcome = ReindexOutcome.Unchanged;
             MemoryRecord? saved = store.SaveSource(
                 previous.RelativePath,
-                current =>
+                (current, _) =>
                 {
-                    if (current is null || current.Id != source.Id)
+                    if (
+                        current is null
+                        || current.Id != source.Id
+                        || current.Revision != source.Revision
+                    )
                     {
-                        throw new SermofurException(
-                            "storage_busy",
-                            "Source changed concurrently; retry.",
-                            3
-                        );
+                        return null;
                     }
                     (SourceChange? change, ReindexOutcome result) = Transition(
                         current,
@@ -145,65 +154,37 @@ public sealed class SourceService
                     previous.RelativePath,
                     outcome,
                     previous.Hash.Length == 0 ? null : previous.Hash,
-                    Content(saved!).Hash
+                    saved is null ? previous.Hash : Content(saved).Hash
                 )
             );
         }
         return entries;
     }
 
+    /// <summary>Actor recorded for the changes made by an index rebuild, an instance operation.</summary>
+    public const string SystemActor = "sermofur";
+
     /// <summary>
-    /// Rebuilds the whole index: claims and RETEX from the registry, then every source of the
-    /// instance read again with the same transitions as <see cref="Reindex"/> (history included),
-    /// so that the registry and the index agree afterwards. Files are read before any write
-    /// transaction. Counts only cover visible objects, so that nothing of another scope leaks.
+    /// Rebuilds the whole index in one write transaction: claims and RETEX from the registry, then
+    /// every source of the instance read again, one at a time, with the transitions of
+    /// <see cref="Reindex"/>. The changes are recorded under <see cref="SystemActor"/>: the rebuild
+    /// is an instance operation. Counts cover visible objects only.
     /// </summary>
-    public IndexRebuild RebuildIndex(string actor)
+    public IndexRebuild RebuildIndex()
     {
-        MemoryService.ValidateText(actor);
-        HashSet<string> all = scopes.Select(scope => scope.Id).ToHashSet(StringComparer.Ordinal);
-        (MemoryRecord Source, SourceSnapshot Snapshot)[] sources = store
-            .ReadRecords(all, RecordKind.Source)
-            .Select(source => (source, reader.Read(context.Root, Content(source).RelativePath)))
-            .ToArray();
-        store.ResetIndex();
-        int changed = 0;
-        foreach ((MemoryRecord source, SourceSnapshot snapshot) in sources)
+        IReadOnlyList<MemoryRecord> changed = store.RebuildIndex(source =>
         {
-            ReindexOutcome outcome = ReindexOutcome.Unchanged;
-            store.SaveSource(
-                Content(source).RelativePath,
-                current =>
-                {
-                    if (current is null || current.Id != source.Id)
-                    {
-                        throw new SermofurException(
-                            "storage_busy",
-                            "Source changed concurrently; retry.",
-                            3
-                        );
-                    }
-                    (SourceChange? change, ReindexOutcome result) = Transition(
-                        current,
-                        snapshot,
-                        actor
-                    );
-                    outcome = result;
-                    return change;
-                },
-                snapshot.Passages,
-                reindex: true
+            SourceSnapshot snapshot = reader.Read(context.Root, Content(source).RelativePath);
+            return new SourceRebuild(
+                Transition(source, snapshot, SystemActor).Change,
+                snapshot.Passages
             );
-            if (
-                outcome != ReindexOutcome.Unchanged
-                && context.VisibleScopes.Contains(source.ScopeId)
-            )
-            {
-                changed++;
-            }
-        }
+        });
         int indexed = store.ReadRecords(context.VisibleScopes).Count(SearchExpectations.IsIndexed);
-        return new IndexRebuild(indexed, changed);
+        return new IndexRebuild(
+            indexed,
+            changed.Count(source => context.VisibleScopes.Contains(source.ScopeId))
+        );
     }
 
     public static SourceContent Content(MemoryRecord source) =>
@@ -251,13 +232,18 @@ public sealed class SourceService
                 4
             );
         }
-        bool narrower = scopes.Any(scope =>
-            scope.Id != context.ScopeId
-            && scope.RelativePath is not null
-            && ScopePolicy.VisibleAncestors(scope.Id, scopes).Contains(context.ScopeId)
-            && paths.Contains(paths.Normalize(context.Root, scope.RelativePath), full)
-        );
-        if (narrower)
+        // One file, one stored path: the case found on disk, whatever the case typed.
+        string relative = paths.CanonicalCase(context.Root, paths.Relativize(context.Root, full));
+        RefuseNarrower(relative, scopes);
+        return relative;
+    }
+
+    private void RefuseNarrower(string relative, IReadOnlyList<Scope> knownScopes)
+    {
+        if (
+            SourcePlacement.NarrowerScope(relative, context.ScopeId, knownScopes, paths.Comparison)
+            is not null
+        )
         {
             throw new SermofurException(
                 "scope_boundary",
@@ -265,7 +251,6 @@ public sealed class SourceService
                 4
             );
         }
-        return paths.Relativize(context.Root, full);
     }
 
     private static void RefuseUnindexable(SourceSnapshot snapshot)
