@@ -12,7 +12,7 @@ public sealed class CommandRunner(TextWriter output, TextWriter error)
         ProductVersion.CliDocumentation(ProductVersion.Current);
 
     private static readonly string Usage = $"""
-        Sermofur {ProductVersion.Current}
+        {CommandHelp.Header}
         Global options: [--path DIRECTORY] [--json]
         smf init | root | status | doctor | export | migrate
         smf scope current | list | tree
@@ -30,7 +30,7 @@ public sealed class CommandRunner(TextWriter output, TextWriter error)
         smf challenge CLAIM_ID | challenge --text TEXT
         smf COMMAND -h | smf GROUP -h       help of one command, or the subcommands of a group
         smf --version | -v                  version
-        --help (-h) and --version (-v) are recognized anywhere before --; --help is recognized first.
+        --help (-h) and --version (-v) are recognized anywhere before --, except as an option value; --help wins.
         -- ends options: every following argument is positional (text starting with --).
         An option value cannot start with --; see {CliDocumentation} for values and exit codes.
         """;
@@ -41,12 +41,25 @@ public sealed class CommandRunner(TextWriter output, TextWriter error)
         bool json = CommandArguments.HasFlag(arguments, "json");
         try
         {
-            if (arguments.Length == 0 || CommandArguments.Asks(arguments, "help", "-h"))
+            if (
+                arguments.Length == 0
+                || CommandArguments.Asks(
+                    arguments,
+                    CommandArguments.Help,
+                    CommandArguments.HelpShortcut
+                )
+            )
             {
                 output.WriteLine(CommandHelp.Find(arguments) ?? Usage);
                 return 0;
             }
-            if (CommandArguments.Asks(arguments, "version", "-v"))
+            if (
+                CommandArguments.Asks(
+                    arguments,
+                    CommandArguments.Version,
+                    CommandArguments.VersionShortcut
+                )
+            )
             {
                 output.WriteLine(
                     json

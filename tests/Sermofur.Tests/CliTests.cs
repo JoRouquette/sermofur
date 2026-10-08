@@ -410,15 +410,54 @@ public class CliTests
         }
     }
 
+    [Theory]
+    [InlineData("--actor")]
+    [InlineData("--key")]
+    public void ShortcutGivenAsAnOptionValueStaysAValue(string option)
+    {
+        using TestInstance fixture = new();
+        CliResult created = TestInstance.Run(
+            "--path",
+            fixture.Root,
+            "--json",
+            "claim",
+            "add",
+            "x",
+            "--origin",
+            "user",
+            option,
+            "-v"
+        );
+        Assert.Equal(0, created.ExitCode);
+        MemoryRecord record = RecordJson.Read<MemoryRecord>(created.Output);
+        Assert.Equal("claim", record.Kind.ToString().ToLowerInvariant());
+        if (option == "--actor")
+        {
+            Assert.Equal("-v", record.Provenance.Actor);
+        }
+    }
+
     [Fact]
     public void EveryCommandHasItsOwnHelp()
     {
         string usage = TestInstance.Run("-h").Output;
         foreach (CommandTopic topic in CommandHelp.Topics)
         {
-            // The general usage names every command form of the catalogue.
+            // The general usage has a line for every command form, with every option.
             string[] words = topic.Command.Split(' ');
-            Assert.Contains(words[^1], usage);
+            string line = Assert.Single(
+                usage.Split('\n').Select(text => text.TrimEnd()),
+                text =>
+                    text.StartsWith("smf " + topic.Command, StringComparison.Ordinal)
+                    || (
+                        words.Length > 1
+                            ? text.StartsWith("smf " + topic.Group, StringComparison.Ordinal)
+                                && text.Contains("| " + words[^1], StringComparison.Ordinal)
+                            : text.StartsWith("smf init", StringComparison.Ordinal)
+                                && text.Contains("| " + topic.Command, StringComparison.Ordinal)
+                    )
+            );
+            Assert.All(topic.Options, option => Assert.Contains(option.Name.Split(' ')[0], line));
             CliResult help = TestInstance.Run(
                 new[] { "--path", TestInstance.TempRoot }.Concat(words).Append("-h").ToArray()
             );
@@ -433,6 +472,8 @@ public class CliTests
             Assert.StartsWith("smf ", topic.Example);
             Assert.All(topic.Options, option => Assert.Contains(option.Name, help.Output));
             Assert.All(topic.Parameters, parameter => Assert.Contains(parameter.Name, help.Output));
+            Assert.All(topic.Errors, entry => Assert.Contains(entry.Name, help.Output));
+            Assert.Contains(CommandHelp.CommonErrors, help.Output);
         }
         string[] expected =
         [

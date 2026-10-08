@@ -121,8 +121,18 @@ public class PropertyTests
             CommandLines(),
             arguments =>
             {
-                bool help = arguments.Length == 0 || CommandArguments.Asks(arguments, "help", "-h");
-                bool version = CommandArguments.Asks(arguments, "version", "-v");
+                // Independent oracle: words before "--" that are not the value of an option.
+                List<string> heads = [];
+                for (int index = 0; index < arguments.Length && arguments[index] != "--"; index++)
+                {
+                    heads.Add(arguments[index]);
+                    if (arguments[index] is "--path" or "--actor" or "--text" or "--x")
+                    {
+                        index++;
+                    }
+                }
+                bool help = arguments.Length == 0 || heads.Any(word => word is "-h" or "--help");
+                bool version = heads.Any(word => word is "-v" or "--version");
                 if (!help && !version)
                 {
                     // Would run a real command: outside the scope of this property.

@@ -61,7 +61,8 @@ Claim : `--category episodic|semantic|procedural|preferences|decisions` ;
 `--volatility stable|evolving|volatile`.
 Types de preuve : `execution`, `source_code`, `authoritative_documentation`, `project_decision`,
 `local_documentation`, `human_observation`, `user_assertion`, `llm_assertion`.
-Un claim `preferences` ou `decisions` exige `--origin user`. Une preuve `execution` déclarée
+Un claim `preferences` ou `decisions` exige `--origin user` (sinon `user_choice_required`,
+code 1). Une preuve `execution` déclarée
 reste low dans cette version. `evidence add` accepte aussi `--contradicts` (preuve contre le
 claim, option sans valeur) et `--source SOURCE_ID` (une source visible et indexée ; son empreinte à
 cet instant est conservée avec la preuve). Pas d'argument `--scope` : le scope vient du chemin. Options
@@ -72,7 +73,8 @@ sans caractère NUL. Elles sont contrôlées avant toute commande, donc avant to
 écriture ; un dépassement donne `invalid_arguments` (exit 1). Le message, en anglais, écrit
 « 16,384 ».
 
-`--help` (`-h`) et `--version` (`-v`) sont reconnus n'importe où **avant** `--` et répondent
+`--help` (`-h`) et `--version` (`-v`) sont reconnus n'importe où **avant** `--`, sauf comme valeur d'une option (`--actor -v`
+garde l'acteur `-v`), et répondent
 (exit 0) avant toute recherche d'instance et avant le contrôle des bornes ; après `--`, ce sont
 des arguments positionnels comme les autres : un texte qui vaut `-h` ou `-v` se place donc après
 `--`. `--help` l'emporte si les deux sont donnés. `smf -h` affiche l'usage général ;

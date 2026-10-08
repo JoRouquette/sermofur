@@ -25,8 +25,9 @@ public sealed record CommandTopic(
 }
 
 /// <summary>
-/// Catalogue of the help of every command, the single source of the general usage and of the
-/// help of a group or of a command.
+/// Catalogue of the help of every command: the source of the help of a group and of a command.
+/// The general usage stays a hand-written summary; a test checks that it names every command
+/// form and option of this catalogue.
 /// </summary>
 public static class CommandHelp
 {
@@ -45,19 +46,19 @@ public static class CommandHelp
         "Idempotency key: the same key with the same content returns the same object."
     );
 
+    private static readonly HelpEntry Blank = new HelpEntry(
+        "invalid_input (1)",
+        "Empty or blank text, or text over the size bound."
+    );
+
+    private static readonly HelpEntry Conflict = new HelpEntry(
+        "idempotency_conflict (1)",
+        "Key reused with another content."
+    );
+
     private static readonly HelpEntry IdError = new HelpEntry(
         "not_found (1)",
         "Unknown identifier, or one of a scope that is not visible."
-    );
-
-    private static readonly HelpEntry NoInstance = new HelpEntry(
-        "no_instance (2)",
-        "No instance above the context directory."
-    );
-
-    private static readonly HelpEntry Migration = new HelpEntry(
-        "migration_required (3)",
-        "Instance created by 0.1: run smf migrate."
     );
 
     private static IReadOnlyList<HelpEntry> Entries(params HelpEntry[] entries) => entries;
@@ -90,7 +91,7 @@ public static class CommandHelp
             "Prints the root of the nearest instance going up from the context directory.",
             [],
             [],
-            Entries(NoInstance),
+            [],
             "smf root"
         ),
         new(
@@ -99,7 +100,7 @@ public static class CommandHelp
             "Identity of the instance, current scope and counts of the visible objects.",
             [],
             [],
-            Entries(NoInstance, Migration),
+            [],
             "smf status --json"
         ),
         new(
@@ -108,7 +109,7 @@ public static class CommandHelp
             "Read-only health check: integrity, schema, scopes, mappings, index, projections. Exit 5 when unhealthy, 0 when healthy, with or without warnings.",
             [],
             [],
-            Entries(NoInstance, new HelpEntry("unsafe_path (4)", "The .sermofur entry is a link.")),
+            Entries(new HelpEntry("unsafe_path (4)", "The .sermofur entry is a link.")),
             "smf doctor"
         ),
         new(
@@ -117,7 +118,7 @@ public static class CommandHelp
             "Rebuilds the Markdown projections of the visible objects and lists their files.",
             [],
             [],
-            Entries(NoInstance, Migration),
+            [],
             "smf export"
         ),
         new(
@@ -127,7 +128,6 @@ public static class CommandHelp
             [],
             [],
             Entries(
-                NoInstance,
                 new HelpEntry(
                     "storage_error (3)",
                     "The instance is not consistent: run smf doctor first."
@@ -141,7 +141,7 @@ public static class CommandHelp
             "Current scope (from the context directory) and its visible ancestors.",
             [],
             [],
-            Entries(NoInstance),
+            [],
             "smf scope current"
         ),
         new(
@@ -150,18 +150,10 @@ public static class CommandHelp
             "Visible scopes: the current one and its ancestors, never siblings or descendants.",
             [],
             [],
-            Entries(NoInstance),
+            [],
             "smf scope list"
         ),
-        new(
-            "scope tree",
-            "",
-            "Same as scope list in this version.",
-            [],
-            [],
-            Entries(NoInstance),
-            "smf scope tree"
-        ),
+        new("scope tree", "", "Same as scope list in this version.", [], [], [], "smf scope tree"),
         new(
             "scope add",
             "ID KIND PARENT RELATIVE_PATH",
@@ -204,7 +196,7 @@ public static class CommandHelp
             Entries(
                 new HelpEntry(
                     "TEXT",
-                    "The statement. Put it after -- if it starts with - or is -h or -v."
+                    "The statement. Put it after -- if it starts with -- or is -h or -v."
                 )
             ),
             Entries(
@@ -225,19 +217,16 @@ public static class CommandHelp
                     "invalid_arguments (1)",
                     "Missing origin, bad value or unknown option."
                 ),
-                new HelpEntry("idempotency_conflict (1)", "Key reused with another content.")
+                Blank,
+                new HelpEntry(
+                    "user_choice_required (1)",
+                    "preferences or decisions with --origin llm."
+                ),
+                Conflict
             ),
             "smf claim add \"The billing API paginates with cursors\" --origin user"
         ),
-        new(
-            "claim list",
-            "",
-            "Visible claims.",
-            [],
-            [],
-            Entries(NoInstance),
-            "smf claim list --json"
-        ),
+        new("claim list", "", "Visible claims.", [], [], [], "smf claim list --json"),
         new(
             "claim show",
             "ID",
@@ -256,7 +245,11 @@ public static class CommandHelp
                 new HelpEntry("--reason TEXT", "Required. Why the claim no longer holds."),
                 Actor
             ),
-            Entries(IdError),
+            Entries(
+                IdError,
+                new HelpEntry("scope_boundary (4)", "The claim belongs to an ancestor scope."),
+                Blank
+            ),
             "smf claim invalidate 7f8c1a3e-0000-4000-8000-000000000001 --reason \"Replaced by cursors v2\""
         ),
         new(
@@ -291,19 +284,13 @@ public static class CommandHelp
                 new HelpEntry(
                     "source_unavailable (1)",
                     "The source is missing, unreadable or rejected."
-                )
+                ),
+                Blank,
+                Conflict
             ),
             "smf evidence add 7f8c1a3e-0000-4000-8000-000000000001 source_code src/Billing/Pagination.cs --lineage billing-repo --origin user"
         ),
-        new(
-            "evidence list",
-            "",
-            "Visible evidence.",
-            [],
-            [],
-            Entries(NoInstance),
-            "smf evidence list"
-        ),
+        new("evidence list", "", "Visible evidence.", [], [], [], "smf evidence list"),
         new(
             "evidence show",
             "ID",
@@ -326,18 +313,14 @@ public static class CommandHelp
                 Actor,
                 Key
             ),
-            Entries(new HelpEntry("invalid_arguments (1)", "Missing option or unknown option.")),
+            Entries(
+                new HelpEntry("invalid_arguments (1)", "Missing option or unknown option."),
+                Blank,
+                Conflict
+            ),
             "smf retex add --event \"Cache cleared on deploy\" --impact \"Slow start\" --next \"Warm the cache\" --origin user"
         ),
-        new CommandTopic(
-            "retex list",
-            "",
-            "Visible RETEX.",
-            [],
-            [],
-            Entries(NoInstance),
-            "smf retex list"
-        ),
+        new("retex list", "", "Visible RETEX.", [], [], [], "smf retex list"),
         new(
             "retex show",
             "ID",
@@ -372,15 +355,7 @@ public static class CommandHelp
             ),
             "smf source add docs/adr/0001.md --origin user"
         ),
-        new CommandTopic(
-            "source list",
-            "",
-            "Visible sources.",
-            [],
-            [],
-            Entries(NoInstance),
-            "smf source list"
-        ),
+        new("source list", "", "Visible sources.", [], [], [], "smf source list"),
         new(
             "source show",
             "ID",
@@ -418,7 +393,10 @@ public static class CommandHelp
             "At most 3 explained results among visible claims, RETEX and source passages. The question is plain text; case and accents are ignored. Writes nothing.",
             Entries(new HelpEntry("QUESTION", "Free text.")),
             Entries(new HelpEntry("--limit 1-3", "Number of results. Default: 3.")),
-            Entries(new HelpEntry("invalid_arguments (1)", "Limit outside 1-3.")),
+            Entries(
+                new HelpEntry("invalid_arguments (1)", "Limit outside 1-3."),
+                new HelpEntry("invalid_input (1)", "No searchable term in the question.")
+            ),
             "smf recall \"how does billing paginate\""
         ),
         new(
@@ -434,6 +412,10 @@ public static class CommandHelp
         ),
     ];
 
+    /// <summary>Errors any command may give, kept out of the per-command lists.</summary>
+    public const string CommonErrors =
+        "Any command: invalid_arguments (1) for a bad command line or a malformed ID. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).";
+
     /// <summary>Header shared by every help output.</summary>
     public static string Header => $"Sermofur {ProductVersion.Current}";
 
@@ -448,17 +430,18 @@ public static class CommandHelp
         {
             return null;
         }
-        if (words.Count > 1 && Topics.Any(topic => topic.Command == $"{words[0]} {words[1]}"))
+        CommandTopic? topic =
+            (words.Count > 1 ? Topic($"{words[0]} {words[1]}") : null) ?? Topic(words[0]);
+        if (topic is not null)
         {
-            return Command(Topics.Single(topic => topic.Command == $"{words[0]} {words[1]}"));
-        }
-        if (Topics.Any(topic => topic.Command == words[0]))
-        {
-            return Command(Topics.Single(topic => topic.Command == words[0]));
+            return Command(topic);
         }
         CommandTopic[] group = Topics.Where(topic => topic.Group == words[0]).ToArray();
         return group.Length == 0 ? null : Group(words[0], group);
     }
+
+    private static CommandTopic? Topic(string command) =>
+        Topics.FirstOrDefault(topic => topic.Command == command);
 
     private static List<string> Positionals(IReadOnlyList<string> arguments)
     {
@@ -497,6 +480,8 @@ public static class CommandHelp
         Section(text, "Arguments", topic.Parameters);
         Section(text, "Options", topic.Options);
         Section(text, "Errors (code, exit)", topic.Errors);
+        text.AppendLine();
+        text.AppendLine(CommonErrors);
         text.AppendLine();
         text.AppendLine("Example:");
         text.AppendLine($"  {topic.Example}");
