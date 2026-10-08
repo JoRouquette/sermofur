@@ -24,12 +24,15 @@ Conséquence assumée en 0.1 : un project qui partage le chemin de son repositor
 atteignable comme contexte d'écriture une fois le repository enregistré, puisque le repository
 gagne l'égalité. Écrire au niveau du project exige alors un mapping distinct du repository.
 
-Limite connue : la comparaison des mappings est lexicale (chemins normalisés sans accès disque).
-Les alias 8.3 de Windows ne sont pas canonisés, ni la casse : la comparaison l'ignore sous
-Windows mais la respecte ailleurs, y compris sur un système de fichiers insensible à la casse.
-Les formes de normalisation Unicode (NFC et NFD, comme sous macOS) ne sont pas unifiées non plus.
-Deux écritures d'un même dossier peuvent donc échapper au contrôle de doublon ou de
-chevauchement.
+Un nouveau mapping est enregistré sous le nom de son dossier sur le disque (casse et normalisation
+Unicode, comme `source add` pour les chemins de source) : un scope et les sources de son dossier
+se comparent toujours sous la même écriture ; un alias 8.3 de Windows est refusé. `doctor` avertit
+(`scope_mappings`) d'un mapping enregistré sous une autre écriture par une version antérieure, car un tel scope peut ne pas contenir les sources de son dossier.
+
+Limite connue : les contrôles de doublon et de chevauchement entre mappings restent lexicaux
+(chemins normalisés, sans accès disque) ; la comparaison ignore la casse sous Windows et la
+respecte ailleurs. Des mappings enregistrés par une version antérieure sous deux écritures d'un
+même dossier peuvent donc y échapper.
 
 Exemple pour un projet mono-dépôt existant, sans créer de dossiers :
 ```powershell

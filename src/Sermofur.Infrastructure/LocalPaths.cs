@@ -1,3 +1,4 @@
+using System.Text;
 using Sermofur.Domain;
 
 namespace Sermofur.Infrastructure;
@@ -94,6 +95,95 @@ public static class LocalPaths
     /// </summary>
     public static string RelativizeMapping(string root, string absolute) =>
         Path.GetRelativePath(root, absolute).Replace(Path.DirectorySeparatorChar, MappingSeparator);
+
+    /// <summary>
+    /// Relative path (stored form) with each existing entry named as it is on disk. Only an entry
+    /// that the file system opens under the given name but lists under another one is renamed:
+    /// that is the same file on a case-insensitive (or normalization-insensitive) file system,
+    /// Windows and macOS by default. On a case-sensitive file system, or for a missing entry, the
+    /// given name is kept. Case and Unicode normalization (NFC/NFD) both come from the disk.
+    /// </summary>
+    /// <exception cref="SermofurException"><c>unsafe_path</c> for an alias or an ambiguous name.</exception>
+    public static string CanonicalCase(string root, string relative)
+    {
+        string current = root;
+        List<string> parts = new List<string>();
+        foreach (
+            string part in relative.Split(MappingSeparator, StringSplitOptions.RemoveEmptyEntries)
+        )
+        {
+            string candidate = Path.Combine(current, part);
+            string name = part;
+            if (part != "." && (File.Exists(candidate) || Directory.Exists(candidate)))
+            {
+                // A folder that can be crossed but not listed cannot tell the name on disk: the
+                // path would not have one stored form, so it is refused with its own reason.
+                string[] listed =
+                    Listed(current, part)
+                    ?? throw new SermofurException(
+                        "invalid_path",
+                        "A folder of the path cannot be listed; its names on disk cannot be checked."
+                    );
+                if (!listed.Contains(part, StringComparer.Ordinal))
+                {
+                    // An entry opened under a name that no listed name reflects (a Windows 8.3
+                    // short name) or that several names reflect cannot be given one stored path.
+                    name =
+                        listed.Length == 1
+                            ? listed[0]
+                            : throw new SermofurException(
+                                "unsafe_path",
+                                "Path reached through an alias (short name) or an ambiguous name.",
+                                4
+                            );
+                }
+            }
+            parts.Add(name);
+            current = Path.Combine(current, name);
+        }
+        return string.Join(MappingSeparator, parts);
+    }
+
+    /// <summary>Entries of <paramref name="directory"/> equal to <paramref name="name"/> without case and normalization.</summary>
+    /// <returns>Null when the directory cannot be listed.</returns>
+    private static string[]? Listed(string directory, string name)
+    {
+        string folded = name.Normalize(NormalizationForm.FormC);
+        // The pattern only filters: the whole directory is read either way. * and ? are
+        // wildcards, and a non-ASCII name may be stored under another normalization, so those
+        // names are compared one by one.
+        string pattern = name.Any(c => c is '*' or '?' || c > 127) ? "*" : name;
+        try
+        {
+            return Matches(directory, folded, pattern);
+        }
+        catch (Exception exception) when (exception is UnauthorizedAccessException or IOException)
+        {
+            return null;
+        }
+    }
+
+    private static string[] Matches(string directory, string folded, string pattern) =>
+        new DirectoryInfo(directory)
+            .EnumerateFileSystemInfos(
+                pattern,
+                new EnumerationOptions
+                {
+                    MatchCasing = MatchCasing.CaseInsensitive,
+                    MatchType = MatchType.Simple,
+                    IgnoreInaccessible = false,
+                    AttributesToSkip = 0,
+                }
+            )
+            .Select(entry => entry.Name)
+            .Where(found =>
+                string.Equals(
+                    found.Normalize(NormalizationForm.FormC),
+                    folded,
+                    StringComparison.OrdinalIgnoreCase
+                )
+            )
+            .ToArray();
 
     private static bool IsNetworkDrive(string full)
     {

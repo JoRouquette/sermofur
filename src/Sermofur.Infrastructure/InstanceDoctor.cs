@@ -13,22 +13,15 @@ public sealed record DoctorReport(
     IReadOnlyList<DiagnosticCheck> Checks
 );
 
-public sealed class InstanceDoctor
+/// <param name="ownership">Owner and type of entries; the operating system by default.</param>
+public sealed class InstanceDoctor(IFileOwnership? ownership = null)
 {
-    private static readonly string[] UndeliveredCapabilities =
-    [
-        "daemon",
-        "laya",
-        "model",
-        "mcp",
-        "indexes",
-        "contradictions",
-    ];
+    private static readonly string[] UndeliveredCapabilities = ["daemon", "laya", "model", "mcp"];
 
     public DoctorReport Inspect(string root)
     {
         List<DiagnosticCheck> checks = new List<DiagnosticCheck>();
-        string? invalidMarker = InstanceManager.DescribeInvalidMarker(root);
+        string? invalidMarker = new InstanceManager(ownership).DescribeInvalidMarker(root);
         if (invalidMarker is not null)
         {
             checks.Add(new("instance", "error", $"invalid_instance: {invalidMarker}"));
@@ -37,7 +30,7 @@ public sealed class InstanceDoctor
         InstanceConfiguration config;
         try
         {
-            config = new InstanceManager().ReadConfiguration(root);
+            config = new InstanceManager(ownership).ReadConfiguration(root);
             checks.Add(new("instance", "ok", "Compatible configuration and version."));
         }
         catch (Exception exception) when (IsDiagnosable(exception))
@@ -51,6 +44,7 @@ public sealed class InstanceDoctor
             InspectStorage(store, checks);
             IReadOnlyList<Scope> scopes = InspectScopes(root, store, checks);
             InspectMemory(root, store, scopes, checks);
+            InspectSearchIndex(store, scopes, checks);
             checks.Add(
                 new(
                     "sqlite",
@@ -113,13 +107,99 @@ public sealed class InstanceDoctor
         );
     }
 
+    /// <summary>
+    /// The full-text index must hold exactly the indexable objects of the registry: claims,
+    /// RETEX and indexed sources. Compared as sets of identifiers, without repairing anything.
+    /// </summary>
+    private static void InspectSearchIndex(
+        SqliteStore store,
+        IReadOnlyList<Scope> scopes,
+        List<DiagnosticCheck> checks
+    )
+    {
+        bool fts5 =
+            Convert.ToInt64(store.Scalar("SELECT sqlite_compileoption_used('ENABLE_FTS5')")) == 1;
+        checks.Add(new("fts5", fts5 ? "ok" : "error", "SQLite full-text search engine."));
+        MemoryRecord[] records = store
+            .QueryStrings("SELECT payload FROM records WHERE kind IN ('Claim','Retex','Source')")
+            .Select(RecordJson.Read<MemoryRecord>)
+            .ToArray();
+        // Identity, scope and kind of each indexed object must match the registry: the
+        // visibility filter of recall relies on the scope column of the index.
+        HashSet<string> indexed = store
+            .QueryStrings("SELECT DISTINCT object_id, scope_id, kind FROM search")
+            .ToHashSet(StringComparer.Ordinal);
+        HashSet<string> expected = records
+            .Where(SearchExpectations.IsIndexed)
+            .Select(record =>
+                $"{record.Id}|{record.ScopeId}|{SqliteSearchIndex.KindOf(record.Kind)}"
+            )
+            .ToHashSet(StringComparer.Ordinal);
+        int missing = expected.Count(entry => !indexed.Contains(entry));
+        int extra = indexed.Count(entry => !expected.Contains(entry));
+        checks.Add(
+            new(
+                "search_index",
+                missing + extra == 0 ? "ok" : "error",
+                $"{missing} objects missing from the index or misplaced, {extra} entries without object; run index rebuild."
+            )
+        );
+        // A source must belong to the narrowest scope that holds its file (FR-002).
+        int misplaced = records
+            .Where(record => record.Kind == RecordKind.Source)
+            .Count(source =>
+                SourcePlacement.NarrowerScope(
+                    RecordJson.Read<SourceContent>(source.ContentJson).RelativePath,
+                    source.ScopeId,
+                    scopes,
+                    LocalPaths.Comparison
+                )
+                    is not null
+            );
+        checks.Add(
+            new(
+                "source_scopes",
+                misplaced == 0 ? "ok" : "error",
+                $"{misplaced} sources attached to a broader scope than their file."
+            )
+        );
+    }
+
     private static void AddUndeliveredCapabilities(List<DiagnosticCheck> checks)
     {
         foreach (string component in UndeliveredCapabilities)
         {
-            checks.Add(
-                new(component, "warning", "Capability not delivered in the 0.1 vertical slice.")
+            checks.Add(new(component, "warning", "Capability not delivered in this version."));
+        }
+    }
+
+    private static bool IsMisnamed(string root, string mapping)
+    {
+        try
+        {
+            string full = LocalPaths.NormalizeMapping(root, mapping);
+            if (!Directory.Exists(full))
+            {
+                // Counted as missing, not as misnamed.
+                return false;
+            }
+            string relative = LocalPaths.RelativizeMapping(root, full);
+            // Only a difference the comparison does not absorb (case on Windows is absorbed).
+            return !string.Equals(
+                LocalPaths.CanonicalCase(root, relative),
+                relative,
+                LocalPaths.Comparison
             );
+        }
+        catch (SermofurException exception) when (exception.Code == "invalid_path")
+        {
+            // A folder that cannot be listed: the name on disk is unknown, not different.
+            return false;
+        }
+        catch (Exception exception)
+            when (exception is SermofurException or IOException or UnauthorizedAccessException)
+        {
+            return true;
         }
     }
 
@@ -137,8 +217,19 @@ public sealed class InstanceDoctor
         ScopePolicy.ValidateTree(scopes);
         checks.Add(new("scopes", "ok", "Valid scope tree."));
         int missing = CountMissingMappings(root, scopes);
+        // A mapping stored with another case or Unicode form than its folder on a
+        // case-insensitive file system does not hold the sources of that folder (stored on-disk).
+        int misnamed = scopes.Count(scope =>
+            scope.RelativePath is not null && IsMisnamed(root, scope.RelativePath)
+        );
         checks.Add(
-            new("scope_mappings", missing == 0 ? "ok" : "warning", $"{missing} missing mappings.")
+            new(
+                "scope_mappings",
+                missing + misnamed == 0 ? "ok" : "warning",
+                misnamed == 0
+                    ? $"{missing} missing mappings."
+                    : $"{missing} missing mappings, {misnamed} named otherwise on disk (such a scope may not hold the sources of its folder)."
+            )
         );
         // Same rules as scope add, on lexically normalized mappings: detects an overlap entered
         // outside the CLI. The detail only gives the number of pairs.
@@ -197,6 +288,9 @@ public sealed class InstanceDoctor
                     break;
                 case RecordKind.Retex:
                     RecordJson.Read<RetexContent>(record.ContentJson);
+                    break;
+                case RecordKind.Source:
+                    RecordJson.Read<SourceContent>(record.ContentJson);
                     break;
                 case RecordKind.Evidence:
                     EvidenceContent evidence = RecordJson.Read<EvidenceContent>(record.ContentJson);

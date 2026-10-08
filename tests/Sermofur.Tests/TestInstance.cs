@@ -62,6 +62,36 @@ public sealed class TestInstance : IDisposable
             Manager.ResolveContext(path ?? Root, Root, store.ReadScopes())
         );
 
+    public MemoryContext Context(SqliteStore store, string? path = null) =>
+        Manager.ResolveContext(path ?? Root, Root, store.ReadScopes());
+
+    public SourceService Sources(
+        SqliteStore store,
+        string? path = null,
+        ISourceReader? reader = null
+    ) =>
+        new(
+            store,
+            reader ?? new FileSourceReader(new FileOwnership()),
+            new LocalPathResolver(),
+            Context(store, path)
+        );
+
+    public RecallService Recall(SqliteStore store, string? path = null) =>
+        new(store, store, Context(store, path));
+
+    public ChallengeService Challenge(SqliteStore store, string? path = null) =>
+        new(Memory(store, path), Recall(store, path));
+
+    /// <summary>Writes a text file below the root and returns its full path.</summary>
+    public string WriteFile(string relative, string content)
+    {
+        string full = Path.Combine(Root, relative);
+        Directory.CreateDirectory(Path.GetDirectoryName(full)!);
+        File.WriteAllText(full, content);
+        return full;
+    }
+
     public string Client(SqliteStore store, string id)
     {
         string path = Path.Combine(Root, id);

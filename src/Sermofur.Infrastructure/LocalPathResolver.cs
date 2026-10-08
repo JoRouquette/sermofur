@@ -15,4 +15,9 @@ public sealed class LocalPathResolver : IPathResolver
         LocalPaths.RelativizeMapping(root, absolute);
 
     public bool Contains(string parent, string child) => LocalPaths.Contains(parent, child);
+
+    public StringComparison Comparison => LocalPaths.Comparison;
+
+    public string CanonicalCase(string root, string relative) =>
+        LocalPaths.CanonicalCase(root, relative);
 }

@@ -1,6 +1,6 @@
 [English](../cli.md) | Français
 
-# CLI 0.1
+# CLI 0.2
 
 `smf [--path DOSSIER] [--json] COMMANDE ...`. Le chemin est un dossier local existant, le
 dossier courant par défaut ; il désigne le contexte de travail, jamais un scope arbitraire.
@@ -41,20 +41,30 @@ grave restent échappés, si bien qu'un texte ne peut pas fermer le bloc JSON d'
 | retex add --event TEXTE --impact TEXTE --next TEXTE --origin user\|llm | RETEX brouillon, aucun apprentissage implicite |
 | retex list / show ID | RETEX visibles |
 | export | Reconstruit les projections des objets visibles |
+| migrate | Format d'instance 1 (0.1) → 2 : sauvegarde, puis migration en une transaction ; rien à faire en format 2 |
+| source add FICHIER --origin user\|llm | Source déclarée du scope courant : hachée, indexée, idempotente |
+| source list / show ID | Sources visibles / la source avec son historique |
+| source reindex [ID] | Relit les sources du scope courant : unchanged, modified, missing, unreadable, rejected, restored, ou skipped quand une autre commande a modifié la source entre-temps |
+| index rebuild | Reconstruit l'index plein texte de l'instance en une seule transaction d'écriture et relit toutes les sources (mêmes issues que `source reindex`, historique sous l'acteur système `sermofur`) ; les autres commandes attendent au plus 5 s, puis échouent en `storage_busy` (code 3) et sont à relancer ; la sortie `{indexed, changedSources}` ne compte que les objets visibles |
+| recall QUESTION [--limit 1-3] | Au plus 3 résultats expliqués parmi claims, RETEX et passages de sources visibles |
+| challenge CLAIM_ID / challenge --text TEXTE | Contradictions, sources modifiées, statut, date de revue, claims proches à confronter ; n'écrit rien |
 
 L'usage affiché par `smf --help` est en anglais (`TEXT`, `RELATIVE_PATH`, `ORIGIN`…).
 
-`--origin user|llm` est **obligatoire** sur `claim add`, `evidence add` et `retex add`
-seulement — pas sur `scope add` —, sans valeur par défaut : son absence donne
+`--origin user|llm` est **obligatoire** sur `claim add`, `evidence add`, `retex add` et
+`source add` — pas sur `scope add` —, sans valeur par défaut : son absence donne
 `invalid_arguments` (exit 1) et rien n'est écrit. L'origine reste déclarative tant que le canal
 host (daemon/MCP) ne la fixe pas.
-Autres options de `add` : `--actor` (défaut `local-user`), `--key` pour l'idempotence.
+Autres options de `add` : `--actor` (défaut `local-user`), `--key` pour l'idempotence (pas sur
+`source add`, idempotent par chemin).
 Claim : `--category episodic|semantic|procedural|preferences|decisions` ;
 `--volatility stable|evolving|volatile`.
 Types de preuve : `execution`, `source_code`, `authoritative_documentation`, `project_decision`,
 `local_documentation`, `human_observation`, `user_assertion`, `llm_assertion`.
 Un claim `preferences` ou `decisions` exige `--origin user`. Une preuve `execution` déclarée
-reste low dans cette version. Pas d'argument `--scope` : le scope vient du chemin. Options
+reste low dans cette version. `evidence add` accepte aussi `--contradicts` (preuve contre le
+claim, option sans valeur) et `--source SOURCE_ID` (une source visible et indexée ; son empreinte à
+cet instant est conservée avec la preuve). Pas d'argument `--scope` : le scope vient du chemin. Options
 inconnues refusées avant toute mutation. Pas encore de `--quiet`/`--verbose`.
 
 Bornes de la ligne de commande : 128 arguments au plus, chacun d'au plus 16 384 caractères et
@@ -89,8 +99,70 @@ pendant, est refusé en `unsafe_path` (exit 4) par toutes les commandes, `doctor
 n'est jamais écrit dans une instance plus haut. Pour une instance endommagée, lancer
 `smf doctor` depuis ce dossier, puis restaurer `instance.json` depuis une sauvegarde ; pour une
 entrée étrangère, la renommer ou la déplacer. `doctor` nomme le cas dans son contrôle
-`instance` : `invalid_instance: foreign`, `invalid_instance: damaged` ou
-`invalid_instance: unreadable`.
+`instance` : `invalid_instance: foreign`, `invalid_instance: damaged`,
+`invalid_instance: unreadable` ou `invalid_instance: foreign_owner`.
+
+Une entrée `.sermofur` qui appartient à un autre compte utilisateur n'est jamais lue : toute
+commande sauf `doctor` échoue en `foreign_owner` (exit 4) ([ADR 0014](adr/0014-instance-owner.md)).
+Un `instance.json` de plus de 64 Kio est une instance endommagée (`invalid_instance`, exit 3).
+
+## migrate
+
+L'outil 0.2 lit les instances au format 2. Sur une instance au format 1 (créée par la 0.1), toute
+commande sauf `migrate`, `doctor` et `root` échoue en `migration_required` (exit 3) sans rien
+modifier ; `doctor` signale `migration_required`. `smf migrate` vérifie la cohérence de la base,
+la sauvegarde par l'API de sauvegarde SQLite dans
+`.sermofur/backups/memory-v1-<heure UTC>-<id>.db`, la migre en une transaction (objets,
+historique, clés d'idempotence et projections inchangés ; claims et RETEX indexés), puis remplace
+`instance.json`. S'il est interrompu, le relancer : il reprend où il s'est arrêté. Sortie :
+`{migrated, from, to, backup}` ; sur une instance au format 2, `migrated: false`
+([ADR 0012](adr/0012-instance-format-2.md)).
+
+## Sources
+
+`source add FICHIER` déclare un fichier texte local comme source du scope courant. Un `FICHIER` relatif
+l'est au dossier de contexte (`--path`, le dossier courant par défaut). Le fichier doit être dans
+le dossier du scope courant (la racine de l'instance pour le workspace) et hors du dossier de tout
+scope plus précis : le fichier d'un client s'ajoute depuis le dossier de ce client, pour qu'il ne
+devienne jamais visible de ses frères. Le fichier est lu une fois, 1 Mio au plus, en UTF-8 strict
+(un BOM est accepté) ; son empreinte SHA-256 couvre exactement les octets indexés. Son texte est
+découpé en passages d'au plus 2 000 caractères. Ajouter de nouveau le même fichier rend la même
+source.
+
+`source reindex` ne relit que les sources déclarées du scope courant ; aucun autre fichier n'est
+jamais lu, et `recall`/`challenge` ne lisent aucun fichier. L'empreinte précédente reste dans
+l'historique. Quand `scope add` crée un scope dont le dossier contient des sources d'un ancêtre,
+ces sources passent au nouveau scope dans la même transaction (historique « rescoped »), pour ne
+jamais rester visibles de ses frères ; `doctor` signale une source rattachée à un scope plus large
+que son fichier (`source_scopes`). Une source est enregistrée sous le nom de son fichier sur le disque : sur un système de fichiers
+insensible à la casse (Windows, macOS par défaut), `Doc.md` et `doc.md` sont une seule source. Une source absente, illisible ou refusée sort de l'index, son enregistrement est
+conservé.
+
+| Code | Exit | Cas |
+|---|---|---|
+| `source_rejected` | 1 | Vide, binaire (octet NUL, UTF-8 invalide, fichier spécial) ou de plus de 1 Mio ; le message donne la raison |
+| `invalid_path` | 1 | Fichier absent, dossier ou fichier illisible |
+| `scope_boundary` | 4 | Hors de l'instance, hors du dossier du scope courant, dans un scope plus précis, ou déjà source d'un autre scope |
+| `unsafe_path` | 4 | Lien, jonction, chemin réseau, ou fichier de `.sermofur` |
+| `source_unavailable` | 1 | `evidence add --source` sur une source absente, illisible ou refusée |
+
+## recall et challenge
+
+`recall` traite la question comme du texte (aucune syntaxe de requête), sans tenir compte de la
+casse ni des accents. Il rend au plus 3 résultats, chacun avec son type, son identifiant, son
+scope, son statut, sa confiance et ses raisons (claims), l'extrait qui correspond, les termes
+trouvés et sa fraîcheur (création, dernière vérification ou date de revue d'un claim, dernière
+indexation et empreinte d'une source). Seuls le scope courant et ses ancêtres sont interrogés, et
+les statistiques de classement sont calculées sur eux seuls : le contenu d'un autre scope ne
+change ni la présence ni l'ordre ([ADR 0013](adr/0013-filtered-ranking.md)). Un claim invalidé ou
+remplacé n'est jamais présenté comme applicable : il ne fait que compléter les places restantes,
+marqué `applicable: false` ; `excluded` compte les visibles laissés de côté.
+
+`challenge CLAIM_ID` rend des signaux — `contradiction`, `source_changed` (avec l'empreinte
+enregistrée et l'empreinte actuelle), `source_unavailable`, `not_applicable`, `review_due` — et au
+plus 3 claims proches `toConfront`, jamais qualifiés de contradictions. `challenge --text TEXTE`
+fait de même pour un texte qui n'est pas encore un claim. Aucun des deux n'écrit. Un identifiant
+d'un autre scope répond comme un identifiant inconnu.
 
 ## scope add
 
@@ -116,16 +188,20 @@ le seul nombre de paires en conflit) pour détecter un chevauchement entré hors
 
 Un dossier mappé supprimé n'empêche pas les autres contextes de fonctionner : seul le mapping
 retenu pour le chemin courant est contrôlé physiquement. `doctor` le signale en warning
-`scope_mappings`, avec le seul nombre de mappings absents.
+`scope_mappings`, avec le seul nombre de mappings absents. Le même avertissement compte les mappings
+enregistrés par une version antérieure sous une écriture que le système de fichiers résout mais
+qui ne se compare pas égale au nom sur le disque (casse hors Windows, normalisation Unicode) : un
+tel scope peut ne pas contenir les sources de son dossier, et Sermofur 0.2 n'offre aucune commande
+pour réécrire un mapping.
 
 | Exit | Signification |
 |---|---|
 | 0 | Succès, aide, ou doctor sain avec warnings |
 | 1 | Entrée invalide / not_found / conflit idempotent / mapping dupliqué |
 | 2 | Instance absente |
-| 3 | Stockage/version/permissions/projection à reconstruire, entrée `.sermofur` invalide (étrangère, endommagée, illisible) |
-| 4 | Frontière scope/chemin, instance imbriquée |
+| 3 | Stockage/version/permissions/projection à reconstruire, entrée `.sermofur` invalide (étrangère, endommagée, illisible), migration requise |
+| 4 | Frontière scope/chemin, instance imbriquée, entrée d'un autre compte |
 | 5 | Doctor unhealthy |
 
-La CLI 0.1 appelle directement Application. runtime/mcp/config/source/recall/challenge sont au
-backlog, jamais des commandes vides qui annoncent un succès.
+La CLI appelle directement Application. runtime/mcp/config sont au backlog, jamais des commandes
+vides qui annoncent un succès.

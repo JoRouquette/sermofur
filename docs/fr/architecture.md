@@ -4,15 +4,18 @@
 
 ## Livré
 Domain : types métier, arbre des scopes, hiérarchie des types et visibilité. Application :
-MemoryService, ScopeService (toutes les règles d'enregistrement des scopes), validation, accès
-scopés, confiance expliquée, port de stockage (`IMemoryStore`) et port de chemins
-(`IPathResolver`). Infrastructure : découverte, chemins, bootstrap, SQLite, schéma, projections
-et doctor. CLI : parsing, commandes et composition. Le port `IMemoryStore` est synchrone en 0.1
+MemoryService, ScopeService (toutes les règles d'enregistrement des scopes), SourceService,
+RecallService (BM25 sur statistiques visibles), ChallengeService, validation, accès scopés,
+confiance expliquée, et les ports `IMemoryStore` (stockage), `IPathResolver` (chemins),
+`ISearchIndex` et `ITokenizer` (index plein texte), `ISourceReader` (fichiers sources).
+Infrastructure : découverte et contrôle du propriétaire, chemins, bootstrap, SQLite, schéma et
+migration, index FTS5, lecteur de fichiers, projections et doctor. CLI : parsing, commandes et
+composition. Le port `IMemoryStore` est synchrone
 ([ADR 0008](adr/0008-synchronous-store.md)).
 
 ```text
 CLI → Application → Domain
-  ↘ Infrastructure (implémente IMemoryStore, IPathResolver)
+  ↘ Infrastructure (implémente IMemoryStore, ISearchIndex, ITokenizer, IPathResolver, ISourceReader)
 ```
 `IMemoryStore.AddScope` reçoit une précondition fournie par ScopeService : le stockage ouvre sa
 transaction immédiate, relit les scopes et l'appelle avant l'insertion. Les règles de doublon et
@@ -25,8 +28,9 @@ son appelant. Les lectures SQL sont filtrées avant de charger les objets. Les p
 scope de leur claim. Choisir un ID n'accorde aucun droit supplémentaire.
 
 ## Stockage
-SQLite est l'unique autorité. Objet, historique et clé idempotente sont validés dans une
-transaction immédiate courte ; clés étrangères actives ; attente bornée à 5 secondes. Journal
+SQLite est l'unique autorité. Objet, historique, clé idempotente et entrées de l'index plein texte
+sont validés dans une transaction immédiate courte (sources : `SaveSource` lit l'état courant et
+applique la décision de SourceService sous cette transaction) ; clés étrangères actives ; attente bornée à 5 secondes. Journal
 DELETE dans cette verticale. Markdown est écrit ensuite par renommage. Si la projection échoue,
 `projection_pending` précise que l'objet est enregistré ; `export` la reconstruit. Une course de
 projections peut laisser une ancienne révision : doctor la détecte, export la répare. Pas de

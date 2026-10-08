@@ -105,13 +105,19 @@ internal static class MemoryCommands
     {
         args.RequireCount(5);
         string lineage = args.Required("lineage");
+        EvidenceRelation relation = args.Flag("contradicts")
+            ? EvidenceRelation.Contradicts
+            : EvidenceRelation.Supports;
+        string? source = args.Option("source");
         args.ValidateUsed();
         return memory.CreateEvidence(
             new EvidenceContent(
                 CommandArguments.ParseId(args.Positionals[2]),
                 CommandArguments.ParseEnum<EvidenceKind>(args.Positionals[3]),
                 args.Positionals[4],
-                lineage
+                lineage,
+                relation,
+                source is null ? null : CommandArguments.ParseId(source)
             ),
             provenance,
             key

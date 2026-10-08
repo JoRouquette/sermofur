@@ -1,6 +1,6 @@
 English | [Français](fr/cli.md)
 
-# CLI 0.1
+# CLI 0.2
 
 `smf [--path DIRECTORY] [--json] COMMAND ...`. The path is an existing local directory, the
 current directory by default; it designates the working context, never an arbitrary scope.
@@ -39,17 +39,27 @@ escaped, so a text cannot close the JSON block of a projection.
 | retex add --event TEXT --impact TEXT --next TEXT --origin user\|llm | Draft RETEX, no implicit learning |
 | retex list / show ID | Visible RETEX |
 | export | Rebuilds the projections of the visible objects |
+| migrate | Instance format 1 (0.1) → 2: backup, then migration in one transaction; nothing to do on format 2 |
+| source add FILE --origin user\|llm | Declared source of the current scope: hashed, indexed, idempotent |
+| source list / show ID | Visible sources / the source with its history |
+| source reindex [ID] | Reads again the sources of the current scope: unchanged, modified, missing, unreadable, rejected, restored, or skipped when another command changed the source meanwhile |
+| index rebuild | Rebuilds the full-text index of the instance in one write transaction and reads every source again (same outcomes as `source reindex`, history under the system actor `sermofur`); other commands wait up to 5 s, then fail with `storage_busy` (exit 3) and are to be run again; output `{indexed, changedSources}` counts visible objects only |
+| recall QUESTION [--limit 1-3] | At most 3 explained results among visible claims, RETEX and source passages |
+| challenge CLAIM_ID / challenge --text TEXT | Contradictions, changed sources, status, review date, close claims to confront; writes nothing |
 
-`--origin user|llm` is **mandatory** on `claim add`, `evidence add` and `retex add` only — not
-on `scope add` — with no default value: when missing, the result is `invalid_arguments` (exit 1)
-and nothing is written. The origin stays declarative until the host channel (daemon/MCP) sets it.
-Other `add` options: `--actor` (default `local-user`), `--key` for idempotency.
+`--origin user|llm` is **mandatory** on `claim add`, `evidence add`, `retex add` and
+`source add` — not on `scope add` — with no default value: when missing, the result is
+`invalid_arguments` (exit 1) and nothing is written. The origin stays declarative until the host channel (daemon/MCP) sets it.
+Other `add` options: `--actor` (default `local-user`), `--key` for idempotency (not on
+`source add`, which is idempotent by path).
 Claim: `--category episodic|semantic|procedural|preferences|decisions`;
 `--volatility stable|evolving|volatile`.
 Evidence kinds: `execution`, `source_code`, `authoritative_documentation`, `project_decision`,
 `local_documentation`, `human_observation`, `user_assertion`, `llm_assertion`.
 A `preferences` or `decisions` claim requires `--origin user`. Declared `execution` evidence
-stays low in this version. There is no `--scope` argument: the scope comes from the path.
+stays low in this version. `evidence add` also takes `--contradicts` (evidence against the claim,
+a flag without value) and `--source SOURCE_ID` (a visible indexed source; its hash at that moment
+is kept with the evidence). There is no `--scope` argument: the scope comes from the path.
 Unknown options are refused before any mutation. No `--quiet`/`--verbose` yet.
 
 Command-line bounds: at most 128 arguments, each at most 16,384 characters and without NUL.
@@ -81,7 +91,67 @@ read). A link or junction, even dangling, is refused with `unsafe_path` (exit 4)
 `doctor` included. Nothing is ever written into an instance higher up. For a damaged instance,
 run `smf doctor` from that folder, then restore `instance.json` from a backup; for a foreign
 entry, rename or move it away. `doctor` names the case in its `instance` check:
-`invalid_instance: foreign`, `invalid_instance: damaged` or `invalid_instance: unreadable`.
+`invalid_instance: foreign`, `invalid_instance: damaged`, `invalid_instance: unreadable` or
+`invalid_instance: foreign_owner`.
+
+A `.sermofur` entry that belongs to another user account is never read: every command but
+`doctor` fails with `foreign_owner` (exit 4) ([ADR 0014](adr/0014-instance-owner.md)). An
+`instance.json` larger than 64 KiB is a damaged instance (`invalid_instance`, exit 3).
+
+## migrate
+
+The 0.2 tool reads instances of format 2. On a format 1 instance (created by 0.1), every command
+except `migrate`, `doctor` and `root` fails with `migration_required` (exit 3) and changes nothing;
+`doctor` reports `migration_required`. `smf migrate` checks the consistency of the database,
+backs it up with the SQLite backup API to `.sermofur/backups/memory-v1-<UTC time>-<id>.db`,
+migrates it in one transaction (objects, history, idempotency keys and projections unchanged;
+claims and RETEX indexed), then replaces `instance.json`. If it is interrupted, run it again: it
+resumes where it stopped. Output: `{migrated, from, to, backup}`; on a format 2 instance,
+`migrated: false` ([ADR 0012](adr/0012-instance-format-2.md)).
+
+## Sources
+
+`source add FILE` declares a local text file as a source of the current scope. A relative `FILE`
+is relative to the context directory (`--path`, the current directory by default). The file must
+be in the directory of the current scope (the instance root for the workspace) and outside the
+directory of any narrower scope: a file of a client is added from that client's directory, so
+that it never becomes visible to sibling scopes. The file is read once, at most 1 MiB, as strict
+UTF-8 (a BOM is accepted); its SHA-256 hash covers exactly the bytes indexed. Its text is split
+into passages of at most 2,000 characters. Adding the same file again returns the same source.
+
+`source reindex` reads again only the declared sources of the current scope; no other file is
+ever read, and `recall`/`challenge` read no file at all. The previous hash stays in the history.
+When `scope add` creates a scope whose directory holds sources of an ancestor, those sources move
+to the new scope in the same transaction (history "rescoped"), so that they never stay visible to
+its siblings; `doctor` reports a source attached to a broader scope than its file
+(`source_scopes`). A source is stored under the name its file has on disk: on a case-insensitive file system
+(Windows, macOS by default), `Doc.md` and `doc.md` are one source.
+A missing, unreadable or rejected source leaves the index, its record is kept.
+
+| Code | Exit | Case |
+|---|---|---|
+| `source_rejected` | 1 | Empty, binary (NUL byte, invalid UTF-8, special file) or larger than 1 MiB; the message gives the reason |
+| `invalid_path` | 1 | Missing file, folder or unreadable file |
+| `scope_boundary` | 4 | Outside the instance, outside the directory of the current scope, inside a narrower scope, or already a source of another scope |
+| `unsafe_path` | 4 | Link, junction, network path, or a file of `.sermofur` |
+| `source_unavailable` | 1 | `evidence add --source` on a missing, unreadable or rejected source |
+
+## recall and challenge
+
+`recall` treats the question as plain text (no query syntax), ignoring case and accents. It
+returns at most 3 results, each with its kind, identifier, scope, status, confidence and reasons
+(claims), the matching excerpt, the matched terms and its freshness (creation, last verification
+or review date of a claim, last indexing and hash of a source). Only the current scope and its
+ancestors are searched, and the ranking statistics are computed on them only, so that content of
+another scope changes neither presence nor order ([ADR 0013](adr/0013-filtered-ranking.md)). An
+invalidated or superseded claim is never presented as applicable: it only fills remaining places,
+marked `applicable: false`; `excluded` counts the visible ones left out.
+
+`challenge CLAIM_ID` returns signals — `contradiction`, `source_changed` (with the recorded and
+current hashes), `source_unavailable`, `not_applicable`, `review_due` — and at most 3 close claims
+`toConfront`, never called contradictions. `challenge --text TEXT` does the same for a text that
+is not a claim yet. Neither writes anything. An identifier of another scope answers like an
+unknown one.
 
 ## scope add
 
@@ -107,16 +177,19 @@ of conflicting pairs) to detect an overlap entered outside the CLI.
 
 A mapped directory that was deleted does not prevent other contexts from working: only the
 mapping selected for the current path is checked physically. `doctor` reports it as a
-`scope_mappings` warning, with only the number of missing mappings.
+`scope_mappings` warning, with only the number of missing mappings. The same warning counts the
+mappings stored by an earlier version under a spelling that the file system resolves but that does
+not compare equal to the name on disk (case outside Windows, Unicode normalization): such a scope
+may not hold the sources of its folder, and Sermofur 0.2 offers no command to rewrite a mapping.
 
 | Exit | Meaning |
 |---|---|
 | 0 | Success, help, or doctor healthy with warnings |
 | 1 | Invalid input / not_found / idempotency conflict / duplicate mapping |
 | 2 | No instance |
-| 3 | Storage/version/permissions/projection to rebuild, invalid `.sermofur` entry (foreign, damaged, unreadable) |
-| 4 | Scope/path boundary, nested instance |
+| 3 | Storage/version/permissions/projection to rebuild, invalid `.sermofur` entry (foreign, damaged, unreadable), migration required |
+| 4 | Scope/path boundary, nested instance, entry of another account |
 | 5 | Doctor unhealthy |
 
-The 0.1 CLI calls Application directly. runtime/mcp/config/source/recall/challenge are in the
-backlog, never empty commands that report a success.
+The CLI calls Application directly. runtime/mcp/config are in the backlog, never empty commands
+that report a success.

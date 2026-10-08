@@ -79,12 +79,50 @@ public interface IMemoryStore
     void AddScope(Scope scope, Action<IReadOnlyList<Scope>> precondition);
 
     IReadOnlyList<MemoryRecord> ReadRecords(IReadOnlySet<string> visible, RecordKind? kind = null);
+
+    /// <summary>Kind, status and creation time of the visible objects, without their content.</summary>
+    IReadOnlyList<RecordSummary> ReadSummaries(IReadOnlySet<string> visible);
     MemoryRecord? FindRecord(Guid id, IReadOnlySet<string> visible);
     IReadOnlyList<HistoryEntry> ReadHistory(Guid id, IReadOnlySet<string> visible);
     MemoryRecord CreateRecord(MemoryRecord candidate, string? key);
     MemoryRecord InvalidateRecord(Guid id, string scopeId, string reason, string actor);
     IReadOnlyList<string> Export(IReadOnlySet<string> visible);
+
+    /// <summary>
+    /// Creates or updates the source at <paramref name="relativePath"/> under an exclusive write
+    /// transaction. <paramref name="decide"/> receives the source currently registered at that
+    /// path (whatever its scope) and the scopes, both read inside the transaction, and returns
+    /// the new state with the history reason, or null to leave it unchanged; it throws to refuse.
+    /// The search entries of the source are replaced by <paramref name="passages"/> when the new
+    /// state is indexed, and removed otherwise.
+    /// </summary>
+    MemoryRecord? SaveSource(
+        string relativePath,
+        Func<MemoryRecord?, IReadOnlyList<Scope>, SourceChange?> decide,
+        IReadOnlyList<SearchDocument> passages
+    );
+
+    /// <summary>
+    /// Rebuilds the whole index in one exclusive write transaction: claims and RETEX from the
+    /// registry, then each source of the instance, one at a time, through <paramref name="decide"/>
+    /// (new state, if any, and passages). Returns the sources whose state changed.
+    /// </summary>
+    IReadOnlyList<MemoryRecord> RebuildIndex(Func<MemoryRecord, SourceRebuild> decide);
 }
+
+/// <summary>Outcome of reading a source again during an index rebuild.</summary>
+public sealed record SourceRebuild(SourceChange? Change, IReadOnlyList<SearchDocument> Passages);
+
+/// <summary>What ranking needs to know of an object before describing it.</summary>
+public sealed record RecordSummary(
+    Guid Id,
+    RecordKind Kind,
+    KnowledgeStatus Status,
+    DateTimeOffset CreatedAt
+);
+
+/// <summary>New state of a source and the reason recorded in its history.</summary>
+public sealed record SourceChange(MemoryRecord Next, string Reason, string Actor);
 
 /// <summary>Resolution of scope mappings relative to the instance root.</summary>
 public interface IPathResolver
@@ -108,6 +146,19 @@ public interface IPathResolver
 
     /// <summary>True if <paramref name="child"/> equals <paramref name="parent"/> or lies below it.</summary>
     bool Contains(string parent, string child);
+
+    /// <summary>
+    /// How stored paths compare, a rule per operating system (without case on Windows only).
+    /// Stored paths come from <see cref="CanonicalCase"/>, so the rule holds on any file system.
+    /// </summary>
+    StringComparison Comparison { get; }
+
+    /// <summary>
+    /// <paramref name="relative"/> with the names of the entries as found on disk (case and Unicode
+    /// normalization), so that one file or folder always has one stored path, whatever the case
+    /// it was typed with. Throws <c>unsafe_path</c> for an alias such as a Windows short name.
+    /// </summary>
+    string CanonicalCase(string root, string relative);
 }
 
 public sealed record MemoryContext(string Root, string ScopeId, IReadOnlySet<string> VisibleScopes);

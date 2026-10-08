@@ -3,7 +3,7 @@ English | [Français](fr/verification.md)
 # Verification
 
 How to check a build of Sermofur yourself, what the automated tests cover, and the known limits of
-version 0.1.
+version 0.2.
 
 ## Check it yourself
 
@@ -35,8 +35,8 @@ mkdir $env:TEMP/sermofur-check; cd $env:TEMP/sermofur-check
 <path-to>/smf doctor              # Overall: healthy_with_warnings, exit 0
 ```
 
-`healthy_with_warnings` is the expected state of a sound 0.1 instance: the capabilities that are
-not delivered yet (daemon, laya, model, mcp, indexes, contradictions) are reported as warnings.
+`healthy_with_warnings` is the expected state of a sound instance: the capabilities that are not
+delivered yet (daemon, laya, model, mcp) are reported as warnings.
 `artifacts/` and `TestResults/` are ignored by Git.
 
 ## What the tests cover
@@ -71,7 +71,54 @@ not delivered yet (daemon, laya, model, mcp, indexes, contradictions) are report
   bounded random input on the `claim show` identifier (fixed seed), UTF-8 stdout with non-ASCII
   text and stderr without BOM (ASCII messages) in a real process, accents kept literal while
   backticks and HTML stay escaped.
-- doctor: read-only behavior, `scope_overlap`, `scope_mappings`, identity mismatch.
+- doctor: read-only behavior, `scope_overlap`, `scope_mappings`, identity mismatch, `search_index`
+  out of sync, FTS5 available.
+- Migration (ADR 0012): a format 1 instance built by the published 0.1.1 tool (test fixture) keeps
+  every record, history row, idempotency key, scope and projection; claims and RETEX get indexed;
+  the backup is a consistent format 1 database; other commands refuse format 1 without writing;
+  an interruption after the backup, inside the transaction or before `instance.json` leaves a
+  usable instance that `migrate` completes; `migrate` is idempotent.
+- Sources: hash of exactly the bytes read, BOM accepted, empty, binary, Latin-1, oversized,
+  missing and folder refused with stable codes; a file of a narrower scope, of another client,
+  outside the instance or in `.sermofur` refused; idempotent add; reindex reporting unchanged,
+  modified (previous hash in history), missing and restored, with the index following; reindex
+  reading only the declared sources of the current scope; evidence freezing the source hash;
+  index rebuild after a desynchronized index, reading every source again with history under the
+  system actor, dropping a lost source and rolling back entirely when a read fails, counting
+  visible objects only; a source of an ancestor moved to a scope created on its folder; a scope
+  created during a source add seen under the write lock; one file is one source whatever the case
+  typed, the file system deciding (case and NFC/NFD); a scope mapping typed in another case
+  stored as named on disk, doctor warning on a stored variant; `.sermofur` unreachable through a
+  case variant; doctor reporting a misplaced index entry and a source left in a broader scope; a
+  file reached through a link refused; a FIFO refused without blocking (Linux and macOS).
+- Recall (ADR 0013): at most 3 explained results in a stable order; content added to a sibling
+  scope changes neither presence, order nor score of visible results; invalidated claims never
+  first, counted as excluded; best passage and freshness of sources; query syntax treated as text;
+  limit bounds; a real process on a read-only store writing nothing. The query tokens equal the
+  index tokens (accents, CJK, emoji, separators).
+- Challenge: independent contradiction capping confidence at medium, LLM contradiction noted
+  without refuting, format 1 evidence read as support, source changed then gone, invalidated and
+  review due, at most 3 close claims never called contradictions with nothing written, a claim of
+  another client answering like an unknown one.
+- Owner (ADR 0014): an entry of another account refused at discovery and named by doctor, own
+  entries recognized, `instance.json` over 64 KiB damaged; on Linux and macOS a real entry owned by
+  root through passwordless sudo, owner and group changed separately (fails if sudo is not
+  available); on an elevated Windows session, an entry owned by SYSTEM refused and one owned by
+  Administrators accepted.
+- Properties (FsCheck): mapping normalization stays inside the root, is stable and portable
+  across separators; the command-line grammar keeps every argument after `--` positional and never
+  takes an option value starting with `--`.
+
+## Recall performance
+
+Reference measure of the spec (SC-004), `RecallPerformanceTests`, run with
+`SERMOFUR_PERFORMANCE=1 dotnet test -c Release --filter Category=Performance`: 10,000 claims and
+RETEX (half of the claims with evidence, some of it contradicting) plus 1,000 sources of about
+20 KiB (11,000 objects, 20,000 indexed passages), 30 questions of three frequent terms, each on a
+newly opened read-only store, as a CLI command does. On 2026-10-08, Windows 11, Intel Core
+i7-1255U, 32 GB: **p50 346 ms, p95 414 ms, max 443 ms**, under the 1 s ceiling of the spec. The
+300 ms p95 target set by the 0.1 plan is not reached: most of the time goes to reading the term
+frequencies of the vocabulary table and the visible passages.
 
 ## Known limits
 
@@ -84,12 +131,14 @@ not delivered yet (daemon, laya, model, mcp, indexes, contradictions) are report
 - Discovery: a `.sermofur` entry counts as an instance only if it is a directory holding
   `instance.json`; any other entry blocks Sermofur below it. The unreadable case is tested on
   Windows only. Mappings are compared lexically (no canonicalization of case, 8.3 aliases or
-  Unicode normalization). Discovery does not check who owns a `.sermofur` entry (ADR 0010).
+  Unicode normalization). The owner check is verified on Windows, Linux x64 and macOS arm64;
+  macOS x64 is not.
 - On Unix, the publishing rename of `init` does not detect an empty `.sermofur` created in the
   instant before it; this race is not tested.
 - A mapped network drive is refused by the code but this was not tested, for lack of such a
   drive.
 - Not delivered, hence not verified: MCP protocol, Laya inference, daemon IPC, UI, self-contained
-  installer, indexing/FTS/recall/challenge, consolidation, schema migrations beyond v1. No power
-  loss was simulated.
+  installer, consolidation, semantic similarity. No power loss was simulated.
+- Recall performance (SC-004) is a reference measure, not a guarantee: see [Recall performance](#recall-performance). It runs only
+  with `SERMOFUR_PERFORMANCE=1` and is not part of the CI.
 - The tool package requires the .NET 10 runtime.

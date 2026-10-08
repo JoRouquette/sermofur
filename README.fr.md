@@ -31,22 +31,34 @@ USER ≠ TRUTH, LLM ≠ TRUTH, MEMORY ≠ TRUTH.
   Les preuves de même lignée comptent pour une seule origine : la répétition n'augmente pas la
   confiance. Une preuve déclarée par un LLM ne renforce jamais un claim, et une preuve
   `execution` déclarée ne suffit pas à vérifier un fait.
+- Une preuve peut **contredire** un claim : une contradiction indépendante plafonne sa confiance à
+  medium ; celle d'un LLM est notée mais ne réfute rien.
+- Une **source** est un fichier texte local que vous déclarez explicitement : Sermofur garde son
+  empreinte, indexe son texte et sait quand une preuve repose sur un fichier modifié depuis.
+- Le **recall** répond à une question par au plus 3 résultats expliqués ; le **challenge**
+  confronte un claim à ce qui le contredit, sans jamais trancher à votre place.
 - Un **RETEX** reste un brouillon tant qu'aucune décision d'apprentissage n'est prise.
 - Les **scopes** (workspace → client → project → repository → task) isolent les mémoires : un
   contexte voit son scope et ses ancêtres, jamais ses frères ni ses descendants.
 - Chaque modification est conservée dans un **historique** auditable.
 
-## État : verticale 0.1
+## État
 
 Livré : la CLI `smf`, les instances locales, les scopes, le stockage Claim/Evidence/RETEX en
-SQLite, l'historique, les projections Markdown et les diagnostics (`doctor`).
+SQLite, l'historique, les projections Markdown et les diagnostics (`doctor`) ; depuis la 0.2, les
+sources déclarées avec index plein texte, le recall, le challenge et les preuves contraires
+(format d'instance 2).
 
 **Pas encore livré** : daemon d'arrière-plan, pont MCP, intégration Laya (modèle System 1),
-sources/recherche plein texte/recall/challenge, apprentissage et consolidation, interface
-desktop Inspector. La documentation les décrit comme conceptions seulement ; aucune commande ne
-prétend les fournir.
+apprentissage et consolidation, interface desktop Inspector. La documentation les décrit comme
+conceptions seulement ; aucune commande ne prétend les fournir.
 
-Aucune télémétrie, synchronisation, connexion réseau ni ingestion de source à l'exécution.
+Aucune télémétrie, synchronisation ni connexion réseau à l'exécution, et aucune ingestion
+implicite : seuls les fichiers que vous ajoutez comme sources sont lus.
+
+Mise à jour depuis la 0.1 : le format d'instance a changé. Les autres commandes refusent une
+instance 0.1 tant que vous n'avez pas lancé `smf migrate`, qui sauvegarde d'abord la base sous
+`.sermofur/backups/`.
 
 ## Installer
 
@@ -92,6 +104,9 @@ cd acme                          # le contexte est maintenant le scope « acme �
 smf claim add "The billing API paginates with cursors" --origin user --json
 smf evidence add <CLAIM_ID> source_code "src/Billing/Pagination.cs" --lineage billing-repo --origin user
 smf claim show <CLAIM_ID>        # claim, preuves, confiance expliquée, historique
+smf source add notes/billing.md --origin user    # source déclarée, hachée et indexée
+smf recall "billing pagination"  # au plus 3 résultats expliqués, ce scope et ses ancêtres
+smf challenge <CLAIM_ID>         # contradictions, sources modifiées, claims proches à confronter
 smf doctor                       # diagnostic en lecture seule
 smf export                       # reconstruit les projections Markdown des objets visibles
 ```

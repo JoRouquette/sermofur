@@ -42,6 +42,9 @@ Une entrée `.sermofur` qui appartient à un autre outil bloque Sermofur en dess
 message explicite ; l'utilisateur la renomme ou la déplace, ou travaille depuis un autre dossier.
 Aucune commande ne retombe jamais sur une instance ancêtre.
 
+Depuis la 0.2, la découverte refuse une entrée détenue par un autre compte
+([ADR 0014](0014-instance-owner.md)) ; les paragraphes suivants décrivent la limite de la 0.1
+qu'elle ferme.
 La découverte remonte jusqu'à la racine du volume et ne vérifie pas le propriétaire de l'entrée
 trouvée. Sermofur suppose un seul utilisateur du système. Sur une machine partagée, un autre
 utilisateur peut créer une entrée `.sermofur` dans tout dossier situé au-dessus de votre dossier

@@ -57,7 +57,12 @@ public sealed partial class ScopeService
         IReadOnlyList<Scope> scopes = store.ReadScopes();
         Scope parent = ValidateParent(candidate, scopes);
         string mapped = ValidateMapping(candidate, parent);
-        Scope normalized = candidate with { RelativePath = paths.Relativize(context.Root, mapped) };
+        // Already as named on disk (see OnDisk), like source paths: both sides of FR-002 compare
+        // exactly.
+        Scope normalized = candidate with
+        {
+            RelativePath = paths.Relativize(context.Root, mapped),
+        };
         store.AddScope(normalized, current => EnsureRegistrable(normalized, current));
         return normalized;
     }
@@ -146,10 +151,16 @@ public sealed partial class ScopeService
         {
             throw new SermofurException("invalid_scope", "Relative mapping required.");
         }
-        string mapped = paths.Resolve(context.Root, candidate.RelativePath);
+        // Both sides as named on disk, before any check: a parent stored by an earlier version
+        // under another spelling still holds a child typed either way.
+        string mapped = OnDisk(
+            context.Root,
+            paths.Resolve(context.Root, candidate.RelativePath),
+            paths
+        );
         string parentPath = parent.RelativePath is null
             ? context.Root
-            : paths.Resolve(context.Root, parent.RelativePath);
+            : OnDisk(context.Root, paths.Resolve(context.Root, parent.RelativePath), paths);
         bool mayShareParentPath =
             candidate.Kind == ScopeKind.Repository && parent.Kind == ScopeKind.Project;
         if (
@@ -242,8 +253,33 @@ public sealed partial class ScopeService
     ) =>
         scopes
             .Where(scope => scope.RelativePath is not null)
-            .Select(scope => new MappedScope(scope, paths.Normalize(root, scope.RelativePath!)))
+            .Select(scope => new MappedScope(scope, Stored(root, scope.RelativePath!, paths)))
             .ToArray();
+
+    /// <summary>
+    /// <paramref name="absolute"/> with each existing entry named as on disk; throws
+    /// <c>unsafe_path</c> for an alias.
+    /// </summary>
+    private static string OnDisk(string root, string absolute, IPathResolver paths) =>
+        paths.Normalize(root, paths.CanonicalCase(root, paths.Relativize(root, absolute)));
+
+    /// <summary>
+    /// Stored mapping in the form compared by the duplicate and overlap rules: as named on disk,
+    /// so that a mapping stored by an earlier version under another spelling still collides;
+    /// lexical when the disk cannot tell (alias).
+    /// </summary>
+    private static string Stored(string root, string mapping, IPathResolver paths)
+    {
+        string lexical = paths.Normalize(root, mapping);
+        try
+        {
+            return OnDisk(root, lexical, paths);
+        }
+        catch (SermofurException)
+        {
+            return lexical;
+        }
+    }
 
     private static bool SamePath(string left, string right, IPathResolver paths) =>
         paths.Contains(left, right) && paths.Contains(right, left);

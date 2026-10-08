@@ -401,7 +401,7 @@ public class InstanceTests
     /// Directory link without elevation: a junction on Windows, a symbolic link elsewhere. A
     /// failure fails the test explicitly instead of skipping it.
     /// </summary>
-    private static void CreateDirectoryLink(string link, string target)
+    internal static void CreateDirectoryLink(string link, string target)
     {
         if (!OperatingSystem.IsWindows())
         {
