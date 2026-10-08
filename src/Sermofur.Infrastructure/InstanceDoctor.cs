@@ -191,6 +191,11 @@ public sealed class InstanceDoctor(IFileOwnership? ownership = null)
                 LocalPaths.Comparison
             );
         }
+        catch (SermofurException exception) when (exception.Code == "invalid_path")
+        {
+            // A folder that cannot be listed: the name on disk is unknown, not different.
+            return false;
+        }
         catch (Exception exception)
             when (exception is SermofurException or IOException or UnauthorizedAccessException)
         {

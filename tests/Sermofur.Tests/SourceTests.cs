@@ -494,16 +494,19 @@ public class SourceTests
             // Case-sensitive file system: CLIENT is another folder, nothing to compare.
             return;
         }
+        // Only macOS (case-insensitive, ordinal comparison) discriminates: on Windows the
+        // comparison already ignores case.
         fixture
             .Scopes(store)
             .Register(new Scope("c", ScopeKind.Client, ScopePolicy.WorkspaceScopeId, "CLIENT"));
-        // A child typed in the spelling the parent was typed with is still inside it.
+        // The parent as an earlier version stored it: under the typed spelling.
+        Tamper(fixture, "UPDATE scopes SET relative_path='CLIENT' WHERE id='c'");
         Scope child = fixture
-            .Scopes(store, Path.Combine(fixture.Root, "client"))
-            .Register(new Scope("p", ScopeKind.Project, "c", "CLIENT/sub"));
+            // Context path in the stored spelling, so that the context resolves to c.
+            .Scopes(store, Path.Combine(fixture.Root, "CLIENT"))
+            .Register(new Scope("p", ScopeKind.Project, "c", "client/sub"));
         Assert.Equal("client/sub", child.RelativePath);
         // A mapping stored under another spelling by an earlier version still collides.
-        Tamper(fixture, "UPDATE scopes SET relative_path='CLIENT' WHERE id='c'");
         SermofurException duplicate = Assert.Throws<SermofurException>(() =>
             fixture
                 .Scopes(store)
