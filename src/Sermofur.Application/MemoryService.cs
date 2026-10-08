@@ -54,6 +54,10 @@ public sealed class MemoryService
             throw new SermofurException("invalid_input", "Invalid evidence kind.");
         }
 
+        if (!Enum.IsDefined(content.Relation))
+        {
+            throw new SermofurException("invalid_input", "Invalid evidence relation.");
+        }
         ValidateText(content.Reference);
         ValidateText(content.LineageId);
         MemoryRecord claim = Get(content.ClaimId);
@@ -65,8 +69,27 @@ public sealed class MemoryService
                 4
             );
         }
+        EvidenceContent stored = content with { SourceHash = null };
+        if (content.SourceId is Guid sourceId)
+        {
+            // The source must be visible; its hash at this moment is frozen with the evidence.
+            MemoryRecord source = Get(sourceId);
+            if (source.Kind != RecordKind.Source)
+            {
+                throw new SermofurException("not_found", "Object missing or inaccessible.");
+            }
+            SourceContent cited = RecordJson.Read<SourceContent>(source.ContentJson);
+            if (cited.Status != SourceStatus.Indexed)
+            {
+                throw new SermofurException(
+                    "source_unavailable",
+                    "The cited source is missing, unreadable or rejected; reindex it first."
+                );
+            }
+            stored = content with { SourceHash = cited.Hash };
+        }
 
-        return Create(RecordKind.Evidence, content, provenance, key);
+        return Create(RecordKind.Evidence, stored, provenance, key);
     }
 
     public MemoryRecord CreateRetex(RetexContent content, Provenance provenance, string? key)
@@ -168,6 +191,13 @@ public sealed class MemoryService
             );
         }
 
+        MemoryRecord[] contradicting = evidence
+            .Where(e =>
+                RecordJson.Read<EvidenceContent>(e.ContentJson).Relation
+                == EvidenceRelation.Contradicts
+            )
+            .ToArray();
+        evidence = evidence.Except(contradicting).ToArray();
         MemoryRecord[] trustedEvidence = evidence
             .Where(e => e.Provenance.Origin != ActorKind.Llm)
             .ToArray();
@@ -203,6 +233,29 @@ public sealed class MemoryService
         if (reasons.Count == 0)
         {
             reasons.Add("No independent evidence available.");
+        }
+
+        int contestingOrigins = contradicting
+            .Where(e => e.Provenance.Origin != ActorKind.Llm)
+            .Select(e => RecordJson.Read<EvidenceContent>(e.ContentJson).LineageId)
+            .Distinct(StringComparer.Ordinal)
+            .Count();
+        if (contestingOrigins > 0)
+        {
+            // An independent contradiction forbids a high level (principle I).
+            level = (ConfidenceLevel)Math.Min((int)level, (int)ConfidenceLevel.Medium);
+            reasons.Add($"Contested by {contestingOrigins} independent origin(s).");
+        }
+        if (
+            contradicting.Length > 0
+            && contradicting.All(e => e.Provenance.Origin == ActorKind.Llm)
+        )
+        {
+            reasons.Add("Contradicted by an LLM assertion: noted, not an independent refutation.");
+        }
+        else if (contradicting.Any(e => e.Provenance.Origin == ActorKind.Llm))
+        {
+            reasons.Add("LLM contradictions noted, not counted as independent refutations.");
         }
 
         reasons.Add("Declared evidence; no controlled execution collector in this version.");

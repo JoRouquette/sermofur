@@ -4,7 +4,7 @@ using Sermofur.Domain;
 
 namespace Sermofur.Infrastructure;
 
-public sealed class SqliteStore : IMemoryStore, IDisposable
+public sealed class SqliteStore : IMemoryStore, ISearchIndex, IDisposable
 {
     private readonly SqliteConnection connection;
     private readonly MarkdownProjection projection;
@@ -53,6 +53,208 @@ public sealed class SqliteStore : IMemoryStore, IDisposable
         SqliteSchema.Initialize(database, instanceId);
     }
 
+    /// <summary>Tokenizer of the search index, on this connection.</summary>
+    public ITokenizer Tokenizer => new SqliteTokenizer(connection);
+
+    public IReadOnlyList<TermHit> Hits(IReadOnlyList<string> terms, IReadOnlySet<string> visible)
+    {
+        Dictionary<long, VisiblePassage> passages = VisiblePassages(visible);
+        using SqliteCommand command = connection.CreateCommand();
+        string termNames = Parameters(command, "$term", terms);
+        // Term frequencies per passage; only passages of visible scopes are kept, before any
+        // statistic is computed (ADR 0013). Grouping before joining is several times faster.
+        command.CommandText = $"""
+            SELECT doc, term, count(*) FROM search_terms
+            WHERE col = 'text' AND term IN ({termNames})
+            GROUP BY doc, term ORDER BY doc, term
+            """;
+        using SqliteDataReader reader = command.ExecuteReader();
+        List<TermHit> hits = new List<TermHit>();
+        while (reader.Read())
+        {
+            if (!passages.TryGetValue(reader.GetInt64(0), out VisiblePassage? passage))
+            {
+                continue;
+            }
+            hits.Add(
+                new TermHit(
+                    reader.GetInt64(0),
+                    passage.ObjectId,
+                    passage.ScopeId,
+                    passage.Kind,
+                    passage.Passage,
+                    passage.Length,
+                    reader.GetString(1),
+                    reader.GetInt32(2)
+                )
+            );
+        }
+        return hits;
+    }
+
+    public VisibleCorpus Corpus(IReadOnlySet<string> visible)
+    {
+        Dictionary<long, VisiblePassage> passages = VisiblePassages(visible);
+        return new VisibleCorpus(
+            passages.Count,
+            passages.Count == 0 ? 0 : passages.Values.Average(passage => passage.Length)
+        );
+    }
+
+    private sealed record VisiblePassage(
+        Guid ObjectId,
+        string ScopeId,
+        string Kind,
+        int Passage,
+        int Length
+    );
+
+    private (string Key, Dictionary<long, VisiblePassage> Passages)? visiblePassages;
+
+    /// <summary>Indexed passages of the visible scopes, read once per visibility set.</summary>
+    private Dictionary<long, VisiblePassage> VisiblePassages(IReadOnlySet<string> visible)
+    {
+        // Any commit, by this connection or another one, changes the key.
+        string key =
+            $"{Scalar("PRAGMA data_version")}|{Scalar("SELECT total_changes()")}|"
+            + string.Join('\n', visible.Order(StringComparer.Ordinal));
+        if (visiblePassages is { } cached && cached.Key == key)
+        {
+            return cached.Passages;
+        }
+        using SqliteCommand command = connection.CreateCommand();
+        string scopeNames = Parameters(command, "$scope", visible.ToArray());
+        command.CommandText =
+            $"SELECT rowid, object_id, scope_id, kind, passage, length FROM search WHERE scope_id IN ({scopeNames})";
+        using SqliteDataReader reader = command.ExecuteReader();
+        Dictionary<long, VisiblePassage> passages = new Dictionary<long, VisiblePassage>();
+        while (reader.Read())
+        {
+            passages[reader.GetInt64(0)] = new VisiblePassage(
+                Guid.Parse(reader.GetString(1)),
+                reader.GetString(2),
+                reader.GetString(3),
+                reader.GetInt32(4),
+                reader.GetInt32(5)
+            );
+        }
+        visiblePassages = (key, passages);
+        return passages;
+    }
+
+    public IReadOnlyList<RecordSummary> ReadSummaries(IReadOnlySet<string> visible)
+    {
+        using SqliteCommand command = connection.CreateCommand();
+        string scopeNames = Parameters(command, "$scope", visible.ToArray());
+        command.CommandText = $"""
+            SELECT id, kind, json_extract(payload,'$.status'), json_extract(payload,'$.provenance.timestamp')
+            FROM records WHERE scope_id IN ({scopeNames})
+            """;
+        using SqliteDataReader reader = command.ExecuteReader();
+        List<RecordSummary> summaries = new List<RecordSummary>();
+        while (reader.Read())
+        {
+            summaries.Add(
+                new RecordSummary(
+                    Guid.Parse(reader.GetString(0)),
+                    Enum.Parse<RecordKind>(reader.GetString(1)),
+                    Enum.Parse<KnowledgeStatus>(reader.GetString(2), ignoreCase: true),
+                    DateTimeOffset.Parse(
+                        reader.GetString(3),
+                        System.Globalization.CultureInfo.InvariantCulture
+                    )
+                )
+            );
+        }
+        return summaries;
+    }
+
+    public string PassageText(long document)
+    {
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText = "SELECT text FROM search WHERE rowid=$document";
+        command.Parameters.AddWithValue("$document", document);
+        return command.ExecuteScalar() as string ?? string.Empty;
+    }
+
+    /// <summary>
+    /// Rebuilds the whole search index in one transaction: claims and RETEX from the registry,
+    /// indexed sources from their files when the file still has the recorded hash. A source whose
+    /// file changed stays out of the index: it needs <c>source reindex</c> from its scope, which
+    /// records the change in its history. Counts are restricted to <paramref name="visible"/>.
+    /// </summary>
+    public IndexRebuild RebuildIndex(
+        ISourceReader reader,
+        string root,
+        IReadOnlySet<string> visible
+    )
+    {
+        using SqliteTransaction transaction = connection.BeginTransaction(deferred: false);
+        using (SqliteCommand clear = connection.CreateCommand())
+        {
+            clear.Transaction = transaction;
+            clear.CommandText = "DELETE FROM search";
+            clear.ExecuteNonQuery();
+        }
+        SqliteSearchIndex.IndexRecords(connection, transaction);
+        List<MemoryRecord> sources = new List<MemoryRecord>();
+        using (SqliteCommand read = connection.CreateCommand())
+        {
+            read.Transaction = transaction;
+            read.CommandText = "SELECT payload FROM records WHERE kind='Source' ORDER BY id";
+            using SqliteDataReader rows = read.ExecuteReader();
+            while (rows.Read())
+            {
+                sources.Add(RecordJson.Read<MemoryRecord>(rows.GetString(0)));
+            }
+        }
+        int stale = 0;
+        foreach (MemoryRecord source in sources)
+        {
+            SourceContent content = RecordJson.Read<SourceContent>(source.ContentJson);
+            if (content.Status != SourceStatus.Indexed)
+            {
+                continue;
+            }
+            SourceSnapshot snapshot = reader.Read(root, content.RelativePath);
+            if (snapshot.Status == SourceStatus.Indexed && snapshot.Hash == content.Hash)
+            {
+                SqliteSearchIndex.Insert(
+                    connection,
+                    transaction,
+                    source.Id,
+                    source.ScopeId,
+                    RecordKind.Source,
+                    snapshot.Passages
+                );
+            }
+            else if (visible.Contains(source.ScopeId))
+            {
+                stale++;
+            }
+        }
+        transaction.Commit();
+        int objects = ReadRecords(visible).Count(SearchExpectations.IsIndexed);
+        return new IndexRebuild(objects - stale, stale);
+    }
+
+    private static string Parameters(
+        SqliteCommand command,
+        string prefix,
+        IReadOnlyList<string> values
+    ) =>
+        string.Join(
+            ',',
+            values.Select(
+                (value, index) =>
+                {
+                    string name = prefix + index;
+                    command.Parameters.AddWithValue(name, value);
+                    return name;
+                }
+            )
+        );
+
     public object Scalar(string sql)
     {
         using SqliteCommand command = connection.CreateCommand();
@@ -78,7 +280,12 @@ public sealed class SqliteStore : IMemoryStore, IDisposable
 
     public void ValidateSchema()
     {
-        if (Convert.ToInt32(Scalar("PRAGMA user_version")) != InstanceManager.SchemaVersion)
+        int version = Convert.ToInt32(Scalar("PRAGMA user_version"));
+        if (version == InstanceManager.LegacySchemaVersion)
+        {
+            throw InstanceManager.MigrationRequired();
+        }
+        if (version != InstanceManager.SchemaVersion)
         {
             throw new SermofurException(
                 "unsupported_schema",
@@ -249,7 +456,7 @@ public sealed class SqliteStore : IMemoryStore, IDisposable
         using SqliteCommand command = connection.CreateCommand();
         command.Transaction = transaction;
         command.CommandText =
-            "INSERT INTO records VALUES($id,$scope,$kind,$claim,$payload,$revision)";
+            "INSERT INTO records(id,scope_id,kind,claim_id,payload,revision) VALUES($id,$scope,$kind,$claim,$payload,$revision)";
         command.Parameters.AddWithValue("$id", candidate.Id.ToString());
         command.Parameters.AddWithValue("$scope", candidate.ScopeId);
         command.Parameters.AddWithValue("$kind", candidate.Kind.ToString());
@@ -261,6 +468,17 @@ public sealed class SqliteStore : IMemoryStore, IDisposable
                 : null;
         command.Parameters.AddWithValue("$claim", (object?)claimId ?? DBNull.Value);
         command.ExecuteNonQuery();
+        if (candidate.Kind is RecordKind.Claim or RecordKind.Retex)
+        {
+            SqliteSearchIndex.Insert(
+                connection,
+                transaction,
+                candidate.Id,
+                candidate.ScopeId,
+                candidate.Kind,
+                SearchDocuments.For(candidate)
+            );
+        }
         AppendHistory(null, candidate, "create", candidate.Provenance.Actor, transaction);
         if (key is not null)
         {
@@ -421,6 +639,72 @@ public sealed class SqliteStore : IMemoryStore, IDisposable
                 3
             );
         }
+    }
+
+    public MemoryRecord? SaveSource(
+        string relativePath,
+        Func<MemoryRecord?, SourceChange?> decide,
+        IReadOnlyList<SearchDocument> passages
+    )
+    {
+        using SqliteTransaction transaction = connection.BeginTransaction(deferred: false);
+        MemoryRecord? previous = FindSourceByPath(relativePath, transaction);
+        SourceChange? change = decide(previous);
+        if (change is null)
+        {
+            transaction.Commit();
+            return previous;
+        }
+        MemoryRecord next = change.Next;
+        using (SqliteCommand command = connection.CreateCommand())
+        {
+            command.Transaction = transaction;
+            command.CommandText = previous is null
+                ? "INSERT INTO records(id,scope_id,kind,claim_id,payload,revision,source_path) VALUES($id,$scope,'Source',NULL,$payload,$revision,$path)"
+                : "UPDATE records SET payload=$payload,revision=$revision WHERE id=$id AND revision=$previous";
+            command.Parameters.AddWithValue("$id", next.Id.ToString());
+            command.Parameters.AddWithValue("$scope", next.ScopeId);
+            command.Parameters.AddWithValue("$payload", RecordJson.Write(next));
+            command.Parameters.AddWithValue("$revision", next.Revision);
+            command.Parameters.AddWithValue("$path", relativePath);
+            command.Parameters.AddWithValue("$previous", previous?.Revision ?? 0);
+            if (command.ExecuteNonQuery() != 1)
+            {
+                throw new SermofurException(
+                    "storage_busy",
+                    "Source changed concurrently; retry.",
+                    3
+                );
+            }
+        }
+        SqliteSearchIndex.Remove(connection, transaction, next.Id);
+        if (RecordJson.Read<SourceContent>(next.ContentJson).Status == SourceStatus.Indexed)
+        {
+            SqliteSearchIndex.Insert(
+                connection,
+                transaction,
+                next.Id,
+                next.ScopeId,
+                RecordKind.Source,
+                passages
+            );
+        }
+        AppendHistory(previous, next, change.Reason, change.Actor, transaction);
+        transaction.Commit();
+        Project(next);
+        return next;
+    }
+
+    private MemoryRecord? FindSourceByPath(string relativePath, SqliteTransaction transaction)
+    {
+        using SqliteCommand command = connection.CreateCommand();
+        command.Transaction = transaction;
+        command.CommandText =
+            "SELECT payload FROM records WHERE kind='Source' AND source_path=$path";
+        command.Parameters.AddWithValue("$path", relativePath);
+        return command.ExecuteScalar() is string payload
+            ? RecordJson.Read<MemoryRecord>(payload)
+            : null;
     }
 
     public IReadOnlyList<string> Export(IReadOnlySet<string> visible)

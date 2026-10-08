@@ -39,6 +39,9 @@ internal sealed class RacingStore(IMemoryStore inner, string databasePath, strin
         RecordKind? kind = null
     ) => inner.ReadRecords(visible, kind);
 
+    public IReadOnlyList<RecordSummary> ReadSummaries(IReadOnlySet<string> visible) =>
+        inner.ReadSummaries(visible);
+
     public MemoryRecord? FindRecord(Guid id, IReadOnlySet<string> visible) =>
         inner.FindRecord(id, visible);
 
@@ -52,4 +55,10 @@ internal sealed class RacingStore(IMemoryStore inner, string databasePath, strin
         inner.InvalidateRecord(id, scopeId, reason, actor);
 
     public IReadOnlyList<string> Export(IReadOnlySet<string> visible) => inner.Export(visible);
+
+    public MemoryRecord? SaveSource(
+        string relativePath,
+        Func<MemoryRecord?, SourceChange?> decide,
+        IReadOnlyList<SearchDocument> passages
+    ) => inner.SaveSource(relativePath, decide, passages);
 }

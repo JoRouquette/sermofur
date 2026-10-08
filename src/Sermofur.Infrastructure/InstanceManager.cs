@@ -4,13 +4,23 @@ using Sermofur.Domain;
 
 namespace Sermofur.Infrastructure;
 
-public sealed class InstanceManager
+/// <param name="ownership">Owner and type of entries; the operating system by default.</param>
+public sealed class InstanceManager(IFileOwnership? ownership = null)
 {
-    public const int SchemaVersion = 1;
+    private readonly IFileOwnership owners = ownership ?? new FileOwnership();
+
+    public const int SchemaVersion = 2;
+
+    /// <summary>Format of the 0.1 CLI: read only by migrate, doctor and root.</summary>
+    public const int LegacySchemaVersion = 1;
+
+    /// <summary>Upper bound of <c>instance.json</c>: beyond it the instance is damaged.</summary>
+    public const long MaxConfigurationBytes = 64 * 1024;
     public const string Marker = ".sermofur";
     public const string ConfigurationFile = "instance.json";
     public const string DatabaseFile = "memory.db";
     public const string RecordsDirectory = "records";
+    public const string BackupsDirectory = "backups";
 
     /// <summary>Entries that only Sermofur creates inside <c>.sermofur</c>.</summary>
     private static readonly string[] SermofurArtifacts =
@@ -18,6 +28,7 @@ public sealed class InstanceManager
         ConfigurationFile,
         DatabaseFile,
         RecordsDirectory,
+        BackupsDirectory,
     ];
 
     public static string DatabasePath(string root) => Path.Combine(root, Marker, DatabaseFile);
@@ -28,9 +39,10 @@ public sealed class InstanceManager
     /// reports this case, the same classification as discovery, instead of reading the
     /// configuration through a folder that discovery refuses.
     /// </summary>
-    public static string? DescribeInvalidMarker(string root) =>
+    public string? DescribeInvalidMarker(string root) =>
         InspectMarker(root) switch
         {
+            MarkerState.ForeignOwner => "foreign_owner",
             MarkerState.Foreign => "foreign",
             MarkerState.Damaged => "damaged",
             MarkerState.Unreadable => "unreadable",
@@ -52,7 +64,12 @@ public sealed class InstanceManager
     /// </summary>
     public string DiscoverForDiagnosis(string path) => Locate(path, forDiagnosis: true);
 
-    public InstanceConfiguration ReadConfiguration(string root)
+    /// <summary>
+    /// Reads <c>instance.json</c>. A format 1 instance is refused with <c>migration_required</c>
+    /// unless <paramref name="allowLegacy"/> (migrate, doctor). The file is bounded: a larger
+    /// one is a damaged instance and is not loaded.
+    /// </summary>
+    public InstanceConfiguration ReadConfiguration(string root, bool allowLegacy = false)
     {
         LocalPaths.RejectLinks(Path.Combine(root, Marker));
         string file = Path.Combine(root, Marker, ConfigurationFile);
@@ -61,10 +78,26 @@ public sealed class InstanceManager
         {
             throw new SermofurException("invalid_instance", "Instance configuration missing.", 3);
         }
+        if (new FileInfo(file).Length > MaxConfigurationBytes)
+        {
+            throw new SermofurException(
+                "invalid_instance",
+                "Damaged Sermofur instance: instance.json exceeds 64 KiB; restore it from a backup.",
+                3
+            );
+        }
         InstanceConfiguration configuration = RecordJson.Read<InstanceConfiguration>(
             File.ReadAllText(file)
         );
-        if (configuration.SchemaVersion != SchemaVersion || configuration.InstanceId == Guid.Empty)
+        if (configuration.InstanceId == Guid.Empty)
+        {
+            throw new SermofurException("unsupported_schema", "Invalid instance identity.", 3);
+        }
+        if (configuration.SchemaVersion == LegacySchemaVersion)
+        {
+            return allowLegacy ? configuration : throw MigrationRequired();
+        }
+        if (configuration.SchemaVersion != SchemaVersion)
         {
             throw new SermofurException(
                 "unsupported_schema",
@@ -74,6 +107,14 @@ public sealed class InstanceManager
         }
         return configuration;
     }
+
+    /// <summary>Single definition of the error for an instance still in format 1.</summary>
+    public static SermofurException MigrationRequired() =>
+        new(
+            "migration_required",
+            "Instance in format 1; back it up if you wish, then run smf migrate.",
+            3
+        );
 
     public object Initialize(string path)
     {
@@ -180,7 +221,7 @@ public sealed class InstanceManager
         return new MemoryContext(root, scopeId, ScopePolicy.VisibleAncestors(scopeId, scopes));
     }
 
-    private static string Locate(string path, bool forDiagnosis)
+    private string Locate(string path, bool forDiagnosis)
     {
         string? current = LocalPaths.ValidateDirectory(path);
         while (current is not null)
@@ -210,7 +251,7 @@ public sealed class InstanceManager
     /// unreadable, never absent nor foreign: when the attributes fail, even the presence of the
     /// entry is unknown, and failing closed is the only safe answer.
     /// </summary>
-    private static MarkerState InspectMarker(string directory)
+    private MarkerState InspectMarker(string directory)
     {
         string marker = Path.Combine(directory, Marker);
         FileAttributes attributes;
@@ -235,6 +276,18 @@ public sealed class InstanceManager
         {
             return MarkerState.Foreign;
         }
+        // An entry of another account is never read (ADR 0014): its content could be planted.
+        try
+        {
+            if (owners.Inspect(marker) is { IsOwnedByCurrentUser: false })
+            {
+                return MarkerState.ForeignOwner;
+            }
+        }
+        catch (Exception exception) when (exception is UnauthorizedAccessException or IOException)
+        {
+            return MarkerState.Unreadable;
+        }
         HashSet<string> entries;
         try
         {
@@ -257,6 +310,11 @@ public sealed class InstanceManager
     private static SermofurException InvalidMarker(MarkerState state) =>
         state switch
         {
+            MarkerState.ForeignOwner => new(
+                "foreign_owner",
+                "The .sermofur entry belongs to another user account; it is not read. Use your own instance.",
+                4
+            ),
             MarkerState.Damaged => new(
                 "invalid_instance",
                 "Damaged Sermofur instance: .sermofur holds Sermofur data but no instance.json; run smf doctor and restore instance.json from a backup.",
@@ -283,6 +341,7 @@ public sealed class InstanceManager
         Foreign,
         Damaged,
         Unreadable,
+        ForeignOwner,
         Instance,
     }
 

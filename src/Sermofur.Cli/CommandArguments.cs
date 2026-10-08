@@ -8,6 +8,13 @@ public sealed class CommandArguments
     /// <summary>Separator after which every argument is positional.</summary>
     public const string EndOfOptions = "--";
 
+    /// <summary>Options that take no value.</summary>
+    private static readonly HashSet<string> Flags = new(StringComparer.Ordinal)
+    {
+        "json",
+        "contradicts",
+    };
+
     private readonly Dictionary<string, string?> options = new(StringComparer.Ordinal);
     private readonly HashSet<string> used = new(StringComparer.Ordinal);
     public List<string> Positionals { get; } = [];
@@ -34,7 +41,7 @@ public sealed class CommandArguments
             {
                 throw new SermofurException("invalid_arguments", "Duplicate option.");
             }
-            if (name == "json")
+            if (Flags.Contains(name))
             {
                 options.Add(name, null);
                 continue;
@@ -76,6 +83,13 @@ public sealed class CommandArguments
     {
         used.Add(name);
         return options.GetValueOrDefault(name, fallback);
+    }
+
+    /// <summary>Presence of a value-less option, marked as used.</summary>
+    public bool Flag(string name)
+    {
+        used.Add(name);
+        return options.ContainsKey(name);
     }
 
     public string Required(string name) =>

@@ -13,22 +13,15 @@ public sealed record DoctorReport(
     IReadOnlyList<DiagnosticCheck> Checks
 );
 
-public sealed class InstanceDoctor
+/// <param name="ownership">Owner and type of entries; the operating system by default.</param>
+public sealed class InstanceDoctor(IFileOwnership? ownership = null)
 {
-    private static readonly string[] UndeliveredCapabilities =
-    [
-        "daemon",
-        "laya",
-        "model",
-        "mcp",
-        "indexes",
-        "contradictions",
-    ];
+    private static readonly string[] UndeliveredCapabilities = ["daemon", "laya", "model", "mcp"];
 
     public DoctorReport Inspect(string root)
     {
         List<DiagnosticCheck> checks = new List<DiagnosticCheck>();
-        string? invalidMarker = InstanceManager.DescribeInvalidMarker(root);
+        string? invalidMarker = new InstanceManager(ownership).DescribeInvalidMarker(root);
         if (invalidMarker is not null)
         {
             checks.Add(new("instance", "error", $"invalid_instance: {invalidMarker}"));
@@ -37,7 +30,7 @@ public sealed class InstanceDoctor
         InstanceConfiguration config;
         try
         {
-            config = new InstanceManager().ReadConfiguration(root);
+            config = new InstanceManager(ownership).ReadConfiguration(root);
             checks.Add(new("instance", "ok", "Compatible configuration and version."));
         }
         catch (Exception exception) when (IsDiagnosable(exception))
@@ -51,6 +44,7 @@ public sealed class InstanceDoctor
             InspectStorage(store, checks);
             IReadOnlyList<Scope> scopes = InspectScopes(root, store, checks);
             InspectMemory(root, store, scopes, checks);
+            InspectSearchIndex(store, checks);
             checks.Add(
                 new(
                     "sqlite",
@@ -113,13 +107,40 @@ public sealed class InstanceDoctor
         );
     }
 
+    /// <summary>
+    /// The full-text index must hold exactly the indexable objects of the registry: claims,
+    /// RETEX and indexed sources. Compared as sets of identifiers, without repairing anything.
+    /// </summary>
+    private static void InspectSearchIndex(SqliteStore store, List<DiagnosticCheck> checks)
+    {
+        bool fts5 =
+            Convert.ToInt64(store.Scalar("SELECT sqlite_compileoption_used('ENABLE_FTS5')")) == 1;
+        checks.Add(new("fts5", fts5 ? "ok" : "error", "SQLite full-text search engine."));
+        HashSet<string> indexed = store
+            .QueryStrings("SELECT DISTINCT object_id FROM search")
+            .ToHashSet(StringComparer.Ordinal);
+        HashSet<string> expected = store
+            .QueryStrings("SELECT payload FROM records WHERE kind IN ('Claim','Retex','Source')")
+            .Select(RecordJson.Read<MemoryRecord>)
+            .Where(SearchExpectations.IsIndexed)
+            .Select(record => record.Id.ToString())
+            .ToHashSet(StringComparer.Ordinal);
+        int missing = expected.Count(id => !indexed.Contains(id));
+        int extra = indexed.Count(id => !expected.Contains(id));
+        checks.Add(
+            new(
+                "search_index",
+                missing + extra == 0 ? "ok" : "error",
+                $"{missing} objects missing from the index, {extra} entries without object; run index rebuild."
+            )
+        );
+    }
+
     private static void AddUndeliveredCapabilities(List<DiagnosticCheck> checks)
     {
         foreach (string component in UndeliveredCapabilities)
         {
-            checks.Add(
-                new(component, "warning", "Capability not delivered in the 0.1 vertical slice.")
-            );
+            checks.Add(new(component, "warning", "Capability not delivered in this version."));
         }
     }
 
@@ -197,6 +218,9 @@ public sealed class InstanceDoctor
                     break;
                 case RecordKind.Retex:
                     RecordJson.Read<RetexContent>(record.ContentJson);
+                    break;
+                case RecordKind.Source:
+                    RecordJson.Read<SourceContent>(record.ContentJson);
                     break;
                 case RecordKind.Evidence:
                     EvidenceContent evidence = RecordJson.Read<EvidenceContent>(record.ContentJson);

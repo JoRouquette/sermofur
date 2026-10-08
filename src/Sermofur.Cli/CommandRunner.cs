@@ -14,15 +14,20 @@ public sealed class CommandRunner(TextWriter output, TextWriter error)
     private static readonly string Usage = $"""
         Sermofur {ProductVersion.Current}
         Global options: [--path DIRECTORY] [--json]
-        smf init | root | status | doctor | export
+        smf init | root | status | doctor | export | migrate
         smf scope current | list | tree
         smf scope add ID KIND PARENT RELATIVE_PATH
         smf claim add TEXT --origin user|llm [--category CATEGORY] [--volatility VOLATILITY] [--actor NAME] [--key KEY]
         smf claim list | show ID | invalidate ID --reason TEXT [--actor NAME]
-        smf evidence add CLAIM_ID KIND REFERENCE --lineage ORIGIN --origin user|llm [--actor NAME] [--key KEY]
+        smf evidence add CLAIM_ID KIND REFERENCE --lineage ORIGIN --origin user|llm [--contradicts] [--source SOURCE_ID] [--actor NAME] [--key KEY]
         smf evidence list | show ID
         smf retex add --event TEXT --impact TEXT --next TEXT --origin user|llm [--actor NAME] [--key KEY]
         smf retex list | show ID
+        smf source add FILE --origin user|llm [--actor NAME]
+        smf source list | show ID | reindex [ID] [--actor NAME]
+        smf index rebuild
+        smf recall QUESTION [--limit 1-3]
+        smf challenge CLAIM_ID | challenge --text TEXT
         --help is recognized anywhere before -- and prints this help.
         -- ends options: every following argument is positional (text starting with --).
         An option value cannot start with --; see {CliDocumentation} for values and exit codes.
@@ -93,14 +98,28 @@ public sealed class CommandRunner(TextWriter output, TextWriter error)
         {
             return RunInstanceCommand(args, root, json);
         }
+        if (command == "migrate")
+        {
+            args.RequireCount(1);
+            args.ValidateUsed();
+            Write(InstanceMigration.Migrate(root), json);
+            return 0;
+        }
         InstanceConfiguration config = manager.ReadConfiguration(root);
-        bool mutating =
-            command == "export"
-            || (args.Positionals.Count > 1 && args.Positionals[1] is "add" or "invalidate");
+        bool knowledge = KnowledgeCommands.IsKnowledgeCommand(command);
+        bool mutating = knowledge
+            ? KnowledgeCommands.Writes(args)
+            : command == "export"
+                || (args.Positionals.Count > 1 && args.Positionals[1] is "add" or "invalidate");
         using SqliteStore store = new(root, config.InstanceId, readOnly: !mutating);
         store.ValidateSchema();
         MemoryContext context = manager.ResolveContext(path, root, store.ReadScopes());
         MemoryService memory = new(store, context);
+        if (knowledge)
+        {
+            Write(KnowledgeCommands.Execute(args, store, memory, context, path), json);
+            return 0;
+        }
         ScopeService scopes = new(store, new LocalPathResolver(), context);
         Write(Dispatch(args, memory, scopes, context, config), json);
         return 0;
@@ -142,6 +161,7 @@ public sealed class CommandRunner(TextWriter output, TextWriter error)
                 claims = records.Count(r => r.Kind == RecordKind.Claim),
                 evidence = records.Count(r => r.Kind == RecordKind.Evidence),
                 retex = records.Count(r => r.Kind == RecordKind.Retex),
+                sources = records.Count(r => r.Kind == RecordKind.Source),
                 mode = "bootstrap",
                 laya = "unavailable",
             };

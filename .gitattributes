@@ -2,3 +2,5 @@
 # a Windows checkout with core.autocrlf=true (the default on GitHub runners) turns files into
 # CRLF and the formatting check fails.
 * text=auto eol=lf
+# Test fixture databases (format 1 instance built by the published 0.1.1 tool).
+*.db binary

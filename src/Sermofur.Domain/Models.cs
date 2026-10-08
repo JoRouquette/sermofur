@@ -14,6 +14,7 @@ public enum RecordKind
     Claim,
     Evidence,
     Retex,
+    Source,
 }
 
 public enum MemoryCategory
@@ -85,11 +86,59 @@ public sealed record ClaimContent(
     DateTimeOffset? ReviewAfter = null
 );
 
+/// <summary>Whether a piece of evidence supports or contradicts its claim.</summary>
+public enum EvidenceRelation
+{
+    Supports,
+    Contradicts,
+}
+
+/// <summary>
+/// Evidence of a claim. <see cref="Relation"/>, <see cref="SourceId"/> and
+/// <see cref="SourceHash"/> came with format 2; a format 1 payload reads as supporting evidence
+/// that cites no source.
+/// </summary>
 public sealed record EvidenceContent(
     Guid ClaimId,
     EvidenceKind Kind,
     string Reference,
-    string LineageId
+    string LineageId,
+    EvidenceRelation Relation = EvidenceRelation.Supports,
+    Guid? SourceId = null,
+    string? SourceHash = null
+);
+
+/// <summary>State of a declared source after its last indexing attempt.</summary>
+public enum SourceStatus
+{
+    Indexed,
+    Missing,
+    Unreadable,
+    Rejected,
+}
+
+/// <summary>Why a source file cannot be indexed.</summary>
+public enum SourceRejection
+{
+    TooLarge,
+    Binary,
+    Empty,
+    UnsafePath,
+}
+
+/// <summary>
+/// A local text file declared as a source. <see cref="Hash"/>, <see cref="Size"/> and
+/// <see cref="IndexedAt"/> describe the bytes last indexed, kept when the file later goes
+/// missing; the indexed text itself lives only in the search index.
+/// </summary>
+public sealed record SourceContent(
+    string RelativePath,
+    SourceStatus Status,
+    string Hash,
+    long Size,
+    DateTimeOffset? IndexedAt,
+    int Passages,
+    SourceRejection? Rejection = null
 );
 
 public sealed record RetexContent(string Event, string Impact, string NextAction);
