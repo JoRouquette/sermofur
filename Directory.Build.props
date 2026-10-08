@@ -4,13 +4,18 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+        <!-- Development version: the release pipeline passes the released version to the build. -->
+        <Version>0.0.0-dev</Version>
         <Deterministic>true</Deterministic>
-        <!-- Release builds map source paths to /_/: no local path of the build machine ends up in a
-             published PDB or package. -->
-        <ContinuousIntegrationBuild Condition="'$(Configuration)' == 'Release'">true</ContinuousIntegrationBuild>
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
         <!-- Only the command-line tool is published; libraries and tests are not packages. -->
         <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <!-- Release builds map source paths to /_/: no local path of the build machine ends up in a
+         published PDB or package. -->
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     </PropertyGroup>
 
     <PropertyGroup>

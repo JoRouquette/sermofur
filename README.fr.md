@@ -2,6 +2,9 @@
 
 # Sermofur
 
+[![CI and release](https://github.com/JoRouquette/sermofur/actions/workflows/ci.yml/badge.svg)](https://github.com/JoRouquette/sermofur/actions/workflows/ci.yml)
+[![NuGet](https://img.shields.io/nuget/v/Sermofur)](https://www.nuget.org/packages/Sermofur)
+
 Sermofur est un runtime cognitif local : une mémoire qu'un assistant, ou vous-même, pouvez consulter
 et **contester**. Il ne stocke pas des « faits » ; il stocke des **claims** (affirmations)
 appuyées par des **preuves** (evidence) et des **RETEX** (retours d'expérience), chacun dans un
@@ -45,9 +48,22 @@ prétend les fournir.
 
 Aucune télémétrie, synchronisation, connexion réseau ni ingestion de source à l'exécution.
 
+## Installer
+
+Avec le [SDK .NET 10](https://dotnet.microsoft.com/download), depuis nuget.org (l'exécution de
+l'outil ne demande ensuite que le runtime .NET 10) :
+
+```powershell
+dotnet tool install --global Sermofur
+smf --help
+```
+
+Versions et notes de version : [GitHub Releases](https://github.com/JoRouquette/sermofur/releases).
+
 ## Installer depuis les sources
 
-Prérequis : le [SDK .NET 10](https://dotnet.microsoft.com/download).
+Prérequis : le [SDK .NET 10](https://dotnet.microsoft.com/download). Un build depuis les sources
+porte la version de développement `0.0.0-dev`.
 
 ```powershell
 git clone https://github.com/JoRouquette/sermofur.git
@@ -55,7 +71,7 @@ cd sermofur
 dotnet restore --locked-mode
 dotnet build --no-restore
 dotnet pack src/Sermofur.Cli -c Release -o artifacts/packages --no-restore
-dotnet tool install Sermofur --version 0.1.0 --tool-path artifacts/tools --configfile nuget.local.config
+dotnet tool install Sermofur --version 0.0.0-dev --tool-path artifacts/tools --configfile nuget.local.config --no-cache
 ./artifacts/tools/smf --help
 ```
 
@@ -95,6 +111,7 @@ invisible. `--origin user|llm` est obligatoire sur chaque `add` qui enregistre d
 - [Modèle mémoire](docs/fr/memory-model.md), [modèle de sécurité](docs/fr/security-model.md).
 - [MCP](docs/fr/mcp-integration.md) et [Laya](docs/fr/laya-integration.md) : contrats futurs,
   pas des implémentations.
+- [Processus de release](docs/fr/release.md) : versions, CI, publication.
 - Décisions d'architecture : [docs/fr/adr](docs/fr/adr/).
 
 Les spécifications sont rédigées dans un atelier Spec Kit tenu hors de ce dépôt ; les décisions

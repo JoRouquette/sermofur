@@ -16,7 +16,9 @@ persisted format (SQLite schema, `instance.json`, Markdown projections).
 Language: code, identifiers, comments, CLI messages and commits in English; documentation in
 English (reference) and French (`README.fr.md`, `docs/fr/`), kept in sync.
 
-Commands: `dotnet restore --locked-mode`, `dotnet build`, `dotnet test`, `csharpier format .`,
-`csharpier check .`. Commits are signed off (`git commit -s`, see `CONTRIBUTING.md`).
+Commands: `dotnet tool restore`, `dotnet restore --locked-mode`, `dotnet build`, `dotnet test`,
+`dotnet csharpier format .`, `dotnet csharpier check .`. Commits follow Conventional Commits (they
+decide the version, see `docs/release.md`) and are signed off (`git commit -s`, see
+`CONTRIBUTING.md`).
 
 Future capabilities not delivered: daemon, MCP, Laya, UI, indexing/recall/consolidation.

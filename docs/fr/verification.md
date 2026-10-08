@@ -7,21 +7,23 @@ limites connues de la version 0.1.
 
 ## Vérifier soi-même
 
-Depuis la racine du dépôt, avec le SDK .NET 10 et CSharpier installés :
+Depuis la racine du dépôt, avec le SDK .NET 10 (la CI passe les mêmes étapes sous Windows, Linux
+et macOS pour chaque pull request) :
 
 ```powershell
+dotnet tool restore                 # CSharpier, épinglé dans .config/dotnet-tools.json
 dotnet restore --locked-mode        # échoue si une dépendance diffère des fichiers de verrouillage
 dotnet build --no-restore           # attendu : 0 avertissement, 0 erreur (avertissements = erreurs)
 dotnet test --no-restore            # attendu : tous les tests réussissent
-csharpier check .                   # attendu : aucun écart de formatage
+dotnet csharpier check .            # attendu : aucun écart de formatage
 ```
 
 Empaqueter et installer l'outil localement, puis l'exécuter :
 
 ```powershell
 dotnet pack src/Sermofur.Cli -c Release -o artifacts/packages --no-restore
-dotnet tool install Sermofur --version 0.1.0 --tool-path artifacts/tools --configfile nuget.local.config
-./artifacts/tools/smf --help      # attendu : exit 0, première ligne « Sermofur 0.1 »
+dotnet tool install Sermofur --version 0.0.0-dev --tool-path artifacts/tools --configfile nuget.local.config --no-cache
+./artifacts/tools/smf --help      # attendu : exit 0, première ligne « Sermofur 0.0.0-dev »
 ```
 
 L'essayer sur une instance jetable, jamais sur un dossier qui porte une vraie mémoire :
@@ -75,8 +77,9 @@ livrées (daemon, laya, model, mcp, indexes, contradictions) sont signalées en 
 
 ## Limites connues
 
-- Plateformes : Windows est vérifié en priorité. Linux et macOS ne sont pas encore vérifiés ;
-  aucune CI distante n'est configurée.
+- Plateformes : la CI construit et lance les tests sous Windows, Linux et macOS pour chaque pull
+  request et chaque push sur `main` ; les vérifications manuelles (page de code de la console,
+  lecteur réseau) ont été faites sous Windows.
 - Page de code de la console : la bascule en UTF-8 et la restauration de la page d'origine ne sont
   pas testées automatiquement, car les tests redirigent les deux flux et cette branche ne s'exécute
   alors pas. La restauration à la fin normale et sur erreur gérée a été vérifiée à la main sous
@@ -87,7 +90,7 @@ livrées (daemon, laya, model, mcp, indexes, contradictions) sont signalées en 
   ni la normalisation Unicode ne sont canonisés). La découverte ne vérifie pas le propriétaire
   d'une entrée `.sermofur` (ADR 0010).
 - Sous Unix, le renommage de publication d'`init` ne détecte pas un `.sermofur` vide créé à
-  l'instant qui le précède ; Unix n'est pas vérifié.
+  l'instant qui le précède ; cette course n'est pas testée.
 - Un lecteur réseau mappé est refusé par le code, mais ce refus n'a pas été testé faute d'un tel
   lecteur.
 - Non livré, donc non vérifié : protocole MCP, inférence Laya, IPC du daemon, UI, installateur

@@ -2,6 +2,9 @@ English | [Français](https://github.com/JoRouquette/sermofur/blob/main/README.f
 
 # Sermofur
 
+[![CI and release](https://github.com/JoRouquette/sermofur/actions/workflows/ci.yml/badge.svg)](https://github.com/JoRouquette/sermofur/actions/workflows/ci.yml)
+[![NuGet](https://img.shields.io/nuget/v/Sermofur)](https://www.nuget.org/packages/Sermofur)
+
 Sermofur is a local cognitive runtime: a memory that an assistant, or you, can consult and
 **contest**. It does not store "facts"; it stores **claims** backed by **evidence**, and lessons
 learned (**RETEX**, from the French *retour d'expérience*), each in an isolated **scope**, with
@@ -43,9 +46,22 @@ These appear in the docs as designs only; no command pretends to provide them.
 
 No telemetry, synchronization, network connection or source ingestion at run time.
 
+## Install
+
+With the [.NET 10 SDK](https://dotnet.microsoft.com/download), from nuget.org (running the tool
+then only needs the .NET 10 runtime):
+
+```powershell
+dotnet tool install --global Sermofur
+smf --help
+```
+
+Releases and their notes: [GitHub Releases](https://github.com/JoRouquette/sermofur/releases).
+
 ## Install from source
 
-Requirements: the [.NET 10 SDK](https://dotnet.microsoft.com/download).
+Requirements: the [.NET 10 SDK](https://dotnet.microsoft.com/download). A build from source carries
+the development version `0.0.0-dev`.
 
 ```powershell
 git clone https://github.com/JoRouquette/sermofur.git
@@ -53,7 +69,7 @@ cd sermofur
 dotnet restore --locked-mode
 dotnet build --no-restore
 dotnet pack src/Sermofur.Cli -c Release -o artifacts/packages --no-restore
-dotnet tool install Sermofur --version 0.1.0 --tool-path artifacts/tools --configfile nuget.local.config
+dotnet tool install Sermofur --version 0.0.0-dev --tool-path artifacts/tools --configfile nuget.local.config --no-cache
 ./artifacts/tools/smf --help
 ```
 
@@ -92,6 +108,7 @@ to any command for machine-readable output. Full reference: [CLI](https://github
 - [Memory model](https://github.com/JoRouquette/sermofur/blob/main/docs/memory-model.md), [security model](https://github.com/JoRouquette/sermofur/blob/main/docs/security-model.md).
 - [MCP](https://github.com/JoRouquette/sermofur/blob/main/docs/mcp-integration.md) and [Laya](https://github.com/JoRouquette/sermofur/blob/main/docs/laya-integration.md): future contracts, not
   implementations.
+- [Release process](https://github.com/JoRouquette/sermofur/blob/main/docs/release.md): versions, CI, publication.
 - Architecture decision records: [docs/adr](https://github.com/JoRouquette/sermofur/tree/main/docs/adr).
 
 Specifications are written in a Spec Kit workshop kept outside this repository; durable

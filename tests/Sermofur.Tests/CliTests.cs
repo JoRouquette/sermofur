@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using Sermofur.Application;
+using Sermofur.Cli;
 using Sermofur.Domain;
 using Sermofur.Infrastructure;
 
@@ -272,6 +273,43 @@ public class CliTests
         Assert.DoesNotContain("tree|add", result.Output);
     }
 
+    [Fact]
+    public void UsageShowsTheBuildVersionAndTheMatchingCliReference()
+    {
+        CliResult result = TestInstance.Run("--help");
+        string version = ProductVersion.Current;
+        // Anchor independent of the code under test: the assembly version comes from the same
+        // MSBuild Version property (0.0.0 for 0.0.0-dev, 9.9.9 for -p:Version=9.9.9).
+        Assert.Equal(
+            typeof(ProductVersion).Assembly.GetName().Version!.ToString(3),
+            version.Split('-')[0]
+        );
+        Assert.StartsWith($"Sermofur {version}", result.Output);
+        Assert.Contains(ProductVersion.CliDocumentation(version), result.Output);
+    }
+
+    [Theory]
+    [InlineData(null, "0.0.0-dev")]
+    [InlineData("", "0.0.0-dev")]
+    [InlineData("1.2.3", "1.2.3")]
+    [InlineData("1.2.3+abc123", "1.2.3")]
+    [InlineData("0.0.0-dev+abc123", "0.0.0-dev")]
+    public void InformationalVersionLosesItsBuildMetadata(string? informational, string expected)
+    {
+        Assert.Equal(expected, ProductVersion.Normalize(informational));
+    }
+
+    [Theory]
+    [InlineData("0.0.0-dev", "https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md")]
+    [InlineData("1.2.3", "https://github.com/JoRouquette/sermofur/blob/v1.2.3/docs/cli.md")]
+    public void CliReferencePointsToTheReleaseTagOrToMainForADevelopmentBuild(
+        string version,
+        string expected
+    )
+    {
+        Assert.Equal(expected, ProductVersion.CliDocumentation(version));
+    }
+
     [Theory]
     [InlineData("claim", "add", "x", "--origin", "user", "--scope", "someone")]
     [InlineData("status", "--unknown", "value")]
@@ -303,7 +341,7 @@ public class CliTests
     {
         // Directory without an instance: without help taking priority, the command would exit 2.
         string outside = Path.Combine(
-            Path.GetTempPath(),
+            TestInstance.TempRoot,
             "sermofur-help-" + Guid.NewGuid().ToString("N")
         );
         Directory.CreateDirectory(outside);
@@ -313,7 +351,7 @@ public class CliTests
                 new[] { "--path", outside }.Concat(arguments).ToArray()
             );
             Assert.Equal(0, result.ExitCode);
-            Assert.StartsWith("Sermofur 0.1", result.Output);
+            Assert.StartsWith($"Sermofur {ProductVersion.Current}", result.Output);
             Assert.Empty(result.Error);
             Assert.False(Directory.Exists(Path.Combine(outside, ".sermofur")));
         }
@@ -357,7 +395,7 @@ public class CliTests
             "--help"
         );
         Assert.Equal(0, helpAsText.ExitCode);
-        Assert.DoesNotContain("Sermofur 0.1", helpAsText.Output);
+        Assert.DoesNotContain("Global options", helpAsText.Output);
     }
 
     [Fact]
@@ -414,7 +452,7 @@ public class CliTests
     {
         TestInstance.RequireNoEntryAboveTemp();
         string root = Path.Combine(
-            Path.GetTempPath(),
+            TestInstance.TempRoot,
             "sermofur-init-test-" + Guid.NewGuid().ToString("N")
         );
         Directory.CreateDirectory(root);

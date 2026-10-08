@@ -25,18 +25,21 @@ ni suffisante : seule la ligne `Signed-off-by` compte.
 ## Prérequis
 
 - [SDK .NET 10](https://dotnet.microsoft.com/download) (voir `global.json`).
-- [CSharpier](https://csharpier.com/) pour le formatage.
+- [CSharpier](https://csharpier.com/) pour le formatage, épinglé comme outil local
+  (`dotnet tool restore`).
 
 ## Construire, tester, formater
 
 ```powershell
+dotnet tool restore
 dotnet restore --locked-mode
 dotnet build
 dotnet test
-csharpier format .
+dotnet csharpier format .
 ```
 
-Lancer `csharpier check .` avant d'ouvrir une pull request. Les tests de processus lancent la CLI
+Lancer `dotnet csharpier check .` avant d'ouvrir une pull request ; la CI passe les mêmes
+contrôles sous Windows, Linux et macOS. Les tests de processus lancent la CLI
 construite : ne pas utiliser `dotnet test --no-build` après une modification du code. Plus :
 [environnement de développement](docs/fr/developer-setup.md) et [vérification](docs/fr/verification.md).
 
@@ -59,9 +62,20 @@ persistant sans discussion préalable dans une issue : ce sont des contrats.
 
 ## Commits et pull requests
 
-Suivre les [Conventional Commits](https://www.conventionalcommits.org/) : `feat:`, `fix:`, `docs:`,
-`test:`, `refactor:`, `chore:`… Un sujet par pull request, avec la description de la
-modification et de la façon dont elle a été vérifiée.
+Suivre les [Conventional Commits](https://www.conventionalcommits.org/). Les types de commit
+décident de la version suivante quand les commits arrivent sur `main`
+([processus de release](docs/fr/release.md)) :
+
+| Commit | Effet sur la version |
+|---|---|
+| `fix:`, `perf:`, `revert:` | correctif (0.1.0 → 0.1.1) |
+| `feat:` | mineure (0.1.0 → 0.2.0) |
+| `!` après le type, ou un pied `BREAKING CHANGE:` | majeure |
+| `docs:`, `test:`, `refactor:`, `build:`, `ci:`, `style:`, `chore:` | pas de release |
+
+Un sujet par pull request, avec la description de la modification et de la façon dont elle a été
+vérifiée. Les pull requests sont fusionnées par merge commit ou rebase, jamais en squash, pour que
+chaque commit garde son type.
 
 ## Documentation
 

@@ -7,21 +7,23 @@ version 0.1.
 
 ## Check it yourself
 
-From the repository root, with the .NET 10 SDK and CSharpier installed:
+From the repository root, with the .NET 10 SDK (the CI runs the same steps on Windows, Linux and
+macOS for every pull request):
 
 ```powershell
+dotnet tool restore                 # CSharpier, pinned in .config/dotnet-tools.json
 dotnet restore --locked-mode        # fails if a dependency differs from the lock files
 dotnet build --no-restore           # expected: 0 warnings, 0 errors (warnings are errors)
 dotnet test --no-restore            # expected: every test passes
-csharpier check .                   # expected: no formatting difference
+dotnet csharpier check .            # expected: no formatting difference
 ```
 
 Package and install the tool locally, then run it:
 
 ```powershell
 dotnet pack src/Sermofur.Cli -c Release -o artifacts/packages --no-restore
-dotnet tool install Sermofur --version 0.1.0 --tool-path artifacts/tools --configfile nuget.local.config
-./artifacts/tools/smf --help      # expected: exit 0, first line "Sermofur 0.1"
+dotnet tool install Sermofur --version 0.0.0-dev --tool-path artifacts/tools --configfile nuget.local.config --no-cache
+./artifacts/tools/smf --help      # expected: exit 0, first line "Sermofur 0.0.0-dev"
 ```
 
 Try it on a disposable instance, never on a folder that holds real memory:
@@ -73,8 +75,8 @@ not delivered yet (daemon, laya, model, mcp, indexes, contradictions) are report
 
 ## Known limits
 
-- Platforms: Windows is verified first. Linux and macOS are not verified yet; no remote CI is
-  configured.
+- Platforms: the CI builds and runs the tests on Windows, Linux and macOS for every pull request
+  and push to `main`; manual checks (console code page, network drive) were done on Windows.
 - Console code page: switching to UTF-8 and restoring the original code page are not tested
   automatically, because tests redirect both streams and that branch then does not run. Restoring
   on normal exit and on a handled error was checked by hand on Windows (cmd.exe, `chcp` before and
@@ -84,7 +86,7 @@ not delivered yet (daemon, laya, model, mcp, indexes, contradictions) are report
   Windows only. Mappings are compared lexically (no canonicalization of case, 8.3 aliases or
   Unicode normalization). Discovery does not check who owns a `.sermofur` entry (ADR 0010).
 - On Unix, the publishing rename of `init` does not detect an empty `.sermofur` created in the
-  instant before it; Unix is not verified.
+  instant before it; this race is not tested.
 - A mapped network drive is refused by the code but this was not tested, for lack of such a
   drive.
 - Not delivered, hence not verified: MCP protocol, Laya inference, daemon IPC, UI, self-contained

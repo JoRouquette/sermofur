@@ -8,8 +8,11 @@ namespace Sermofur.Cli;
 
 public sealed class CommandRunner(TextWriter output, TextWriter error)
 {
-    private const string Usage = """
-        Sermofur 0.1
+    private static string CliDocumentation =>
+        ProductVersion.CliDocumentation(ProductVersion.Current);
+
+    private static readonly string Usage = $"""
+        Sermofur {ProductVersion.Current}
         Global options: [--path DIRECTORY] [--json]
         smf init | root | status | doctor | export
         smf scope current | list | tree
@@ -22,7 +25,7 @@ public sealed class CommandRunner(TextWriter output, TextWriter error)
         smf retex list | show ID
         --help is recognized anywhere before -- and prints this help.
         -- ends options: every following argument is positional (text starting with --).
-        An option value cannot start with --; see https://github.com/JoRouquette/sermofur/blob/v0.1.0/docs/cli.md for values and exit codes.
+        An option value cannot start with --; see {CliDocumentation} for values and exit codes.
         """;
 
     public int Run(string[] arguments)

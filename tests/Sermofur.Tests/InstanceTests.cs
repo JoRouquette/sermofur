@@ -322,7 +322,7 @@ public class InstanceTests
             // The link goes first, on its own: a recursive delete of its parent is refused.
             if (new DirectoryInfo(link).LinkTarget is not null)
             {
-                Directory.Delete(link);
+                TestInstance.DeleteDirectoryLink(link);
             }
             Directory.Delete(top, true);
         }
@@ -507,7 +507,7 @@ public class InstanceTests
     {
         TestInstance.RequireNoEntryAboveTemp();
         string path = Path.Combine(
-            Path.GetTempPath(),
+            TestInstance.TempRoot,
             "sermofur-bare-" + Guid.NewGuid().ToString("N")
         );
         Directory.CreateDirectory(path);

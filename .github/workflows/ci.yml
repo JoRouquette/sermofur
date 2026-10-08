@@ -1,0 +1,299 @@
+name: CI and release
+
+# Every pull request and every push to main is built and tested on Windows, Linux and macOS.
+# On main, a release is computed from the Conventional Commits; when one is due, it waits for
+# the approval of the `release` environment, then tags and creates the GitHub Release; the
+# `package` job builds the tag without any npm code, attests the package and attaches it; the
+# `publish` job pushes it to nuget.org through Trusted Publishing. See docs/release.md and ADR 0011.
+#
+# The file name `ci.yml` and the environment `nuget` are part of the nuget.org Trusted Publishing
+# policy: renaming either stops publication until the policy is updated.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag to build and publish again (for example v0.1.0)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: "true"
+  DOTNET_CLI_TELEMETRY_OPTOUT: "true"
+
+jobs:
+  build:
+    name: build (${{ matrix.os }})
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+      - name: Restore
+        run: |
+          dotnet tool restore
+          dotnet restore --locked-mode
+      - name: Check formatting
+        run: dotnet csharpier check .
+      - name: Build
+        run: dotnet build -c Release --no-restore
+      - name: Test
+        run: dotnet test -c Release --no-build --logger trx --results-directory TestResults
+      - name: Upload test results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: test-results-${{ matrix.os }}
+          path: TestResults
+          if-no-files-found: ignore
+      - name: Pack
+        if: matrix.os == 'ubuntu-latest'
+        run: dotnet pack src/Sermofur.Cli -c Release --no-build -o artifacts/packages
+      - name: Upload the pull request package
+        # For inspection only: releases are built from their tag by the `package` job.
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: pr-package
+          path: artifacts/packages/*.nupkg
+
+  plan:
+    # Dry run: tells whether a release is due, so that approval is only requested when it is.
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      # semantic-release checks that it could push the tag; the dry run writes nothing.
+      contents: write
+    outputs:
+      version: ${{ steps.dry-run.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+      - run: npm ci --ignore-scripts
+      - id: dry-run
+        name: Compute the next version
+        run: npx --no-install semantic-release --dry-run
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release:
+    # Tags and creates the GitHub Release, after the maintainer's approval. It builds nothing:
+    # the npm tooling of semantic-release never touches the published package.
+    needs: plan
+    if: needs.plan.outputs.version != ''
+    runs-on: ubuntu-latest
+    environment: release
+    concurrency:
+      group: release
+      cancel-in-progress: false
+    permissions:
+      contents: write
+    outputs:
+      tag: v${{ steps.release.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+      - run: npm ci --ignore-scripts
+      - id: release
+        name: Tag and GitHub Release
+        run: npx --no-install semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Stop if nothing was released
+        if: steps.release.outputs.version == ''
+        env:
+          PLANNED: ${{ needs.plan.outputs.version }}
+        run: |
+          echo "::error::The plan announced $PLANNED but nothing was released: main moved during the approval, or this is a re-run of a release whose tag already exists. Nothing was published; see docs/release.md (Recovering)."
+          exit 1
+
+  republish:
+    # Publishes an existing tag again without computing a new version: first release v0.1.0, or
+    # a nuget.org publication to resume. The `package` job reuses or rebuilds the package. Its
+    # own concurrency group lets it run while a `release` job waits for approval.
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment: release
+    concurrency:
+      group: republish
+      cancel-in-progress: false
+    permissions:
+      contents: read
+    outputs:
+      tag: ${{ inputs.tag }}
+    steps:
+      - name: Check the tag name
+        env:
+          TAG: ${{ inputs.tag }}
+        run: |
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Expected a release tag such as v1.2.3, got '$TAG'."
+            exit 1
+          fi
+
+  package:
+    # Hands `publish` the package of the released tag. When the GitHub Release already carries a
+    # package, that package is reused only if its provenance attestation comes from this
+    # workflow, so that the release asset and nuget.org always hold the same bytes. Otherwise
+    # the tag is built without any npm code, attested and attached. Its OIDC token carries no
+    # environment, so nuget.org never accepts it.
+    needs: [release, republish]
+    if: always() && (needs.release.result == 'success' || needs.republish.result == 'success')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    env:
+      TAG: ${{ needs.release.outputs.tag || needs.republish.outputs.tag }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check that the tag exists and is on main
+        run: |
+          if ! git rev-parse -q --verify "refs/tags/$TAG^{commit}" > /dev/null; then
+            echo "::error::Tag $TAG does not exist."
+            exit 1
+          fi
+          if ! git merge-base --is-ancestor "refs/tags/$TAG" HEAD; then
+            echo "::error::$TAG does not point to a commit of main; refusing to publish it."
+            exit 1
+          fi
+      - id: existing
+        name: Reuse the package already attached, if it is attested
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          expected="Sermofur.${TAG#v}.nupkg"
+          assets=""
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            assets="$(gh release view "$TAG" --json assets --jq '.assets[].name' | grep '\.nupkg$' || true)"
+          fi
+          if [[ -z "$assets" ]]; then
+            echo "reuse=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [[ "$assets" != "$expected" ]]; then
+            echo "::error::$TAG carries unexpected packages: $assets (expected $expected only)."
+            exit 1
+          fi
+          mkdir -p artifacts/release
+          gh release download "$TAG" --pattern "$expected" --dir artifacts/release
+          # Only an attestation made by this workflow on main, on a GitHub-hosted runner, counts.
+          gh attestation verify "artifacts/release/$expected" --repo "$GITHUB_REPOSITORY" \
+            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/ci.yml" \
+            --source-ref refs/heads/main --deny-self-hosted-runners
+          # The attestation binds the bytes, not the name: an older package renamed would pass.
+          packaged="$(unzip -p "artifacts/release/$expected" '*.nuspec' \
+            | grep -oP '(?<=<version>)[^<]+' | head -n 1)"
+          if [[ "$packaged" != "${TAG#v}" ]]; then
+            echo "::error::The package attached to $TAG is version '$packaged'."
+            exit 1
+          fi
+          echo "reuse=true" >> "$GITHUB_OUTPUT"
+      - name: Check out the tag, keeping the packaging script of main
+        # Older tags may predate the script: always use the one from main.
+        if: steps.existing.outputs.reuse != 'true'
+        run: |
+          cp .github/scripts/pack.sh "$RUNNER_TEMP/pack.sh"
+          git checkout --quiet "refs/tags/$TAG"
+      - if: steps.existing.outputs.reuse != 'true'
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+      - name: Pack
+        if: steps.existing.outputs.reuse != 'true'
+        run: |
+          dotnet restore --locked-mode
+          bash "$RUNNER_TEMP/pack.sh" "${TAG#v}"
+      - name: Attest the package
+        if: steps.existing.outputs.reuse != 'true'
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: artifacts/release/*.nupkg
+      - name: Attach to the GitHub Release
+        if: steps.existing.outputs.reuse != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            gh release upload "$TAG" artifacts/release/*.nupkg
+            exit 0
+          fi
+          # An older tag republished after newer releases must not become "Latest".
+          highest="$(git tag --list 'v*' --sort=-v:refname | head -n 1)"
+          latest=false
+          if [[ "$highest" == "$TAG" ]]; then
+            latest=true
+          fi
+          gh release create "$TAG" artifacts/release/*.nupkg --verify-tag --title "$TAG" \
+            --generate-notes --latest="$latest"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-package
+          path: artifacts/release/*.nupkg
+          if-no-files-found: error
+
+  publish:
+    # Only job with a token that nuget.org accepts (environment `nuget`): it runs no repository
+    # code, no npm and no build, only the push of the package built and attested by `package`.
+    needs: package
+    if: always() && needs.package.result == 'success'
+    runs-on: ubuntu-latest
+    environment: nuget
+    concurrency:
+      group: publish
+      cancel-in-progress: false
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: release-package
+          path: artifacts/release
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          # No checkout here: keep in step with the SDK of global.json.
+          dotnet-version: 10.0.x
+      - name: NuGet login
+        id: nuget
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
+        with:
+          user: ${{ secrets.NUGET_USER }}
+      - name: Publish to nuget.org
+        run: >-
+          dotnet nuget push artifacts/release/*.nupkg
+          --api-key "$NUGET_API_KEY"
+          --source "$NUGET_SOURCE" --skip-duplicate
+        env:
+          NUGET_SOURCE: https://api.nuget.org/v3/index.json
+          NUGET_API_KEY: ${{ steps.nuget.outputs.NUGET_API_KEY }}

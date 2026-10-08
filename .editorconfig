@@ -16,3 +16,6 @@ csharp_prefer_braces = true:error
 dotnet_diagnostic.IDE0007.severity = error
 dotnet_diagnostic.IDE0008.severity = error
 dotnet_diagnostic.IDE0011.severity = error
+
+[*.{yml,yaml,json}]
+indent_size = 2
