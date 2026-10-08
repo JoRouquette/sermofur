@@ -43,6 +43,9 @@ public class PropertyTests
         "add",
         "value",
         "-v",
+        "-h",
+        "--help",
+        "--version",
         string.Empty,
     ];
 
@@ -109,6 +112,52 @@ public class PropertyTests
                         value is null || !value.StartsWith("--", StringComparison.Ordinal)
                     );
                 return tailKept && headPlain && valuesPlain;
+            }
+        );
+
+    [Property(MaxTest = 500)]
+    public Property HelpAndVersionAnswerWheneverAskedBeforeTheSeparator() =>
+        Prop.ForAll(
+            CommandLines(),
+            arguments =>
+            {
+                // Independent oracle: words before "--" that are not the value of an option.
+                List<string> heads = [];
+                for (int index = 0; index < arguments.Length && arguments[index] != "--"; index++)
+                {
+                    heads.Add(arguments[index]);
+                    if (
+                        arguments[index] is "--path" or "--actor" or "--text" or "--x"
+                        && index + 1 < arguments.Length
+                        && !arguments[index + 1].StartsWith("--", StringComparison.Ordinal)
+                    )
+                    {
+                        index++;
+                    }
+                }
+                bool help = arguments.Length == 0 || heads.Any(word => word is "-h" or "--help");
+                bool version = heads.Any(word => word is "-v" or "--version");
+                if (!help && !version)
+                {
+                    // Would run a real command: outside the scope of this property.
+                    return true;
+                }
+                using StringWriter output = new();
+                using StringWriter error = new();
+                int exit = new CommandRunner(output, error).Run(arguments);
+                string text = output.ToString();
+                bool json = CommandArguments.HasFlag(arguments, "json");
+                bool expected =
+                    help || !json
+                        ? text.StartsWith(
+                            $"Sermofur {ProductVersion.Current}",
+                            StringComparison.Ordinal
+                        )
+                        : text.Contains(
+                            $"\"version\": \"{ProductVersion.Current}\"",
+                            StringComparison.Ordinal
+                        );
+                return exit == 0 && error.ToString().Length == 0 && expected;
             }
         );
 }

@@ -61,7 +61,8 @@ Claim : `--category episodic|semantic|procedural|preferences|decisions` ;
 `--volatility stable|evolving|volatile`.
 Types de preuve : `execution`, `source_code`, `authoritative_documentation`, `project_decision`,
 `local_documentation`, `human_observation`, `user_assertion`, `llm_assertion`.
-Un claim `preferences` ou `decisions` exige `--origin user`. Une preuve `execution` déclarée
+Un claim `preferences` ou `decisions` exige `--origin user` (sinon `user_choice_required`,
+code 1). Une preuve `execution` déclarée
 reste low dans cette version. `evidence add` accepte aussi `--contradicts` (preuve contre le
 claim, option sans valeur) et `--source SOURCE_ID` (une source visible et indexée ; son empreinte à
 cet instant est conservée avec la preuve). Pas d'argument `--scope` : le scope vient du chemin. Options
@@ -72,9 +73,15 @@ sans caractère NUL. Elles sont contrôlées avant toute commande, donc avant to
 écriture ; un dépassement donne `invalid_arguments` (exit 1). Le message, en anglais, écrit
 « 16,384 ».
 
-`--help` est reconnu n'importe où **avant** `--` et affiche l'usage (exit 0) avant toute
-recherche d'instance et avant le contrôle des bornes ; après `--`, c'est un argument positionnel
-comme un autre.
+`--help` (`-h`) et `--version` (`-v`) sont reconnus n'importe où **avant** `--`, sauf comme valeur d'une option (`--actor -v`
+garde l'acteur `-v`), et répondent
+(exit 0) avant toute recherche d'instance et avant le contrôle des bornes ; après `--`, ce sont
+des arguments positionnels comme les autres : un texte qui vaut `-h` ou `-v` se place donc après
+`--`. `--help` l'emporte si les deux sont donnés. `smf -h` affiche l'usage général ;
+`smf COMMANDE -h` (`smf claim add -h`, `smf recall -h`…) affiche l'aide de cette commande :
+forme d'appel, description, arguments, options avec leurs valeurs et défauts, codes d'erreur
+propres et un exemple ; `smf GROUPE -h` (`smf source -h`) liste les sous-commandes d'un groupe.
+`--version` affiche `Sermofur <version>`, ou `{"version": "<version>"}` avec `--json`.
 `--` termine les options : tout argument qui suit est positionnel, ce qui permet un texte
 commençant par `--` (`smf claim add --origin user -- "--texte"`).
 Une valeur d'option ne peut pas commencer par `--` : `--actor --x` donne `invalid_arguments`

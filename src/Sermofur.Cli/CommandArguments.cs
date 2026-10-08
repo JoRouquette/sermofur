@@ -58,9 +58,59 @@ public sealed class CommandArguments
         used.Add("json");
     }
 
+    public const string Help = "help";
+    public const string HelpShortcut = "-h";
+    public const string Version = "version";
+    public const string VersionShortcut = "-v";
+
+    /// <summary>True for an option that takes no value, help and version included.</summary>
+    public static bool IsFlag(string name) => Flags.Contains(name) || name is Help or Version;
+
+    /// <summary>The single-dash shortcuts: <c>-h</c> for help, <c>-v</c> for version.</summary>
+    public static bool IsShortcut(string argument) => argument is HelpShortcut or VersionShortcut;
+
+    /// <summary>
+    /// Help or version asked before <c>--</c>, as <c>--NAME</c> or as its shortcut, without
+    /// parsing the line: answered before the bounds check and any instance lookup. The value of
+    /// an option is never taken for a shortcut: <c>--actor -v</c> keeps the actor <c>-v</c>.
+    /// </summary>
+    public static bool Asks(IReadOnlyList<string> arguments, string name, string shortcut)
+    {
+        for (int index = 0; index < arguments.Count; index++)
+        {
+            string argument = arguments[index];
+            if (argument == EndOfOptions)
+            {
+                return false;
+            }
+            if (argument == shortcut || argument == "--" + name)
+            {
+                return true;
+            }
+            if (TakesValue(arguments, index))
+            {
+                // The next argument is this option's value, not a shortcut.
+                index++;
+            }
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// True when the argument at <paramref name="index"/> is an option whose value is the next
+    /// argument, with the rule of the parser: an option that is not a flag, followed by an
+    /// argument that does not start with <c>--</c>.
+    /// </summary>
+    public static bool TakesValue(IReadOnlyList<string> arguments, int index) =>
+        arguments[index].StartsWith("--", StringComparison.Ordinal)
+        && arguments[index] != EndOfOptions
+        && !IsFlag(arguments[index][2..])
+        && index + 1 < arguments.Count
+        && !arguments[index + 1].StartsWith("--", StringComparison.Ordinal);
+
     /// <summary>
     /// Presence of a flag before the <c>--</c> separator, without parsing the line: used for
-    /// help and for the error format before any validation.
+    /// the error format before any validation.
     /// </summary>
     public static bool HasFlag(IReadOnlyList<string> arguments, string name)
     {
