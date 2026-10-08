@@ -73,11 +73,17 @@ public class RecallTests
                 null
             );
         }
+        // Control: on relevance alone, the shorter claim comes first.
+        Assert.Equal(
+            new[] { relevant.Id, confident.Id },
+            fixture.Recall(store).Recall("cache vide").Results.Take(2).Select(r => r.Id)
+        );
         memory.CreateEvidence(
             new(confident.Id, EvidenceKind.SourceCode, "cache.cs", "code"),
             TestInstance.User,
             null
         );
+        Assert.Equal(ConfidenceLevel.High, memory.Explain(confident.Id).Confidence.Level);
 
         RecallAnswer all = fixture.Recall(store).Recall("cache vide");
         // Without its evidence the shorter claim would come first; x1.2 lifts the other one.

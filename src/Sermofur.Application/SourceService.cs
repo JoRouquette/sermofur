@@ -91,12 +91,8 @@ public sealed class SourceService
             },
             snapshot.Passages
         );
-        return saved
-            ?? throw new SermofurException(
-                "storage_busy",
-                "Source changed concurrently; retry.",
-                3
-            );
+        // decide never declines a missing source (it creates it or throws): saved is set.
+        return saved!;
     }
 
     /// <summary>
@@ -136,6 +132,7 @@ public sealed class SourceService
                         || current.Revision != source.Revision
                     )
                     {
+                        outcome = ReindexOutcome.Skipped;
                         return null;
                     }
                     (SourceChange? change, ReindexOutcome result) = Transition(
@@ -154,7 +151,9 @@ public sealed class SourceService
                     previous.RelativePath,
                     outcome,
                     previous.Hash.Length == 0 ? null : previous.Hash,
-                    saved is null ? previous.Hash : Content(saved).Hash
+                    outcome == ReindexOutcome.Skipped || saved is null
+                        ? previous.Hash
+                        : Content(saved).Hash
                 )
             );
         }
@@ -207,12 +206,19 @@ public sealed class SourceService
         {
             throw new SermofurException("invalid_input", InputLimits.TextMessage);
         }
-        string full = Path.GetFullPath(file);
-        if (!paths.Contains(context.Root, full))
+        string typed = Path.GetFullPath(file);
+        if (!paths.Contains(context.Root, typed))
         {
             throw new SermofurException("scope_boundary", "Source outside the instance.", 4);
         }
-        if (paths.Contains(Path.Combine(context.Root, ".sermofur"), full))
+        // One file, one stored path: the names found on disk, whatever the case typed. Every
+        // check below runs on that form, so a case variant or an alias cannot slip past them.
+        string relative = paths.CanonicalCase(context.Root, paths.Relativize(context.Root, typed));
+        string full = Path.GetFullPath(Path.Combine(context.Root, relative));
+        if (
+            paths.Contains(Path.Combine(context.Root, ".sermofur"), full)
+            || relative.Split('/')[0].Equals(".sermofur", StringComparison.OrdinalIgnoreCase)
+        )
         {
             throw new SermofurException(
                 "unsafe_path",
@@ -232,8 +238,6 @@ public sealed class SourceService
                 4
             );
         }
-        // One file, one stored path: the case found on disk, whatever the case typed.
-        string relative = paths.CanonicalCase(context.Root, paths.Relativize(context.Root, full));
         RefuseNarrower(relative, scopes);
         return relative;
     }

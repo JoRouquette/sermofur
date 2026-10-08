@@ -147,12 +147,16 @@ public interface IPathResolver
     /// <summary>True if <paramref name="child"/> equals <paramref name="parent"/> or lies below it.</summary>
     bool Contains(string parent, string child);
 
-    /// <summary>How paths compare on this system: without case on Windows only.</summary>
+    /// <summary>
+    /// How stored paths compare, a rule per operating system (without case on Windows only).
+    /// Stored paths come from <see cref="CanonicalCase"/>, so the rule holds on any file system.
+    /// </summary>
     StringComparison Comparison { get; }
 
     /// <summary>
-    /// <paramref name="relative"/> with the case of the entries found on disk, so that one file
-    /// always has one stored path, whatever the case it was typed with.
+    /// <paramref name="relative"/> with the names of the entries as found on disk (case and Unicode
+    /// normalization), so that one file or folder always has one stored path, whatever the case
+    /// it was typed with. Throws <c>unsafe_path</c> for an alias such as a Windows short name.
     /// </summary>
     string CanonicalCase(string root, string relative);
 }

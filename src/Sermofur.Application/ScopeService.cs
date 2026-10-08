@@ -57,7 +57,14 @@ public sealed partial class ScopeService
         IReadOnlyList<Scope> scopes = store.ReadScopes();
         Scope parent = ValidateParent(candidate, scopes);
         string mapped = ValidateMapping(candidate, parent);
-        Scope normalized = candidate with { RelativePath = paths.Relativize(context.Root, mapped) };
+        // Stored as named on disk, like source paths: both sides of FR-002 compare exactly.
+        Scope normalized = candidate with
+        {
+            RelativePath = paths.CanonicalCase(
+                context.Root,
+                paths.Relativize(context.Root, mapped)
+            ),
+        };
         store.AddScope(normalized, current => EnsureRegistrable(normalized, current));
         return normalized;
     }

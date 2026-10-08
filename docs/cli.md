@@ -42,8 +42,8 @@ escaped, so a text cannot close the JSON block of a projection.
 | migrate | Instance format 1 (0.1) → 2: backup, then migration in one transaction; nothing to do on format 2 |
 | source add FILE --origin user\|llm | Declared source of the current scope: hashed, indexed, idempotent |
 | source list / show ID | Visible sources / the source with its history |
-| source reindex [ID] | Reads again the sources of the current scope: unchanged, modified, missing, unreadable, rejected, restored |
-| index rebuild | Rebuilds the full-text index of the instance in one write transaction and reads every source again (same outcomes as `source reindex`, history under the system actor `sermofur`); other commands that write wait until it ends; output `{indexed, changedSources}` counts visible objects only |
+| source reindex [ID] | Reads again the sources of the current scope: unchanged, modified, missing, unreadable, rejected, restored, or skipped when another command changed the source meanwhile |
+| index rebuild | Rebuilds the full-text index of the instance in one write transaction and reads every source again (same outcomes as `source reindex`, history under the system actor `sermofur`); other commands wait up to 5 s, then fail with `storage_busy` (exit 3) and are to be run again; output `{indexed, changedSources}` counts visible objects only |
 | recall QUESTION [--limit 1-3] | At most 3 explained results among visible claims, RETEX and source passages |
 | challenge CLAIM_ID / challenge --text TEXT | Contradictions, changed sources, status, review date, close claims to confront; writes nothing |
 

@@ -44,8 +44,8 @@ grave restent échappés, si bien qu'un texte ne peut pas fermer le bloc JSON d'
 | migrate | Format d'instance 1 (0.1) → 2 : sauvegarde, puis migration en une transaction ; rien à faire en format 2 |
 | source add FICHIER --origin user\|llm | Source déclarée du scope courant : hachée, indexée, idempotente |
 | source list / show ID | Sources visibles / la source avec son historique |
-| source reindex [ID] | Relit les sources du scope courant : unchanged, modified, missing, unreadable, rejected, restored |
-| index rebuild | Reconstruit l'index plein texte de l'instance en une seule transaction d'écriture et relit toutes les sources (mêmes issues que `source reindex`, historique sous l'acteur système `sermofur`) ; les autres commandes qui écrivent attendent la fin ; la sortie `{indexed, changedSources}` ne compte que les objets visibles |
+| source reindex [ID] | Relit les sources du scope courant : unchanged, modified, missing, unreadable, rejected, restored, ou skipped quand une autre commande a modifié la source entre-temps |
+| index rebuild | Reconstruit l'index plein texte de l'instance en une seule transaction d'écriture et relit toutes les sources (mêmes issues que `source reindex`, historique sous l'acteur système `sermofur`) ; les autres commandes attendent au plus 5 s, puis échouent en `storage_busy` (code 3) et sont à relancer ; la sortie `{indexed, changedSources}` ne compte que les objets visibles |
 | recall QUESTION [--limit 1-3] | Au plus 3 résultats expliqués parmi claims, RETEX et passages de sources visibles |
 | challenge CLAIM_ID / challenge --text TEXTE | Contradictions, sources modifiées, statut, date de revue, claims proches à confronter ; n'écrit rien |
 

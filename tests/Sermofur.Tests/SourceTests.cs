@@ -410,6 +410,8 @@ public class SourceTests
     [Theory]
     [InlineData("Doc.md", "doc.md")]
     [InlineData("Dossier/Été.md", "dossier/été.md")]
+    // Decomposed on disk (NFD, as some macOS tools write it), composed when typed (NFC).
+    [InlineData("Dossier/E\u0301te\u0301.md", "dossier/été.md")]
     public void OneFileIsOneSourceWhateverTheCaseTyped(string onDisk, string typed)
     {
         using TestInstance fixture = new TestInstance();
@@ -433,11 +435,108 @@ public class SourceTests
         File.WriteAllText(other, "autre contenu");
         MemoryRecord second = fixture.Sources(store).Add(other, TestInstance.User);
         Assert.NotEqual(first.Id, second.Id);
-        Assert.Equal(typed, SourceService.Content(second).RelativePath);
+        // The folder may still be matched without case (Windows); the file name is the typed one.
+        Assert.EndsWith(
+            "/" + Path.GetFileName(typed),
+            "/" + SourceService.Content(second).RelativePath
+        );
         Assert.All(
             fixture.Sources(store).Reindex(null, "tester"),
             entry => Assert.Equal(ReindexOutcome.Unchanged, entry.Outcome)
         );
+    }
+
+    [Fact]
+    public void ScopeMappingTypedInAnotherCaseStillHoldsItsFolder()
+    {
+        using TestInstance fixture = new TestInstance();
+        using SqliteStore store = fixture.Open();
+        string file = fixture.WriteFile("client/notes.md", "secret du client");
+        if (!Directory.Exists(Path.Combine(fixture.Root, "CLIENT")))
+        {
+            // Case-sensitive file system: CLIENT is another folder, nothing to compare.
+            return;
+        }
+        Scope registered = fixture
+            .Scopes(store)
+            .Register(new Scope("c", ScopeKind.Client, ScopePolicy.WorkspaceScopeId, "CLIENT"));
+        Assert.Equal("client", registered.RelativePath);
+        Assert.Equal(
+            "scope_boundary",
+            Refusal(() => fixture.Sources(store).Add(file, TestInstance.User))
+        );
+        Assert.Equal(
+            "ok",
+            new InstanceDoctor()
+                .Inspect(fixture.Root)
+                .Checks.Single(c => c.Name == "scope_mappings")
+                .Status
+        );
+        Tamper(fixture, "UPDATE scopes SET relative_path='CLIENT' WHERE id='c'");
+        Assert.Equal(
+            "warning",
+            new InstanceDoctor()
+                .Inspect(fixture.Root)
+                .Checks.Single(c => c.Name == "scope_mappings")
+                .Status
+        );
+    }
+
+    [Theory]
+    [InlineData(".SERMOFUR/instance.json")]
+    [InlineData(".Sermofur/memory.db")]
+    public void SermofurFilesCannotBeReachedThroughACaseVariant(string typed)
+    {
+        using TestInstance fixture = new TestInstance();
+        using SqliteStore store = fixture.Open();
+        Assert.Equal(
+            "unsafe_path",
+            Refusal(() =>
+                fixture.Sources(store).Add(Path.Combine(fixture.Root, typed), TestInstance.User)
+            )
+        );
+    }
+
+    [Fact]
+    public void IndexRebuildDropsALostSourceAndRollsBackOnFailure()
+    {
+        using TestInstance fixture = new TestInstance();
+        using SqliteStore store = fixture.Open();
+        string kept = fixture.WriteFile("kept.md", "texte conservé");
+        string lost = fixture.WriteFile("lost.md", "texte perdu");
+        fixture.Sources(store).Add(kept, TestInstance.User);
+        MemoryRecord lostSource = fixture.Sources(store).Add(lost, TestInstance.User);
+
+        // A failure while reading the second source leaves registry and index untouched.
+        Assert.Throws<IOException>(() =>
+            fixture.Sources(store, reader: new FailingReader(failAt: 2)).RebuildIndex()
+        );
+        Assert.Single(fixture.Recall(store).Recall("perdu").Results);
+        Assert.Single(fixture.Sources(store).Show(lostSource.Id).History);
+
+        File.Delete(lost);
+        Assert.Equal(new IndexRebuild(1, 1), fixture.Sources(store).RebuildIndex());
+        Assert.Empty(fixture.Recall(store).Recall("perdu").Results);
+        HistoryEntry entry = fixture.Sources(store).Show(lostSource.Id).History[^1];
+        Assert.Equal(("missing", SourceService.SystemActor), (entry.Reason, entry.Actor));
+        Assert.Equal(
+            "ok",
+            new InstanceDoctor()
+                .Inspect(fixture.Root)
+                .Checks.Single(c => c.Name == "search_index")
+                .Status
+        );
+    }
+
+    private sealed class FailingReader(int failAt) : ISourceReader
+    {
+        private readonly FileSourceReader inner = new FileSourceReader(new FileOwnership());
+        private int calls;
+
+        public SourceSnapshot Read(string root, string relativePath) =>
+            ++calls == failAt
+                ? throw new IOException("simulated read failure")
+                : inner.Read(root, relativePath);
     }
 
     [Fact]

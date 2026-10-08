@@ -45,7 +45,7 @@ public static class InstanceMigration
                     // Another migrate committed first: nothing left to do on the database, and
                     // this backup is not the one taken before the migration that ran.
                     version = InstanceManager.SchemaVersion;
-                    File.Delete(backup);
+                    DeleteQuietly(backup);
                     backup = null;
                 }
             }
@@ -78,6 +78,20 @@ public static class InstanceMigration
             InstanceManager.SchemaVersion,
             backup is null ? null : LocalPaths.RelativizeMapping(root, backup)
         );
+    }
+
+    /// <summary>
+    /// Cleanup only: a file held by a scanner must not fail a migration that another process
+    /// completed. The orphan stays in backups/, which is harmless.
+    /// </summary>
+    private static void DeleteQuietly(string path)
+    {
+        try
+        {
+            File.Delete(path);
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        { }
     }
 
     private static SqliteConnection Open(string path)

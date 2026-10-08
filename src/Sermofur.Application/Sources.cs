@@ -41,6 +41,9 @@ public enum ReindexOutcome
     Unreadable,
     Rejected,
     Restored,
+
+    /// <summary>Changed by another command since it was listed: left as that command wrote it.</summary>
+    Skipped,
 }
 
 public sealed record ReindexEntry(

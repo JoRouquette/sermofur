@@ -23,11 +23,14 @@ Accepted consequence in 0.1: a project that shares the path of its repository is
 reachable as a write context once the repository is registered, since the repository wins the
 tie. Writing at the project level then requires a mapping distinct from the repository's.
 
-Known limit: mappings are compared lexically (normalized paths, no disk access). Windows 8.3
-aliases are not canonicalized, nor is case: the comparison ignores case on Windows but respects
-it elsewhere, including on a case-insensitive file system. Unicode normalization forms (NFC and
-NFD, as on macOS) are not unified either. Two spellings of the same folder can therefore escape
-the duplicate or overlap check.
+A new mapping is stored as its folder is named on disk (case and Unicode normalization, as
+`source add` stores source paths), so a scope and the sources of its folder always compare under
+the same spelling; a Windows 8.3 alias is refused. `doctor` warns (`scope_mappings`) on a mapping
+stored under another spelling by an earlier version, since such a scope may not hold the sources of its folder.
+
+Known limit: the duplicate and overlap checks between mappings stay lexical (normalized paths, no
+disk access); the comparison ignores case on Windows but respects it elsewhere. Mappings stored
+by an earlier version under two spellings of one folder can therefore escape them.
 
 Example for an existing single-repository project, without creating folders:
 ```powershell

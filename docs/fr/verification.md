@@ -86,10 +86,15 @@ mkdir $env:TEMP/sermofur-check; cd $env:TEMP/sermofur-check
   hors de l'instance ou dans `.sermofur` refusé ; ajout idempotent ; réindexation qui rend
   inchangée, modifiée (empreinte précédente dans l'historique), absente et restaurée, l'index
   suivant ; réindexation qui ne lit que les sources déclarées du scope courant ; preuve qui fige
-  l'empreinte de sa source ; reconstruction après un index désynchronisé, qui relit chaque source avec historique et ne
-  compte que le visible ; source d'un ancêtre déplacée vers un scope créé sur son dossier ; chemins
-  comparés comme le système de fichiers (casse sous Unix) ; fichier atteint par un lien refusé ;
-  FIFO refusée sans blocage (Linux et macOS).
+  l'empreinte de sa source ; reconstruction après un index désynchronisé, qui relit chaque source avec historique sous
+  l'acteur système, retire une source perdue et annule tout si une lecture échoue, et ne compte que
+  le visible ; source d'un ancêtre déplacée vers un scope créé sur son dossier ; scope créé pendant
+  un `source add` vu sous le verrou d'écriture ; un fichier, une source, quelle que soit la casse
+  tapée, le système de fichiers décidant (casse et NFC/NFD) ; mapping de scope tapé dans une autre
+  casse enregistré sous le nom du disque, avertissement de doctor sur une variante enregistrée ;
+  `.sermofur` inatteignable par une variante de casse ; doctor qui signale une entrée d'index mal
+  placée et une source restée dans un scope plus large ; fichier atteint par un lien refusé ; FIFO
+  refusée sans blocage (Linux et macOS).
 - Recall (ADR 0013) : au plus 3 résultats expliqués dans un ordre stable ; du contenu ajouté à un
   scope frère ne change ni la présence, ni l'ordre, ni le score des résultats visibles ; claims
   invalidés jamais en tête, comptés comme écartés ; meilleur passage et fraîcheur des sources ;

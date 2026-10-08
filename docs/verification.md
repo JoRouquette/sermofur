@@ -83,10 +83,14 @@ delivered yet (daemon, laya, model, mcp) are reported as warnings.
   outside the instance or in `.sermofur` refused; idempotent add; reindex reporting unchanged,
   modified (previous hash in history), missing and restored, with the index following; reindex
   reading only the declared sources of the current scope; evidence freezing the source hash;
-  index rebuild after a desynchronized index, reading every source again with history and
-  counting visible objects only; a source of an ancestor moved to a scope created on its folder;
-  paths compared like the file system (case on Unix); a file reached through a link refused; a
-  FIFO refused without blocking (Linux and macOS).
+  index rebuild after a desynchronized index, reading every source again with history under the
+  system actor, dropping a lost source and rolling back entirely when a read fails, counting
+  visible objects only; a source of an ancestor moved to a scope created on its folder; a scope
+  created during a source add seen under the write lock; one file is one source whatever the case
+  typed, the file system deciding (case and NFC/NFD); a scope mapping typed in another case
+  stored as named on disk, doctor warning on a stored variant; `.sermofur` unreachable through a
+  case variant; doctor reporting a misplaced index entry and a source left in a broader scope; a
+  file reached through a link refused; a FIFO refused without blocking (Linux and macOS).
 - Recall (ADR 0013): at most 3 explained results in a stable order; content added to a sibling
   scope changes neither presence, order nor score of visible results; invalidated claims never
   first, counted as excluded; best passage and freshness of sources; query syntax treated as text;

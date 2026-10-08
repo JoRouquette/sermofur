@@ -173,6 +173,26 @@ public sealed class InstanceDoctor(IFileOwnership? ownership = null)
         }
     }
 
+    private static bool IsMisnamed(string root, string mapping)
+    {
+        try
+        {
+            string full = LocalPaths.NormalizeMapping(root, mapping);
+            if (!Directory.Exists(full))
+            {
+                // Counted as missing, not as misnamed.
+                return false;
+            }
+            string relative = LocalPaths.RelativizeMapping(root, full);
+            return LocalPaths.CanonicalCase(root, relative) != relative;
+        }
+        catch (Exception exception)
+            when (exception is SermofurException or IOException or UnauthorizedAccessException)
+        {
+            return true;
+        }
+    }
+
     /// <summary>
     /// Checks scopes, scope_mappings and scope_overlap; returns the scopes read for the memory
     /// checks. An invalid tree stops the inspection with an exception.
@@ -187,8 +207,19 @@ public sealed class InstanceDoctor(IFileOwnership? ownership = null)
         ScopePolicy.ValidateTree(scopes);
         checks.Add(new("scopes", "ok", "Valid scope tree."));
         int missing = CountMissingMappings(root, scopes);
+        // A mapping stored with another case or Unicode form than its folder on a
+        // case-insensitive file system does not hold the sources of that folder (stored on-disk).
+        int misnamed = scopes.Count(scope =>
+            scope.RelativePath is not null && IsMisnamed(root, scope.RelativePath)
+        );
         checks.Add(
-            new("scope_mappings", missing == 0 ? "ok" : "warning", $"{missing} missing mappings.")
+            new(
+                "scope_mappings",
+                missing + misnamed == 0 ? "ok" : "warning",
+                misnamed == 0
+                    ? $"{missing} missing mappings."
+                    : $"{missing} missing mappings, {misnamed} named otherwise on disk (such a scope may not hold the sources of its folder)."
+            )
         );
         // Same rules as scope add, on lexically normalized mappings: detects an overlap entered
         // outside the CLI. The detail only gives the number of pairs.
