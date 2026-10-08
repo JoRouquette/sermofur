@@ -24,3 +24,8 @@ updates:
     groups:
       release-tooling:
         patterns: ["*"]
+    ignore:
+      # Major 10 needs conventional-changelog-writer 9, which release-notes-generator 14 does not
+      # use yet. Remove once it does: the `release-notes` job of ci.yml proves the pair works.
+      - dependency-name: conventional-changelog-conventionalcommits
+        update-types: ["version-update:semver-major"]

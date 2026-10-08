@@ -11,8 +11,8 @@ Sermofur follows [Semantic Versioning](https://semver.org/). Versions are comput
 
 | Event | Jobs |
 |---|---|
-| Pull request to `main` | `build` on Windows, Linux and macOS: locked restore, formatting check, Release build, tests, package (Linux) |
-| Push to `main` | `build`, then `plan`: a semantic-release dry run that tells whether a release is due |
+| Pull request to `main` | `build` on Windows, Linux and macOS: locked restore, formatting check, Release build, tests, package (Linux); `release-notes`: renders sample release notes with the locked semantic-release tooling |
+| Push to `main` | `build` and `release-notes`, then `plan`: a semantic-release dry run that tells whether a release is due |
 | Release due | `release` waits for the approval of the `release` environment, then creates the tag `vX.Y.Z` and the GitHub Release; `package` builds the tag, attests the package and attaches it to the release; `publish` pushes it to nuget.org |
 | Manual run with a tag | `republish` waits for the same approval; `package` reuses the package attached to that release if this workflow attested it on `main`, or builds the tag; `publish` pushes it to nuget.org |
 
@@ -42,9 +42,10 @@ merging it, so that a patch release ships the fix.
 These settings live outside the repository and are done once.
 
 1. **Protect `main`** (Settings → Rules → Rulesets → New branch ruleset, target `main`): require a
-   pull request; require the status checks `build (windows-latest)`, `build (ubuntu-latest)` and
-   `build (macos-latest)`; block force pushes and deletions. In Settings → General, allow merge
-   commits and rebase merging, disable squash merging.
+   pull request (0 approvals for a single maintainer, who cannot approve their own pull request);
+   require the status checks `build (windows-latest)`, `build (ubuntu-latest)`,
+   `build (macos-latest)` and `release-notes`; block force pushes and deletions. In Settings →
+   General, allow merge commits and rebase merging, disable squash merging.
 2. **Protect release tags** (New tag ruleset, target `v*`): block updates and deletions, so that
    a published tag can never be moved or removed.
 3. **Environment `release`** (Settings → Environments → New environment): required reviewer = the
@@ -53,7 +54,8 @@ These settings live outside the repository and are done once.
    only environment that nuget.org trusts.
 5. **nuget.org Trusted Publishing** (nuget.org → your user name → Trusted Publishing → add a
    policy): owner `JoRouquette`, repository `sermofur`, workflow file `ci.yml`, environment
-   `nuget`.
+   `nuget`; scope *Push new packages and package versions* (the first push creates the package),
+   *Unlist or relist* unchecked; glob patterns and packages: `Sermofur` only.
 6. **Secret `NUGET_USER`** (Settings → Secrets and variables → Actions, or as an environment
    secret of `nuget`): the nuget.org profile name (not the email address). It is not a
    credential: nuget.org issues a one-hour key to the workflow in exchange for its OIDC token.

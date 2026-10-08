@@ -72,9 +72,26 @@ jobs:
           name: pr-package
           path: artifacts/packages/*.nupkg
 
+  release-notes:
+    # Renders sample release notes with the locked commit-analyzer, release-notes-generator and
+    # preset: `plan` renders notes only on main when a release is due, so an incompatible update
+    # of these must fail here, in the pull request. No token, no git history needed.
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+      - run: npm ci --ignore-scripts
+      - name: Render sample release notes
+        run: node .github/scripts/check-release-notes.mjs
+
   plan:
     # Dry run: tells whether a release is due, so that approval is only requested when it is.
-    needs: build
+    needs: [build, release-notes]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
