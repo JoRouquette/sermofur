@@ -14,6 +14,13 @@ de lancement du client et aucune requête ne peut le changer. Les requêtes sont
 60 s) ; le journal n'enregistre aucun argument ni aucune sortie. Tout processus de votre compte
 peut utiliser ou arrêter votre daemon, comme il peut déjà lire votre instance.
 
+Le serveur MCP ([mcp-integration.md](mcp-integration.md)) ne contient aucun moteur : ses outils
+s'exécutent via le daemon dans le scope du dossier du projet. Ses schémas sont fermés et ne
+prennent ni chemin, ni scope, ni instance, ni origine, ni acteur ; toute écriture est enregistrée
+avec l'origine `llm` et le host comme acteur, si bien qu'un modèle ne peut pas faire passer ses
+affirmations pour les vôtres, et un identifiant d'un scope frère répond comme un identifiant
+inconnu. Il n'offre ni SQL, ni accès aux fichiers, ni ressource, ni prompt.
+
 Un seul utilisateur OS. Les scopes protègent les opérations du produit ; le même utilisateur
 OS peut accéder à ses fichiers SQLite et Markdown. Ni chiffrement, ni ACL multi-utilisateur, ni
 bac à sable contre un code hostile.

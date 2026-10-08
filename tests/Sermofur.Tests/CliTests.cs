@@ -515,6 +515,9 @@ public class CliTests
             "daemon unregister",
             "daemon instances",
             "daemon run",
+            "mcp install",
+            "mcp uninstall",
+            "mcp serve",
         ];
         Assert.Equal(
             expected.Order(StringComparer.Ordinal),

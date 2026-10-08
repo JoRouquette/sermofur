@@ -36,7 +36,8 @@ mkdir $env:TEMP/sermofur-check; cd $env:TEMP/sermofur-check
 ```
 
 `healthy_with_warnings` est l'état attendu d'une instance saine : les capacités pas encore livrées
-(laya, model, mcp) sont signalées en warning, de même que le daemon quand il ne tourne pas.
+(laya, model) sont signalées en warning, de même que le daemon quand il ne tourne pas et le
+serveur MCP quand la racine de l'instance ne le déclare pas.
 `artifacts/` et `TestResults/` sont ignorés par Git.
 
 ## Ce que couvrent les tests
@@ -128,6 +129,18 @@ mkdir $env:TEMP/sermofur-check; cd $env:TEMP/sermofur-check
   piloté et retiré (`RealServiceTests`).
 - L'ensemble des tests utilise son propre `SERMOFUR_DAEMON_HOME` : il n'atteint jamais le daemon
   du développeur.
+- Pont MCP (ADR 0017) : le vrai protocole avec le client du SDK officiel contre un processus
+  `smf mcp serve` (initialisation, huit outils aux schémas fermés, une écriture puis un recall
+  identique à `smf recall`) ; outils de lecture identiques à la CLI ; claims d'un scope frère
+  inconnus de challenge, evidence et feedback et absents du recall ; champs de chemin et de scope
+  refusés ; écritures enregistrées en `llm` avec le host comme acteur, rejeux idempotents, textes
+  en `--` conservés, valeurs d'option qui commencent par `--` refusées, `preferences` et
+  `decisions` non proposés ; feedback enregistré comme RETEX brouillon qui ne change ni le rang ni
+  la confiance ; pas de daemon (erreur en moins d'une seconde, serveur toujours en marche),
+  instance non enregistrée, hors de toute instance, daemon d'une autre version, daemon redémarré
+  sous le même pont, dix appels en parallèle ; `.mcp.json` modifié en gardant toute autre entrée
+  identique octet par octet (FsCheck : installer puis retirer rend les mêmes octets), fichiers
+  invalides laissés intacts, contrôle `mcp` de doctor.
 
 ## Mesures du daemon
 
@@ -168,7 +181,7 @@ vocabulaire et des passages visibles.
   l'instant qui le précède ; cette course n'est pas testée.
 - Un lecteur réseau mappé est refusé par le code, mais ce refus n'a pas été testé faute d'un tel
   lecteur.
-- Non livré, donc non vérifié : protocole MCP, inférence Laya, UI, installateur autonome,
+- Non livré, donc non vérifié : Codex comme host MCP, inférence Laya, UI, installateur autonome,
   consolidation, similarité sémantique. Aucune coupure électrique simulée.
 - La performance du recall (SC-004) est une mesure de référence, pas une garantie : voir [Performance du recall](#performance-du-recall).
   Elle ne tourne qu'avec `SERMOFUR_PERFORMANCE=1` et ne fait pas partie de la CI.

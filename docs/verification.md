@@ -36,8 +36,8 @@ mkdir $env:TEMP/sermofur-check; cd $env:TEMP/sermofur-check
 ```
 
 `healthy_with_warnings` is the expected state of a sound instance: the capabilities that are not
-delivered yet (laya, model, mcp) are reported as warnings, and so is the daemon when it does not
-run.
+delivered yet (laya, model) are reported as warnings, and so are the daemon when it does not run
+and the MCP server when the instance root does not declare it.
 `artifacts/` and `TestResults/` are ignored by Git.
 
 ## What the tests cover
@@ -123,6 +123,17 @@ run.
   the real service of each system installed, killed, piloted and removed (`RealServiceTests`).
 - The whole test run uses its own `SERMOFUR_DAEMON_HOME`: it never reaches the daemon of the
   developer.
+- MCP bridge (ADR 0017): the real protocol with the client of the official SDK against a
+  `smf mcp serve` process (initialization, eight tools with closed schemas, a write then a recall
+  identical to `smf recall`); read tools identical to the CLI; claims of a sibling scope unknown to
+  challenge, evidence and feedback and absent from recall; path and scope fields refused; writes
+  recorded as `llm` with the host as actor, idempotent replays, `--` texts kept, option values
+  starting with `--` refused, `preferences` and `decisions` not offered; feedback as a draft RETEX
+  that changes neither rank nor confidence; no daemon (error in under a second, server still up),
+  instance not registered, outside any instance, daemon of another version, daemon restarted under
+  the same bridge, ten parallel calls; `.mcp.json` edited with every other entry kept byte for byte
+  (FsCheck: install then remove gives back the same bytes), invalid files left untouched, the
+  `mcp` check of doctor.
 
 ## Daemon measures
 
@@ -160,7 +171,7 @@ frequencies of the vocabulary table and the visible passages.
   instant before it; this race is not tested.
 - A mapped network drive is refused by the code but this was not tested, for lack of such a
   drive.
-- Not delivered, hence not verified: MCP protocol, Laya inference, UI, self-contained
+- Not delivered, hence not verified: Codex as an MCP host, Laya inference, UI, self-contained
   installer, consolidation, semantic similarity. No power loss was simulated.
 - Recall performance (SC-004) is a reference measure, not a guarantee: see [Recall performance](#recall-performance). It runs only
   with `SERMOFUR_PERFORMANCE=1` and is not part of the CI.

@@ -213,6 +213,7 @@ public sealed class DaemonCommands(
             version = answer?.Version,
             executable = definition?.Executable,
             pid = answer?.Pid,
+            registry = answer?.Registry,
             startedAt = answer?.StartedAt,
             instancesOpen = answer?.InstancesOpen,
             clients = answer?.Clients,
@@ -224,7 +225,8 @@ public sealed class DaemonCommands(
         int? Pid,
         string? StartedAt,
         int? InstancesOpen,
-        int? Clients
+        int? Clients,
+        string? Registry
     );
 
     /// <summary>What a running daemon of this version says about itself, or null when none answers.</summary>
@@ -241,7 +243,8 @@ public sealed class DaemonCommands(
             status.Pid,
             status.StartedAt,
             status.InstancesOpen,
-            status.Clients
+            status.Clients,
+            status.Registry
         );
     }
 
@@ -368,12 +371,16 @@ public sealed class DaemonCommands(
         Directory.CreateDirectory(paths.StateDirectory);
         using FileStream lockFile = AcquireLock(paths);
         FileOwnership owners = new FileOwnership();
+        DaemonLog log = new DaemonLog(paths.LogFile);
         DaemonServer server = new DaemonServer(
             paths,
             ProductVersion.Current,
             new CliCommandExecutor(),
-            new ServingGate(new InstanceRegistry(paths.RegistryFile)),
-            new DaemonLog(paths.LogFile),
+            new ServingGate(
+                new InstanceRegistry(paths.RegistryFile),
+                refused: code => log.Write("not_served", code)
+            ),
+            log,
             owners
         );
         using CancellationTokenSource stop = new CancellationTokenSource();

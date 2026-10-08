@@ -150,7 +150,8 @@ public sealed class InstanceRegistry(string file, InstanceManager? manager = nul
     public DateTime LastWriteUtc() =>
         System.IO.File.Exists(file) ? System.IO.File.GetLastWriteTimeUtc(file) : DateTime.MinValue;
 
-    internal static bool Same(string left, string right) =>
+    /// <summary>Same root, with the case rule of the operating system.</summary>
+    public static bool Same(string left, string right) =>
         string.Equals(
             Path.TrimEndingDirectorySeparator(left),
             Path.TrimEndingDirectorySeparator(right),

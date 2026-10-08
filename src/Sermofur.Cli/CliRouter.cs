@@ -89,7 +89,7 @@ public sealed class CliRouter(TextWriter output, TextWriter error)
         {
             CommandArguments parsed = new CommandArguments(arguments);
             return parsed.Positionals.Count > 0
-                && parsed.Positionals[0] is not ("init" or "doctor" or "daemon");
+                && parsed.Positionals[0] is not ("init" or "doctor" or "daemon" or "mcp");
         }
         catch (SermofurException)
         {

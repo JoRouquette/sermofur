@@ -4,6 +4,7 @@ using Sermofur.Application;
 using Sermofur.Daemon;
 using Sermofur.Domain;
 using Sermofur.Infrastructure;
+using Sermofur.Mcp;
 
 namespace Sermofur.Cli;
 
@@ -34,6 +35,7 @@ public sealed class CommandRunner(TextWriter output, TextWriter error, string mo
         smf daemon install | uninstall | start | stop | restart | status
         smf daemon register | unregister | instances
         smf daemon run [--supervise]
+        smf mcp install | uninstall | serve
         smf COMMAND -h | smf GROUP -h       help of one command, or the subcommands of a group
         smf --version | -v                  version
         --help (-h) and --version (-v) are recognized anywhere before --, except as an option value; --help wins.
@@ -86,6 +88,10 @@ public sealed class CommandRunner(TextWriter output, TextWriter error, string mo
             if (parsed.Positionals.Count > 0 && parsed.Positionals[0] == "daemon")
             {
                 return new DaemonCommands(output, Write).Run(parsed, json, workingDirectory);
+            }
+            if (parsed.Positionals.Count > 0 && parsed.Positionals[0] == "mcp")
+            {
+                return new McpCommands(Write).Run(parsed, json, workingDirectory);
             }
             return Execute(parsed, json, workingDirectory);
         }
@@ -197,7 +203,19 @@ public sealed class CommandRunner(TextWriter output, TextWriter error, string mo
                     DaemonPaths.ForCurrentUser,
                     new FileOwnership(),
                     ProductVersion.Current
-                )
+                ),
+            instanceRoot =>
+                McpDeclaration.IsDeclared(instanceRoot)
+                    ? new DiagnosticCheck(
+                        "mcp",
+                        "ok",
+                        "Declared to Claude Code in .mcp.json at the root of the instance."
+                    )
+                    : new DiagnosticCheck(
+                        "mcp",
+                        "warning",
+                        "Not declared at the root of the instance: smf mcp install."
+                    )
         ).Inspect(root);
         Write(report, json);
         return report.Overall == "unhealthy" ? 5 : 0;

@@ -13,6 +13,12 @@ of a session comes from the launch folder of the client and no request can chang
 are bounded (256 KiB, 60 s); the journal records no argument and no output. Any process of your
 account can use or stop your daemon, as it can already read your instance.
 
+The MCP server ([mcp-integration.md](mcp-integration.md)) holds no engine: its tools run through
+the daemon in the scope of the project folder. Its schemas are closed and take no path, scope,
+instance, origin or actor; every write is recorded with the origin `llm` and the host as actor,
+so a model cannot pass its statements off as yours, and an identifier of a sibling scope answers
+like an unknown one. It offers no SQL, no file access, no resource and no prompt.
+
 One OS user. Scopes protect the product's operations; the same OS user can access their SQLite
 and Markdown files. No encryption, no multi-user ACL and no sandbox against hostile code.
 

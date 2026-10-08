@@ -13,7 +13,8 @@ public sealed class ServingGate(
     InstanceRegistry registry,
     InstanceManager? manager = null,
     TimeSpan? idle = null,
-    Func<DateTimeOffset>? clock = null
+    Func<DateTimeOffset>? clock = null,
+    Action<string>? refused = null
 ) : IServingGate
 {
     private readonly InstanceManager instances = manager ?? new InstanceManager();
@@ -51,6 +52,7 @@ public sealed class ServingGate(
         }
         if (candidate is null)
         {
+            refused?.Invoke("not_registered");
             return null;
         }
         string root;
@@ -58,13 +60,15 @@ public sealed class ServingGate(
         {
             root = instances.Discover(path);
         }
-        catch (SermofurException)
+        catch (SermofurException exception)
         {
             // The direct CLI reports the same error with its own wording and exit code.
+            refused?.Invoke(exception.Code);
             return null;
         }
         if (!InstanceRegistry.Same(root, candidate.Root))
         {
+            refused?.Invoke("nested_instance_not_registered");
             // A nested instance that is not registered itself.
             return null;
         }
@@ -86,9 +90,10 @@ public sealed class ServingGate(
         {
             entries = registry.Read();
         }
-        catch (SermofurException)
+        catch (SermofurException exception)
         {
             // An unreadable registry serves nothing; the CLI keeps working directly.
+            refused?.Invoke(exception.Code);
             entries = [];
         }
         loadedAt = written;

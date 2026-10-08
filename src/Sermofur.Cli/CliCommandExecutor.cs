@@ -14,9 +14,8 @@ public sealed class CliCommandExecutor : ICommandExecutor
         try
         {
             CommandArguments args = new CommandArguments([.. argv]);
-            string path = Path.GetFullPath(
-                args.Option("path", workingDirectory)!,
-                workingDirectory
+            string path = LongPath.Of(
+                Path.GetFullPath(args.Option("path", workingDirectory)!, workingDirectory)
             );
             bool writes = args.Positionals.Count == 0 || CommandRunner.Writes(args);
             return new CommandPlan(path, writes);

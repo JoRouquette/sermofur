@@ -80,6 +80,11 @@ The journal holds one JSON object per line (local time with its offset), three f
 most. It records events, error codes, client process IDs and durations, never the arguments or
 outputs of a command.
 
+On Windows, a terminal started by a packaged (MSIX) application, such as some desktop apps, may
+write `%APPDATA%` into a private copy of that application: the registry it writes is then
+invisible to the service, and `smf status` keeps running directly. Register from an ordinary
+terminal; `smf daemon status` names the registry file the daemon reads.
+
 ## Environment variables
 
 | Variable | Effect |

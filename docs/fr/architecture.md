@@ -51,7 +51,16 @@ smf ──→ CliRouter ──(pas de daemon / non servie)──→ CommandRunne
             └──(pipe / socket Unix)──→ DaemonServer ──→ CommandRunner → Application
 ```
 
+## Pont MCP
+`Sermofur.Mcp` porte `smf mcp serve`, un serveur MCP sur stdio construit avec le SDK C# officiel,
+et la modification de `.mcp.json`. Chaque outil devient une ou deux commandes `smf` envoyées au daemon
+par `DaemonClient` ; le pont n'a pas de moteur ([ADR 0017](adr/0017-mcp-bridge.md)).
+
+```text
+Claude Code ──stdio──→ McpBridge ──(protocole 1)──→ DaemonServer ──→ CommandRunner → Application
+```
+
 ## Cible non livrée
-Pont MCP stdio vers le daemon, sans moteur par host. Laya géré, paresseux, facultatif. Inspector
-Angular/Tauri exposant preuves, conflits et historique. Aucune dépendance Anthropic/OpenAI dans Domain ou Application.
+Codex comme second host MCP. Laya géré, paresseux, facultatif. Inspector Angular/Tauri exposant
+preuves, conflits et historique. Aucune dépendance Anthropic/OpenAI dans Domain ou Application.
 La planification vit dans un atelier Spec Kit hors dépôt ; voir [AGENTS.md](../../AGENTS.md).

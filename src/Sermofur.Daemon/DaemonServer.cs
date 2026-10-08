@@ -345,6 +345,7 @@ public sealed class DaemonServer(
             Kind = MessageKind.Status,
             ToolVersion = toolVersion,
             Pid = Environment.ProcessId,
+            Registry = paths.RegistryFile,
             StartedAt = startedAt.ToString("yyyy-MM-dd'T'HH:mm:sszzz"),
             InstancesOpen = gate.OpenCount,
             Clients = Volatile.Read(ref clients),

@@ -83,6 +83,12 @@ Le journal contient un objet JSON par ligne (heure locale avec son décalage), e
 1 Mio au plus. Il enregistre les événements, les codes d'erreur, les identifiants de processus des
 clients et les durées, jamais les arguments ni les sorties d'une commande.
 
+Sous Windows, un terminal lancé par une application empaquetée (MSIX), comme certaines
+applications de bureau, peut écrire `%APPDATA%` dans une copie privée de cette application : le
+registre qu'il écrit est alors invisible du service, et `smf status` reste en mode direct.
+Enregistrer depuis un terminal ordinaire ; `smf daemon status` donne le fichier de registre que
+lit le daemon.
+
 ## Variables d'environnement
 
 | Variable | Effet |

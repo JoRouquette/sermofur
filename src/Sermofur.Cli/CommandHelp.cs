@@ -520,6 +520,43 @@ public static class CommandHelp
             ),
             "smf daemon run"
         ),
+        new(
+            "mcp install",
+            "",
+            "Declares the Sermofur MCP server to Claude Code in .mcp.json of the context directory, changing only the sermofur entry. Idempotent; says what remains to do (daemon, registration).",
+            [],
+            [],
+            Entries(
+                new HelpEntry(
+                    "invalid_mcp_config (3)",
+                    "The file is not a JSON object, or its mcpServers is not one; it is left untouched."
+                )
+            ),
+            "smf mcp install"
+        ),
+        new(
+            "mcp uninstall",
+            "",
+            "Removes the sermofur entry from .mcp.json of the context directory, and nothing else.",
+            [],
+            [],
+            Entries(
+                new HelpEntry(
+                    "invalid_mcp_config (3)",
+                    "The file cannot be read as JSON; it is left untouched."
+                )
+            ),
+            "smf mcp uninstall"
+        ),
+        new(
+            "mcp serve",
+            "",
+            "The MCP server on stdio, started by the host (Claude Code), not by hand. Its tools run through the daemon in the scope of the project; what they write comes from an LLM.",
+            [],
+            [],
+            [],
+            "smf mcp serve"
+        ),
     ];
 
     /// <summary>Errors any command may give, kept out of the per-command lists.</summary>

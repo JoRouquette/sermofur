@@ -71,6 +71,10 @@ public sealed record IpcMessage
     [JsonPropertyName("clients")]
     public int? Clients { get; init; }
 
+    /// <summary>Registry file the daemon reads (status only).</summary>
+    [JsonPropertyName("registry")]
+    public string? Registry { get; init; }
+
     public static IpcMessage Failure(string code, string message, long? id = null) =>
         new IpcMessage
         {

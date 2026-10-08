@@ -51,9 +51,11 @@ grave restent échappés, si bien qu'un texte ne peut pas fermer le bloc JSON d'
 | daemon install / uninstall / start / stop / restart / status | Le service daemon de votre session ; voir [daemon.md](daemon.md) |
 | daemon register / unregister / instances | Instances que le daemon peut servir |
 | daemon run [--supervise] | Le daemon au premier plan |
+| mcp install / uninstall | L'entrée sermofur de `.mcp.json` pour Claude Code ; voir [mcp-integration.md](mcp-integration.md) |
+| mcp serve | Le serveur MCP sur stdio, lancé par le host |
 
-Quand le daemon tourne et sert l'instance, toute commande sauf `daemon …`, `init`, `doctor`,
-`--help` et `--version` passe par lui, avec la même sortie, les mêmes erreurs et les mêmes codes
+Quand le daemon tourne et sert l'instance, toute commande sauf `daemon …`, `mcp …`, `init`,
+`doctor`, `--help` et `--version` passe par lui, avec la même sortie, les mêmes erreurs et les mêmes codes
 de sortie ; sinon la CLI l'exécute directement. `SERMOFUR_NO_DAEMON=1` force l'exécution directe.
 Un daemon d'une autre version arrête la commande en `daemon_version_mismatch` (exit 3) jusqu'à
 `smf daemon restart`. Les autres codes du daemon sont listés dans [daemon.md](daemon.md#erreurs).
@@ -62,8 +64,8 @@ L'usage affiché par `smf --help` est en anglais (`TEXT`, `RELATIVE_PATH`, `ORIG
 
 `--origin user|llm` est **obligatoire** sur `claim add`, `evidence add`, `retex add` et
 `source add` — pas sur `scope add` —, sans valeur par défaut : son absence donne
-`invalid_arguments` (exit 1) et rien n'est écrit. L'origine reste déclarative tant que le canal
-host (daemon/MCP) ne la fixe pas.
+`invalid_arguments` (exit 1) et rien n'est écrit. L'origine reste déclarative dans la CLI ;
+le canal MCP la fixe à `llm` pour toute écriture ([ADR 0017](adr/0017-mcp-bridge.md)).
 Autres options de `add` : `--actor` (défaut `local-user`), `--key` pour l'idempotence (pas sur
 `source add`, idempotent par chemin).
 Claim : `--category episodic|semantic|procedural|preferences|decisions` ;
@@ -215,8 +217,8 @@ pour réécrire un mapping.
 | 0 | Succès, aide, ou doctor sain avec warnings |
 | 1 | Entrée invalide / not_found / conflit idempotent / mapping dupliqué / instance non enregistrée / requête trop grande |
 | 2 | Instance absente |
-| 3 | Stockage/version/permissions/projection à reconstruire, entrée `.sermofur` invalide (étrangère, endommagée, illisible), migration requise, daemon d'une autre version ou indisponible, gestionnaire de services indisponible ou qui refuse |
+| 3 | Stockage/version/permissions/projection à reconstruire, entrée `.sermofur` invalide (étrangère, endommagée, illisible), migration requise, daemon d'une autre version ou indisponible, gestionnaire de services indisponible ou qui refuse, `.mcp.json` inutilisable |
 | 4 | Frontière scope/chemin, instance imbriquée, entrée ou point de connexion du daemon d'un autre compte |
 | 5 | Doctor unhealthy |
 
-mcp et config sont au backlog, jamais des commandes vides qui annoncent un succès.
+config est au backlog, jamais une commande vide qui annonce un succès.

@@ -64,6 +64,12 @@ public sealed class TestDaemon : IAsyncDisposable
         string? version = null
     ) => new TestDaemon(NewHome(), executor, limits, version);
 
+    /// <summary>A daemon on a given home, kept after it stops (for restart tests).</summary>
+    public static TestDaemon StartAt(string home) =>
+        new TestDaemon(home, null, null, null) { KeepHome = true };
+
+    public bool KeepHome { get; init; }
+
     public Task<DaemonClient?> Connect(string workingDirectory, string? version = null) =>
         DaemonClient.ConnectAsync(
             Paths,
@@ -83,7 +89,10 @@ public sealed class TestDaemon : IAsyncDisposable
         }
         catch (OperationCanceledException) { }
         stop.Dispose();
-        DeleteHome(Home);
+        if (!KeepHome)
+        {
+            DeleteHome(Home);
+        }
     }
 
     public static void DeleteHome(string home)

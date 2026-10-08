@@ -16,9 +16,11 @@ public sealed record DoctorReport(
 /// <param name="ownership">Owner and type of entries; the operating system by default.</param>
 /// <param name="daemon">State of the daemon, supplied by the CLI; without it the daemon is reported
 /// as not delivered, as before the daemon existed.</param>
+/// <param name="mcp">Declaration of the MCP bridge at the root of the instance, supplied by the CLI.</param>
 public sealed class InstanceDoctor(
     IFileOwnership? ownership = null,
-    Func<DiagnosticCheck>? daemon = null
+    Func<DiagnosticCheck>? daemon = null,
+    Func<string, DiagnosticCheck>? mcp = null
 )
 {
     private static readonly string[] UndeliveredCapabilities = ["daemon", "laya", "model", "mcp"];
@@ -67,7 +69,7 @@ public sealed class InstanceDoctor(
 
     private DoctorReport Report(string root, List<DiagnosticCheck> checks)
     {
-        AddUndeliveredCapabilities(checks, daemon);
+        AddUndeliveredCapabilities(checks, daemon, mcp is null ? null : () => mcp(root));
         string overall = checks.Any(c => c.Status == "error")
             ? "unhealthy"
             : "healthy_with_warnings";
@@ -172,7 +174,8 @@ public sealed class InstanceDoctor(
 
     private static void AddUndeliveredCapabilities(
         List<DiagnosticCheck> checks,
-        Func<DiagnosticCheck>? daemon
+        Func<DiagnosticCheck>? daemon,
+        Func<DiagnosticCheck>? mcp
     )
     {
         foreach (string component in UndeliveredCapabilities)
@@ -180,6 +183,11 @@ public sealed class InstanceDoctor(
             if (component == "daemon" && daemon is not null)
             {
                 checks.Add(daemon());
+                continue;
+            }
+            if (component == "mcp" && mcp is not null)
+            {
+                checks.Add(mcp());
                 continue;
             }
             checks.Add(new(component, "warning", "Capability not delivered in this version."));

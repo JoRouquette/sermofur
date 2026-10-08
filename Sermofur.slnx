@@ -3,6 +3,7 @@
         <Project Path="src/Sermofur.Application/Sermofur.Application.csproj" />
         <Project Path="src/Sermofur.Cli/Sermofur.Cli.csproj" />
         <Project Path="src/Sermofur.Daemon/Sermofur.Daemon.csproj" />
+        <Project Path="src/Sermofur.Mcp/Sermofur.Mcp.csproj" />
         <Project Path="src/Sermofur.Domain/Sermofur.Domain.csproj" />
         <Project Path="src/Sermofur.Infrastructure/Sermofur.Infrastructure.csproj" />
     </Folder>
