@@ -31,9 +31,9 @@
       },
       "xunit.runner.visualstudio": {
         "type": "Direct",
-        "requested": "[3.1.4, )",
-        "resolved": "3.1.4",
-        "contentHash": "5mj99LvCqrq3CNi06xYdyIAXOEh+5b33F2nErCzI5zWiDdLHXiPXEWFSUAF8zlIv0ZWqjZNCwHTQeAPYbF3pCg=="
+        "requested": "[4.0.0, )",
+        "resolved": "4.0.0",
+        "contentHash": "kzLFyBYUnoidpGOXvpNOfIo8C92gVgVR6X8ncHwhcrDYugiOut5rrhDkr0L3cWHd7J2pKXf6LgaeXoBBDlx1ag=="
       },
       "Microsoft.CodeCoverage": {
         "type": "Transitive",
@@ -152,10 +152,16 @@
           "xunit.extensibility.core": "[2.9.3]"
         }
       },
+      "Sermofur": {
+        "type": "Project",
+        "dependencies": {
+          "Sermofur.Infrastructure": "[0.0.0-dev, )"
+        }
+      },
       "sermofur.application": {
         "type": "Project",
         "dependencies": {
-          "Sermofur.Domain": "[1.0.0, )"
+          "Sermofur.Domain": "[0.0.0-dev, )"
         }
       },
       "sermofur.domain": {
@@ -164,15 +170,9 @@
       "sermofur.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Sermofur.Application": "[1.0.0, )",
           "Microsoft.Data.Sqlite": "[10.0.12, )",
-          "SQLitePCLRaw.bundle_e_sqlite3": "[3.0.5, )"
-        }
-      },
-      "Sermofur": {
-        "type": "Project",
-        "dependencies": {
-          "Sermofur.Infrastructure": "[1.0.0, )"
+          "SQLitePCLRaw.bundle_e_sqlite3": "[3.0.5, )",
+          "Sermofur.Application": "[0.0.0-dev, )"
         }
       }
     }
