@@ -401,6 +401,125 @@ public static class CommandHelp
             Entries(IdError),
             "smf challenge --text \"Billing paginates with offsets\""
         ),
+        new(
+            "daemon install",
+            "",
+            "Installs the daemon as a service of your session (no administrator rights) and starts it. Run again: nothing changes when the same version is installed; another version or executable replaces the service.",
+            [],
+            [],
+            Entries(
+                new HelpEntry(
+                    "service_manager_unavailable (3)",
+                    "No service manager in this session (container, WSL without systemd); the CLI keeps working directly."
+                ),
+                new HelpEntry(
+                    "service_install_failed (3)",
+                    "The service manager refused the service; the previous state is restored."
+                ),
+                new HelpEntry(
+                    "daemon_unavailable (3)",
+                    "The service is registered but the daemon did not answer; see its journal."
+                )
+            ),
+            "smf daemon install"
+        ),
+        new(
+            "daemon uninstall",
+            "",
+            "Stops and removes the service. Instances, backups and the registry are left untouched.",
+            [],
+            [],
+            [],
+            "smf daemon uninstall"
+        ),
+        new(
+            "daemon start",
+            "",
+            "Starts the installed service.",
+            [],
+            [],
+            Entries(new HelpEntry("daemon_unavailable (3)", "The service is not installed.")),
+            "smf daemon start"
+        ),
+        new(
+            "daemon stop",
+            "",
+            "Stops the daemon; commands then run directly. Stop it before updating smf on Windows.",
+            [],
+            [],
+            Entries(new HelpEntry("daemon_unavailable (3)", "The service is not installed.")),
+            "smf daemon stop"
+        ),
+        new(
+            "daemon restart",
+            "",
+            "Stops then starts the service: the way to load a new version of smf.",
+            [],
+            [],
+            Entries(new HelpEntry("daemon_unavailable (3)", "The service is not installed.")),
+            "smf daemon restart"
+        ),
+        new(
+            "daemon status",
+            "",
+            "State of the daemon: absent, installed_stopped, running, version_mismatch, foreign_endpoint or service_manager_unavailable; version, process, start time, open instances, clients.",
+            [],
+            [],
+            [],
+            "smf daemon status --json"
+        ),
+        new(
+            "daemon register",
+            "",
+            "Lets the daemon serve the instance found from the context directory, with the checks of a direct command. Idempotent.",
+            [],
+            [],
+            Entries(
+                new HelpEntry(
+                    "invalid_registry (3)",
+                    "The registry cannot be read; it is left untouched."
+                )
+            ),
+            "smf daemon register"
+        ),
+        new(
+            "daemon unregister",
+            "",
+            "Stops serving an instance, found from the context directory or registered at that exact path.",
+            [],
+            [],
+            Entries(new HelpEntry("not_registered (1)", "No such instance in the registry.")),
+            "smf daemon unregister --path ~/work"
+        ),
+        new(
+            "daemon instances",
+            "",
+            "Instances the daemon may serve; missing marks one no longer found where it was registered.",
+            [],
+            [],
+            [],
+            "smf daemon instances"
+        ),
+        new(
+            "daemon run",
+            "",
+            "Serves in the foreground until Ctrl+C: what the service runs, useful to diagnose. --supervise restarts the daemon after an abnormal exit (Windows service).",
+            [],
+            Entries(
+                new HelpEntry(
+                    "--supervise",
+                    "Runs the daemon as a child and restarts it within a second after a crash."
+                )
+            ),
+            Entries(
+                new HelpEntry("daemon_already_running (3)", "A daemon already serves this user."),
+                new HelpEntry(
+                    "foreign_endpoint (4)",
+                    "The endpoint or its folder belongs to another account."
+                )
+            ),
+            "smf daemon run"
+        ),
     ];
 
     /// <summary>Errors any command may give, kept out of the per-command lists.</summary>

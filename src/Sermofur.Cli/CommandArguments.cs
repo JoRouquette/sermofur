@@ -13,6 +13,7 @@ public sealed class CommandArguments
     {
         "json",
         "contradicts",
+        "supervise",
     };
 
     private readonly Dictionary<string, string?> options = new(StringComparer.Ordinal);

@@ -505,6 +505,16 @@ public class CliTests
             "index rebuild",
             "recall",
             "challenge",
+            "daemon install",
+            "daemon uninstall",
+            "daemon start",
+            "daemon stop",
+            "daemon restart",
+            "daemon status",
+            "daemon register",
+            "daemon unregister",
+            "daemon instances",
+            "daemon run",
         ];
         Assert.Equal(
             expected.Order(StringComparer.Ordinal),

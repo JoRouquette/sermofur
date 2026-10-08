@@ -36,7 +36,7 @@ mkdir $env:TEMP/sermofur-check; cd $env:TEMP/sermofur-check
 ```
 
 `healthy_with_warnings` est l'état attendu d'une instance saine : les capacités pas encore livrées
-(daemon, laya, model, mcp) sont signalées en warning.
+(laya, model, mcp) sont signalées en warning, de même que le daemon quand il ne tourne pas.
 `artifacts/` et `TestResults/` sont ignorés par Git.
 
 ## Ce que couvrent les tests
@@ -113,6 +113,30 @@ mkdir $env:TEMP/sermofur-check; cd $env:TEMP/sermofur-check
 - Propriétés (FsCheck) : la normalisation des mappings reste dans la racine, est stable et
   portable d'un séparateur à l'autre ; la grammaire de la ligne de commande garde positionnel tout
   argument après `--` et ne prend jamais une valeur d'option qui commence par `--`.
+- Daemon (ADR 0015, 0016) : trames à 256 Kio et au-delà, tronquées, vides, JSON malformé et
+  UTF-8 invalide, octets arbitraires (FsCheck), vecteurs d'arguments qui survivent à un aller-retour ;
+  hello, version différente, second daemon, `run` dont le dossier diffère de celui de son `hello` ; registre
+  (idempotence, mêmes refus qu'une commande directe, registre illisible ou trop gros laissé intact, instance
+  déplacée), filtre de service (rien de lu hors du registre, instance imbriquée non servie,
+  instances inactives et désenregistrées fermées) ; un vrai processus `smf daemon run` ; dossier du
+  socket d'un autre compte (sudo) ou ouvert à d'autres refusé sous Linux et macOS ; treize vraies
+  commandes comparées octet par octet avec et sans le daemon ; écritures passées par le daemon vues
+  en direct ; `doctor` et `status` qui le signalent ; délais dépassés, départs pendant des écritures
+  en file d'attente et en cours, rejeux par `--key` ; définitions de service (systemd, launchd, XML
+  de la tâche et guillemets) ; commandes de service avec un gestionnaire simulé ; superviseur qui
+  relance un daemon tué ; et, en CI seulement, le vrai service de chaque système installé, tué,
+  piloté et retiré (`RealServiceTests`).
+- L'ensemble des tests utilise son propre `SERMOFUR_DAEMON_HOME` : il n'atteint jamais le daemon
+  du développeur.
+
+## Mesures du daemon
+
+`TenWritersNeverMeetStorageBusy` (`--filter Category=DaemonLoad`, une minute avec
+`SERMOFUR_PERFORMANCE=1`) : le 2026-10-08, Windows 11, Intel Core i7-1255U, dix clients ont écrit
+430 claims en dix secondes, sans perte ni doublon, sans `storage_busy` ; le daemon a ajouté
+**2,9 ms** au 95e percentile à une commande sur une instance ouverte (limite de la spec : 50 ms).
+Sans daemon, la CLI paie une recherche dans le système de fichiers avant de s'exécuter directement
+(moins de 100 ms, `NoDaemonMeansNoClient`).
 
 ## Performance du recall
 
@@ -144,8 +168,8 @@ vocabulaire et des passages visibles.
   l'instant qui le précède ; cette course n'est pas testée.
 - Un lecteur réseau mappé est refusé par le code, mais ce refus n'a pas été testé faute d'un tel
   lecteur.
-- Non livré, donc non vérifié : protocole MCP, inférence Laya, IPC du daemon, UI, installateur
-  autonome, consolidation, similarité sémantique. Aucune coupure électrique simulée.
+- Non livré, donc non vérifié : protocole MCP, inférence Laya, UI, installateur autonome,
+  consolidation, similarité sémantique. Aucune coupure électrique simulée.
 - La performance du recall (SC-004) est une mesure de référence, pas une garantie : voir [Performance du recall](#performance-du-recall).
   Elle ne tourne qu'avec `SERMOFUR_PERFORMANCE=1` et ne fait pas partie de la CI.
 - Le paquet d'outil exige le runtime .NET 10.

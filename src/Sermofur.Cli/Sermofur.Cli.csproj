@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
+        <ProjectReference Include="..\Sermofur.Daemon\Sermofur.Daemon.csproj" />
         <ProjectReference Include="..\Sermofur.Infrastructure\Sermofur.Infrastructure.csproj" />
     </ItemGroup>
 

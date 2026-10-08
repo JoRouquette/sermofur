@@ -3,6 +3,17 @@
 # Modèle de sécurité
 
 Local d'abord : ni écoute réseau, ni télémétrie, ni synchronisation cloud, ni envoi à un LLM.
+
+Le daemon ([daemon.md](daemon.md)) tourne sous votre compte et n'écoute sur aucun port : un pipe
+nommé réservé à votre compte sous Windows, ailleurs un socket Unix `0600` dans un dossier `0700`,
+dont le serveur contrôle l'identifiant utilisateur de chaque pair. Un point de connexion ou un
+dossier d'un autre compte, ou ouvert à d'autres, est refusé (`foreign_endpoint`) et la CLI
+s'exécute directement. Le daemon ne sert que les instances que vous avez enregistrées : une
+requête pour tout autre chemin est refusée sans le lire. Le scope d'une session vient du dossier
+de lancement du client et aucune requête ne peut le changer. Les requêtes sont bornées (256 Kio,
+60 s) ; le journal n'enregistre aucun argument ni aucune sortie. Tout processus de votre compte
+peut utiliser ou arrêter votre daemon, comme il peut déjà lire votre instance.
+
 Un seul utilisateur OS. Les scopes protègent les opérations du produit ; le même utilisateur
 OS peut accéder à ses fichiers SQLite et Markdown. Ni chiffrement, ni ACL multi-utilisateur, ni
 bac à sable contre un code hostile.

@@ -37,9 +37,21 @@ projections peut laisser une ancienne révision : doctor la détecte, export la 
 promesse de transaction atomique SQLite + fichiers. Un écrivain hostile sous le même utilisateur
 n'est pas une frontière du système d'exploitation.
 
+## Daemon
+`Sermofur.Daemon` porte le transport local et le service : un daemon par utilisateur, installé
+comme service de la session, qui sert les instances que l'utilisateur a enregistrées
+([daemon.md](daemon.md), [ADR 0015](adr/0015-user-daemon.md)). La CLI envoie ses commandes au
+daemon quand il sert l'instance ; le daemon les exécute avec le même `CommandRunner`, à partir du
+dossier de lancement du client, si bien que les deux chemins appliquent les mêmes règles
+([ADR 0016](adr/0016-ipc-protocol.md)). Le daemon ne dépend d'aucun type de la CLI : c'est la CLI
+qui lui fournit l'exécuteur des commandes.
+
+```text
+smf ──→ CliRouter ──(pas de daemon / non servie)──→ CommandRunner → Application
+            └──(pipe / socket Unix)──→ DaemonServer ──→ CommandRunner → Application
+```
+
 ## Cible non livrée
-Daemon machine multiplexant des instances séparées ; CLI, UI et pont MCP utilisent un IPC
-local : pipe nommé CurrentUserOnly sous Windows, socket de domaine Unix 0600 sous Unix. Pont MCP
-stdio sans moteur par host. Laya géré, paresseux, facultatif. Inspector Angular/Tauri exposant
-preuves, conflits et historique. Aucune dépendance Anthropic/OpenAI dans Domain ou Application.
+Pont MCP stdio vers le daemon, sans moteur par host. Laya géré, paresseux, facultatif. Inspector
+Angular/Tauri exposant preuves, conflits et historique. Aucune dépendance Anthropic/OpenAI dans Domain ou Application.
 La planification vit dans un atelier Spec Kit hors dépôt ; voir [AGENTS.md](../../AGENTS.md).

@@ -36,7 +36,8 @@ mkdir $env:TEMP/sermofur-check; cd $env:TEMP/sermofur-check
 ```
 
 `healthy_with_warnings` is the expected state of a sound instance: the capabilities that are not
-delivered yet (daemon, laya, model, mcp) are reported as warnings.
+delivered yet (laya, model, mcp) are reported as warnings, and so is the daemon when it does not
+run.
 `artifacts/` and `TestResults/` are ignored by Git.
 
 ## What the tests cover
@@ -108,6 +109,28 @@ delivered yet (daemon, laya, model, mcp) are reported as warnings.
 - Properties (FsCheck): mapping normalization stays inside the root, is stable and portable
   across separators; the command-line grammar keeps every argument after `--` positional and never
   takes an option value starting with `--`.
+- Daemon (ADR 0015, 0016): frames at and beyond 256 KiB, truncated, empty, malformed JSON and
+  invalid UTF-8, arbitrary bytes (FsCheck), argument vectors that survive a round trip; hello,
+  version mismatch, second daemon, a `run` whose folder differs from that of its `hello`; registry
+  (idempotence, the same refusals as a direct command, unreadable or oversized registry left untouched,
+  moved instance), serving gate (nothing read outside the registry, nested instance not served,
+  idle and unregistered instances closed); a real `smf daemon run` process; the socket folder of
+  another account (sudo) or open to others refused on Linux and macOS; thirteen real commands
+  compared byte for byte with and without the daemon; writes through the daemon seen directly;
+  `doctor` and `status` reporting it; timeouts, departures during queued and running writes,
+  `--key` replays; service definitions (systemd, launchd, task XML and quoting); the service
+  commands with a simulated manager; the supervisor bringing a killed daemon back; and, in CI only,
+  the real service of each system installed, killed, piloted and removed (`RealServiceTests`).
+- The whole test run uses its own `SERMOFUR_DAEMON_HOME`: it never reaches the daemon of the
+  developer.
+
+## Daemon measures
+
+`TenWritersNeverMeetStorageBusy` (`--filter Category=DaemonLoad`, one minute with
+`SERMOFUR_PERFORMANCE=1`): on 2026-10-08, Windows 11, Intel Core i7-1255U, ten clients wrote 430
+claims in ten seconds, none lost or doubled, no `storage_busy`; the daemon added **2.9 ms** at the
+95th percentile to a command on an open instance (limit of the spec: 50 ms). With no daemon, the
+CLI pays one file-system lookup before running directly (under 100 ms, `NoDaemonMeansNoClient`).
 
 ## Recall performance
 
@@ -137,7 +160,7 @@ frequencies of the vocabulary table and the visible passages.
   instant before it; this race is not tested.
 - A mapped network drive is refused by the code but this was not tested, for lack of such a
   drive.
-- Not delivered, hence not verified: MCP protocol, Laya inference, daemon IPC, UI, self-contained
+- Not delivered, hence not verified: MCP protocol, Laya inference, UI, self-contained
   installer, consolidation, semantic similarity. No power loss was simulated.
 - Recall performance (SC-004) is a reference measure, not a guarantee: see [Recall performance](#recall-performance). It runs only
   with `SERMOFUR_PERFORMANCE=1` and is not part of the CI.

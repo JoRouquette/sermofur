@@ -2,7 +2,9 @@ English | [Français](../fr/adr/0003-ipc-daemon.md)
 
 # ADR 0003-ipc-daemon — Shared daemon and local transport
 
-Date: 2026-10-06. Status: accepted for design (future capabilities, not delivered).
+Date: 2026-10-06. Status: accepted for design; the machine daemon is replaced by one daemon per
+user ([ADR 0015](0015-user-daemon.md)), the transport is delivered in 0.4
+([ADR 0016](0016-ipc-protocol.md)).
 
 ## Context
 Sermofur mission: epistemic invariants, isolation and an installable local product.

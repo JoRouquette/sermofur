@@ -21,4 +21,7 @@ Commands: `dotnet tool restore`, `dotnet restore --locked-mode`, `dotnet build`,
 decide the version, see `docs/release.md`) and are signed off (`git commit -s`, see
 `CONTRIBUTING.md`).
 
-Future capabilities not delivered: daemon, MCP, Laya, UI, learning and consolidation.
+Future capabilities not delivered: MCP, Laya, UI, learning and consolidation. The daemon
+(`src/Sermofur.Daemon`, `docs/daemon.md`) is delivered; tests isolate themselves from a real daemon
+through `SERMOFUR_DAEMON_HOME`, and the real service test only runs in CI or with
+`SERMOFUR_SERVICE_TESTS=1`.

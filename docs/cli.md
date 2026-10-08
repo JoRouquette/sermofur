@@ -1,6 +1,6 @@
 English | [Français](fr/cli.md)
 
-# CLI 0.2
+# CLI 0.4
 
 `smf [--path DIRECTORY] [--json] COMMAND ...`. The path is an existing local directory, the
 current directory by default; it designates the working context, never an arbitrary scope.
@@ -26,8 +26,8 @@ escaped, so a text cannot close the JSON block of a projection.
 |---|---|
 | init | New instance, or the same identity if it already exists; no nested instance |
 | root | Nearest instance going up (a `.sermofur` directory holding `instance.json`) |
-| status | Identity, scope, visible counts, bootstrap mode |
-| doctor | Integrity, schema, foreign keys, scopes, mappings, overlaps, consistency, projections; no mutation |
+| status | Identity, scope, visible counts; `mode` is `daemon` when the daemon ran the command, `direct` otherwise |
+| doctor | Integrity, schema, foreign keys, scopes, mappings, overlaps, consistency, projections, state of the daemon; no mutation |
 | scope current | Current scope and visible ancestors |
 | scope list / tree | Visible scopes only (tree = list in 0.1) |
 | scope add ID KIND PARENT RELATIVE_PATH | Direct child of the current scope; typed immediate parent |
@@ -46,6 +46,15 @@ escaped, so a text cannot close the JSON block of a projection.
 | index rebuild | Rebuilds the full-text index of the instance in one write transaction and reads every source again (same outcomes as `source reindex`, history under the system actor `sermofur`); other commands wait up to 5 s, then fail with `storage_busy` (exit 3) and are to be run again; output `{indexed, changedSources}` counts visible objects only |
 | recall QUESTION [--limit 1-3] | At most 3 explained results among visible claims, RETEX and source passages |
 | challenge CLAIM_ID / challenge --text TEXT | Contradictions, changed sources, status, review date, close claims to confront; writes nothing |
+| daemon install / uninstall / start / stop / restart / status | The daemon service of your session; see [daemon.md](daemon.md) |
+| daemon register / unregister / instances | Instances the daemon may serve |
+| daemon run [--supervise] | The daemon in the foreground |
+
+When the daemon runs and serves the instance, every command except `daemon …`, `init`,
+`doctor`, `--help` and `--version` goes through it, with the same output, errors and exit codes;
+otherwise the CLI runs it directly. `SERMOFUR_NO_DAEMON=1` forces direct runs. A daemon of
+another version stops the command with `daemon_version_mismatch` (exit 3) until
+`smf daemon restart`. The other codes of the daemon are listed in [daemon.md](daemon.md#errors).
 
 `--origin user|llm` is **mandatory** on `claim add`, `evidence add`, `retex add` and
 `source add` — not on `scope add` — with no default value: when missing, the result is
@@ -193,11 +202,10 @@ may not hold the sources of its folder, and Sermofur 0.2 offers no command to re
 | Exit | Meaning |
 |---|---|
 | 0 | Success, help, or doctor healthy with warnings |
-| 1 | Invalid input / not_found / idempotency conflict / duplicate mapping |
+| 1 | Invalid input / not_found / idempotency conflict / duplicate mapping / instance not registered / request too large |
 | 2 | No instance |
-| 3 | Storage/version/permissions/projection to rebuild, invalid `.sermofur` entry (foreign, damaged, unreadable), migration required |
-| 4 | Scope/path boundary, nested instance, entry of another account |
+| 3 | Storage/version/permissions/projection to rebuild, invalid `.sermofur` entry (foreign, damaged, unreadable), migration required, daemon of another version or unavailable, service manager unavailable or refusing |
+| 4 | Scope/path boundary, nested instance, entry or daemon endpoint of another account |
 | 5 | Doctor unhealthy |
 
-The CLI calls Application directly. runtime/mcp/config are in the backlog, never empty commands
-that report a success.
+mcp and config are in the backlog, never empty commands that report a success.

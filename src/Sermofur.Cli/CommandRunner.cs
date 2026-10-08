@@ -1,12 +1,15 @@
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
 using Sermofur.Application;
+using Sermofur.Daemon;
 using Sermofur.Domain;
 using Sermofur.Infrastructure;
 
 namespace Sermofur.Cli;
 
-public sealed class CommandRunner(TextWriter output, TextWriter error)
+/// <param name="mode"><c>daemon</c> when the daemon runs the command for a client, <c>direct</c>
+/// otherwise; reported by <c>status</c>.</param>
+public sealed class CommandRunner(TextWriter output, TextWriter error, string mode = "direct")
 {
     private static string CliDocumentation =>
         ProductVersion.CliDocumentation(ProductVersion.Current);
@@ -28,6 +31,9 @@ public sealed class CommandRunner(TextWriter output, TextWriter error)
         smf index rebuild
         smf recall QUESTION [--limit 1-3]
         smf challenge CLAIM_ID | challenge --text TEXT
+        smf daemon install | uninstall | start | stop | restart | status
+        smf daemon register | unregister | instances
+        smf daemon run [--supervise]
         smf COMMAND -h | smf GROUP -h       help of one command, or the subcommands of a group
         smf --version | -v                  version
         --help (-h) and --version (-v) are recognized anywhere before --, except as an option value; --help wins.
@@ -35,7 +41,15 @@ public sealed class CommandRunner(TextWriter output, TextWriter error)
         An option value cannot start with --; see {CliDocumentation} for values and exit codes.
         """;
 
-    public int Run(string[] arguments)
+    /// <summary>Runs a command from the current directory of this process.</summary>
+    public int Run(string[] arguments) => Run(arguments, Directory.GetCurrentDirectory());
+
+    /// <summary>
+    /// Runs a command as if launched from <paramref name="workingDirectory"/>: the daemon runs
+    /// the commands of its clients this way, so nothing here may read the current directory of
+    /// the process (research R4).
+    /// </summary>
+    public int Run(string[] arguments, string workingDirectory)
     {
         // Read ahead: a parsing error must already honour the requested format.
         bool json = CommandArguments.HasFlag(arguments, "json");
@@ -68,7 +82,12 @@ public sealed class CommandRunner(TextWriter output, TextWriter error)
                 );
                 return 0;
             }
-            return Execute(new CommandArguments(arguments), json);
+            CommandArguments parsed = new CommandArguments(arguments);
+            if (parsed.Positionals.Count > 0 && parsed.Positionals[0] == "daemon")
+            {
+                return new DaemonCommands(output, Write).Run(parsed, json, workingDirectory);
+            }
+            return Execute(parsed, json, workingDirectory);
         }
         catch (SermofurException exception)
         {
@@ -95,9 +114,9 @@ public sealed class CommandRunner(TextWriter output, TextWriter error)
         }
     }
 
-    private int Execute(CommandArguments args, bool json)
+    private int Execute(CommandArguments args, bool json, string workingDirectory)
     {
-        string path = args.Option("path", Directory.GetCurrentDirectory())!;
+        string path = Path.GetFullPath(args.Option("path", workingDirectory)!, workingDirectory);
         if (args.Positionals.Count == 0)
         {
             throw new SermofurException("invalid_arguments", "Command required.");
@@ -131,11 +150,7 @@ public sealed class CommandRunner(TextWriter output, TextWriter error)
         }
         InstanceConfiguration config = manager.ReadConfiguration(root);
         bool knowledge = KnowledgeCommands.IsKnowledgeCommand(command);
-        bool mutating = knowledge
-            ? KnowledgeCommands.Writes(args)
-            : command == "export"
-                || (args.Positionals.Count > 1 && args.Positionals[1] is "add" or "invalidate");
-        using SqliteStore store = new(root, config.InstanceId, readOnly: !mutating);
+        using SqliteStore store = new(root, config.InstanceId, readOnly: !Writes(args));
         store.ValidateSchema();
         MemoryContext context = manager.ResolveContext(path, root, store.ReadScopes());
         MemoryService memory = new(store, context);
@@ -149,6 +164,23 @@ public sealed class CommandRunner(TextWriter output, TextWriter error)
         return 0;
     }
 
+    /// <summary>
+    /// True when the command may write to the instance: the store is then opened read-write, and
+    /// the daemon runs it alone on its instance.
+    /// </summary>
+    internal static bool Writes(CommandArguments args)
+    {
+        string command = args.Positionals[0];
+        if (command is "init" or "migrate")
+        {
+            return true;
+        }
+        return KnowledgeCommands.IsKnowledgeCommand(command)
+            ? KnowledgeCommands.Writes(args)
+            : command == "export"
+                || (args.Positionals.Count > 1 && args.Positionals[1] is "add" or "invalidate");
+    }
+
     private int RunInstanceCommand(CommandArguments args, string root, bool json)
     {
         args.RequireCount(1);
@@ -158,12 +190,20 @@ public sealed class CommandRunner(TextWriter output, TextWriter error)
             Write(json ? new { root } : root, json);
             return 0;
         }
-        DoctorReport report = new InstanceDoctor().Inspect(root);
+        DoctorReport report = new InstanceDoctor(
+            null,
+            () =>
+                DaemonProbe.Check(
+                    DaemonPaths.ForCurrentUser,
+                    new FileOwnership(),
+                    ProductVersion.Current
+                )
+        ).Inspect(root);
         Write(report, json);
         return report.Overall == "unhealthy" ? 5 : 0;
     }
 
-    private static object Dispatch(
+    private object Dispatch(
         CommandArguments args,
         MemoryService memory,
         ScopeService scopes,
@@ -186,7 +226,7 @@ public sealed class CommandRunner(TextWriter output, TextWriter error)
                 evidence = records.Count(r => r.Kind == RecordKind.Evidence),
                 retex = records.Count(r => r.Kind == RecordKind.Retex),
                 sources = records.Count(r => r.Kind == RecordKind.Source),
-                mode = "bootstrap",
+                mode,
                 laya = "unavailable",
             };
         }

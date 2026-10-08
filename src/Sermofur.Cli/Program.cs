@@ -10,7 +10,7 @@ try
     // stdout and stderr explicitly in UTF-8, without BOM, whatever the original console.
     using StreamWriter output = new(Console.OpenStandardOutput(), utf8) { AutoFlush = true };
     using StreamWriter error = new(Console.OpenStandardError(), utf8) { AutoFlush = true };
-    return new CommandRunner(output, error).Run(args);
+    return new CliRouter(output, error).Run(args, Directory.GetCurrentDirectory());
 }
 finally
 {

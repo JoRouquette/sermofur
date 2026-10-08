@@ -1,7 +1,7 @@
 name: CI and release
 
-# Every pull request and every push to main is built and tested on Windows, Linux and macOS.
-# On main, a release is computed from the Conventional Commits; when one is due, it waits for
+# Every pull request, every push to main and every push to a `feat/**` branch is built and tested
+# on Windows, Linux and macOS; a feature branch never reaches the release jobs. On main, a release is computed from the Conventional Commits; when one is due, it waits for
 # the approval of the `release` environment, then tags and creates the GitHub Release; the
 # `package` job builds the tag without any npm code, attests the package and attaches it; the
 # `publish` job pushes it to nuget.org through Trusted Publishing. See docs/release.md and ADR 0011.
@@ -13,7 +13,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main]
+    branches: [main, "feat/**"]
   workflow_dispatch:
     inputs:
       tag:
@@ -52,6 +52,16 @@ jobs:
         run: dotnet csharpier check .
       - name: Build
         run: dotnet build -c Release --no-restore
+      - name: User session for the service test (Linux)
+        # The real service test installs a systemd user unit: it needs the user manager,
+        # which a runner without login session only gets with lingering.
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo loginctl enable-linger "$USER"
+          runtime="/run/user/$(id -u)"
+          for i in $(seq 1 40); do [ -S "$runtime/bus" ] && break; sleep 0.5; done
+          echo "XDG_RUNTIME_DIR=$runtime" >> "$GITHUB_ENV"
+          echo "DBUS_SESSION_BUS_ADDRESS=unix:path=$runtime/bus" >> "$GITHUB_ENV"
       - name: Test
         run: dotnet test -c Release --no-build --logger trx --results-directory TestResults
       - name: Upload test results

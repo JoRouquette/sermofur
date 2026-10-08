@@ -47,9 +47,11 @@ USER ≠ TRUTH, LLM ≠ TRUTH, MEMORY ≠ TRUTH.
 Livré : la CLI `smf`, les instances locales, les scopes, le stockage Claim/Evidence/RETEX en
 SQLite, l'historique, les projections Markdown et les diagnostics (`doctor`) ; depuis la 0.2, les
 sources déclarées avec index plein texte, le recall, le challenge et les preuves contraires
-(format d'instance 2).
+(format d'instance 2) ; depuis la 0.4, un [daemon](docs/fr/daemon.md) facultatif par
+utilisateur, installé comme service de votre session (`smf daemon install`), qui sert les
+instances que vous enregistrez à toutes les commandes `smf`.
 
-**Pas encore livré** : daemon d'arrière-plan, pont MCP, intégration Laya (modèle System 1),
+**Pas encore livré** : pont MCP, intégration Laya (modèle System 1),
 apprentissage et consolidation, interface desktop Inspector. La documentation les décrit comme
 conceptions seulement ; aucune commande ne prétend les fournir.
 

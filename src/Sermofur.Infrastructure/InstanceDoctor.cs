@@ -14,7 +14,12 @@ public sealed record DoctorReport(
 );
 
 /// <param name="ownership">Owner and type of entries; the operating system by default.</param>
-public sealed class InstanceDoctor(IFileOwnership? ownership = null)
+/// <param name="daemon">State of the daemon, supplied by the CLI; without it the daemon is reported
+/// as not delivered, as before the daemon existed.</param>
+public sealed class InstanceDoctor(
+    IFileOwnership? ownership = null,
+    Func<DiagnosticCheck>? daemon = null
+)
 {
     private static readonly string[] UndeliveredCapabilities = ["daemon", "laya", "model", "mcp"];
 
@@ -60,9 +65,9 @@ public sealed class InstanceDoctor(IFileOwnership? ownership = null)
         return Report(root, checks);
     }
 
-    private static DoctorReport Report(string root, List<DiagnosticCheck> checks)
+    private DoctorReport Report(string root, List<DiagnosticCheck> checks)
     {
-        AddUndeliveredCapabilities(checks);
+        AddUndeliveredCapabilities(checks, daemon);
         string overall = checks.Any(c => c.Status == "error")
             ? "unhealthy"
             : "healthy_with_warnings";
@@ -165,10 +170,18 @@ public sealed class InstanceDoctor(IFileOwnership? ownership = null)
         );
     }
 
-    private static void AddUndeliveredCapabilities(List<DiagnosticCheck> checks)
+    private static void AddUndeliveredCapabilities(
+        List<DiagnosticCheck> checks,
+        Func<DiagnosticCheck>? daemon
+    )
     {
         foreach (string component in UndeliveredCapabilities)
         {
+            if (component == "daemon" && daemon is not null)
+            {
+                checks.Add(daemon());
+                continue;
+            }
             checks.Add(new(component, "warning", "Capability not delivered in this version."));
         }
     }

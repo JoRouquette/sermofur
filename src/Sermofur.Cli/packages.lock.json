@@ -58,7 +58,13 @@
       "sermofur.application": {
         "type": "Project",
         "dependencies": {
-          "Sermofur.Domain": "[1.0.0, )"
+          "Sermofur.Domain": "[0.0.0-dev, )"
+        }
+      },
+      "sermofur.daemon": {
+        "type": "Project",
+        "dependencies": {
+          "Sermofur.Infrastructure": "[0.0.0-dev, )"
         }
       },
       "sermofur.domain": {
@@ -67,9 +73,9 @@
       "sermofur.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Sermofur.Application": "[1.0.0, )",
           "Microsoft.Data.Sqlite": "[10.0.12, )",
-          "SQLitePCLRaw.bundle_e_sqlite3": "[3.0.5, )"
+          "SQLitePCLRaw.bundle_e_sqlite3": "[3.0.5, )",
+          "Sermofur.Application": "[0.0.0-dev, )"
         }
       }
     }

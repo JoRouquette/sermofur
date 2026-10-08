@@ -1,6 +1,6 @@
 [English](../cli.md) | Français
 
-# CLI 0.2
+# CLI 0.4
 
 `smf [--path DOSSIER] [--json] COMMANDE ...`. Le chemin est un dossier local existant, le
 dossier courant par défaut ; il désigne le contexte de travail, jamais un scope arbitraire.
@@ -28,8 +28,8 @@ grave restent échappés, si bien qu'un texte ne peut pas fermer le bloc JSON d'
 |---|---|
 | init | Instance neuve, ou même identité si elle existe déjà ; pas d'instance imbriquée |
 | root | Instance la plus proche en remontant (dossier `.sermofur` qui contient `instance.json`) |
-| status | Identité, scope, comptes visibles, mode bootstrap |
-| doctor | Intégrité, schéma, clés étrangères, scopes, mappings, chevauchements, cohérence, projections ; sans mutation |
+| status | Identité, scope, comptes visibles ; `mode` vaut `daemon` quand le daemon a exécuté la commande, `direct` sinon |
+| doctor | Intégrité, schéma, clés étrangères, scopes, mappings, chevauchements, cohérence, projections, état du daemon ; sans mutation |
 | scope current | Scope courant et ancêtres visibles |
 | scope list / tree | Scopes visibles uniquement (tree = list en 0.1) |
 | scope add ID KIND PARENT CHEMIN_RELATIF | Enfant direct du scope courant ; parent immédiat typé |
@@ -48,6 +48,15 @@ grave restent échappés, si bien qu'un texte ne peut pas fermer le bloc JSON d'
 | index rebuild | Reconstruit l'index plein texte de l'instance en une seule transaction d'écriture et relit toutes les sources (mêmes issues que `source reindex`, historique sous l'acteur système `sermofur`) ; les autres commandes attendent au plus 5 s, puis échouent en `storage_busy` (code 3) et sont à relancer ; la sortie `{indexed, changedSources}` ne compte que les objets visibles |
 | recall QUESTION [--limit 1-3] | Au plus 3 résultats expliqués parmi claims, RETEX et passages de sources visibles |
 | challenge CLAIM_ID / challenge --text TEXTE | Contradictions, sources modifiées, statut, date de revue, claims proches à confronter ; n'écrit rien |
+| daemon install / uninstall / start / stop / restart / status | Le service daemon de votre session ; voir [daemon.md](daemon.md) |
+| daemon register / unregister / instances | Instances que le daemon peut servir |
+| daemon run [--supervise] | Le daemon au premier plan |
+
+Quand le daemon tourne et sert l'instance, toute commande sauf `daemon …`, `init`, `doctor`,
+`--help` et `--version` passe par lui, avec la même sortie, les mêmes erreurs et les mêmes codes
+de sortie ; sinon la CLI l'exécute directement. `SERMOFUR_NO_DAEMON=1` force l'exécution directe.
+Un daemon d'une autre version arrête la commande en `daemon_version_mismatch` (exit 3) jusqu'à
+`smf daemon restart`. Les autres codes du daemon sont listés dans [daemon.md](daemon.md#erreurs).
 
 L'usage affiché par `smf --help` est en anglais (`TEXT`, `RELATIVE_PATH`, `ORIGIN`…).
 
@@ -204,11 +213,10 @@ pour réécrire un mapping.
 | Exit | Signification |
 |---|---|
 | 0 | Succès, aide, ou doctor sain avec warnings |
-| 1 | Entrée invalide / not_found / conflit idempotent / mapping dupliqué |
+| 1 | Entrée invalide / not_found / conflit idempotent / mapping dupliqué / instance non enregistrée / requête trop grande |
 | 2 | Instance absente |
-| 3 | Stockage/version/permissions/projection à reconstruire, entrée `.sermofur` invalide (étrangère, endommagée, illisible), migration requise |
-| 4 | Frontière scope/chemin, instance imbriquée, entrée d'un autre compte |
+| 3 | Stockage/version/permissions/projection à reconstruire, entrée `.sermofur` invalide (étrangère, endommagée, illisible), migration requise, daemon d'une autre version ou indisponible, gestionnaire de services indisponible ou qui refuse |
+| 4 | Frontière scope/chemin, instance imbriquée, entrée ou point de connexion du daemon d'un autre compte |
 | 5 | Doctor unhealthy |
 
-La CLI appelle directement Application. runtime/mcp/config sont au backlog, jamais des commandes
-vides qui annoncent un succès.
+mcp et config sont au backlog, jamais des commandes vides qui annoncent un succès.
