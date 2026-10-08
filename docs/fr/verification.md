@@ -86,8 +86,10 @@ mkdir $env:TEMP/sermofur-check; cd $env:TEMP/sermofur-check
   hors de l'instance ou dans `.sermofur` refusé ; ajout idempotent ; réindexation qui rend
   inchangée, modifiée (empreinte précédente dans l'historique), absente et restaurée, l'index
   suivant ; réindexation qui ne lit que les sources déclarées du scope courant ; preuve qui fige
-  l'empreinte de sa source ; reconstruction après un index désynchronisé ; FIFO refusée (Linux et
-  macOS).
+  l'empreinte de sa source ; reconstruction après un index désynchronisé, qui relit chaque source avec historique et ne
+  compte que le visible ; source d'un ancêtre déplacée vers un scope créé sur son dossier ; chemins
+  comparés comme le système de fichiers (casse sous Unix) ; fichier atteint par un lien refusé ;
+  FIFO refusée sans blocage (Linux et macOS).
 - Recall (ADR 0013) : au plus 3 résultats expliqués dans un ordre stable ; du contenu ajouté à un
   scope frère ne change ni la présence, ni l'ordre, ni le score des résultats visibles ; claims
   invalidés jamais en tête, comptés comme écartés ; meilleur passage et fraîcheur des sources ;
@@ -100,7 +102,9 @@ mkdir $env:TEMP/sermofur-check; cd $env:TEMP/sermofur-check
   rien écrire, claim d'un autre client qui répond comme un inconnu.
 - Propriétaire (ADR 0014) : entrée d'un autre compte refusée à la découverte et nommée par doctor,
   entrées propres reconnues, `instance.json` de plus de 64 Kio endommagé ; sous Linux et macOS,
-  vraie entrée détenue par root via sudo sans mot de passe (échoue si sudo n'est pas disponible).
+  vraie entrée détenue par root via sudo sans mot de passe, propriétaire et groupe changés
+  séparément (échoue si sudo n'est pas disponible) ; dans une session Windows élevée, entrée
+  détenue par SYSTEM refusée et entrée détenue par Administrateurs acceptée.
 - Propriétés (FsCheck) : la normalisation des mappings reste dans la racine, est stable et
   portable d'un séparateur à l'autre ; la grammaire de la ligne de commande garde positionnel tout
   argument après `--` et ne prend jamais une valeur d'option qui commence par `--`.
@@ -109,12 +113,13 @@ mkdir $env:TEMP/sermofur-check; cd $env:TEMP/sermofur-check
 
 Mesure de référence de la spec (SC-004), `RecallPerformanceTests`, lancée par
 `SERMOFUR_PERFORMANCE=1 dotnet test -c Release --filter Category=Performance` : 10 000 claims et
-RETEX plus 1 000 sources d'environ 20 Kio (11 000 objets, 20 000 passages indexés), 30 questions de
-trois termes fréquents, base en lecture seule. Le 2026-10-08, Windows 11, Intel Core i7-1255U,
-32 Go : **p50 329 ms, p95 411 ms, max 420 ms**, sous le plafond de 1 s de la spec. L'objectif de
-300 ms au p95 fixé par le plan de la 0.1 n'est pas atteint : environ la moitié du temps va à la
-lecture des fréquences de termes dans la table de vocabulaire, le reste aux passages visibles et
-aux résumés des objets.
+RETEX (la moitié des claims avec des preuves, dont certaines contraires) plus 1 000 sources
+d'environ 20 Kio (11 000 objets, 20 000 passages indexés), 30 questions de trois termes fréquents,
+chacune sur une base en lecture seule ouverte à nouveau, comme le fait une commande CLI. Le
+2026-10-08, Windows 11, Intel Core i7-1255U, 32 Go : **p50 417 ms, p95 569 ms, max 587 ms**, sous
+le plafond de 1 s de la spec. L'objectif de 300 ms au p95 fixé par le plan de la 0.1 n'est pas
+atteint : l'essentiel du temps va à la lecture des fréquences de termes dans la table de
+vocabulaire et des passages visibles.
 
 ## Limites connues
 
@@ -136,6 +141,6 @@ aux résumés des objets.
   lecteur.
 - Non livré, donc non vérifié : protocole MCP, inférence Laya, IPC du daemon, UI, installateur
   autonome, consolidation, similarité sémantique. Aucune coupure électrique simulée.
-- La performance du recall (SC-004) est une mesure de référence, pas une garantie : voir plus bas.
+- La performance du recall (SC-004) est une mesure de référence, pas une garantie : voir [Performance du recall](#performance-du-recall).
   Elle ne tourne qu'avec `SERMOFUR_PERFORMANCE=1` et ne fait pas partie de la CI.
 - Le paquet d'outil exige le runtime .NET 10.

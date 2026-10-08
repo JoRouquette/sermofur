@@ -21,6 +21,11 @@ Indexed sources make this worse, since the index holds the text of your files.
   structures are stable ABIs, unlike glibc's `stat` wrappers.
 - The same call gives the type of a source file: a FIFO, device or socket is rejected instead of
   being opened.
+- Linux requires glibc 2.28 or later. On musl, or an older glibc, the owner cannot be read and
+  every entry is treated as unreadable (`invalid_instance`): Sermofur fails closed there.
+- Limit: the type of a source is checked by path, then the file is opened. A process that can
+  write to the scope's directory can swap the file in between; folders that other accounts can
+  write to are not supported.
 
 ## Alternatives
 Running `stat` and `id`: an external process found through `PATH`. Mono.Posix: unmaintained.

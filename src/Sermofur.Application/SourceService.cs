@@ -152,6 +152,60 @@ public sealed class SourceService
         return entries;
     }
 
+    /// <summary>
+    /// Rebuilds the whole index: claims and RETEX from the registry, then every source of the
+    /// instance read again with the same transitions as <see cref="Reindex"/> (history included),
+    /// so that the registry and the index agree afterwards. Files are read before any write
+    /// transaction. Counts only cover visible objects, so that nothing of another scope leaks.
+    /// </summary>
+    public IndexRebuild RebuildIndex(string actor)
+    {
+        MemoryService.ValidateText(actor);
+        HashSet<string> all = scopes.Select(scope => scope.Id).ToHashSet(StringComparer.Ordinal);
+        (MemoryRecord Source, SourceSnapshot Snapshot)[] sources = store
+            .ReadRecords(all, RecordKind.Source)
+            .Select(source => (source, reader.Read(context.Root, Content(source).RelativePath)))
+            .ToArray();
+        store.ResetIndex();
+        int changed = 0;
+        foreach ((MemoryRecord source, SourceSnapshot snapshot) in sources)
+        {
+            ReindexOutcome outcome = ReindexOutcome.Unchanged;
+            store.SaveSource(
+                Content(source).RelativePath,
+                current =>
+                {
+                    if (current is null || current.Id != source.Id)
+                    {
+                        throw new SermofurException(
+                            "storage_busy",
+                            "Source changed concurrently; retry.",
+                            3
+                        );
+                    }
+                    (SourceChange? change, ReindexOutcome result) = Transition(
+                        current,
+                        snapshot,
+                        actor
+                    );
+                    outcome = result;
+                    return change;
+                },
+                snapshot.Passages,
+                reindex: true
+            );
+            if (
+                outcome != ReindexOutcome.Unchanged
+                && context.VisibleScopes.Contains(source.ScopeId)
+            )
+            {
+                changed++;
+            }
+        }
+        int indexed = store.ReadRecords(context.VisibleScopes).Count(SearchExpectations.IsIndexed);
+        return new IndexRebuild(indexed, changed);
+    }
+
     public static SourceContent Content(MemoryRecord source) =>
         RecordJson.Read<SourceContent>(source.ContentJson);
 

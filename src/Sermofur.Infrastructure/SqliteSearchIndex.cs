@@ -25,10 +25,13 @@ internal static class SqliteSearchIndex
         Guid objectId,
         string scopeId,
         RecordKind kind,
-        IReadOnlyList<SearchDocument> documents
+        IReadOnlyList<SearchDocument> documents,
+        SqliteTokenizer? shared = null
     )
     {
-        SqliteTokenizer tokenizer = new SqliteTokenizer(connection) { Transaction = transaction };
+        // One tokenizer per batch: its temporary tables are created once.
+        SqliteTokenizer tokenizer =
+            shared ?? new SqliteTokenizer(connection) { Transaction = transaction };
         foreach (SearchDocument document in documents)
         {
             using SqliteCommand command = connection.CreateCommand();
@@ -58,6 +61,15 @@ internal static class SqliteSearchIndex
         command.ExecuteNonQuery();
     }
 
+    /// <summary>Removes every entry of the index.</summary>
+    public static void Clear(SqliteConnection connection, SqliteTransaction transaction)
+    {
+        using SqliteCommand command = connection.CreateCommand();
+        command.Transaction = transaction;
+        command.CommandText = "DELETE FROM search";
+        command.ExecuteNonQuery();
+    }
+
     /// <summary>Indexes every claim and RETEX of the registry: migration and rebuild.</summary>
     public static int IndexRecords(SqliteConnection connection, SqliteTransaction transaction)
     {
@@ -73,6 +85,7 @@ internal static class SqliteSearchIndex
                 records.Add(RecordJson.Read<MemoryRecord>(reader.GetString(0)));
             }
         }
+        SqliteTokenizer tokenizer = new SqliteTokenizer(connection) { Transaction = transaction };
         foreach (MemoryRecord record in records)
         {
             Insert(
@@ -81,7 +94,8 @@ internal static class SqliteSearchIndex
                 record.Id,
                 record.ScopeId,
                 record.Kind,
-                SearchDocuments.For(record)
+                SearchDocuments.For(record),
+                tokenizer
             );
         }
         return records.Count;

@@ -26,6 +26,10 @@ historique, ses clés d'idempotence et ses projections.
   format 1 est une migration inachevée que `migrate` termine.
 - Les charges utiles des preuves ne sont pas réécrites : une charge du format 1 se lit comme une
   preuve qui soutient, sans source citée.
+- Concurrence : la version est relue sous le verrou IMMEDIATE, pour que deux `migrate`
+  concurrents ne reconstruisent jamais tous deux la base. Le contrôle de cohérence et la
+  sauvegarde se font juste avant ce verrou : aucune autre version de `smf` ne doit écrire dans
+  l'instance pendant la migration.
 
 ## Alternatives
 Migration automatique à la première écriture : refusée par le mainteneur, une lecture pourrait

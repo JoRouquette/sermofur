@@ -13,7 +13,10 @@ un appelant. SQL paramétré ; entrées bornées ; options inconnues refusées ;
 métier. Les références de preuves ne sont jamais ouvertes. Un fichier source n'est lu que lorsque
 l'utilisateur l'ajoute ou le réindexe explicitement : dans le dossier du scope courant et hors des
 scopes plus précis, sans lien, jonction, chemin réseau, fichier spécial ni fichier de `.sermofur`,
-1 Mio au plus, lu une seule fois. Recall et challenge ne lisent aucun fichier. La question est
+1 Mio au plus, lu une seule fois. Recall et challenge ne lisent aucun fichier. Le type d'une source est contrôlé par son chemin avant
+son ouverture : un processus qui peut écrire dans le dossier peut substituer le fichier entre les
+deux, les sources doivent donc vivre dans des dossiers où vous seul pouvez écrire
+([ADR 0014](adr/0014-instance-owner.md)). La question est
 découpée comme du texte et envoyée en termes entre guillemets : aucune syntaxe de requête
 n'atteint le moteur, et les statistiques de classement ne viennent que des scopes visibles
 ([ADR 0013](adr/0013-filtered-ranking.md)).

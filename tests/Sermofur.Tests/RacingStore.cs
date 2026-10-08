@@ -59,6 +59,9 @@ internal sealed class RacingStore(IMemoryStore inner, string databasePath, strin
     public MemoryRecord? SaveSource(
         string relativePath,
         Func<MemoryRecord?, SourceChange?> decide,
-        IReadOnlyList<SearchDocument> passages
-    ) => inner.SaveSource(relativePath, decide, passages);
+        IReadOnlyList<SearchDocument> passages,
+        bool reindex = false
+    ) => inner.SaveSource(relativePath, decide, passages, reindex);
+
+    public void ResetIndex() => inner.ResetIndex();
 }

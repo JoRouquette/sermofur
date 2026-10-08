@@ -31,7 +31,7 @@ public interface ISearchIndex
 }
 
 /// <summary>Result of an index rebuild, counted on visible objects only.</summary>
-public sealed record IndexRebuild(int Indexed, int StaleSources);
+public sealed record IndexRebuild(int Indexed, int ChangedSources);
 
 public sealed record Freshness(
     DateTimeOffset CreatedAt,
@@ -129,7 +129,6 @@ public sealed class RecallService
         bool fill
     )
     {
-        visibleEvidence = null;
         IReadOnlyList<string> terms = SearchTerms.Query(index.Tokenizer, query);
         if (terms.Count == 0)
         {
@@ -183,49 +182,49 @@ public sealed class RecallService
             .ThenByDescending(candidate => candidate.Record.CreatedAt)
             .ThenBy(candidate => candidate.Record.Id)
             .ToArray();
-        // A claim without evidence is low: weight 1. Only claims with evidence are read in full
-        // to compute their weight, then only the shown results are described.
-        visibleEvidence = store.ReadRecords(context.VisibleScopes, RecordKind.Evidence);
-        HashSet<Guid> withEvidence = visibleEvidence
-            .Select(e => RecordJson.Read<EvidenceContent>(e.ContentJson).ClaimId)
-            .ToHashSet();
-        List<RecallResult> shown = candidates
-            .Where(c => c.Applicable)
-            .Select(c => (Candidate: c, Score: c.Relevance * Weight(c, withEvidence)))
-            .OrderByDescending(pair => pair.Score)
-            .ThenByDescending(pair => pair.Candidate.Record.CreatedAt)
-            .ThenBy(pair => pair.Candidate.Record.Id)
-            .Take(limit)
-            .Select(pair => Describe(pair.Candidate, terms))
+        // Evidence is parsed once. A claim without evidence is low (weight 1); weights are only
+        // computed in order of relevance while a candidate can still enter the top (x1.2 bound).
+        ILookup<Guid, MemoryRecord> evidence = store
+            .ReadRecords(context.VisibleScopes, RecordKind.Evidence)
+            .ToLookup(record => RecordJson.Read<EvidenceContent>(record.ContentJson).ClaimId);
+        List<(Candidate Candidate, double Score)> top = new List<(Candidate, double)>();
+        foreach (Candidate candidate in candidates.Where(c => c.Applicable))
+        {
+            if (top.Count >= limit && candidate.Relevance * MaxWeight < top[limit - 1].Score)
+            {
+                break;
+            }
+            top.Add((candidate, candidate.Relevance * Weight(candidate, evidence)));
+            top = top.OrderByDescending(pair => pair.Score)
+                .ThenByDescending(pair => pair.Candidate.Record.CreatedAt)
+                .ThenBy(pair => pair.Candidate.Record.Id)
+                .ToList();
+        }
+        List<RecallResult> shown = top.Take(limit)
+            .Select(pair => Describe(pair.Candidate, evidence, terms))
             .ToList();
         Candidate[] notApplicable = candidates.Where(c => !c.Applicable).ToArray();
         if (fill)
         {
-            shown.AddRange(notApplicable.Take(limit - shown.Count).Select(c => Describe(c, terms)));
+            shown.AddRange(
+                notApplicable.Take(limit - shown.Count).Select(c => Describe(c, evidence, terms))
+            );
         }
         int excluded = notApplicable.Length - shown.Count(result => !result.Applicable);
         return new Selection(shown, fill ? excluded : 0);
     }
 
-    private double Weight(Candidate candidate, IReadOnlySet<Guid> withEvidence)
+    private double Weight(Candidate candidate, ILookup<Guid, MemoryRecord> evidence)
     {
-        if (
-            candidate.Record.Kind != RecordKind.Claim
-            || !withEvidence.Contains(candidate.Record.Id)
-        )
+        if (candidate.Record.Kind != RecordKind.Claim || !evidence.Contains(candidate.Record.Id))
         {
             return 1.0;
         }
-        MemoryRecord claim =
-            store.FindRecord(candidate.Record.Id, context.VisibleScopes)
-            ?? throw new SermofurException(
-                "storage_busy",
-                "Object changed during recall; retry.",
-                3
-            );
-        return Weight(MemoryService.EvaluateConfidence(claim, EvidenceOf(claim.Id)).Level);
+        MemoryRecord claim = Find(candidate.Record.Id);
+        return Weight(MemoryService.EvaluateConfidence(claim, evidence[claim.Id].ToArray()).Level);
     }
 
+    /// <summary>Single table of confidence weights, for the ranking and the shown score.</summary>
     private static double Weight(ConfidenceLevel level) =>
         level switch
         {
@@ -234,27 +233,21 @@ public sealed class RecallService
             _ => 1.0,
         };
 
-    private MemoryRecord[] EvidenceOf(Guid claimId) =>
-        (visibleEvidence ?? [])
-            .Where(e => RecordJson.Read<EvidenceContent>(e.ContentJson).ClaimId == claimId)
-            .ToArray();
-
-    private IReadOnlyList<MemoryRecord>? visibleEvidence;
+    private MemoryRecord Find(Guid id) =>
+        store.FindRecord(id, context.VisibleScopes)
+        ?? throw new SermofurException("storage_busy", "Object changed during recall; retry.", 3);
 
     /// <summary>Full description of a shown candidate: its record and, for a claim, its evidence.</summary>
-    private RecallResult Describe(Candidate candidate, IReadOnlyList<string> terms)
+    private RecallResult Describe(
+        Candidate candidate,
+        ILookup<Guid, MemoryRecord> evidence,
+        IReadOnlyList<string> terms
+    )
     {
-        MemoryRecord record =
-            store.FindRecord(candidate.Record.Id, context.VisibleScopes)
-            ?? throw new SermofurException(
-                "storage_busy",
-                "Object changed during recall; retry.",
-                3
-            );
-        MemoryRecord[] evidence = record.Kind == RecordKind.Claim ? EvidenceOf(record.Id) : [];
+        MemoryRecord record = Find(candidate.Record.Id);
         return Describe(
             record,
-            evidence,
+            evidence[record.Id].ToArray(),
             candidate.Document,
             candidate.Relevance,
             candidate.Terms,
@@ -281,12 +274,7 @@ public sealed class RecallService
                 bool applicable =
                     record.Status
                     is not (KnowledgeStatus.Invalidated or KnowledgeStatus.Superseded);
-                double factor = confidence.Level switch
-                {
-                    ConfidenceLevel.Medium => 1.1,
-                    ConfidenceLevel.High or ConfidenceLevel.Verified => 1.2,
-                    _ => 1.0,
-                };
+                double factor = Weight(confidence.Level);
                 return new RecallResult(
                     "claim",
                     record.Id,

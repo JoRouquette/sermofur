@@ -23,6 +23,12 @@ l'index contient le texte de vos fichiers.
   la glibc.
 - Le même appel donne le type d'un fichier source : une FIFO, un périphérique ou une socket est
   refusé au lieu d'être ouvert.
+- Linux exige une glibc 2.28 ou plus récente. Sous musl, ou avec une glibc plus ancienne, le
+  propriétaire ne peut pas être lu et toute entrée est traitée comme illisible
+  (`invalid_instance`) : Sermofur échoue fermé dans ce cas.
+- Limite : le type d'une source est contrôlé par son chemin, puis le fichier est ouvert. Un
+  processus qui peut écrire dans le dossier du scope peut substituer le fichier entre les deux ;
+  les dossiers modifiables par d'autres comptes ne sont pas pris en charge.
 
 ## Alternatives
 Lancer `stat` et `id` : un processus externe trouvé par le `PATH`. Mono.Posix : non maintenu. Une

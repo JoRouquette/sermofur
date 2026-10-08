@@ -43,14 +43,15 @@ escaped, so a text cannot close the JSON block of a projection.
 | source add FILE --origin user\|llm | Declared source of the current scope: hashed, indexed, idempotent |
 | source list / show ID | Visible sources / the source with its history |
 | source reindex [ID] | Reads again the sources of the current scope: unchanged, modified, missing, unreadable, rejected, restored |
-| index rebuild | Rebuilds the full-text index of the instance |
+| index rebuild [--actor NAME] | Rebuilds the full-text index of the instance and reads every source again (same outcomes and history as `source reindex`); output `{indexed, changedSources}` counts visible objects only |
 | recall QUESTION [--limit 1-3] | At most 3 explained results among visible claims, RETEX and source passages |
 | challenge CLAIM_ID / challenge --text TEXT | Contradictions, changed sources, status, review date, close claims to confront; writes nothing |
 
 `--origin user|llm` is **mandatory** on `claim add`, `evidence add`, `retex add` and
 `source add` — not on `scope add` — with no default value: when missing, the result is
 `invalid_arguments` (exit 1) and nothing is written. The origin stays declarative until the host channel (daemon/MCP) sets it.
-Other `add` options: `--actor` (default `local-user`), `--key` for idempotency.
+Other `add` options: `--actor` (default `local-user`), `--key` for idempotency (not on
+`source add`, which is idempotent by path).
 Claim: `--category episodic|semantic|procedural|preferences|decisions`;
 `--volatility stable|evolving|volatile`.
 Evidence kinds: `execution`, `source_code`, `authoritative_documentation`, `project_decision`,
@@ -120,6 +121,10 @@ into passages of at most 2,000 characters. Adding the same file again returns th
 
 `source reindex` reads again only the declared sources of the current scope; no other file is
 ever read, and `recall`/`challenge` read no file at all. The previous hash stays in the history.
+When `scope add` creates a scope whose directory holds sources of an ancestor, those sources move
+to the new scope in the same transaction (history "rescoped"), so that they never stay visible to
+its siblings; `doctor` reports a source attached to a broader scope than its file
+(`source_scopes`). Paths compare without case on Windows only.
 A missing, unreadable or rejected source leaves the index, its record is kept.
 
 | Code | Exit | Case |

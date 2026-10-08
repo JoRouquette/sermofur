@@ -40,7 +40,11 @@ public static class InstanceMigration
                 RequireConsistent(connection);
                 backup = Backup(connection, root);
                 StepHook?.Invoke("backup");
-                MigrateDatabase(connection);
+                if (!MigrateDatabase(connection))
+                {
+                    // Another migrate committed first: nothing left to do on the database.
+                    version = InstanceManager.SchemaVersion;
+                }
             }
             else if (version != InstanceManager.SchemaVersion)
             {
@@ -153,9 +157,21 @@ public static class InstanceMigration
         return target;
     }
 
-    private static void MigrateDatabase(SqliteConnection connection)
+    /// <summary>
+    /// Migrates under an IMMEDIATE transaction; the version is read again under that lock, so
+    /// that two concurrent migrations never both rebuild the database. Returns false when it
+    /// was already migrated.
+    /// </summary>
+    private static bool MigrateDatabase(SqliteConnection connection)
     {
         using SqliteTransaction transaction = connection.BeginTransaction(deferred: false);
+        if (
+            Convert.ToInt32(Scalar(connection, "PRAGMA user_version", transaction))
+            != InstanceManager.LegacySchemaVersion
+        )
+        {
+            return false;
+        }
         SqliteSchema.MigrateVersion1(connection, transaction);
         SqliteSearchIndex.IndexRecords(connection, transaction);
         using (SqliteCommand version = connection.CreateCommand())
@@ -177,6 +193,7 @@ public static class InstanceMigration
         }
         StepHook?.Invoke("transaction");
         transaction.Commit();
+        return true;
     }
 
     private static void WriteConfiguration(string root, InstanceConfiguration configuration)

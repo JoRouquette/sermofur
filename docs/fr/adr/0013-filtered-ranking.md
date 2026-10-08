@@ -11,14 +11,15 @@ résultats après classement ne suffit pas : la fonction `bm25()` de FTS5 calcul
 table ; le contenu d'un scope frère changerait l'ordre des résultats visibles, et fuirait par là.
 
 ## Décision
-- FTS5 ne fait que trouver les candidats. La requête restreint les lignes aux scopes visibles dans
-  la même instruction.
-- Sermofur calcule lui-même BM25 (k1 = 1,2, b = 0,75) à partir des fréquences de termes par
-  passage de la table `fts5vocab` « instance », avec des statistiques calculées sur les seuls
-  passages visibles.
+- Sermofur calcule lui-même BM25 (k1 = 1,2, b = 0,75). Les fréquences de termes par passage
+  viennent de la table `fts5vocab` « instance », interrogée avec les termes liés en paramètres ;
+  les passages des scopes non visibles sont écartés avant tout calcul, et les statistiques (nombre
+  de documents, fréquence documentaire, longueur moyenne) ne viennent que des passages visibles.
+  Ni la fonction `bm25()` ni l'opérateur `MATCH` ne sont utilisés.
 - La question est découpée par le tokenizer de l'index lui-même (une table FTS5 temporaire de même
-  configuration), et chaque terme est envoyé entre guillemets : aucune syntaxe de requête de
-  l'utilisateur n'atteint le moteur.
+  configuration) : aucune syntaxe de requête de l'utilisateur n'atteint le moteur.
+- La requête de fréquences lit les occurrences de toute l'instance avant le filtre de visibilité :
+  elle ne fuit rien, mais son coût croît avec le contenu des autres scopes.
 - Chaque objet garde son meilleur passage. La pertinence d'un claim est pondérée par sa confiance
   (low 1,0 ; medium 1,1 ; high 1,2) ; les claims invalidés ou remplacés ne sont pas applicables et
   ne font que compléter les places restantes, marqués comme tels. Les égalités sont départagées par

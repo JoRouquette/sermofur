@@ -12,12 +12,15 @@ results after ranking is not enough: the `bm25()` function of FTS5 computes its 
 content of a sibling scope would change the order of visible results and leak through it.
 
 ## Decision
-- FTS5 only finds candidates. The query restricts rows to visible scopes in the same statement.
-- Sermofur computes BM25 itself (k1 = 1.2, b = 0.75) from the per-passage term frequencies of the
-  `fts5vocab` instance table, with statistics computed on visible passages only.
+- Sermofur computes BM25 itself (k1 = 1.2, b = 0.75). The per-passage term frequencies come
+  from the `fts5vocab` instance table, queried with the terms bound as parameters; the passages
+  of scopes that are not visible are dropped before anything is computed, and the statistics
+  (document count, document frequency, average length) come from visible passages only. The
+  `bm25()` function and the `MATCH` operator are not used.
 - The query is tokenized by the index tokenizer itself (a temporary FTS5 table of the same
-  configuration), and every term is sent as a quoted string: no query syntax from the user
-  reaches the engine.
+  configuration): no query syntax from the user reaches the engine.
+- The frequency query reads the postings of the whole instance before the visibility filter: it
+  leaks nothing, but its cost grows with the content of other scopes.
 - Each object keeps its best passage. A claim's relevance is weighted by its confidence (low 1.0,
   medium 1.1, high 1.2); invalidated and superseded claims are not applicable and only fill
   remaining places, marked as such. Ties are broken by creation date, then identifier.

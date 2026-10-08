@@ -67,17 +67,12 @@ public sealed class FileSourceReader(IFileOwnership ownership) : ISourceReader
 
     internal static SourceSnapshot Snapshot(byte[] bytes)
     {
-        string hash = Convert.ToHexStringLower(SHA256.HashData(bytes));
         if (bytes.Length > SourceLimits.MaxBytes)
         {
-            return new SourceSnapshot(
-                SourceStatus.Rejected,
-                string.Empty,
-                bytes.Length,
-                [],
-                SourceRejection.TooLarge
-            );
+            return Rejected(SourceRejection.TooLarge, string.Empty, bytes.Length);
         }
+        // The hash covers exactly the bytes read, those that are indexed.
+        string hash = Convert.ToHexStringLower(SHA256.HashData(bytes));
         ReadOnlySpan<byte> content = bytes;
         if (content.StartsWith(Encoding.UTF8.Preamble))
         {
@@ -90,33 +85,15 @@ public sealed class FileSourceReader(IFileOwnership ownership) : ISourceReader
         }
         catch (DecoderFallbackException)
         {
-            return new SourceSnapshot(
-                SourceStatus.Rejected,
-                hash,
-                bytes.Length,
-                [],
-                SourceRejection.Binary
-            );
+            return Rejected(SourceRejection.Binary, hash, bytes.Length);
         }
         if (text.Contains('\0'))
         {
-            return new SourceSnapshot(
-                SourceStatus.Rejected,
-                hash,
-                bytes.Length,
-                [],
-                SourceRejection.Binary
-            );
+            return Rejected(SourceRejection.Binary, hash, bytes.Length);
         }
         if (string.IsNullOrWhiteSpace(text))
         {
-            return new SourceSnapshot(
-                SourceStatus.Rejected,
-                hash,
-                bytes.Length,
-                [],
-                SourceRejection.Empty
-            );
+            return Rejected(SourceRejection.Empty, hash, bytes.Length);
         }
         return new SourceSnapshot(
             SourceStatus.Indexed,
@@ -134,7 +111,10 @@ public sealed class FileSourceReader(IFileOwnership ownership) : ISourceReader
             FileAccess.Read,
             FileShare.ReadWrite | FileShare.Delete
         );
-        byte[] buffer = new byte[SourceLimits.MaxBytes + 1];
+        // Sized on the file, never more than the bound plus one byte; the loop stays bounded even
+        // if the file grows while it is read.
+        int capacity = (int)Math.Min(stream.Length, SourceLimits.MaxBytes) + 1;
+        byte[] buffer = new byte[capacity];
         int total = 0;
         int read;
         while (
@@ -143,11 +123,26 @@ public sealed class FileSourceReader(IFileOwnership ownership) : ISourceReader
         {
             total += read;
         }
-        return buffer[..total];
+        if (total == buffer.Length && total <= SourceLimits.MaxBytes)
+        {
+            // The file grew past its announced length: read on, up to the bound plus one byte.
+            Array.Resize(ref buffer, SourceLimits.MaxBytes + 1);
+            while (
+                total < buffer.Length
+                && (read = stream.Read(buffer, total, buffer.Length - total)) > 0
+            )
+            {
+                total += read;
+            }
+        }
+        return total == buffer.Length ? buffer : buffer[..total];
     }
 
     private static SourceSnapshot Empty(SourceStatus status) => new(status, string.Empty, 0, []);
 
-    private static SourceSnapshot Rejected(SourceRejection rejection) =>
-        new(SourceStatus.Rejected, string.Empty, 0, [], rejection);
+    private static SourceSnapshot Rejected(
+        SourceRejection rejection,
+        string hash = "",
+        long size = 0
+    ) => new(SourceStatus.Rejected, hash, size, [], rejection);
 }

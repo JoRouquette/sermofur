@@ -28,16 +28,16 @@ internal static class KnowledgeCommands
         string path
     )
     {
-        FileSourceReader reader = new FileSourceReader(new FileOwnership());
-        SourceService sources = new SourceService(store, reader, new LocalPathResolver(), context);
-        RecallService recall = new RecallService(store, store, context);
-        string command = args.Positionals[0];
-        return command switch
+        // Each command builds only the services it uses.
+        SourceService Sources() =>
+            new(store, new FileSourceReader(new FileOwnership()), new LocalPathResolver(), context);
+        RecallService Recalls() => new(store, store, context);
+        return args.Positionals[0] switch
         {
-            "source" => Source(args, sources, path),
-            "index" => Index(args, store, reader, context),
-            "recall" => Recall(args, recall),
-            _ => Challenge(args, new ChallengeService(memory, recall)),
+            "source" => Source(args, Sources(), path),
+            "index" => Index(args, Sources()),
+            "recall" => Recall(args, Recalls()),
+            _ => Challenge(args, new ChallengeService(memory, Recalls())),
         };
     }
 
@@ -89,20 +89,16 @@ internal static class KnowledgeCommands
         }
     }
 
-    private static object Index(
-        CommandArguments args,
-        SqliteStore store,
-        FileSourceReader reader,
-        MemoryContext context
-    )
+    private static object Index(CommandArguments args, SourceService sources)
     {
         args.RequireCount(2);
         if (args.Positionals[1] != "rebuild")
         {
             throw new SermofurException("invalid_arguments", "Unknown index subcommand.");
         }
+        string actor = args.Option("actor", "local-user")!;
         args.ValidateUsed();
-        return store.RebuildIndex(reader, context.Root, context.VisibleScopes);
+        return sources.RebuildIndex(actor);
     }
 
     private static object Recall(CommandArguments args, RecallService recall)

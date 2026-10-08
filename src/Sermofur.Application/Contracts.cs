@@ -96,11 +96,17 @@ public interface IMemoryStore
     /// the source are replaced by <paramref name="passages"/> when the new state is indexed, and
     /// removed otherwise.
     /// </summary>
+    /// <remarks>With <paramref name="reindex"/>, the entries are written even when the state does
+    /// not change (index rebuild).</remarks>
     MemoryRecord? SaveSource(
         string relativePath,
         Func<MemoryRecord?, SourceChange?> decide,
-        IReadOnlyList<SearchDocument> passages
+        IReadOnlyList<SearchDocument> passages,
+        bool reindex = false
     );
+
+    /// <summary>Empties the search index and indexes again every claim and RETEX.</summary>
+    void ResetIndex();
 }
 
 /// <summary>What ranking needs to know of an object before describing it.</summary>

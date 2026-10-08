@@ -59,7 +59,8 @@ public class HardeningTests
 
     /// <summary>
     /// Real entry of another account: root through passwordless sudo, as on the CI runners. Fails
-    /// explicitly when sudo is not available instead of being skipped.
+    /// explicitly when sudo is not available instead of being skipped. Only the owner changes,
+    /// then only the group, so that a UID read at the GID offset would fail the test.
     /// </summary>
     [UnixFact]
     public async Task RealEntryOfAnotherAccountIsRefused()
@@ -72,7 +73,9 @@ public class HardeningTests
         );
         try
         {
-            Assert.True(await Sudo("-n", "chown", "-R", "0:0", marker));
+            Assert.True(await Sudo("-n", "chgrp", "0", marker));
+            Assert.Equal(fixture.Root, new InstanceManager().Discover(fixture.Root));
+            Assert.True(await Sudo("-n", "chown", "0", marker));
             SermofurException refusal = Assert.Throws<SermofurException>(() =>
                 new InstanceManager().Discover(fixture.Root)
             );
@@ -80,7 +83,7 @@ public class HardeningTests
         }
         finally
         {
-            await Sudo("-n", "chown", "-R", Environment.UserName, marker);
+            await Sudo("-n", "chown", "-R", $"{Environment.UserName}:", marker);
         }
     }
 
@@ -95,10 +98,55 @@ public class HardeningTests
             Assert.Equal(0, mkfifo.ExitCode);
         }
         using SqliteStore store = fixture.Open();
-        SermofurException refusal = Assert.Throws<SermofurException>(() =>
-            fixture.Sources(store).Add(fifo, TestInstance.User)
+        // A regression would open the FIFO and block: fail on a timeout instead of hanging.
+        Task<string> attempt = Task.Run(() =>
+            Assert
+                .Throws<SermofurException>(() =>
+                    fixture.Sources(store).Add(fifo, TestInstance.User)
+                )
+                .Code
         );
-        Assert.Equal("source_rejected", refusal.Code);
+        Assert.Equal("source_rejected", await attempt.WaitAsync(TimeSpan.FromSeconds(10)));
+    }
+
+    /// <summary>
+    /// Real owners on Windows: needs an elevated session (the CI runner is one) to give the entry
+    /// to SYSTEM, then to the Administrators group the current user belongs to.
+    /// </summary>
+    [ElevatedWindowsFact]
+    public async Task RealOwnersAreCheckedOnWindows()
+    {
+        using TestInstance fixture = new TestInstance();
+        string marker = Path.Combine(fixture.Root, ".sermofur");
+        try
+        {
+            Assert.Equal(0, await Icacls(marker, "/setowner", "*S-1-5-18"));
+            Assert.Equal(
+                "foreign_owner",
+                Assert
+                    .Throws<SermofurException>(() => new InstanceManager().Discover(fixture.Root))
+                    .Code
+            );
+            Assert.Equal(0, await Icacls(marker, "/setowner", "*S-1-5-32-544"));
+            Assert.Equal(fixture.Root, new InstanceManager().Discover(fixture.Root));
+        }
+        finally
+        {
+            await Icacls(marker, "/setowner", Environment.UserName);
+        }
+    }
+
+    private static async Task<int> Icacls(params string[] arguments)
+    {
+        using Process process = Process.Start(
+            new ProcessStartInfo("icacls", arguments)
+            {
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+            }
+        )!;
+        await process.WaitForExitAsync();
+        return process.ExitCode;
     }
 
     private static async Task<bool> Sudo(params string[] arguments)

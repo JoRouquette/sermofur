@@ -42,12 +42,12 @@ grave restent échappés, si bien qu'un texte ne peut pas fermer le bloc JSON d'
 | retex list / show ID | RETEX visibles |
 | export | Reconstruit les projections des objets visibles |
 | migrate | Format d'instance 1 (0.1) → 2 : sauvegarde, puis migration en une transaction ; rien à faire en format 2 |
-| source add FILE --origin user\|llm | Source déclarée du scope courant : hachée, indexée, idempotente |
+| source add FICHIER --origin user\|llm | Source déclarée du scope courant : hachée, indexée, idempotente |
 | source list / show ID | Sources visibles / la source avec son historique |
 | source reindex [ID] | Relit les sources du scope courant : unchanged, modified, missing, unreadable, rejected, restored |
-| index rebuild | Reconstruit l'index plein texte de l'instance |
+| index rebuild [--actor NOM] | Reconstruit l'index plein texte de l'instance et relit toutes les sources (mêmes issues et même historique que `source reindex`) ; la sortie `{indexed, changedSources}` ne compte que les objets visibles |
 | recall QUESTION [--limit 1-3] | Au plus 3 résultats expliqués parmi claims, RETEX et passages de sources visibles |
-| challenge CLAIM_ID / challenge --text TEXT | Contradictions, sources modifiées, statut, date de revue, claims proches à confronter ; n'écrit rien |
+| challenge CLAIM_ID / challenge --text TEXTE | Contradictions, sources modifiées, statut, date de revue, claims proches à confronter ; n'écrit rien |
 
 L'usage affiché par `smf --help` est en anglais (`TEXT`, `RELATIVE_PATH`, `ORIGIN`…).
 
@@ -55,7 +55,8 @@ L'usage affiché par `smf --help` est en anglais (`TEXT`, `RELATIVE_PATH`, `ORIG
 `source add` — pas sur `scope add` —, sans valeur par défaut : son absence donne
 `invalid_arguments` (exit 1) et rien n'est écrit. L'origine reste déclarative tant que le canal
 host (daemon/MCP) ne la fixe pas.
-Autres options de `add` : `--actor` (défaut `local-user`), `--key` pour l'idempotence.
+Autres options de `add` : `--actor` (défaut `local-user`), `--key` pour l'idempotence (pas sur
+`source add`, idempotent par chemin).
 Claim : `--category episodic|semantic|procedural|preferences|decisions` ;
 `--volatility stable|evolving|volatile`.
 Types de preuve : `execution`, `source_code`, `authoritative_documentation`, `project_decision`,
@@ -119,7 +120,7 @@ historique, clés d'idempotence et projections inchangés ; claims et RETEX inde
 
 ## Sources
 
-`source add FILE` déclare un fichier texte local comme source du scope courant. Un `FILE` relatif
+`source add FICHIER` déclare un fichier texte local comme source du scope courant. Un `FICHIER` relatif
 l'est au dossier de contexte (`--path`, le dossier courant par défaut). Le fichier doit être dans
 le dossier du scope courant (la racine de l'instance pour le workspace) et hors du dossier de tout
 scope plus précis : le fichier d'un client s'ajoute depuis le dossier de ce client, pour qu'il ne
@@ -130,7 +131,11 @@ source.
 
 `source reindex` ne relit que les sources déclarées du scope courant ; aucun autre fichier n'est
 jamais lu, et `recall`/`challenge` ne lisent aucun fichier. L'empreinte précédente reste dans
-l'historique. Une source absente, illisible ou refusée sort de l'index, son enregistrement est
+l'historique. Quand `scope add` crée un scope dont le dossier contient des sources d'un ancêtre,
+ces sources passent au nouveau scope dans la même transaction (historique « rescoped »), pour ne
+jamais rester visibles de ses frères ; `doctor` signale une source rattachée à un scope plus large
+que son fichier (`source_scopes`). Les chemins se comparent sans tenir compte de la casse sous
+Windows seulement. Une source absente, illisible ou refusée sort de l'index, son enregistrement est
 conservé.
 
 | Code | Exit | Cas |
@@ -155,7 +160,7 @@ marqué `applicable: false` ; `excluded` compte les visibles laissés de côté.
 
 `challenge CLAIM_ID` rend des signaux — `contradiction`, `source_changed` (avec l'empreinte
 enregistrée et l'empreinte actuelle), `source_unavailable`, `not_applicable`, `review_due` — et au
-plus 3 claims proches `toConfront`, jamais qualifiés de contradictions. `challenge --text TEXT`
+plus 3 claims proches `toConfront`, jamais qualifiés de contradictions. `challenge --text TEXTE`
 fait de même pour un texte qui n'est pas encore un claim. Aucun des deux n'écrit. Un identifiant
 d'un autre scope répond comme un identifiant inconnu.
 

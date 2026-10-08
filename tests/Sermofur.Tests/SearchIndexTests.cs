@@ -44,36 +44,26 @@ public class SearchIndexTests
     }
 
     [Theory]
-    [InlineData("\"")]
     [InlineData("a\" OR \"b")]
     [InlineData("NEAR(a b) AND col:x*")]
     [InlineData("^start - not")]
-    public void MatchExpressionNeverCarriesQuerySyntax(string query)
+    public void QueryTermsAreBareTokens(string query)
     {
         using TestInstance fixture = new TestInstance();
         using SqliteStore store = fixture.Open();
         IReadOnlyList<string> terms = SearchTerms.Query(store.Tokenizer, query);
-        if (terms.Count == 0)
-        {
-            return;
-        }
+        Assert.NotEmpty(terms);
         Assert.All(terms, term => Assert.Matches(@"^[\p{L}\p{N}\p{Co}]+$", term));
-        using SqliteConnection connection = new(
-            $"Pooling=False;Data Source={InstanceManager.DatabasePath(fixture.Root)}"
-        );
-        connection.Open();
-        using SqliteCommand command = connection.CreateCommand();
-        command.CommandText = "SELECT count(*) FROM search WHERE search MATCH $q";
-        command.Parameters.AddWithValue("$q", SearchTerms.MatchExpression(terms));
-        Assert.Equal(0L, command.ExecuteScalar());
     }
 
     [Fact]
-    public void QueryWithoutTermsIsAnInputError()
+    public void QuestionWithoutTermsIsAnInputError()
     {
+        using TestInstance fixture = new TestInstance();
+        using SqliteStore store = fixture.Open();
         Assert.Equal(
             "invalid_input",
-            Assert.Throws<SermofurException>(() => SearchTerms.MatchExpression([])).Code
+            Assert.Throws<SermofurException>(() => fixture.Recall(store).Recall("!? \" --")).Code
         );
     }
 }

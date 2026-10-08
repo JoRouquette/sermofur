@@ -4,6 +4,12 @@ namespace Sermofur.Infrastructure;
 
 internal static class SqliteSchema
 {
+    /// <summary>
+    /// Tokenizer of the search index, shared with the query tokenizer: the question must be split
+    /// exactly like the indexed text (ADR 0013).
+    /// </summary>
+    internal const string SearchTokenizer = "unicode61 remove_diacritics 2";
+
     /// <summary>Format 1 (CLI 0.1): kept to read and migrate existing instances, and for tests.</summary>
     internal const string Version1 = """
         CREATE TABLE metadata(key TEXT PRIMARY KEY, value TEXT NOT NULL);
@@ -26,14 +32,14 @@ internal static class SqliteSchema
             kind TEXT NOT NULL CHECK(kind IN ('Claim','Evidence','Retex','Source')),
             claim_id TEXT REFERENCES records(id),
             payload TEXT NOT NULL CHECK(json_valid(payload)), revision INTEGER NOT NULL CHECK(revision>0),
-            source_path TEXT COLLATE NOCASE CHECK(source_path IS NULL OR kind='Source'));
+            source_path TEXT CHECK(source_path IS NULL OR kind='Source'));
         """;
 
-    private const string IndexesVersion2 = """
+    private const string IndexesVersion2 = $"""
         CREATE INDEX records_scope_kind ON records(scope_id,kind);
         CREATE UNIQUE INDEX records_source_path ON records(source_path) WHERE source_path IS NOT NULL;
         CREATE VIRTUAL TABLE search USING fts5(object_id UNINDEXED, scope_id UNINDEXED, kind UNINDEXED,
-            passage UNINDEXED, length UNINDEXED, text, tokenize='unicode61 remove_diacritics 2');
+            passage UNINDEXED, length UNINDEXED, text, tokenize='{SearchTokenizer}');
         CREATE VIRTUAL TABLE search_terms USING fts5vocab(search, instance);
         """;
 

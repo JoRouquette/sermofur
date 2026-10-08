@@ -314,6 +314,7 @@ public class SourceTests
         CliResult rebuild = TestInstance.Run("--path", fixture.Root, "--json", "index", "rebuild");
         Assert.Equal(0, rebuild.ExitCode);
         Assert.Contains("\"indexed\": 2", rebuild.Output);
+        Assert.Contains("\"changedSources\": 0", rebuild.Output);
         Assert.Equal(
             "ok",
             new InstanceDoctor()
@@ -353,6 +354,114 @@ public class SourceTests
         Assert.Contains("\"outcome\": \"unchanged\"", reindex.Output);
         CliResult list = TestInstance.Run("--path", fixture.Root, "--json", "source", "list");
         Assert.Contains("doc.md", list.Output);
+    }
+
+    [Fact]
+    public void IndexRebuildReadsEverySourceAgainAndCountsOnlyVisibleObjects()
+    {
+        using TestInstance fixture = new TestInstance();
+        using SqliteStore store = fixture.Open();
+        string a = fixture.Client(store, "a");
+        string b = fixture.Client(store, "b");
+        fixture.Sources(store, a).Add(fixture.WriteFile("a/a.md", "texte de a"), TestInstance.User);
+        string inB = fixture.WriteFile("b/b.md", "texte de b");
+        MemoryRecord sourceB = fixture.Sources(store, b).Add(inB, TestInstance.User);
+        fixture
+            .Memory(store, b)
+            .CreateClaim(TestInstance.Fact("claim de b"), TestInstance.User, null);
+        File.WriteAllText(inB, "texte de b modifié");
+
+        IndexRebuild rebuild = fixture.Sources(store, a).RebuildIndex("tester");
+        Assert.Equal(new IndexRebuild(1, 0), rebuild);
+        Assert.Equal(
+            new[] { "create", "modified" },
+            fixture.Sources(store, b).Show(sourceB.Id).History.Select(entry => entry.Reason)
+        );
+        Assert.Contains(
+            "modifié",
+            Assert.Single(fixture.Recall(store, b).Recall("modifie").Results).Excerpt
+        );
+        DoctorReport report = new InstanceDoctor().Inspect(fixture.Root);
+        Assert.Equal("ok", report.Checks.Single(c => c.Name == "search_index").Status);
+        Assert.Equal(new IndexRebuild(2, 0), fixture.Sources(store, b).RebuildIndex("tester"));
+    }
+
+    [Fact]
+    public void ScopeCreatedOnTheFolderOfAnAncestorSourceTakesTheSource()
+    {
+        using TestInstance fixture = new TestInstance();
+        using SqliteStore store = fixture.Open();
+        string file = fixture.WriteFile("a/notes.md", "secret de a");
+        MemoryRecord source = fixture.Sources(store).Add(file, TestInstance.User);
+        string a = fixture.Client(store, "a");
+        string b = fixture.Client(store, "b");
+
+        MemoryRecord moved = Assert.Single(fixture.Sources(store, a).List());
+        Assert.Equal((source.Id, "a"), (moved.Id, moved.ScopeId));
+        Assert.Equal("rescoped to a", fixture.Sources(store, a).Show(source.Id).History[^1].Reason);
+        Assert.Empty(fixture.Recall(store, b).Recall("secret").Results);
+        Assert.Empty(fixture.Recall(store).Recall("secret").Results);
+        Assert.Single(fixture.Recall(store, a).Recall("secret").Results);
+        DoctorReport report = new InstanceDoctor().Inspect(fixture.Root);
+        Assert.Equal("ok", report.Checks.Single(c => c.Name == "source_scopes").Status);
+        Assert.Equal("ok", report.Checks.Single(c => c.Name == "search_index").Status);
+    }
+
+    [Fact]
+    public void PathsCompareLikeTheFileSystem()
+    {
+        using TestInstance fixture = new TestInstance();
+        using SqliteStore store = fixture.Open();
+        string upper = fixture.WriteFile("Doc.md", "majuscule");
+        MemoryRecord first = fixture.Sources(store).Add(upper, TestInstance.User);
+        string lower = Path.Combine(fixture.Root, "doc.md");
+        if (OperatingSystem.IsWindows())
+        {
+            // Same file on a case-insensitive file system: the same source.
+            Assert.Equal(first.Id, fixture.Sources(store).Add(lower, TestInstance.User).Id);
+            return;
+        }
+        File.WriteAllText(lower, "minuscule");
+        MemoryRecord second = fixture.Sources(store).Add(lower, TestInstance.User);
+        Assert.NotEqual(first.Id, second.Id);
+        Assert.NotEqual(SourceService.Content(first).Hash, SourceService.Content(second).Hash);
+        Assert.All(
+            fixture.Sources(store).Reindex(null, "tester"),
+            entry => Assert.Equal(ReindexOutcome.Unchanged, entry.Outcome)
+        );
+    }
+
+    [Fact]
+    public void FileReachedThroughALinkIsRefused()
+    {
+        using TestInstance fixture = new TestInstance();
+        string outside = Path.Combine(
+            TestInstance.TempRoot,
+            "sermofur-outside-" + Guid.NewGuid().ToString("N")
+        );
+        Directory.CreateDirectory(outside);
+        File.WriteAllText(Path.Combine(outside, "secret.md"), "hors instance");
+        string link = Path.Combine(fixture.Root, "linked");
+        try
+        {
+            InstanceTests.CreateDirectoryLink(link, outside);
+            using SqliteStore store = fixture.Open();
+            Assert.Equal(
+                "unsafe_path",
+                Refusal(() =>
+                    fixture.Sources(store).Add(Path.Combine(link, "secret.md"), TestInstance.User)
+                )
+            );
+            Assert.Empty(fixture.Sources(store).List());
+        }
+        finally
+        {
+            if (new DirectoryInfo(link).LinkTarget is not null)
+            {
+                TestInstance.DeleteDirectoryLink(link);
+            }
+            Directory.Delete(outside, true);
+        }
     }
 
     private static string Refusal(Action action) => Assert.Throws<SermofurException>(action).Code;

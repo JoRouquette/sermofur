@@ -48,9 +48,9 @@ internal sealed class SqliteTokenizer(SqliteConnection connection) : ITokenizer
             return;
         }
         Execute(
-            """
+            $"""
             CREATE VIRTUAL TABLE IF NOT EXISTS temp.tokenizer USING fts5(text,
-                tokenize='unicode61 remove_diacritics 2');
+                tokenize='{SqliteSchema.SearchTokenizer}');
             CREATE VIRTUAL TABLE IF NOT EXISTS temp.tokenizer_terms USING fts5vocab(temp, tokenizer, instance);
             """
         );

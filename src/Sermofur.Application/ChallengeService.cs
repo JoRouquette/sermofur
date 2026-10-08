@@ -161,14 +161,7 @@ public sealed class ChallengeService(MemoryService memory, RecallService recall)
         );
     }
 
+    /// <summary>Same naming as the JSON output of the enumerations.</summary>
     private static string Snake(EvidenceKind kind) =>
-        string.Concat(
-            kind.ToString()
-                .Select(
-                    (c, i) =>
-                        i > 0 && char.IsUpper(c)
-                            ? "_" + char.ToLowerInvariant(c)
-                            : char.ToLowerInvariant(c).ToString()
-                )
-        );
+        System.Text.Json.JsonNamingPolicy.SnakeCaseLower.ConvertName(kind.ToString());
 }

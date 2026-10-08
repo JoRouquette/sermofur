@@ -24,6 +24,9 @@ created by 0.1 must keep every object, its history, its idempotency keys and its
   migration that `migrate` completes.
 - Evidence payloads are not rewritten: a format 1 payload reads as supporting evidence that cites
   no source.
+- Concurrency: the version is read again under the IMMEDIATE lock, so two concurrent `migrate`
+  never both rebuild the database. The consistency check and the backup run just before that
+  lock: no other version of `smf` must write to the instance while it migrates.
 
 ## Alternatives
 Automatic migration on the first write: rejected by the maintainer, a read could then change the

@@ -83,7 +83,10 @@ delivered yet (daemon, laya, model, mcp) are reported as warnings.
   outside the instance or in `.sermofur` refused; idempotent add; reindex reporting unchanged,
   modified (previous hash in history), missing and restored, with the index following; reindex
   reading only the declared sources of the current scope; evidence freezing the source hash;
-  index rebuild after a desynchronized index; a FIFO refused (Linux and macOS).
+  index rebuild after a desynchronized index, reading every source again with history and
+  counting visible objects only; a source of an ancestor moved to a scope created on its folder;
+  paths compared like the file system (case on Unix); a file reached through a link refused; a
+  FIFO refused without blocking (Linux and macOS).
 - Recall (ADR 0013): at most 3 explained results in a stable order; content added to a sibling
   scope changes neither presence, order nor score of visible results; invalidated claims never
   first, counted as excluded; best passage and freshness of sources; query syntax treated as text;
@@ -95,7 +98,9 @@ delivered yet (daemon, laya, model, mcp) are reported as warnings.
   another client answering like an unknown one.
 - Owner (ADR 0014): an entry of another account refused at discovery and named by doctor, own
   entries recognized, `instance.json` over 64 KiB damaged; on Linux and macOS a real entry owned by
-  root through passwordless sudo (fails if sudo is not available).
+  root through passwordless sudo, owner and group changed separately (fails if sudo is not
+  available); on an elevated Windows session, an entry owned by SYSTEM refused and one owned by
+  Administrators accepted.
 - Properties (FsCheck): mapping normalization stays inside the root, is stable and portable
   across separators; the command-line grammar keeps every argument after `--` positional and never
   takes an option value starting with `--`.
@@ -104,11 +109,12 @@ delivered yet (daemon, laya, model, mcp) are reported as warnings.
 
 Reference measure of the spec (SC-004), `RecallPerformanceTests`, run with
 `SERMOFUR_PERFORMANCE=1 dotnet test -c Release --filter Category=Performance`: 10,000 claims and
-RETEX plus 1,000 sources of about 20 KiB (11,000 objects, 20,000 indexed passages), 30 questions of
-three frequent terms, read-only store. On 2026-10-08, Windows 11, Intel Core i7-1255U, 32 GB:
-**p50 329 ms, p95 411 ms, max 420 ms**, under the 1 s ceiling of the spec. The 300 ms p95 target
-set by the 0.1 plan is not reached: about half of the time goes to reading the term frequencies
-of the vocabulary table, the rest to the visible passages and the object summaries.
+RETEX (half of the claims with evidence, some of it contradicting) plus 1,000 sources of about
+20 KiB (11,000 objects, 20,000 indexed passages), 30 questions of three frequent terms, each on a
+newly opened read-only store, as a CLI command does. On 2026-10-08, Windows 11, Intel Core
+i7-1255U, 32 GB: **p50 417 ms, p95 569 ms, max 587 ms**, under the 1 s ceiling of the spec. The
+300 ms p95 target set by the 0.1 plan is not reached: most of the time goes to reading the term
+frequencies of the vocabulary table and the visible passages.
 
 ## Known limits
 
@@ -122,13 +128,13 @@ of the vocabulary table, the rest to the visible passages and the object summari
   `instance.json`; any other entry blocks Sermofur below it. The unreadable case is tested on
   Windows only. Mappings are compared lexically (no canonicalization of case, 8.3 aliases or
   Unicode normalization). The owner check is verified on Windows, Linux x64 and macOS arm64;
-macOS x64 is not.
+  macOS x64 is not.
 - On Unix, the publishing rename of `init` does not detect an empty `.sermofur` created in the
   instant before it; this race is not tested.
 - A mapped network drive is refused by the code but this was not tested, for lack of such a
   drive.
 - Not delivered, hence not verified: MCP protocol, Laya inference, daemon IPC, UI, self-contained
   installer, consolidation, semantic similarity. No power loss was simulated.
-- Recall performance (SC-004) is a reference measure, not a guarantee: see below. It runs only
+- Recall performance (SC-004) is a reference measure, not a guarantee: see [Recall performance](#recall-performance). It runs only
   with `SERMOFUR_PERFORMANCE=1` and is not part of the CI.
 - The tool package requires the .NET 10 runtime.

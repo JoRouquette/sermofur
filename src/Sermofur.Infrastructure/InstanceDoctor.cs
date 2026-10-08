@@ -44,7 +44,7 @@ public sealed class InstanceDoctor(IFileOwnership? ownership = null)
             InspectStorage(store, checks);
             IReadOnlyList<Scope> scopes = InspectScopes(root, store, checks);
             InspectMemory(root, store, scopes, checks);
-            InspectSearchIndex(store, checks);
+            InspectSearchIndex(store, scopes, checks);
             checks.Add(
                 new(
                     "sqlite",
@@ -111,27 +111,63 @@ public sealed class InstanceDoctor(IFileOwnership? ownership = null)
     /// The full-text index must hold exactly the indexable objects of the registry: claims,
     /// RETEX and indexed sources. Compared as sets of identifiers, without repairing anything.
     /// </summary>
-    private static void InspectSearchIndex(SqliteStore store, List<DiagnosticCheck> checks)
+    private static void InspectSearchIndex(
+        SqliteStore store,
+        IReadOnlyList<Scope> scopes,
+        List<DiagnosticCheck> checks
+    )
     {
         bool fts5 =
             Convert.ToInt64(store.Scalar("SELECT sqlite_compileoption_used('ENABLE_FTS5')")) == 1;
         checks.Add(new("fts5", fts5 ? "ok" : "error", "SQLite full-text search engine."));
-        HashSet<string> indexed = store
-            .QueryStrings("SELECT DISTINCT object_id FROM search")
-            .ToHashSet(StringComparer.Ordinal);
-        HashSet<string> expected = store
+        MemoryRecord[] records = store
             .QueryStrings("SELECT payload FROM records WHERE kind IN ('Claim','Retex','Source')")
             .Select(RecordJson.Read<MemoryRecord>)
-            .Where(SearchExpectations.IsIndexed)
-            .Select(record => record.Id.ToString())
+            .ToArray();
+        // Identity, scope and kind of each indexed object must match the registry: the
+        // visibility filter of recall relies on the scope column of the index.
+        HashSet<string> indexed = store
+            .QueryStrings("SELECT DISTINCT object_id, scope_id, kind FROM search")
             .ToHashSet(StringComparer.Ordinal);
-        int missing = expected.Count(id => !indexed.Contains(id));
-        int extra = indexed.Count(id => !expected.Contains(id));
+        HashSet<string> expected = records
+            .Where(SearchExpectations.IsIndexed)
+            .Select(record =>
+                $"{record.Id}|{record.ScopeId}|{SqliteSearchIndex.KindOf(record.Kind)}"
+            )
+            .ToHashSet(StringComparer.Ordinal);
+        int missing = expected.Count(entry => !indexed.Contains(entry));
+        int extra = indexed.Count(entry => !expected.Contains(entry));
         checks.Add(
             new(
                 "search_index",
                 missing + extra == 0 ? "ok" : "error",
-                $"{missing} objects missing from the index, {extra} entries without object; run index rebuild."
+                $"{missing} objects missing from the index or misplaced, {extra} entries without object; run index rebuild."
+            )
+        );
+        // A source must belong to the narrowest scope that holds its file (FR-002).
+        int misplaced = records
+            .Where(record => record.Kind == RecordKind.Source)
+            .Count(source =>
+            {
+                string path = RecordJson.Read<SourceContent>(source.ContentJson).RelativePath;
+                return scopes.Any(scope =>
+                    scope.Id != source.ScopeId
+                    && scope.RelativePath is not null
+                    && ScopePolicy.VisibleAncestors(scope.Id, scopes).Contains(source.ScopeId)
+                    && (
+                        string.Equals(path, scope.RelativePath.TrimEnd('/'), LocalPaths.Comparison)
+                        || path.StartsWith(
+                            scope.RelativePath.TrimEnd('/') + "/",
+                            LocalPaths.Comparison
+                        )
+                    )
+                );
+            });
+        checks.Add(
+            new(
+                "source_scopes",
+                misplaced == 0 ? "ok" : "error",
+                $"{misplaced} sources attached to a broader scope than their file."
             )
         );
     }

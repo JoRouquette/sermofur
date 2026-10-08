@@ -8,8 +8,9 @@ using Xunit.Abstractions;
 namespace Sermofur.Tests;
 
 /// <summary>
-/// Reference measure of SC-004: 10,000 claims and RETEX plus 1,000 sources of 20 KiB, recall
-/// p95 measured over 30 questions. The data is inserted in bulk through the same index writer
+/// Reference measure of SC-004: 10,000 claims and RETEX (half of the claims with evidence, a
+/// quarter of it contradicting) plus 1,000 sources of 20 KiB, recall p95 measured over 30
+/// questions, each on a newly opened store, as a CLI command does. The data is inserted in bulk through the same index writer
 /// as the store, without projections, to keep the setup short.
 /// </summary>
 public class RecallPerformanceTests(ITestOutputHelper output)
@@ -48,16 +49,14 @@ public class RecallPerformanceTests(ITestOutputHelper output)
     {
         using TestInstance fixture = new TestInstance();
         Seed(fixture.Root);
-        using SqliteStore store = fixture.Open(readOnly: true);
-        RecallService recall = fixture.Recall(store);
-        recall.Recall("cache"); // warm-up: connection, temporary tokenizer tables
         Random random = new Random(42);
         List<double> timings = new List<double>();
         for (int index = 0; index < 30; index++)
         {
             string question = $"{Pick(random)} {Pick(random)} {Pick(random)}";
             Stopwatch watch = Stopwatch.StartNew();
-            RecallAnswer answer = recall.Recall(question);
+            using SqliteStore store = fixture.Open(readOnly: true);
+            RecallAnswer answer = fixture.Recall(store).Recall(question);
             watch.Stop();
             timings.Add(watch.Elapsed.TotalMilliseconds);
             Assert.InRange(answer.Results.Count, 1, RecallService.MaxResults);
@@ -97,6 +96,29 @@ public class RecallPerformanceTests(ITestOutputHelper output)
                 user
             );
             Insert(connection, transaction, record);
+            if (claim && index % 2 == 1)
+            {
+                EvidenceRelation relation =
+                    index % 8 == 1 ? EvidenceRelation.Contradicts : EvidenceRelation.Supports;
+                MemoryRecord evidence = new MemoryRecord(
+                    Guid.NewGuid(),
+                    "workspace",
+                    RecordKind.Evidence,
+                    KnowledgeStatus.Proposed,
+                    1,
+                    RecordJson.Write(
+                        new EvidenceContent(
+                            record.Id,
+                            EvidenceKind.SourceCode,
+                            "src/file.cs",
+                            $"origin{index % 50}",
+                            relation
+                        )
+                    ),
+                    user
+                );
+                Insert(connection, transaction, evidence, claimId: record.Id);
+            }
             SqliteSearchIndex.Insert(
                 connection,
                 transaction,
@@ -159,18 +181,20 @@ public class RecallPerformanceTests(ITestOutputHelper output)
         SqliteConnection connection,
         SqliteTransaction transaction,
         MemoryRecord record,
-        string? path = null
+        string? path = null,
+        Guid? claimId = null
     )
     {
         using SqliteCommand command = connection.CreateCommand();
         command.Transaction = transaction;
         command.CommandText =
-            "INSERT INTO records(id,scope_id,kind,claim_id,payload,revision,source_path) VALUES($id,$scope,$kind,NULL,$payload,1,$path)";
+            "INSERT INTO records(id,scope_id,kind,claim_id,payload,revision,source_path) VALUES($id,$scope,$kind,$claim,$payload,1,$path)";
         command.Parameters.AddWithValue("$id", record.Id.ToString());
         command.Parameters.AddWithValue("$scope", record.ScopeId);
         command.Parameters.AddWithValue("$kind", record.Kind.ToString());
         command.Parameters.AddWithValue("$payload", RecordJson.Write(record));
         command.Parameters.AddWithValue("$path", (object?)path ?? DBNull.Value);
+        command.Parameters.AddWithValue("$claim", (object?)claimId?.ToString() ?? DBNull.Value);
         command.ExecuteNonQuery();
     }
 }

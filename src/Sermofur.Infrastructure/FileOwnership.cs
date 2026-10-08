@@ -34,6 +34,15 @@ public sealed class FileOwnership : IFileOwnership
     private const int NoSuchEntry = 2;
     private const int NotADirectory = 20;
 
+    // struct statx (linux/stat.h): stx_uid (__u32) at 20, stx_mode (__u16) at 28.
+    private const int StatxUidOffset = 20;
+    private const int StatxModeOffset = 28;
+
+    // struct stat with 64-bit inodes (Darwin sys/stat.h): st_mode (mode_t, 16 bits) at 4,
+    // st_uid (uid_t) at 16.
+    private const int DarwinStatModeOffset = 4;
+    private const int DarwinStatUidOffset = 16;
+
     public EntryStatus? Inspect(string path)
     {
         if (OperatingSystem.IsWindows())
@@ -94,9 +103,24 @@ public sealed class FileOwnership : IFileOwnership
     private static EntryStatus? InspectUnix(string path, bool linux)
     {
         byte[] buffer = new byte[256];
-        int result = linux
-            ? Statx(AtCurrentDirectory, path, AtSymlinkNoFollow, StatxTypeModeUid, buffer)
-            : MacLstat(path, buffer);
+        int result;
+        uint currentUser;
+        try
+        {
+            result = linux
+                ? Statx(AtCurrentDirectory, path, AtSymlinkNoFollow, StatxTypeModeUid, buffer)
+                : MacLstat(path, buffer);
+            currentUser = GetEffectiveUserId();
+        }
+        catch (Exception exception)
+            when (exception is DllNotFoundException or EntryPointNotFoundException)
+        {
+            // musl or a glibc older than 2.28: the owner cannot be read, so it is not trusted.
+            throw new IOException(
+                "File owner unavailable on this C library (glibc 2.28+ required).",
+                exception
+            );
+        }
         if (result != 0)
         {
             int error = Marshal.GetLastPInvokeError();
@@ -106,12 +130,12 @@ public sealed class FileOwnership : IFileOwnership
             }
             throw new IOException($"Cannot read the status of an entry (errno {error}).");
         }
-        uint owner = BitConverter.ToUInt32(buffer, linux ? 20 : 16);
-        uint mode = BitConverter.ToUInt16(buffer, linux ? 28 : 4);
+        uint owner = BitConverter.ToUInt32(buffer, linux ? StatxUidOffset : DarwinStatUidOffset);
+        uint mode = BitConverter.ToUInt16(buffer, linux ? StatxModeOffset : DarwinStatModeOffset);
         return new EntryStatus(
             (mode & TypeMask) == RegularFile,
             (mode & TypeMask) == DirectoryType,
-            owner == GetEffectiveUserId()
+            owner == currentUser
         );
     }
 

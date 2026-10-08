@@ -178,64 +178,16 @@ public sealed class SqliteStore : IMemoryStore, ISearchIndex, IDisposable
     }
 
     /// <summary>
-    /// Rebuilds the whole search index in one transaction: claims and RETEX from the registry,
-    /// indexed sources from their files when the file still has the recorded hash. A source whose
-    /// file changed stays out of the index: it needs <c>source reindex</c> from its scope, which
-    /// records the change in its history. Counts are restricted to <paramref name="visible"/>.
+    /// Empties the search index and indexes again every claim and RETEX, in one transaction.
+    /// Sources are indexed back by <see cref="SaveSource"/> with <c>reindex</c>, after their
+    /// files were read outside any write transaction.
     /// </summary>
-    public IndexRebuild RebuildIndex(
-        ISourceReader reader,
-        string root,
-        IReadOnlySet<string> visible
-    )
+    public void ResetIndex()
     {
         using SqliteTransaction transaction = connection.BeginTransaction(deferred: false);
-        using (SqliteCommand clear = connection.CreateCommand())
-        {
-            clear.Transaction = transaction;
-            clear.CommandText = "DELETE FROM search";
-            clear.ExecuteNonQuery();
-        }
+        SqliteSearchIndex.Clear(connection, transaction);
         SqliteSearchIndex.IndexRecords(connection, transaction);
-        List<MemoryRecord> sources = new List<MemoryRecord>();
-        using (SqliteCommand read = connection.CreateCommand())
-        {
-            read.Transaction = transaction;
-            read.CommandText = "SELECT payload FROM records WHERE kind='Source' ORDER BY id";
-            using SqliteDataReader rows = read.ExecuteReader();
-            while (rows.Read())
-            {
-                sources.Add(RecordJson.Read<MemoryRecord>(rows.GetString(0)));
-            }
-        }
-        int stale = 0;
-        foreach (MemoryRecord source in sources)
-        {
-            SourceContent content = RecordJson.Read<SourceContent>(source.ContentJson);
-            if (content.Status != SourceStatus.Indexed)
-            {
-                continue;
-            }
-            SourceSnapshot snapshot = reader.Read(root, content.RelativePath);
-            if (snapshot.Status == SourceStatus.Indexed && snapshot.Hash == content.Hash)
-            {
-                SqliteSearchIndex.Insert(
-                    connection,
-                    transaction,
-                    source.Id,
-                    source.ScopeId,
-                    RecordKind.Source,
-                    snapshot.Passages
-                );
-            }
-            else if (visible.Contains(source.ScopeId))
-            {
-                stale++;
-            }
-        }
         transaction.Commit();
-        int objects = ReadRecords(visible).Count(SearchExpectations.IsIndexed);
-        return new IndexRebuild(objects - stale, stale);
     }
 
     private static string Parameters(
@@ -344,7 +296,85 @@ public sealed class SqliteStore : IMemoryStore, ISearchIndex, IDisposable
         command.Parameters.AddWithValue("$parent", (object?)scope.ParentId ?? DBNull.Value);
         command.Parameters.AddWithValue("$path", (object?)scope.RelativePath ?? DBNull.Value);
         command.ExecuteNonQuery();
+        IReadOnlyList<MemoryRecord> moved = RescopeSources(
+            scope,
+            scopes.Append(scope).ToArray(),
+            transaction
+        );
         transaction.Commit();
+        foreach (MemoryRecord source in moved)
+        {
+            Project(source);
+        }
+    }
+
+    /// <summary>
+    /// A source belongs to the narrowest scope that holds its file (FR-002). Sources of an
+    /// ancestor whose file lies under the new scope's mapping move to the new scope, in the same
+    /// transaction, so that they never stay visible to the new scope's siblings.
+    /// </summary>
+    private List<MemoryRecord> RescopeSources(
+        Scope scope,
+        IReadOnlyList<Scope> scopes,
+        SqliteTransaction transaction
+    )
+    {
+        List<MemoryRecord> moved = new List<MemoryRecord>();
+        if (scope.RelativePath is null)
+        {
+            return moved;
+        }
+        string mapping = scope.RelativePath.TrimEnd('/');
+        IReadOnlySet<string> ancestors = ScopePolicy.VisibleAncestors(scope.Id, scopes);
+        List<MemoryRecord> sources = new List<MemoryRecord>();
+        using (SqliteCommand read = connection.CreateCommand())
+        {
+            read.Transaction = transaction;
+            read.CommandText = "SELECT payload FROM records WHERE kind='Source'";
+            using SqliteDataReader reader = read.ExecuteReader();
+            while (reader.Read())
+            {
+                sources.Add(RecordJson.Read<MemoryRecord>(reader.GetString(0)));
+            }
+        }
+        foreach (
+            MemoryRecord source in sources.Where(s =>
+                s.ScopeId != scope.Id && ancestors.Contains(s.ScopeId)
+            )
+        )
+        {
+            string path = RecordJson.Read<SourceContent>(source.ContentJson).RelativePath;
+            if (
+                !string.Equals(path, mapping, LocalPaths.Comparison)
+                && !path.StartsWith(mapping + "/", LocalPaths.Comparison)
+            )
+            {
+                continue;
+            }
+            MemoryRecord next = source with { ScopeId = scope.Id, Revision = source.Revision + 1 };
+            using (SqliteCommand update = connection.CreateCommand())
+            {
+                update.Transaction = transaction;
+                update.CommandText =
+                    "UPDATE records SET scope_id=$scope,payload=$payload,revision=$revision WHERE id=$id";
+                update.Parameters.AddWithValue("$scope", scope.Id);
+                update.Parameters.AddWithValue("$payload", RecordJson.Write(next));
+                update.Parameters.AddWithValue("$revision", next.Revision);
+                update.Parameters.AddWithValue("$id", source.Id.ToString());
+                update.ExecuteNonQuery();
+            }
+            using (SqliteCommand index = connection.CreateCommand())
+            {
+                index.Transaction = transaction;
+                index.CommandText = "UPDATE search SET scope_id=$scope WHERE object_id=$id";
+                index.Parameters.AddWithValue("$scope", scope.Id);
+                index.Parameters.AddWithValue("$id", source.Id.ToString());
+                index.ExecuteNonQuery();
+            }
+            AppendHistory(source, next, $"rescoped to {scope.Id}", "sermofur", transaction);
+            moved.Add(next);
+        }
+        return moved;
     }
 
     private SqliteCommand VisibleCommand(IReadOnlySet<string> visible, string suffix = "")
@@ -644,7 +674,8 @@ public sealed class SqliteStore : IMemoryStore, ISearchIndex, IDisposable
     public MemoryRecord? SaveSource(
         string relativePath,
         Func<MemoryRecord?, SourceChange?> decide,
-        IReadOnlyList<SearchDocument> passages
+        IReadOnlyList<SearchDocument> passages,
+        bool reindex = false
     )
     {
         using SqliteTransaction transaction = connection.BeginTransaction(deferred: false);
@@ -652,6 +683,10 @@ public sealed class SqliteStore : IMemoryStore, ISearchIndex, IDisposable
         SourceChange? change = decide(previous);
         if (change is null)
         {
+            if (reindex && previous is not null)
+            {
+                ReplaceSourceEntries(previous, passages, transaction);
+            }
             transaction.Commit();
             return previous;
         }
@@ -677,22 +712,32 @@ public sealed class SqliteStore : IMemoryStore, ISearchIndex, IDisposable
                 );
             }
         }
-        SqliteSearchIndex.Remove(connection, transaction, next.Id);
-        if (RecordJson.Read<SourceContent>(next.ContentJson).Status == SourceStatus.Indexed)
-        {
-            SqliteSearchIndex.Insert(
-                connection,
-                transaction,
-                next.Id,
-                next.ScopeId,
-                RecordKind.Source,
-                passages
-            );
-        }
+        ReplaceSourceEntries(next, passages, transaction);
         AppendHistory(previous, next, change.Reason, change.Actor, transaction);
         transaction.Commit();
         Project(next);
         return next;
+    }
+
+    /// <summary>The index holds the passages of a source exactly when it is indexed.</summary>
+    private void ReplaceSourceEntries(
+        MemoryRecord source,
+        IReadOnlyList<SearchDocument> passages,
+        SqliteTransaction transaction
+    )
+    {
+        SqliteSearchIndex.Remove(connection, transaction, source.Id);
+        if (RecordJson.Read<SourceContent>(source.ContentJson).Status == SourceStatus.Indexed)
+        {
+            SqliteSearchIndex.Insert(
+                connection,
+                transaction,
+                source.Id,
+                source.ScopeId,
+                RecordKind.Source,
+                passages
+            );
+        }
     }
 
     private MemoryRecord? FindSourceByPath(string relativePath, SqliteTransaction transaction)
@@ -700,7 +745,10 @@ public sealed class SqliteStore : IMemoryStore, ISearchIndex, IDisposable
         using SqliteCommand command = connection.CreateCommand();
         command.Transaction = transaction;
         command.CommandText =
-            "SELECT payload FROM records WHERE kind='Source' AND source_path=$path";
+            // Paths compare like the file system: without case on Windows, exactly elsewhere.
+            OperatingSystem.IsWindows()
+                ? "SELECT payload FROM records WHERE kind='Source' AND source_path=$path COLLATE NOCASE"
+                : "SELECT payload FROM records WHERE kind='Source' AND source_path=$path";
         command.Parameters.AddWithValue("$path", relativePath);
         return command.ExecuteScalar() is string payload
             ? RecordJson.Read<MemoryRecord>(payload)
