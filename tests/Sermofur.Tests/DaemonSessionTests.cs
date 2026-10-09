@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 using Sermofur.Cli;
@@ -29,7 +30,9 @@ public class DaemonSessionTests
         Task stopped = daemon.StopAsync();
         await Task.Delay(200);
         Assert.False(stopped.IsCompleted);
-        // The endpoint is closed during the drain: a new client finds no daemon.
+        // The endpoint is closed during the drain: a new client finds no daemon, at once (well
+        // under its one-second connect timeout, on Windows too).
+        Stopwatch refused = Stopwatch.StartNew();
         Assert.Null(
             await DaemonClient.ConnectAsync(
                 daemon.Paths,
@@ -40,6 +43,7 @@ public class DaemonSessionTests
                 CancellationToken.None
             )
         );
+        Assert.True(refused.ElapsedMilliseconds < 500, $"{refused.ElapsedMilliseconds} ms");
         release.Set();
         IpcMessage answer = await write.WaitAsync(TimeSpan.FromSeconds(10));
         Assert.Equal(

@@ -9,8 +9,13 @@ namespace Sermofur.Daemon.Services;
 /// task. The task runs the supervisor, which restarts the daemon within a second; the task
 /// scheduler itself only restarts the supervisor, after a minute.
 /// </summary>
-public sealed class WindowsScheduledTask(IProcessRunner runner, string userId, string workDirectory)
-    : IServiceManager
+/// <param name="resolve">Finds a system tool by name; the system folder by default.</param>
+public sealed class WindowsScheduledTask(
+    IProcessRunner runner,
+    string userId,
+    string workDirectory,
+    Func<string, string?>? resolve = null
+) : IServiceManager
 {
     public const string TaskName = @"Sermofur\Daemon";
 
@@ -23,7 +28,10 @@ public sealed class WindowsScheduledTask(IProcessRunner runner, string userId, s
             paths.StateDirectory
         );
 
-    public string? Unavailable() => null;
+    public string? Unavailable() =>
+        (resolve ?? (name => SystemTool.Resolve(name, null)))("schtasks") is null
+            ? "schtasks.exe is not in the system folder of Windows."
+            : null;
 
     public ServiceStatus Query()
     {
@@ -47,7 +55,7 @@ public sealed class WindowsScheduledTask(IProcessRunner runner, string userId, s
         return new ServiceStatus(query.Succeeded, running);
     }
 
-    public void Install(ServiceDefinition definition)
+    public void Install(ServiceDefinition definition, ServiceDefinition? previous)
     {
         Validate(definition);
         Directory.CreateDirectory(workDirectory);
@@ -72,7 +80,7 @@ public sealed class WindowsScheduledTask(IProcessRunner runner, string userId, s
             ProcessOutcome started = runner.Run("schtasks", "/Run", "/TN", TaskName);
             if (!started.Succeeded)
             {
-                runner.Run("schtasks", "/Delete", "/TN", TaskName, "/F");
+                Restore(previous, file);
                 throw ServiceErrors.Failed("schtasks /Run", started);
             }
         }
@@ -80,6 +88,25 @@ public sealed class WindowsScheduledTask(IProcessRunner runner, string userId, s
         {
             File.Delete(file);
         }
+    }
+
+    /// <summary>
+    /// /Create /F replaced the task: registers the previous one again, rebuilt from its definition
+    /// (never from the text schtasks prints, whose encoding depends on the console), without
+    /// starting it. With no previous definition, or if it cannot be registered, the new task is
+    /// removed.
+    /// </summary>
+    private void Restore(ServiceDefinition? previous, string file)
+    {
+        if (previous is not null)
+        {
+            File.WriteAllText(file, TaskXml(previous, userId), Encoding.Unicode);
+            if (runner.Run("schtasks", "/Create", "/TN", TaskName, "/XML", file, "/F").Succeeded)
+            {
+                return;
+            }
+        }
+        runner.Run("schtasks", "/Delete", "/TN", TaskName, "/F");
     }
 
     public void Validate(ServiceDefinition definition)

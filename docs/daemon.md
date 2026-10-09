@@ -39,14 +39,18 @@ These always run in the CLI itself: `smf daemon …`, `smf mcp …`, `init`, `do
 `--version`; the daemon refuses them from any client (`cli_only`). Commands for an instance that
 is not registered run directly.
 
-If the daemon stops while it runs a command (crash, or a command still running when the shutdown
-delay ends), a read runs
-again directly; a write is never run twice: the CLI reports `daemon_interrupted`, and you check
-its result before running it again. A shutdown lets commands already started finish and answer
-(65 s at most); a write still waiting for its turn gets `daemon_stopping` and did not start.
-Meanwhile the endpoint is closed and new commands run directly. `smf daemon stop`, `restart`,
-`install` and `uninstall` wait for the daemon to exit (75 s at most) before they call the service
-manager, and systemd and launchd give it as long before forcing it.
+If the daemon stops while it runs a command (crash, a Windows task ended outside `smf`, or a
+command still running when the shutdown delay ends), a read runs again directly; a write is never
+run twice: the CLI reports `daemon_interrupted`, and you check its result before running it
+again. A shutdown lets commands already started finish and answer (65 s at most); a write still
+waiting for its turn gets `daemon_stopping` and did not start. Meanwhile new commands find no
+daemon at once and run directly: on Linux and macOS the socket is removed; on Windows the pipe
+stays listed but closes every new connection. `smf daemon stop`, `restart`, `install` and
+`uninstall` wait for the daemon to exit (75 s at most) before they call the service manager, and
+systemd and launchd give it as long before forcing it. After a second of waiting they say so on
+stderr, and they warn when the delay runs out; with `--json`, stderr keeps only the JSON error. A
+daemon that has just started and does not listen yet receives the stop request again until it
+answers.
 
 | Command | Effect |
 |---|---|
@@ -54,7 +58,7 @@ manager, and systemd and launchd give it as long before forcing it.
 | `smf daemon start` / `stop` / `restart` | Pilots the installed service |
 | `smf daemon register` / `unregister` | Adds or removes the instance found from the folder (or `--path`) |
 | `smf daemon instances` | Registered instances; `missing` for one no longer found |
-| `smf daemon run [--supervise]` | Serves in the foreground, until Ctrl+C |
+| `smf daemon run [--supervise]` | Serves in the foreground; the first Ctrl+C finishes the running commands, a second one stops at once |
 | `smf daemon uninstall` | Stops and removes the service; instances, backups and registry are kept |
 
 `smf doctor` reports the daemon: `ok` when it runs with your version, `warning` when it is absent
@@ -118,7 +122,7 @@ agent on Linux and macOS, through the supervisor on Windows. A different `PATH` 
 | `cli_only` | 3 | A client sent the daemon a command that runs only in the CLI |
 | `daemon_already_running` | 3 | `smf daemon run` while a daemon already serves you |
 | `service_manager_unavailable` | 3 | No service manager in the session |
-| `service_install_failed` | 3 | The service manager refused the service, or a value cannot go into its definition; previous state restored |
+| `service_install_failed` | 3 | The service manager refused the service, or a value cannot go into its definition; previous state restored: the previous registration is put back (on Windows, the previous task is rebuilt from its definition) and the previous daemon is started again if it was running (launchd starts it as it loads it) |
 | `foreign_endpoint` | 4 | The endpoint or its folder belongs to another account or is not private |
 | `invalid_registry` | 3 | Registry unreadable, too large or malformed; left untouched |
 | `not_registered` | 1 | `unregister` of an instance that is not in the registry |

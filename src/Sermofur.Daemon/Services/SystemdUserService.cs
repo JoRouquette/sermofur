@@ -41,7 +41,8 @@ public sealed class SystemdUserService(IProcessRunner runner, string unitDirecto
             runner.Run("systemctl", "--user", "is-active", UnitName).Output.Trim() == "active"
         );
 
-    public void Install(ServiceDefinition definition)
+    // The previous unit or agent file is kept on disk and restored as is.
+    public void Install(ServiceDefinition definition, ServiceDefinition? previousDefinition)
     {
         string? previous = File.Exists(UnitFile) ? File.ReadAllText(UnitFile) : null;
         Directory.CreateDirectory(unitDirectory);
@@ -115,7 +116,7 @@ public sealed class SystemdUserService(IProcessRunner runner, string unitDirecto
         }
         unit.Append("Restart=on-failure\nRestartSec=1\n");
         // Time for the daemon to drain its started commands before systemd forces it.
-        unit.Append($"TimeoutStopSec={(int)DaemonLimits.StopTimeout.TotalSeconds}\n\n");
+        unit.Append($"TimeoutStopSec={(int)DaemonLimits.Default.StopTimeout.TotalSeconds}\n\n");
         unit.Append("[Install]\nWantedBy=default.target\n");
         return unit.ToString();
     }

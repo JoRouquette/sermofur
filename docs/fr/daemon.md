@@ -40,14 +40,19 @@ Celles-ci s'exécutent toujours dans la CLI elle-même : `smf daemon …`, `smf 
 `doctor`, `--help`, `--version` ; le daemon les refuse, quel que soit le client (`cli_only`). Les
 commandes pour une instance non enregistrée s'exécutent directement.
 
-Si le daemon s'arrête pendant une commande (plantage, ou commande encore en cours à la fin du
-délai d'arrêt), une lecture est relancée directement ; une écriture n'est jamais exécutée deux fois : la CLI signale
-`daemon_interrupted`, et vous vérifiez son résultat avant de la relancer. Un arrêt laisse les
-commandes déjà commencées se terminer et répondre (65 s au plus) ; une écriture qui attendait
-encore son tour reçoit `daemon_stopping` et n'a pas commencé. Pendant ce temps, le point de
-connexion est fermé et les nouvelles commandes s'exécutent directement. `smf daemon stop`,
-`restart`, `install` et `uninstall` attendent la fin du daemon (75 s au plus) avant d'appeler le
-gestionnaire de services, et systemd comme launchd lui laissent autant avant de le forcer.
+Si le daemon s'arrête pendant une commande (plantage, tâche Windows arrêtée hors de `smf`, ou
+commande encore en cours à la fin du délai d'arrêt), une lecture est relancée directement ; une
+écriture n'est jamais exécutée deux fois : la CLI signale `daemon_interrupted`, et vous vérifiez
+son résultat avant de la relancer. Un arrêt laisse les commandes déjà commencées se terminer et
+répondre (65 s au plus) ; une écriture qui attendait encore son tour reçoit `daemon_stopping` et
+n'a pas commencé. Pendant ce temps, les nouvelles commandes ne trouvent aussitôt aucun daemon et
+s'exécutent directement : sous Linux et macOS le socket est supprimé ; sous Windows le pipe reste
+listé mais ferme toute nouvelle connexion. `smf daemon stop`, `restart`, `install` et `uninstall`
+attendent la fin du daemon (75 s au plus) avant d'appeler le gestionnaire de services, et systemd
+comme launchd lui laissent autant avant de le forcer. Au bout d'une seconde d'attente, elles le
+signalent sur stderr, et elles avertissent quand le délai est écoulé ; avec `--json`, stderr ne
+garde que l'erreur JSON. Un daemon qui vient de démarrer et n'écoute pas encore reçoit de nouveau
+la demande d'arrêt jusqu'à ce qu'il réponde.
 
 | Commande | Effet |
 |---|---|
@@ -55,7 +60,7 @@ gestionnaire de services, et systemd comme launchd lui laissent autant avant de 
 | `smf daemon start` / `stop` / `restart` | Pilote le service installé |
 | `smf daemon register` / `unregister` | Ajoute ou retire l'instance trouvée depuis le dossier (ou `--path`) |
 | `smf daemon instances` | Instances enregistrées ; `missing` pour une instance introuvable |
-| `smf daemon run [--supervise]` | Sert au premier plan, jusqu'à Ctrl+C |
+| `smf daemon run [--supervise]` | Sert au premier plan ; un premier Ctrl+C laisse finir les commandes en cours, un second arrête tout de suite |
 | `smf daemon uninstall` | Arrête et retire le service ; instances, sauvegardes et registre sont conservés |
 
 `smf doctor` signale le daemon : `ok` quand il tourne avec votre version, `warning` quand il est
@@ -122,7 +127,7 @@ ou l'agent sous Linux et macOS, par le superviseur sous Windows. Un `PATH` diff�
 | `cli_only` | 3 | Un client a envoyé au daemon une commande réservée à la CLI |
 | `daemon_already_running` | 3 | `smf daemon run` alors qu'un daemon vous sert déjà |
 | `service_manager_unavailable` | 3 | Aucun gestionnaire de services dans la session |
-| `service_install_failed` | 3 | Le gestionnaire de services a refusé le service, ou une valeur ne peut pas entrer dans sa définition ; état précédent restauré |
+| `service_install_failed` | 3 | Le gestionnaire de services a refusé le service, ou une valeur ne peut pas entrer dans sa définition ; état précédent restauré : l'enregistrement précédent est remis en place (sous Windows, la tâche précédente est reconstruite depuis sa définition) et le daemon précédent est relancé s'il tournait (launchd le démarre en le chargeant) |
 | `foreign_endpoint` | 4 | Le point de connexion ou son dossier appartient à un autre compte ou n'est pas privé |
 | `invalid_registry` | 3 | Registre illisible, trop gros ou malformé ; laissé intact |
 | `not_registered` | 1 | `unregister` d'une instance absente du registre |

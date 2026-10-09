@@ -211,6 +211,155 @@ public class ServiceTests
     }
 
     [Fact]
+    public async Task StopSaysItIsWaitingOnStderrOnly()
+    {
+        DaemonPaths paths = DaemonPaths.ForCurrentUser();
+        Directory.CreateDirectory(paths.StateDirectory);
+        FileStream draining = new FileStream(
+            paths.LockFile,
+            FileMode.OpenOrCreate,
+            FileAccess.ReadWrite,
+            FileShare.None
+        );
+        using StringWriter text = new StringWriter();
+        TextWriter progress = TextWriter.Synchronized(text);
+        using FakeManager manager = new FakeManager { StartsInstalled = true };
+        Task<CliResult> stop = Task.Run(() => DaemonWith(manager, progress, "stop", "--json"));
+        try
+        {
+            // The lock is held until the line shows: no race with the one-second threshold.
+            Stopwatch waited = Stopwatch.StartNew();
+            while (
+                !text.ToString().Contains("waiting for the daemon", StringComparison.Ordinal)
+                && waited.Elapsed < TimeSpan.FromSeconds(15)
+            )
+            {
+                await Task.Delay(50);
+            }
+            Assert.Equal(0, manager.Stops);
+        }
+        finally
+        {
+            await draining.DisposeAsync();
+        }
+        CliResult result = await stop.WaitAsync(TimeSpan.FromSeconds(10));
+        Assert.Contains("waiting for the daemon to finish its running commands", text.ToString());
+        // The JSON on stdout stays one object.
+        Assert.Equal(
+            "installed_stopped",
+            JsonDocument.Parse(result.Output).RootElement.GetProperty("state").GetString()
+        );
+    }
+
+    [Fact]
+    public async Task StopReachesADaemonThatStartsListeningLate()
+    {
+        DaemonPaths paths = DaemonPaths.ForCurrentUser();
+        Directory.CreateDirectory(paths.StateDirectory);
+        FileStream starting = new FileStream(
+            paths.LockFile,
+            FileMode.OpenOrCreate,
+            FileAccess.ReadWrite,
+            FileShare.None
+        );
+        using FakeManager manager = new FakeManager { StartsInstalled = true };
+        Task<CliResult> stop = Task.Run(() => Daemon(manager, "stop", "--json"));
+        TestDaemonOnPaths? late = null;
+        try
+        {
+            await Task.Delay(300);
+            // The daemon holds its lock but only now opens its endpoint.
+            late = new TestDaemonOnPaths(paths);
+            await late.Serving.WaitAsync(TimeSpan.FromSeconds(10));
+            Assert.Equal(0, manager.Stops);
+        }
+        finally
+        {
+            await starting.DisposeAsync();
+            late?.Dispose();
+        }
+        Assert.Equal(0, (await stop.WaitAsync(TimeSpan.FromSeconds(10))).ExitCode);
+        Assert.Equal(1, manager.Stops);
+    }
+
+    [Fact]
+    public async Task FailedUpgradeStartsThePreviousOlderDaemonAgainWithoutAWarning()
+    {
+        DaemonPaths paths = DaemonPaths.ForCurrentUser();
+        InstalledDefinition.Write(
+            paths,
+            new ServiceDefinition(
+                "/opt/old/smf",
+                ["daemon", "run"],
+                "0.3.9",
+                new Dictionary<string, string>()
+            )
+        );
+        using StringWriter progress = new StringWriter();
+        using FakeManager manager = new FakeManager
+        {
+            FailInstall = true,
+            StartsInstalled = true,
+            DaemonVersion = "0.3.9",
+        };
+        manager.Start();
+        try
+        {
+            CliResult result = DaemonWith(manager, progress, "install", "--json");
+            Assert.Equal("service_install_failed", TestInstance.ErrorCode(result));
+            // Started once before the upgrade, once again after its failure.
+            Assert.Equal(2, manager.Starts);
+            Assert.DoesNotContain("could not be started again", progress.ToString());
+            await using DaemonClient? back = await ConnectAs(paths, "0.3.9");
+            Assert.NotNull(back);
+        }
+        finally
+        {
+            manager.Uninstall();
+            InstalledDefinition.Delete(paths);
+        }
+    }
+
+    [Fact]
+    public async Task FailedReinstallLeavesAStoppedServiceStopped()
+    {
+        DaemonPaths paths = DaemonPaths.ForCurrentUser();
+        InstalledDefinition.Write(
+            paths,
+            new ServiceDefinition(
+                "/opt/old/smf",
+                ["daemon", "run"],
+                "0.3.9",
+                new Dictionary<string, string>()
+            )
+        );
+        using FakeManager manager = new FakeManager { FailInstall = true, StartsInstalled = true };
+        try
+        {
+            CliResult result = Daemon(manager, "install", "--json");
+            Assert.Equal("service_install_failed", TestInstance.ErrorCode(result));
+            Assert.Equal(0, manager.Starts);
+            Assert.Null(await Connect(paths));
+        }
+        finally
+        {
+            manager.Uninstall();
+            InstalledDefinition.Delete(paths);
+        }
+    }
+
+    [Fact]
+    public void SecondSignalEndsTheProcess()
+    {
+        using CancellationTokenSource stop = new CancellationTokenSource();
+        int first = 0;
+        Assert.True(SignalStop.Handle(stop, () => first++));
+        Assert.True(stop.IsCancellationRequested);
+        Assert.False(SignalStop.Handle(stop, () => first++));
+        Assert.Equal(1, first);
+    }
+
+    [Fact]
     public void SystemdRefusesAnImpossibleUnitBeforeAnythingStops() =>
         Assert.Equal(
             "service_install_failed",
@@ -301,6 +450,16 @@ public class ServiceTests
         throw new TimeoutException("The supervised daemon did not answer.");
     }
 
+    private static Task<DaemonClient?> ConnectAs(DaemonPaths paths, string version) =>
+        DaemonClient.ConnectAsync(
+            paths,
+            new FileOwnership(),
+            version,
+            TestInstance.TempRoot,
+            TimeSpan.FromMilliseconds(500),
+            CancellationToken.None
+        );
+
     private static Task<DaemonClient?> Connect(DaemonPaths paths) =>
         DaemonClient.ConnectAsync(
             paths,
@@ -311,7 +470,15 @@ public class ServiceTests
             CancellationToken.None
         );
 
-    private static CliResult Daemon(FakeManager manager, params string[] arguments)
+    private static CliResult Daemon(FakeManager manager, params string[] arguments) =>
+        DaemonWith(manager, null, arguments);
+
+    /// <summary>The daemon commands, with progress lines sent to <paramref name="progress"/>.</summary>
+    private static CliResult DaemonWith(
+        FakeManager manager,
+        TextWriter? progress,
+        params string[] arguments
+    )
     {
         using StringWriter output = new StringWriter();
         using StringWriter error = new StringWriter();
@@ -322,7 +489,8 @@ public class ServiceTests
             code = new DaemonCommands(
                 output,
                 (result, asJson) => output.WriteLine(RecordJsonOf(result)),
-                _ => manager
+                _ => manager,
+                progress
             )
             {
                 StartTimeout = TimeSpan.FromSeconds(10),
@@ -373,6 +541,8 @@ public class ServiceTests
 
         public int Stops { get; private set; }
 
+        public int Starts { get; private set; }
+
         public int Installs { get; private set; }
 
         public void Validate(ServiceDefinition definition)
@@ -391,7 +561,7 @@ public class ServiceTests
 
         public ServiceStatus Query() => new ServiceStatus(installed, daemon is not null);
 
-        public void Install(ServiceDefinition definition)
+        public void Install(ServiceDefinition definition, ServiceDefinition? previous)
         {
             if (FailInstall)
             {
@@ -408,7 +578,19 @@ public class ServiceTests
             installed = false;
         }
 
-        public void Start() => daemon ??= new TestDaemonOnPaths(DaemonPaths.ForCurrentUser());
+        /// <summary>Version the simulated daemon answers with; the current one by default.</summary>
+        public string DaemonVersion { get; init; } = ProductVersion.Current;
+
+        public void Start()
+        {
+            // A daemon stopped by a shutdown request is started anew, as a service manager would.
+            if (daemon is null || daemon.Serving.IsCompleted)
+            {
+                Starts++;
+                daemon?.Dispose();
+                daemon = new TestDaemonOnPaths(DaemonPaths.ForCurrentUser(), DaemonVersion);
+            }
+        }
 
         public void Stop()
         {
@@ -432,14 +614,17 @@ public class ServiceTests
         private readonly CancellationTokenSource stop = new();
         private readonly Task serving;
 
-        public TestDaemonOnPaths(DaemonPaths paths)
+        /// <summary>Completes when the server stops, on Dispose or on a shutdown request.</summary>
+        public Task Serving => serving;
+
+        public TestDaemonOnPaths(DaemonPaths paths, string? version = null)
         {
             TaskCompletionSource listening = new(
                 TaskCreationOptions.RunContinuationsAsynchronously
             );
             DaemonServer server = new DaemonServer(
                 paths,
-                ProductVersion.Current,
+                version ?? ProductVersion.Current,
                 new CliCommandExecutor(),
                 new ServingGate(new InstanceRegistry(paths.RegistryFile)),
                 new DaemonLog(paths.LogFile),

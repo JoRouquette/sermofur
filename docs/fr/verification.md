@@ -144,6 +144,17 @@ serveur MCP quand la racine de l'instance ne le déclare pas.
   Windows qui refuse `SERMOFUR_DAEMON_HOME` ; le daemon supervisé qui reçoit l'environnement
   relevé ; écritures atomiques qui gardent les droits d'un fichier (Linux et macOS) et ne laissent
   aucun fichier temporaire.
+- Chemin d'arrêt (`ServiceTests`, `ServiceHardeningTests`, `DaemonSessionTests`) : l'attente
+  annoncée sur stderr sans toucher au JSON ; un daemon qui se met à écouter pendant l'attente,
+  invité à s'arrêter ; une mise à jour ratée qui relance l'ancien daemon sans faux avertissement,
+  et laisse arrêté un service qui l'était ; le second signal non annulé (test unitaire du
+  gestionnaire) ; sous Windows, un client refusé bien avant son délai de connexion
+  pendant la vidange ; des arrêteurs qui attendent plus longtemps que la vidange, avec la même
+  valeur dans l'unité systemd et le plist launchd ; la tâche planifiée précédente reconstruite
+  depuis sa définition (chemins accentués compris) quand la nouvelle ne démarre pas, et la nouvelle
+  supprimée quand rien ne peut être remis en place ; un `schtasks.exe`
+  introuvable signalé comme gestionnaire de services indisponible ; launchd qui a le temps de
+  retirer l'agent, et un bootstrap en erreur 5 retenté.
 - L'ensemble des tests utilise son propre `SERMOFUR_DAEMON_HOME` : il n'atteint jamais le daemon
   du développeur.
 - Pont MCP (ADR 0017) : le vrai protocole avec le client du SDK officiel contre un processus

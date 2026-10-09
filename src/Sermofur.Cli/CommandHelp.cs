@@ -513,7 +513,7 @@ public static class CommandHelp
         new(
             "daemon run",
             "",
-            "Serves in the foreground until Ctrl+C: what the service runs, useful to diagnose. --supervise restarts the daemon after an abnormal exit (Windows service).",
+            "Serves in the foreground: what the service runs, useful to diagnose. A first Ctrl+C or SIGTERM lets the running commands finish, a second one stops at once. --supervise restarts the daemon after an abnormal exit (Windows service).",
             [],
             Entries(
                 new HelpEntry(

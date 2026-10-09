@@ -108,7 +108,7 @@ public sealed class Supervisor(
         try
         {
             // The daemon drains its started commands before it exits (ADR 0016).
-            requestStop?.Invoke().Wait(DaemonLimits.StopTimeout);
+            requestStop?.Invoke().Wait(DaemonLimits.Default.StopTimeout);
         }
         catch (AggregateException)
         {

@@ -150,7 +150,7 @@ public class ServiceHardeningTests
             );
             Assert.Equal(
                 "service_install_failed",
-                Assert.Throws<SermofurException>(() => task.Install(definition)).Code
+                Assert.Throws<SermofurException>(() => task.Install(definition, null)).Code
             );
             Assert.Empty(runner.Calls);
         }
@@ -215,6 +215,177 @@ public class ServiceHardeningTests
         finally
         {
             Directory.Delete(folder, true);
+        }
+    }
+
+    [Fact]
+    public void StoppersWaitLongerThanTheDrainWithOneValue()
+    {
+        DaemonLimits limits = DaemonLimits.Default;
+        Assert.True(limits.StopTimeout > limits.DrainTimeout);
+        int seconds = (int)limits.StopTimeout.TotalSeconds;
+        ServiceDefinition definition = Definition([]);
+        Assert.Contains($"TimeoutStopSec={seconds}\n", SystemdUserService.Unit(definition));
+        Assert.Contains(
+            $"<key>ExitTimeOut</key><integer>{seconds}</integer>",
+            LaunchAgentService.Plist(definition, "/tmp/logs")
+        );
+        DaemonLimits shorter = new DaemonLimits(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2));
+        Assert.Equal(TimeSpan.FromSeconds(17), shorter.StopTimeout);
+    }
+
+    [Fact]
+    public void FailedTaskStartPutsThePreviousTaskBackWithoutStartingIt()
+    {
+        string folder = NewFolder();
+        try
+        {
+            List<string> registered = [];
+            ScriptedRunner runner = new ScriptedRunner(call =>
+            {
+                if (call.Contains("/Create"))
+                {
+                    // The task XML as schtasks reads it: UTF-16.
+                    string file = call[(call.IndexOf("/XML ", StringComparison.Ordinal) + 5)..^3];
+                    registered.Add(File.ReadAllText(file, System.Text.Encoding.Unicode));
+                }
+                return call.Contains("/Run")
+                    ? new ProcessOutcome(1, "", "refused")
+                    : new ProcessOutcome(0, "", "");
+            });
+            WindowsScheduledTask task = new WindowsScheduledTask(
+                runner,
+                @"PC\jérôme",
+                folder,
+                _ => "schtasks.exe"
+            );
+            ServiceDefinition previous = new ServiceDefinition(
+                @"C:\Users\Jérôme\.dotnet\tools\smf.exe",
+                ["daemon", "run", "--supervise"],
+                "0.4.0",
+                new Dictionary<string, string>()
+            );
+            Assert.Throws<SermofurException>(() => task.Install(Definition([]), previous));
+            Assert.Equal(["/Create", "/Run", "/Create"], runner.Calls.Select(Verb));
+            Assert.Contains(@"C:\Users\Jérôme\.dotnet\tools\smf.exe", registered[1]);
+            Assert.Contains(@"PC\jérôme", registered[1]);
+            Assert.Contains("/opt/smf", registered[0]);
+        }
+        finally
+        {
+            Directory.Delete(folder, true);
+        }
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void FailedTaskStartRemovesTheNewTaskWhenNothingCanBePutBack(bool hadPrevious)
+    {
+        string folder = NewFolder();
+        try
+        {
+            int creates = 0;
+            ScriptedRunner runner = new ScriptedRunner(call =>
+                call.Contains("/Run") || (call.Contains("/Create") && ++creates == 2)
+                    ? new ProcessOutcome(1, "", "refused")
+                    : new ProcessOutcome(0, "", "")
+            );
+            WindowsScheduledTask task = new WindowsScheduledTask(
+                runner,
+                @"PC\john",
+                folder,
+                _ => "schtasks.exe"
+            );
+            ServiceDefinition? previous = hadPrevious ? Definition([]) : null;
+            Assert.Throws<SermofurException>(() => task.Install(Definition([]), previous));
+            string[] expected = hadPrevious
+                ? ["/Create", "/Run", "/Create", "/Delete"]
+                : ["/Create", "/Run", "/Delete"];
+            Assert.Equal(expected, runner.Calls.Select(Verb));
+        }
+        finally
+        {
+            Directory.Delete(folder, true);
+        }
+    }
+
+    [Fact]
+    public void MissingSchtasksMakesTheManagerUnavailable()
+    {
+        WindowsScheduledTask task = new WindowsScheduledTask(
+            new ScriptedRunner(_ => new ProcessOutcome(0, "", "")),
+            @"PC\john",
+            TestInstance.TempRoot,
+            _ => null
+        );
+        Assert.Contains("schtasks", task.Unavailable());
+    }
+
+    [Fact]
+    public void LaunchdIsGivenTimeToRemoveTheAgentBeforeLoadingIt()
+    {
+        string folder = NewFolder();
+        try
+        {
+            int prints = 0;
+            int bootstraps = 0;
+            List<TimeSpan> waits = [];
+            ScriptedRunner runner = new ScriptedRunner(call =>
+            {
+                if (call.StartsWith("launchctl print gui/501/"))
+                {
+                    // Still loaded twice after bootout, then gone.
+                    return new ProcessOutcome(++prints <= 2 ? 0 : 113, "", "");
+                }
+                if (call.StartsWith("launchctl bootstrap"))
+                {
+                    return ++bootstraps == 1
+                        ? new ProcessOutcome(5, "", "Bootstrap failed: 5: Input/output error")
+                        : new ProcessOutcome(0, "", "");
+                }
+                return new ProcessOutcome(0, "", "");
+            });
+            LaunchAgentService agent = new LaunchAgentService(
+                runner,
+                Path.Combine(folder, "agents"),
+                501,
+                Path.Combine(folder, "logs"),
+                waits.Add
+            );
+            agent.Install(Definition([]), null);
+            Assert.Equal(3, prints);
+            Assert.Equal(2, bootstraps);
+            Assert.Equal(
+                [
+                    TimeSpan.FromMilliseconds(100),
+                    TimeSpan.FromMilliseconds(100),
+                    TimeSpan.FromSeconds(1),
+                ],
+                waits
+            );
+        }
+        finally
+        {
+            Directory.Delete(folder, true);
+        }
+    }
+
+    private static string Verb(string call)
+    {
+        string[] parts = call.Split(' ');
+        return parts[1];
+    }
+
+    private sealed class ScriptedRunner(Func<string, ProcessOutcome> answer) : IProcessRunner
+    {
+        public List<string> Calls { get; } = [];
+
+        public ProcessOutcome Run(string program, params string[] arguments)
+        {
+            string call = $"{program} {string.Join(' ', arguments)}";
+            Calls.Add(call);
+            return answer(call);
         }
     }
 

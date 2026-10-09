@@ -88,7 +88,12 @@ public sealed class CommandRunner(TextWriter output, TextWriter error, string mo
             CommandArguments parsed = new CommandArguments(arguments);
             if (parsed.Positionals.Count > 0 && parsed.Positionals[0] == "daemon")
             {
-                return new DaemonCommands(output, Write).Run(parsed, json, workingDirectory);
+                // With --json, stderr holds only the JSON error: no progress lines.
+                return new DaemonCommands(output, Write, error: json ? null : error).Run(
+                    parsed,
+                    json,
+                    workingDirectory
+                );
             }
             if (parsed.Positionals.Count > 0 && parsed.Positionals[0] == "mcp")
             {
