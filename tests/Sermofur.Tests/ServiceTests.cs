@@ -269,7 +269,7 @@ public class ServiceTests
         {
             await Task.Delay(300);
             // The daemon holds its lock but only now opens its endpoint.
-            late = new TestDaemonOnPaths(paths);
+            late = new TestDaemonOnPaths(paths, holdsLock: false);
             await late.Serving.WaitAsync(TimeSpan.FromSeconds(10));
             Assert.Equal(0, manager.Stops);
         }
@@ -667,7 +667,8 @@ public class ServiceTests
         /// <summary>Completes when the server stops, on Dispose or on a shutdown request.</summary>
         public Task Serving => serving;
 
-        public TestDaemonOnPaths(DaemonPaths paths, string? version = null)
+        /// <param name="holdsLock">False when the test itself holds the daemon lock.</param>
+        public TestDaemonOnPaths(DaemonPaths paths, string? version = null, bool holdsLock = true)
         {
             TaskCompletionSource listening = new(
                 TaskCreationOptions.RunContinuationsAsynchronously
@@ -681,7 +682,24 @@ public class ServiceTests
                 new FileOwnership()
             );
             server.Listening += () => listening.TrySetResult();
-            serving = Task.Run(() => server.RunAsync(stop.Token));
+            // Like smf daemon run, the server holds the daemon lock until it has exited: a
+            // stopper that waits for the lock knows the daemon is gone, and the simulated
+            // service manager never sees a daemon that is still finishing.
+            FileStream? daemonLock = holdsLock ? DaemonLock.Acquire(paths) : null;
+            serving = Task.Run(async () =>
+            {
+                try
+                {
+                    await server.RunAsync(stop.Token);
+                }
+                finally
+                {
+                    if (daemonLock is not null)
+                    {
+                        await daemonLock.DisposeAsync();
+                    }
+                }
+            });
             Task.WhenAny(listening.Task, serving).GetAwaiter().GetResult();
         }
 
