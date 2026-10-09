@@ -2,7 +2,9 @@
 
 # ADR 0003-ipc-daemon — Daemon partagé et transport local
 
-Date : 2026-10-06. Statut : accepté pour conception (capacités futures non livrées).
+Date : 2026-10-06. Statut : accepté pour conception ; le daemon machine est remplacé par un
+daemon par utilisateur ([ADR 0015](0015-user-daemon.md)), le transport est livré en 0.4
+([ADR 0016](0016-ipc-protocol.md)).
 
 ## Contexte
 Mission Sermofur : invariants épistémiques, isolation et produit installable local.

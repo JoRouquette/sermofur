@@ -20,6 +20,33 @@
           "SQLitePCLRaw.core": "2.1.12"
         }
       },
+      "Microsoft.Extensions.AI.Abstractions": {
+        "type": "Transitive",
+        "resolved": "10.8.3",
+        "contentHash": "K0B05oApxmviWalNHPMBBcRC7erKiDATz3ENNR/jqTR9JwIwLRefgDhj2jCRwL1aca99pXUe0qyQC73/xIuZig=="
+      },
+      "Microsoft.Extensions.DependencyInjection.Abstractions": {
+        "type": "Transitive",
+        "resolved": "10.0.10",
+        "contentHash": "z/2xXlFw2aLGjHyEm6E0tQ+In6VfzQzTrtArbQ2c0TQE16ZbyDCMGPvaUT9I0s8rgy9sRWlU2P9waW37qV04qA=="
+      },
+      "Microsoft.Extensions.Logging.Abstractions": {
+        "type": "Transitive",
+        "resolved": "10.0.10",
+        "contentHash": "zkFxGYUvdxAvIKTyXHrmW+Sux53D4SezD9dMyZ6hrwwzPQJNuwCRy1f5W7AvYTqacEGhWF2XderRQG1OvbV8og==",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.10"
+        }
+      },
+      "ModelContextProtocol.Core": {
+        "type": "Transitive",
+        "resolved": "2.2.0",
+        "contentHash": "FeBfXU6T8k+jw4afg4sfxdEX2rL/e5oKOk9ROOGztu9k47+7Bz08sdaToYt2XvMY1opNbwxYQOFMj6wH9TInhA==",
+        "dependencies": {
+          "Microsoft.Extensions.AI.Abstractions": "10.8.3",
+          "Microsoft.Extensions.Logging.Abstractions": "10.0.10"
+        }
+      },
       "SQLite": {
         "type": "Transitive",
         "resolved": "3.53.4",
@@ -58,7 +85,13 @@
       "sermofur.application": {
         "type": "Project",
         "dependencies": {
-          "Sermofur.Domain": "[1.0.0, )"
+          "Sermofur.Domain": "[0.0.0-dev, )"
+        }
+      },
+      "sermofur.daemon": {
+        "type": "Project",
+        "dependencies": {
+          "Sermofur.Infrastructure": "[0.0.0-dev, )"
         }
       },
       "sermofur.domain": {
@@ -67,9 +100,16 @@
       "sermofur.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Sermofur.Application": "[1.0.0, )",
           "Microsoft.Data.Sqlite": "[10.0.12, )",
-          "SQLitePCLRaw.bundle_e_sqlite3": "[3.0.5, )"
+          "SQLitePCLRaw.bundle_e_sqlite3": "[3.0.5, )",
+          "Sermofur.Application": "[0.0.0-dev, )"
+        }
+      },
+      "sermofur.mcp": {
+        "type": "Project",
+        "dependencies": {
+          "ModelContextProtocol.Core": "[2.2.0, )",
+          "Sermofur.Daemon": "[0.0.0-dev, )"
         }
       }
     }

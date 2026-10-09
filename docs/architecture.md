@@ -36,9 +36,30 @@ projections may leave an older revision: doctor detects it, export repairs it. T
 promise of an atomic SQLite + files transaction. A hostile writer running as the same user is not
 an OS boundary.
 
+## Daemon
+`Sermofur.Daemon` holds the local transport and the service: one daemon per user, installed as a
+service of the session, serving the instances the user registered
+([daemon.md](daemon.md), [ADR 0015](adr/0015-user-daemon.md)). The CLI sends its commands to the
+daemon when it serves the instance; the daemon runs them with the same `CommandRunner`, given the
+launch folder of the client, so both paths apply the same rules
+([ADR 0016](adr/0016-ipc-protocol.md)). The daemon depends on no CLI type: the executor of
+commands is handed to it by the CLI.
+
+```text
+smf ──→ CliRouter ──(no daemon / not served)──→ CommandRunner → Application
+            └──(pipe / Unix socket)──→ DaemonServer ──→ CommandRunner → Application
+```
+
+## MCP bridge
+`Sermofur.Mcp` holds `smf mcp serve`, an MCP server on stdio built with the official C# SDK, and
+the editing of the host configurations (`.mcp.json` for Claude Code, TOML for Codex). Each tool becomes one or two `smf` commands sent to the daemon through
+`DaemonClient`; the bridge has no engine ([ADR 0017](adr/0017-mcp-bridge.md)).
+
+```text
+Claude Code / Codex ──stdio──→ McpBridge ──(protocol 1)──→ DaemonServer ──→ CommandRunner → Application
+```
+
 ## Target, not delivered
-A machine daemon multiplexing separate instances; CLI, UI and MCP bridge use local IPC: a
-CurrentUserOnly named pipe on Windows, a 0600 Unix domain socket on Unix. A stdio MCP bridge with
-no engine per host. Laya managed, lazy and optional. An Angular/Tauri Inspector exposing
+Laya managed, lazy and optional. An Angular/Tauri Inspector exposing
 evidence, conflicts and history. No Anthropic/OpenAI dependency in Domain or Application.
 Planning lives in a Spec Kit workshop outside the repository; see [AGENTS.md](../AGENTS.md).

@@ -198,6 +198,26 @@ public sealed class TestInstance : IDisposable
     /// <summary>Real process run, outputs kept as the raw bytes written by the CLI.</summary>
     public static async Task<RawCliResult> RunCliRaw(params string[] arguments)
     {
+        using Process process = Process.Start(CliStart(arguments))!;
+        // Raw streams: neither the console encoding nor BOM detection alter what the CLI wrote.
+        Task<byte[]> stdout = ReadAllBytesAsync(process.StandardOutput.BaseStream);
+        Task<byte[]> stderr = ReadAllBytesAsync(process.StandardError.BaseStream);
+        using CancellationTokenSource timeout = new(TimeSpan.FromSeconds(30));
+        try
+        {
+            await process.WaitForExitAsync(timeout.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            process.Kill(true);
+            throw;
+        }
+        return new RawCliResult(process.ExitCode, await stdout, await stderr);
+    }
+
+    /// <summary>Start information of the built CLI, outputs redirected.</summary>
+    public static ProcessStartInfo CliStart(IEnumerable<string> arguments)
+    {
         DirectoryInfo? repository = new(AppContext.BaseDirectory);
         while (
             repository is not null
@@ -229,21 +249,7 @@ public sealed class TestInstance : IDisposable
         {
             start.ArgumentList.Add(argument);
         }
-        using Process process = Process.Start(start)!;
-        // Raw streams: neither the console encoding nor BOM detection alter what the CLI wrote.
-        Task<byte[]> stdout = ReadAllBytesAsync(process.StandardOutput.BaseStream);
-        Task<byte[]> stderr = ReadAllBytesAsync(process.StandardError.BaseStream);
-        using CancellationTokenSource timeout = new(TimeSpan.FromSeconds(30));
-        try
-        {
-            await process.WaitForExitAsync(timeout.Token);
-        }
-        catch (OperationCanceledException)
-        {
-            process.Kill(true);
-            throw;
-        }
-        return new RawCliResult(process.ExitCode, await stdout, await stderr);
+        return start;
     }
 
     private static async Task<byte[]> ReadAllBytesAsync(Stream stream)

@@ -45,9 +45,13 @@ USER ≠ TRUTH, LLM ≠ TRUTH, MEMORY ≠ TRUTH.
 
 Delivered: the `smf` CLI, local instances, scopes, Claim/Evidence/RETEX storage in SQLite,
 history, Markdown projections and diagnostics (`doctor`); since 0.2, declared sources with
-full-text indexing, recall, challenge and contradicting evidence (instance format 2).
+full-text indexing, recall, challenge and contradicting evidence (instance format 2); since 0.4,
+an optional [daemon](docs/daemon.md) per user, installed as a service of your session
+(`smf daemon install`), that serves the instances you register to every `smf` command, and an
+[MCP server for Claude Code and Codex](docs/mcp-integration.md) (`smf mcp install`, with
+`--host codex` for Codex) whose eight tools recall, challenge and record through that daemon.
 
-**Not delivered yet**: background daemon, MCP bridge, Laya integration (System 1 model),
+**Not delivered yet**: Laya integration (System 1 model),
 learning and consolidation, desktop Inspector UI. These appear in the docs as designs only; no
 command pretends to provide them.
 

@@ -60,7 +60,7 @@
       "sermofur.application": {
         "type": "Project",
         "dependencies": {
-          "Sermofur.Domain": "[1.0.0, )"
+          "Sermofur.Domain": "[0.0.0-dev, )"
         }
       },
       "sermofur.domain": {

@@ -36,7 +36,8 @@ mkdir $env:TEMP/sermofur-check; cd $env:TEMP/sermofur-check
 ```
 
 `healthy_with_warnings` est l'état attendu d'une instance saine : les capacités pas encore livrées
-(daemon, laya, model, mcp) sont signalées en warning.
+(laya, model) sont signalées en warning, de même que le daemon quand il ne tourne pas et le
+serveur MCP quand la racine de l'instance ne le déclare pas.
 `artifacts/` et `TestResults/` sont ignorés par Git.
 
 ## Ce que couvrent les tests
@@ -113,6 +114,71 @@ mkdir $env:TEMP/sermofur-check; cd $env:TEMP/sermofur-check
 - Propriétés (FsCheck) : la normalisation des mappings reste dans la racine, est stable et
   portable d'un séparateur à l'autre ; la grammaire de la ligne de commande garde positionnel tout
   argument après `--` et ne prend jamais une valeur d'option qui commence par `--`.
+- Daemon (ADR 0015, 0016) : trames à 256 Kio et au-delà, tronquées, vides, JSON malformé et
+  UTF-8 invalide, octets arbitraires (FsCheck), vecteurs d'arguments qui survivent à un aller-retour ;
+  hello, version différente, second daemon, `run` dont le dossier diffère de celui de son `hello` ; registre
+  (idempotence, mêmes refus qu'une commande directe, registre illisible ou trop gros laissé intact, instance
+  déplacée), filtre de service (rien de lu hors du registre, instance imbriquée non servie,
+  instances inactives et désenregistrées fermées) ; un vrai processus `smf daemon run` ; dossier du
+  socket d'un autre compte (sudo) ou ouvert à d'autres refusé sous Linux et macOS ; treize vraies
+  commandes comparées octet par octet avec et sans le daemon ; écritures passées par le daemon vues
+  en direct ; `doctor` et `status` qui le signalent ; délais dépassés, départs pendant des écritures
+  en file d'attente et en cours, rejeux par `--key` ; définitions de service (systemd, launchd, XML
+  de la tâche et guillemets) ; commandes de service avec un gestionnaire simulé ; superviseur qui
+  relance un daemon tué ; et, en CI seulement, le vrai service de chaque système installé, tué,
+  piloté et retiré (`RealServiceTests`).
+- Fins de session (`DaemonSessionTests`) : un arrêt pendant une écriture lui laisse répondre, une
+  écriture qui attend le verrou reçoit `daemon_stopping` et ne s'exécute jamais ; une sortie
+  accentuée d'environ 600 Kio rendue en une seule exécution, une de 16 Mio refusée en
+  `response_too_large`, la session continuant ; `daemon`, `mcp`, `init`, `doctor` et l'aide
+  refusés par le daemon (`cli_only`) ; une autre version signalée avant le protocole, avec le
+  remède du côté en retard ; un daemon qui ferme après un `run` : l'écriture n'est pas rejouée en
+  direct (`daemon_interrupted`, rien d'enregistré), la lecture s'exécute en direct ; un hello
+  refusé jamais suivi d'une exécution directe ; une réponse à une autre requête refusée ; un appel
+  MCP annulé pendant une commande lente, les appels suivants recevant leur propre réponse.
+- Durcissement des services (`ServiceHardeningTests`) : outils système résolus par chemin absolu,
+  jamais depuis un dossier relatif ; `$` échappé et sauts de ligne refusés dans une unité systemd ;
+  retrait de ce qui n'a jamais été installé ; un `PATH` différent qui ne réinstalle pas ;
+  `smf daemon stop` qui attend le verrou d'un daemon en vidange avant d'appeler le gestionnaire de
+  services ; une définition refusée (tâche Windows, unité systemd) qui n'arrête rien ; la tâche
+  Windows qui refuse `SERMOFUR_DAEMON_HOME` ; le daemon supervisé qui reçoit l'environnement
+  relevé ; écritures atomiques qui gardent les droits d'un fichier (Linux et macOS) et ne laissent
+  aucun fichier temporaire.
+- L'ensemble des tests utilise son propre `SERMOFUR_DAEMON_HOME` : il n'atteint jamais le daemon
+  du développeur.
+- Pont MCP (ADR 0017) : le vrai protocole avec le client du SDK officiel contre un processus
+  `smf mcp serve` (initialisation, huit outils aux schémas fermés, une écriture puis un recall
+  identique à `smf recall`) ; outils de lecture identiques à la CLI ; claims d'un scope frère
+  inconnus de challenge, evidence et feedback et absents du recall ; champs de chemin et de scope
+  refusés ; écritures enregistrées en `llm` avec le host comme acteur, rejeux idempotents, textes
+  en `--` conservés, valeurs d'option qui commencent par `--` refusées, `preferences` et
+  `decisions` non proposés ; feedback enregistré comme RETEX brouillon qui ne change ni le rang ni
+  la confiance ; pas de daemon (erreur en moins d'une seconde, serveur toujours en marche),
+  instance non enregistrée, hors de toute instance, daemon d'une autre version, daemon redémarré
+  sous le même pont, dix appels en parallèle ; `.mcp.json` modifié en gardant toute autre entrée
+  identique octet par octet (FsCheck : installer puis retirer rend les mêmes octets), fichiers
+  invalides laissés intacts, contrôle `mcp` de doctor.
+- Déclaration à Codex : la table `[mcp_servers.sermofur]` ajoutée, ses lignes `command` et `args`
+  mises à jour en gardant les clés et sous-tables ajoutées par l'utilisateur, la table retirée avec
+  ses sous-tables, toute autre ligne gardée identique octet par octet, commentaires, profils, tableaux
+  de tables, chaînes multilignes contenant une ligne qui ressemble à un en-tête et valeurs de
+  tableaux laissés intacts, fichiers CRLF gardés en CRLF, chemins Windows écrits en chaînes
+  littérales TOML ; refus (clé en ligne ou pointée, chaîne multiligne non fermée, table déclarée
+  deux fois) ; commentaires au-dessus de la table suivante gardés au retrait ; FsCheck : installer
+  puis retirer rend le même texte (commentaires, sous-tables, CRLF), plus un saut de ligne final
+  quand le fichier n'en avait pas, seule exception documentée ; un retrait au milieu garde le
+  reste ; `--host`, `--scope`, la
+  configuration utilisateur sous `CODEX_HOME`, doctor par host. Les tests utilisent leur propre
+  `CODEX_HOME`.
+
+## Mesures du daemon
+
+`TenWritersNeverMeetStorageBusy` (`--filter Category=DaemonLoad`, une minute avec
+`SERMOFUR_PERFORMANCE=1`) : le 2026-10-08, Windows 11, Intel Core i7-1255U, dix clients ont écrit
+430 claims en dix secondes, sans perte ni doublon, sans `storage_busy` ; le daemon a ajouté
+**2,9 ms** au 95e percentile à une commande sur une instance ouverte (limite de la spec : 50 ms).
+Sans daemon, la CLI paie une recherche dans le système de fichiers avant de s'exécuter directement
+(moins de 100 ms, `NoDaemonMeansNoClient`).
 
 ## Performance du recall
 
@@ -144,8 +210,8 @@ vocabulaire et des passages visibles.
   l'instant qui le précède ; cette course n'est pas testée.
 - Un lecteur réseau mappé est refusé par le code, mais ce refus n'a pas été testé faute d'un tel
   lecteur.
-- Non livré, donc non vérifié : protocole MCP, inférence Laya, IPC du daemon, UI, installateur
-  autonome, consolidation, similarité sémantique. Aucune coupure électrique simulée.
+- Non livré, donc non vérifié : inférence Laya, UI, installateur autonome, consolidation,
+  similarité sémantique. Aucune coupure électrique simulée.
 - La performance du recall (SC-004) est une mesure de référence, pas une garantie : voir [Performance du recall](#performance-du-recall).
   Elle ne tourne qu'avec `SERMOFUR_PERFORMANCE=1` et ne fait pas partie de la CI.
 - Le paquet d'outil exige le runtime .NET 10.

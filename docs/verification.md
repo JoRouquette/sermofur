@@ -36,7 +36,8 @@ mkdir $env:TEMP/sermofur-check; cd $env:TEMP/sermofur-check
 ```
 
 `healthy_with_warnings` is the expected state of a sound instance: the capabilities that are not
-delivered yet (daemon, laya, model, mcp) are reported as warnings.
+delivered yet (laya, model) are reported as warnings, and so are the daemon when it does not run
+and the MCP server when the instance root does not declare it.
 `artifacts/` and `TestResults/` are ignored by Git.
 
 ## What the tests cover
@@ -108,6 +109,64 @@ delivered yet (daemon, laya, model, mcp) are reported as warnings.
 - Properties (FsCheck): mapping normalization stays inside the root, is stable and portable
   across separators; the command-line grammar keeps every argument after `--` positional and never
   takes an option value starting with `--`.
+- Daemon (ADR 0015, 0016): frames at and beyond 256 KiB, truncated, empty, malformed JSON and
+  invalid UTF-8, arbitrary bytes (FsCheck), argument vectors that survive a round trip; hello,
+  version mismatch, second daemon, a `run` whose folder differs from that of its `hello`; registry
+  (idempotence, the same refusals as a direct command, unreadable or oversized registry left untouched,
+  moved instance), serving gate (nothing read outside the registry, nested instance not served,
+  idle and unregistered instances closed); a real `smf daemon run` process; the socket folder of
+  another account (sudo) or open to others refused on Linux and macOS; thirteen real commands
+  compared byte for byte with and without the daemon; writes through the daemon seen directly;
+  `doctor` and `status` reporting it; timeouts, departures during queued and running writes,
+  `--key` replays; service definitions (systemd, launchd, task XML and quoting); the service
+  commands with a simulated manager; the supervisor bringing a killed daemon back; and, in CI only,
+  the real service of each system installed, killed, piloted and removed (`RealServiceTests`).
+- Session ends (`DaemonSessionTests`): a shutdown during a write answers it, a write waiting for
+  the lock gets `daemon_stopping` and never runs; an accented output of about 600 KiB answered once and a
+  16 MiB one refused with `response_too_large`, the session going on; `daemon`, `mcp`, `init`,
+  `doctor` and help refused by the daemon (`cli_only`); another version reported before the
+  protocol, with the remedy of the side that is behind; a daemon closing after a `run`: the write
+  is not replayed directly (`daemon_interrupted`, nothing stored), the read runs directly; a
+  refused hello never followed by a direct run; an answer to another request refused; an MCP call
+  cancelled during a slow command, the next calls getting their own answers.
+- Service hardening (`ServiceHardeningTests`): system tools resolved by absolute path, never from
+  a relative folder; `$` escaped and line breaks refused in a systemd unit; removal of what was
+  never installed; a different `PATH` not reinstalling; `smf daemon stop` waiting for the lock of
+  a draining daemon before calling the service manager; a refused definition (Windows task,
+  systemd unit) stopping nothing; the Windows task refusing
+  `SERMOFUR_DAEMON_HOME`; the supervised daemon getting the recorded environment; atomic writes
+  keeping the permissions of a file (Linux and macOS) and leaving no temporary file.
+- The whole test run uses its own `SERMOFUR_DAEMON_HOME`: it never reaches the daemon of the
+  developer.
+- MCP bridge (ADR 0017): the real protocol with the client of the official SDK against a
+  `smf mcp serve` process (initialization, eight tools with closed schemas, a write then a recall
+  identical to `smf recall`); read tools identical to the CLI; claims of a sibling scope unknown to
+  challenge, evidence and feedback and absent from recall; path and scope fields refused; writes
+  recorded as `llm` with the host as actor, idempotent replays, `--` texts kept, option values
+  starting with `--` refused, `preferences` and `decisions` not offered; feedback as a draft RETEX
+  that changes neither rank nor confidence; no daemon (error in under a second, server still up),
+  instance not registered, outside any instance, daemon of another version, daemon restarted under
+  the same bridge, ten parallel calls; `.mcp.json` edited with every other entry kept byte for byte
+  (FsCheck: install then remove gives back the same bytes), invalid files left untouched, the
+  `mcp` check of doctor.
+- Codex declaration: the `[mcp_servers.sermofur]` table added, its `command` and `args` lines
+  updated while keys and sub-tables added by the user stay, the table removed with its
+  sub-tables, every other line kept byte for byte, comments, profiles, array tables, multi-line
+  strings holding a header-like line and array values left alone, CRLF files kept CRLF, Windows
+  paths written as TOML literal strings; refusals (inline or dotted key, unclosed multi-line
+  string, table twice); comments above the next table kept on removal; FsCheck: install then
+  remove gives back the same text (comments, sub-tables, CRLF), plus a final line break when the
+  file had none, the one documented exception; removal from the middle keeps the rest; `--host`,
+  `--scope`, the user configuration under `CODEX_HOME`, doctor per host. The test run uses its own
+  `CODEX_HOME`.
+
+## Daemon measures
+
+`TenWritersNeverMeetStorageBusy` (`--filter Category=DaemonLoad`, one minute with
+`SERMOFUR_PERFORMANCE=1`): on 2026-10-08, Windows 11, Intel Core i7-1255U, ten clients wrote 430
+claims in ten seconds, none lost or doubled, no `storage_busy`; the daemon added **2.9 ms** at the
+95th percentile to a command on an open instance (limit of the spec: 50 ms). With no daemon, the
+CLI pays one file-system lookup before running directly (under 100 ms, `NoDaemonMeansNoClient`).
 
 ## Recall performance
 
@@ -137,7 +196,7 @@ frequencies of the vocabulary table and the visible passages.
   instant before it; this race is not tested.
 - A mapped network drive is refused by the code but this was not tested, for lack of such a
   drive.
-- Not delivered, hence not verified: MCP protocol, Laya inference, daemon IPC, UI, self-contained
+- Not delivered, hence not verified: Laya inference, UI, self-contained
   installer, consolidation, semantic similarity. No power loss was simulated.
 - Recall performance (SC-004) is a reference measure, not a guarantee: see [Recall performance](#recall-performance). It runs only
   with `SERMOFUR_PERFORMANCE=1` and is not part of the CI.

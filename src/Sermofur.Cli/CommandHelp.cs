@@ -56,6 +56,16 @@ public static class CommandHelp
         "Unknown identifier, or one of a scope that is not visible."
     );
 
+    private static readonly HelpEntry McpHost = new HelpEntry(
+        "--host claude-code|codex",
+        "MCP host. Default: claude-code."
+    );
+
+    private static readonly HelpEntry McpScope = new HelpEntry(
+        "--scope project|user",
+        "Codex only: configuration of the project (.codex/config.toml, loaded when the project is trusted) or of the user. Default: project."
+    );
+
     private static IReadOnlyList<HelpEntry> Entries(params HelpEntry[] entries) => entries;
 
     private static HelpEntry Id(string name, string what) =>
@@ -400,6 +410,162 @@ public static class CommandHelp
             ),
             Entries(IdError),
             "smf challenge --text \"Billing paginates with offsets\""
+        ),
+        new(
+            "daemon install",
+            "",
+            "Installs the daemon as a service of your session (no administrator rights) and starts it. Run again: nothing changes when the same version is installed; another version or executable replaces the service.",
+            [],
+            [],
+            Entries(
+                new HelpEntry(
+                    "service_manager_unavailable (3)",
+                    "No service manager in this session (container, WSL without systemd); the CLI keeps working directly."
+                ),
+                new HelpEntry(
+                    "service_install_failed (3)",
+                    "The service manager refused the service; the previous state is restored."
+                ),
+                new HelpEntry(
+                    "daemon_unavailable (3)",
+                    "The service is registered but the daemon did not answer; see its journal."
+                )
+            ),
+            "smf daemon install"
+        ),
+        new(
+            "daemon uninstall",
+            "",
+            "Stops and removes the service. Instances, backups and the registry are left untouched.",
+            [],
+            [],
+            [],
+            "smf daemon uninstall"
+        ),
+        new(
+            "daemon start",
+            "",
+            "Starts the installed service.",
+            [],
+            [],
+            Entries(new HelpEntry("daemon_unavailable (3)", "The service is not installed.")),
+            "smf daemon start"
+        ),
+        new(
+            "daemon stop",
+            "",
+            "Stops the daemon; commands then run directly. Stop it before updating smf on Windows, and close the hosts that run smf mcp serve: both hold the files of the tool.",
+            [],
+            [],
+            Entries(new HelpEntry("daemon_unavailable (3)", "The service is not installed.")),
+            "smf daemon stop"
+        ),
+        new(
+            "daemon restart",
+            "",
+            "Stops then starts the service: the way to load a new version of smf.",
+            [],
+            [],
+            Entries(new HelpEntry("daemon_unavailable (3)", "The service is not installed.")),
+            "smf daemon restart"
+        ),
+        new(
+            "daemon status",
+            "",
+            "State of the daemon: absent, installed_stopped, running, version_mismatch, foreign_endpoint or service_manager_unavailable; version, process, start time, open instances, clients.",
+            [],
+            [],
+            [],
+            "smf daemon status --json"
+        ),
+        new(
+            "daemon register",
+            "",
+            "Lets the daemon serve the instance found from the context directory, with the checks of a direct command. Idempotent.",
+            [],
+            [],
+            Entries(
+                new HelpEntry(
+                    "invalid_registry (3)",
+                    "The registry cannot be read; it is left untouched."
+                )
+            ),
+            "smf daemon register"
+        ),
+        new(
+            "daemon unregister",
+            "",
+            "Stops serving an instance, found from the context directory or registered at that exact path.",
+            [],
+            [],
+            Entries(new HelpEntry("not_registered (1)", "No such instance in the registry.")),
+            "smf daemon unregister --path ~/work"
+        ),
+        new(
+            "daemon instances",
+            "",
+            "Instances the daemon may serve; missing marks one no longer found where it was registered.",
+            [],
+            [],
+            [],
+            "smf daemon instances"
+        ),
+        new(
+            "daemon run",
+            "",
+            "Serves in the foreground until Ctrl+C: what the service runs, useful to diagnose. --supervise restarts the daemon after an abnormal exit (Windows service).",
+            [],
+            Entries(
+                new HelpEntry(
+                    "--supervise",
+                    "Runs the daemon as a child and restarts it within a second after a crash."
+                )
+            ),
+            Entries(
+                new HelpEntry("daemon_already_running (3)", "A daemon already serves this user."),
+                new HelpEntry(
+                    "foreign_endpoint (4)",
+                    "The endpoint or its folder belongs to another account."
+                )
+            ),
+            "smf daemon run"
+        ),
+        new(
+            "mcp install",
+            "",
+            "Declares the Sermofur MCP server to a host, changing only its own entry: .mcp.json of the context directory for Claude Code, the [mcp_servers.sermofur] table of .codex/config.toml (or of the Codex user configuration) for Codex. Idempotent; says what remains to do (daemon, registration, trust).",
+            [],
+            Entries(McpHost, McpScope),
+            Entries(
+                new HelpEntry(
+                    "invalid_mcp_config (3)",
+                    "The file cannot be changed safely (not a JSON object, mcpServers not an object, TOML the edit cannot handle); it is left untouched."
+                )
+            ),
+            "smf mcp install --host codex"
+        ),
+        new(
+            "mcp uninstall",
+            "",
+            "Removes the Sermofur entry of the host configuration, and nothing else.",
+            [],
+            Entries(McpHost, McpScope),
+            Entries(
+                new HelpEntry(
+                    "invalid_mcp_config (3)",
+                    "The file cannot be read safely; it is left untouched."
+                )
+            ),
+            "smf mcp uninstall"
+        ),
+        new(
+            "mcp serve",
+            "",
+            "The MCP server on stdio, started by the host (Claude Code, Codex), not by hand. Its tools run through the daemon in the scope of the project; what they write comes from an LLM.",
+            [],
+            [],
+            [],
+            "smf mcp serve"
         ),
     ];
 

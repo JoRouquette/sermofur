@@ -10,7 +10,11 @@ try
     // stdout and stderr explicitly in UTF-8, without BOM, whatever the original console.
     using StreamWriter output = new(Console.OpenStandardOutput(), utf8) { AutoFlush = true };
     using StreamWriter error = new(Console.OpenStandardError(), utf8) { AutoFlush = true };
-    return new CommandRunner(output, error).Run(args);
+    // Long form of the folder: a short 8.3 name would not match the registry of the daemon.
+    return new CliRouter(output, error).Run(
+        args,
+        Sermofur.Daemon.LongPath.Of(Directory.GetCurrentDirectory())
+    );
 }
 finally
 {
