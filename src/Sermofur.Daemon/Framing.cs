@@ -1,5 +1,6 @@
 using System.Buffers.Binary;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Sermofur.Domain;
@@ -8,25 +9,44 @@ namespace Sermofur.Daemon;
 
 /// <summary>
 /// Length-prefixed frames: a little-endian <c>uint32</c> with the size of the body, then a UTF-8
-/// JSON body without BOM, at most <see cref="MaxBodyBytes"/> bytes (research R4).
+/// JSON body without BOM (research R4). What the daemon reads is bounded by
+/// <see cref="MaxBodyBytes"/>; what a client reads, by <see cref="MaxResponseBytes"/>.
 /// </summary>
 public static class Framing
 {
-    /// <summary>Largest body accepted: covers 128 arguments of 16 384 characters with escaping.</summary>
+    /// <summary>
+    /// Largest request the daemon accepts. It covers any ordinary command; a larger one is
+    /// refused before it is sent (<c>request_too_large</c>), and the CLI then runs it directly.
+    /// </summary>
     public const int MaxBodyBytes = 256 * 1024;
+
+    /// <summary>Largest answer a client accepts: the output of a list or an export.</summary>
+    public const int MaxResponseBytes = 16 * 1024 * 1024;
 
     private static readonly JsonSerializerOptions Options = new JsonSerializerOptions
     {
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        // A local frame is never embedded in HTML: non-ASCII text stays one to four bytes
+        // instead of six per character.
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };
 
     private static readonly UTF8Encoding StrictUtf8 = new UTF8Encoding(false, true);
 
     /// <summary>
-    /// Reads one message, or null when the peer closed the stream cleanly between two frames.
-    /// A truncated, oversized or malformed frame is a <see cref="SermofurException"/>.
+    /// Reads one request (at most <see cref="MaxBodyBytes"/>), or null when the peer closed the
+    /// stream cleanly between two frames. A truncated, oversized or malformed frame is a
+    /// <see cref="SermofurException"/>.
     /// </summary>
-    public static async Task<IpcMessage?> ReadAsync(Stream stream, CancellationToken cancellation)
+    public static Task<IpcMessage?> ReadAsync(Stream stream, CancellationToken cancellation) =>
+        ReadAsync(stream, MaxBodyBytes, cancellation);
+
+    /// <summary>Reads one message of at most <paramref name="limit"/> bytes.</summary>
+    public static async Task<IpcMessage?> ReadAsync(
+        Stream stream,
+        int limit,
+        CancellationToken cancellation
+    )
     {
         byte[] header = new byte[4];
         int headerRead = await FillAsync(stream, header, cancellation);
@@ -43,11 +63,11 @@ public static class Framing
         {
             throw ProtocolError("Empty frame.");
         }
-        if (length > MaxBodyBytes)
+        if (length > limit)
         {
             throw new SermofurException(
                 "request_too_large",
-                $"Frame of {length} bytes; the limit is {MaxBodyBytes}.",
+                $"Frame of {length} bytes; the limit is {limit}.",
                 1
             );
         }
@@ -59,27 +79,38 @@ public static class Framing
         return Decode(body);
     }
 
-    /// <summary>Writes one message as a single frame and flushes it.</summary>
-    public static async Task WriteAsync(
+    /// <summary>Writes one request as a single frame and flushes it.</summary>
+    public static Task WriteAsync(
         Stream stream,
         IpcMessage message,
         CancellationToken cancellation
+    ) => WriteAsync(stream, message, MaxBodyBytes, cancellation);
+
+    /// <summary>Writes one message of at most <paramref name="limit"/> bytes and flushes it.</summary>
+    public static async Task WriteAsync(
+        Stream stream,
+        IpcMessage message,
+        int limit,
+        CancellationToken cancellation
     )
     {
-        byte[] frame = Encode(message);
+        byte[] frame = Encode(message, limit);
         await stream.WriteAsync(frame, cancellation);
         await stream.FlushAsync(cancellation);
     }
 
-    /// <summary>Header and body of a message; refuses a body over the limit.</summary>
-    public static byte[] Encode(IpcMessage message)
+    /// <summary>Header and body of a request; refuses a body over <see cref="MaxBodyBytes"/>.</summary>
+    public static byte[] Encode(IpcMessage message) => Encode(message, MaxBodyBytes);
+
+    /// <summary>Header and body of a message; refuses a body over <paramref name="limit"/>.</summary>
+    public static byte[] Encode(IpcMessage message, int limit)
     {
         byte[] body = JsonSerializer.SerializeToUtf8Bytes(message, Options);
-        if (body.Length > MaxBodyBytes)
+        if (body.Length > limit)
         {
             throw new SermofurException(
                 "request_too_large",
-                $"Message of {body.Length} bytes; the limit is {MaxBodyBytes}.",
+                $"Message of {body.Length} bytes; the limit is {limit}.",
                 1
             );
         }

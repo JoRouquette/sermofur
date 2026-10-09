@@ -57,6 +57,8 @@ public sealed class SystemdUserService(IProcessRunner runner, string unitDirecto
         {
             if (previous is null)
             {
+                // A first install leaves nothing behind, not even the enable link.
+                runner.Run("systemctl", "--user", "disable", UnitName);
                 File.Delete(UnitFile);
             }
             else
@@ -68,10 +70,16 @@ public sealed class SystemdUserService(IProcessRunner runner, string unitDirecto
         }
     }
 
+    /// <summary>A value the unit cannot hold is refused before the running daemon stops.</summary>
+    public void Validate(ServiceDefinition definition) => _ = Unit(definition);
+
     public void Uninstall()
     {
         runner.Run("systemctl", "--user", "disable", "--now", UnitName);
-        File.Delete(UnitFile);
+        if (File.Exists(UnitFile))
+        {
+            File.Delete(UnitFile);
+        }
         runner.Run("systemctl", "--user", "daemon-reload");
     }
 
@@ -90,7 +98,9 @@ public sealed class SystemdUserService(IProcessRunner runner, string unitDirecto
             .Append(
                 string.Join(
                     ' ',
-                    new[] { definition.Executable }.Concat(definition.Arguments).Select(Quote)
+                    new[] { definition.Executable }
+                        .Concat(definition.Arguments)
+                        .Select(value => Quote(value).Replace("$", "$$"))
                 )
             )
             .Append('\n');
@@ -100,15 +110,29 @@ public sealed class SystemdUserService(IProcessRunner runner, string unitDirecto
             )
         )
         {
+            // Environment= expands specifiers (%) but not variables ($).
             unit.Append($"Environment={Quote($"{variable.Key}={variable.Value}")}\n");
         }
-        unit.Append("Restart=on-failure\nRestartSec=1\n\n");
+        unit.Append("Restart=on-failure\nRestartSec=1\n");
+        // Time for the daemon to drain its started commands before systemd forces it.
+        unit.Append($"TimeoutStopSec={(int)DaemonLimits.StopTimeout.TotalSeconds}\n\n");
         unit.Append("[Install]\nWantedBy=default.target\n");
         return unit.ToString();
     }
 
-    private static string Quote(string value) =>
-        "\"" + value.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("%", "%%") + "\"";
+    private static string Quote(string value)
+    {
+        if (value.IndexOfAny(['\n', '\r', '\0']) >= 0)
+        {
+            // A line break would end the directive and start another one.
+            throw new Sermofur.Domain.SermofurException(
+                "service_install_failed",
+                "A path or variable of the service holds a line break or NUL; it cannot go into a unit file.",
+                3
+            );
+        }
+        return "\"" + value.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("%", "%%") + "\"";
+    }
 
     private static void Check(string action, ProcessOutcome outcome)
     {

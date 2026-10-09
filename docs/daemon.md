@@ -35,8 +35,18 @@ Once an instance is registered, every `smf` command run inside it goes through t
 the same output, errors and exit codes. The daemon is the only writer of the instance: concurrent
 commands no longer wait and fail with `storage_busy`.
 
-These always run in the CLI itself: `smf daemon …`, `init`, `doctor`, `--help`, `--version`.
-Commands for an instance that is not registered run directly.
+These always run in the CLI itself: `smf daemon …`, `smf mcp …`, `init`, `doctor`, `--help`,
+`--version`; the daemon refuses them from any client (`cli_only`). Commands for an instance that
+is not registered run directly.
+
+If the daemon stops while it runs a command (crash, or a command still running when the shutdown
+delay ends), a read runs
+again directly; a write is never run twice: the CLI reports `daemon_interrupted`, and you check
+its result before running it again. A shutdown lets commands already started finish and answer
+(65 s at most); a write still waiting for its turn gets `daemon_stopping` and did not start.
+Meanwhile the endpoint is closed and new commands run directly. `smf daemon stop`, `restart`,
+`install` and `uninstall` wait for the daemon to exit (75 s at most) before they call the service
+manager, and systemd and launchd give it as long before forcing it.
 
 | Command | Effect |
 |---|---|
@@ -57,7 +67,8 @@ then it keeps the old version and the new CLI refuses to send it commands
 (`daemon_version_mismatch`).
 
 On Windows, the running daemon keeps the files of the tool in use and `dotnet tool update` fails
-("Access to the path … is denied"), leaving the old version installed. Stop it first:
+("Access to the path … is denied"), leaving the old version installed. An MCP server started by
+Claude Code or Codex (`smf mcp serve`) runs the same tool: close those sessions too. Then:
 
 ```text
 smf daemon stop
@@ -90,20 +101,28 @@ terminal; `smf daemon status` names the registry file the daemon reads.
 | Variable | Effect |
 |---|---|
 | `SERMOFUR_NO_DAEMON=1` | The CLI never tries the daemon |
-| `SERMOFUR_DAEMON_HOME=<folder>` | Registry, journal and endpoint under this folder (tests, trials) |
+| `SERMOFUR_DAEMON_HOME=<folder>` | Registry, journal and endpoint under this folder (tests, trials); the Windows scheduled task cannot carry it, so `install` refuses it there |
+
+The variables recorded at install (`DOTNET_ROOT`, `PATH`) reach the daemon: through the unit or the
+agent on Linux and macOS, through the supervisor on Windows. A different `PATH` alone does not make
+`install` replace the service.
 
 ## Errors
 
 | Code | Exit | When |
 |---|---|---|
-| `daemon_version_mismatch` | 3 | The running daemon has another version: `smf daemon restart` |
+| `daemon_version_mismatch` | 3 | The running daemon has another version: `smf daemon restart` when it is the older one; otherwise restart the client (the MCP server in its host) or update smf |
 | `daemon_unavailable` | 3 | Service not installed (`start`, `stop`, `restart`), or registered but not answering |
+| `daemon_interrupted` | 3 | The daemon stopped during a write: its result is unknown, check before running it again |
+| `daemon_stopping` | 3 | The daemon was stopping; the command did not start: run it again |
+| `cli_only` | 3 | A client sent the daemon a command that runs only in the CLI |
 | `daemon_already_running` | 3 | `smf daemon run` while a daemon already serves you |
 | `service_manager_unavailable` | 3 | No service manager in the session |
-| `service_install_failed` | 3 | The service manager refused the service; previous state restored |
+| `service_install_failed` | 3 | The service manager refused the service, or a value cannot go into its definition; previous state restored |
 | `foreign_endpoint` | 4 | The endpoint or its folder belongs to another account or is not private |
 | `invalid_registry` | 3 | Registry unreadable, too large or malformed; left untouched |
 | `not_registered` | 1 | `unregister` of an instance that is not in the registry |
-| `request_too_large` | 1 | Request over 256 KiB |
-| `request_timeout` | 3 | Command over 60 s; its transaction still completes |
+| `request_too_large` | 1 | Request over 256 KiB; the CLI runs it directly |
+| `response_too_large` | 1 | Output of a write over 16 MiB: it ran, check its effect before running it again (a read runs again directly) |
+| `request_timeout` | 3 | Command over 60 s; it keeps running and may still apply |
 | `protocol_error` | 3 | Malformed request |

@@ -235,7 +235,45 @@ public static class CodexConfigFile
             last++;
         }
         int end = last + 1 < headers.Count ? headers[last + 1].Start : content.Length;
+        if (last + 1 < headers.Count)
+        {
+            end = BeforeAttachedComments(content, headers[first].Start, end);
+        }
         return new Layout((headers[first].Start, end));
+    }
+
+    /// <summary>
+    /// End of the block when a table follows: comment lines written just above that table, and
+    /// what separates them from it, belong to it. The block keeps its last line of content and
+    /// the blank lines right after it.
+    /// </summary>
+    private static int BeforeAttachedComments(string content, int start, int end)
+    {
+        List<(int Start, string Text)> lines = [];
+        int index = start;
+        while (index < end)
+        {
+            int lineEnd = content.IndexOf('\n', index, end - index);
+            int next = lineEnd < 0 ? end : lineEnd + 1;
+            lines.Add((index, content[index..next].Trim()));
+            index = next;
+        }
+        int lastContent = 0;
+        for (int position = 0; position < lines.Count; position++)
+        {
+            if (lines[position].Text.Length > 0 && lines[position].Text[0] != '#')
+            {
+                lastContent = position;
+            }
+        }
+        for (int position = lastContent + 1; position < lines.Count; position++)
+        {
+            if (lines[position].Text.StartsWith('#'))
+            {
+                return lines[position].Start;
+            }
+        }
+        return end;
     }
 
     /// <summary>Multi-line string still open at the end of the line, given the one open at its start.</summary>
@@ -317,8 +355,6 @@ public static class CodexConfigFile
 
     private static string[] Names(string dotted) =>
         [.. dotted.Split('.').Select(part => part.Trim().Trim('"', '\''))];
-
-    private static string Normalize(string text) => text.Replace("\r\n", "\n");
 
     /// <summary>A TOML literal string when possible, so that Windows backslashes stay as they are.</summary>
     private static string Literal(string value) =>

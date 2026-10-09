@@ -28,11 +28,19 @@ public sealed class CliRouter(TextWriter output, TextWriter error)
         {
             answer = Send(arguments, workingDirectory);
         }
-        catch (SermofurException exception) when (exception.Code == "daemon_version_mismatch")
+        catch (DaemonAnswer refusal)
         {
-            // Never write directly beside a daemon of another version (FR-013).
-            WriteError(exception.Code, exception.Message, json);
-            return exception.ExitCode;
+            // A daemon answered, refused or stopped mid-command: never run directly beside it
+            // (FR-013), and never replay a write whose result is unknown.
+            if (
+                refusal.Error.Code == DaemonClient.InterruptedCode
+                && !CommandRunner.Writes(new CommandArguments(arguments))
+            )
+            {
+                return Direct(arguments, workingDirectory);
+            }
+            WriteError(refusal.Error.Code, refusal.Error.Message, json);
+            return refusal.Error.ExitCode;
         }
         catch (Exception exception)
             when (exception
@@ -44,7 +52,8 @@ public sealed class CliRouter(TextWriter output, TextWriter error)
                         or NotSupportedException
             )
         {
-            // Foreign endpoint, broken daemon, unencodable argument: the CLI still works.
+            // No daemon of ours, or the command never reached it (foreign endpoint, endpoint
+            // gone, request too large to send): the CLI still works.
             return Direct(arguments, workingDirectory);
         }
         if (answer is null || answer.Kind == MessageKind.NotServing)
@@ -58,8 +67,45 @@ public sealed class CliRouter(TextWriter output, TextWriter error)
             return exitCode;
         }
         string code = answer.Code ?? "protocol_error";
+        if (code == "response_too_large" && !CommandRunner.Writes(new CommandArguments(arguments)))
+        {
+            // A read can run again: directly, its output has no size limit.
+            return Direct(arguments, workingDirectory);
+        }
         WriteError(code, answer.Message ?? code, json);
-        return code == "request_too_large" ? 1 : 3;
+        return answer.ExitCode ?? 3;
+    }
+
+    /// <summary>
+    /// Commands that never run in the daemon, whoever sends them: help, version, empty,
+    /// <c>init</c>, <c>doctor</c>, <c>daemon …</c> and <c>mcp …</c> (FR-021).
+    /// </summary>
+    public static bool LocalOnly(IReadOnlyList<string> arguments)
+    {
+        string[] values = [.. arguments];
+        if (
+            values.Length == 0
+            || CommandArguments.Asks(values, CommandArguments.Help, CommandArguments.HelpShortcut)
+            || CommandArguments.Asks(
+                values,
+                CommandArguments.Version,
+                CommandArguments.VersionShortcut
+            )
+        )
+        {
+            return true;
+        }
+        try
+        {
+            CommandArguments parsed = new CommandArguments(values);
+            return parsed.Positionals.Count == 0
+                || parsed.Positionals[0] is "init" or "doctor" or "daemon" or "mcp";
+        }
+        catch (SermofurException)
+        {
+            // Not a command the daemon could run anyway; the runner reports the parsing error.
+            return false;
+        }
     }
 
     /// <summary>
@@ -68,28 +114,14 @@ public sealed class CliRouter(TextWriter output, TextWriter error)
     /// </summary>
     public static bool Routable(string[] arguments)
     {
-        if (
-            Environment.GetEnvironmentVariable(NoDaemonVariable) == "1"
-            || arguments.Length == 0
-            || CommandArguments.Asks(
-                arguments,
-                CommandArguments.Help,
-                CommandArguments.HelpShortcut
-            )
-            || CommandArguments.Asks(
-                arguments,
-                CommandArguments.Version,
-                CommandArguments.VersionShortcut
-            )
-        )
+        if (Environment.GetEnvironmentVariable(NoDaemonVariable) == "1" || LocalOnly(arguments))
         {
             return false;
         }
         try
         {
-            CommandArguments parsed = new CommandArguments(arguments);
-            return parsed.Positionals.Count > 0
-                && parsed.Positionals[0] is not ("init" or "doctor" or "daemon" or "mcp");
+            _ = new CommandArguments(arguments);
+            return true;
         }
         catch (SermofurException)
         {
@@ -107,19 +139,49 @@ public sealed class CliRouter(TextWriter output, TextWriter error)
         {
             return null;
         }
-        using CancellationTokenSource limit = new CancellationTokenSource();
-        using DaemonClient? client = DaemonClient
-            .ConnectAsync(
-                paths,
-                owners,
-                ProductVersion.Current,
-                workingDirectory,
-                ConnectTimeout,
-                limit.Token
-            )
-            .GetAwaiter()
-            .GetResult();
-        return client?.RunAsync(arguments, limit.Token).GetAwaiter().GetResult();
+        DaemonClient? client;
+        try
+        {
+            client = DaemonClient
+                .ConnectAsync(
+                    paths,
+                    owners,
+                    ProductVersion.Current,
+                    workingDirectory,
+                    ConnectTimeout,
+                    CancellationToken.None
+                )
+                .GetAwaiter()
+                .GetResult();
+        }
+        catch (SermofurException exception) when (exception.Code != "foreign_endpoint")
+        {
+            // Our daemon answered the hello with a refusal.
+            throw new DaemonAnswer(exception);
+        }
+        using (client)
+        {
+            if (client is null)
+            {
+                return null;
+            }
+            try
+            {
+                return client.RunAsync(arguments, CancellationToken.None).GetAwaiter().GetResult();
+            }
+            catch (SermofurException exception)
+                when (exception.Code is DaemonClient.InterruptedCode or "protocol_error")
+            {
+                // The command was sent: the daemon may have run it.
+                throw new DaemonAnswer(exception);
+            }
+        }
+    }
+
+    /// <summary>An error from our daemon after which the command must not simply run directly.</summary>
+    private sealed class DaemonAnswer(SermofurException error) : Exception(error.Message, error)
+    {
+        public SermofurException Error { get; } = error;
     }
 
     private int Direct(string[] arguments, string workingDirectory) =>

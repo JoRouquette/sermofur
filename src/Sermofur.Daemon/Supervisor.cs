@@ -22,6 +22,30 @@ public sealed class Supervisor(
 
     public TimeSpan RestartDelay { get; init; } = TimeSpan.FromMilliseconds(500);
 
+    /// <summary>
+    /// Start of the supervised daemon. A scheduled task carries no environment: the variables
+    /// recorded at install time (DOTNET_ROOT, PATH) reach the daemon through its supervisor.
+    /// </summary>
+    public static ProcessStartInfo ChildStart(
+        Services.ServiceDefinition child,
+        Services.ServiceDefinition? installed
+    )
+    {
+        ProcessStartInfo start = new ProcessStartInfo(child.Executable) { UseShellExecute = false };
+        foreach (string argument in child.Arguments)
+        {
+            start.ArgumentList.Add(argument);
+        }
+        foreach (
+            KeyValuePair<string, string> variable in installed?.Environment
+                ?? new Dictionary<string, string>()
+        )
+        {
+            start.Environment[variable.Key] = variable.Value;
+        }
+        return start;
+    }
+
     public int Run(CancellationToken stop)
     {
         using WindowsJob? job = OperatingSystem.IsWindows() ? WindowsJob.Create() : null;
@@ -83,7 +107,8 @@ public sealed class Supervisor(
     {
         try
         {
-            requestStop?.Invoke().Wait(TimeSpan.FromSeconds(2));
+            // The daemon drains its started commands before it exits (ADR 0016).
+            requestStop?.Invoke().Wait(DaemonLimits.StopTimeout);
         }
         catch (AggregateException)
         {

@@ -35,7 +35,8 @@ public sealed class CommandRunner(TextWriter output, TextWriter error, string mo
         smf daemon install | uninstall | start | stop | restart | status
         smf daemon register | unregister | instances
         smf daemon run [--supervise]
-        smf mcp install | uninstall | serve [--host claude-code|codex] [--scope project|user]
+        smf mcp install | uninstall [--host claude-code|codex] [--scope project|user]
+        smf mcp serve
         smf COMMAND -h | smf GROUP -h       help of one command, or the subcommands of a group
         smf --version | -v                  version
         --help (-h) and --version (-v) are recognized anywhere before --, except as an option value; --help wins.

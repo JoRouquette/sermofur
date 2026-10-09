@@ -36,8 +36,18 @@ avec la même sortie, les mêmes erreurs et les mêmes codes de sortie. Le daemo
 écrivain de l'instance : des commandes concurrentes n'attendent plus et n'échouent plus en
 `storage_busy`.
 
-Celles-ci s'exécutent toujours dans la CLI elle-même : `smf daemon …`, `init`, `doctor`,
-`--help`, `--version`. Les commandes pour une instance non enregistrée s'exécutent directement.
+Celles-ci s'exécutent toujours dans la CLI elle-même : `smf daemon …`, `smf mcp …`, `init`,
+`doctor`, `--help`, `--version` ; le daemon les refuse, quel que soit le client (`cli_only`). Les
+commandes pour une instance non enregistrée s'exécutent directement.
+
+Si le daemon s'arrête pendant une commande (plantage, ou commande encore en cours à la fin du
+délai d'arrêt), une lecture est relancée directement ; une écriture n'est jamais exécutée deux fois : la CLI signale
+`daemon_interrupted`, et vous vérifiez son résultat avant de la relancer. Un arrêt laisse les
+commandes déjà commencées se terminer et répondre (65 s au plus) ; une écriture qui attendait
+encore son tour reçoit `daemon_stopping` et n'a pas commencé. Pendant ce temps, le point de
+connexion est fermé et les nouvelles commandes s'exécutent directement. `smf daemon stop`,
+`restart`, `install` et `uninstall` attendent la fin du daemon (75 s au plus) avant d'appeler le
+gestionnaire de services, et systemd comme launchd lui laissent autant avant de le forcer.
 
 | Commande | Effet |
 |---|---|
@@ -59,8 +69,9 @@ Jusque-là, il garde l'ancienne version et la nouvelle CLI refuse de lui envoyer
 (`daemon_version_mismatch`).
 
 Sous Windows, le daemon en marche garde les fichiers de l'outil ouverts et `dotnet tool update`
-échoue (« Access to the path … is denied ») en laissant l'ancienne version en place. L'arrêter
-d'abord :
+échoue (« Access to the path … is denied ») en laissant l'ancienne version en place. Un serveur
+MCP lancé par Claude Code ou Codex (`smf mcp serve`) exécute le même outil : fermer aussi ces
+sessions. Puis :
 
 ```text
 smf daemon stop
@@ -94,20 +105,28 @@ lit le daemon.
 | Variable | Effet |
 |---|---|
 | `SERMOFUR_NO_DAEMON=1` | La CLI n'essaie jamais le daemon |
-| `SERMOFUR_DAEMON_HOME=<dossier>` | Registre, journal et point de connexion sous ce dossier (tests, essais) |
+| `SERMOFUR_DAEMON_HOME=<dossier>` | Registre, journal et point de connexion sous ce dossier (tests, essais) ; la tâche planifiée de Windows ne peut pas la transmettre, `install` la refuse donc sous Windows |
+
+Les variables relevées à l'installation (`DOTNET_ROOT`, `PATH`) parviennent au daemon : par l'unité
+ou l'agent sous Linux et macOS, par le superviseur sous Windows. Un `PATH` différent ne suffit pas
+à faire remplacer le service par `install`.
 
 ## Erreurs
 
 | Code | Exit | Cas |
 |---|---|---|
-| `daemon_version_mismatch` | 3 | Le daemon en marche a une autre version : `smf daemon restart` |
+| `daemon_version_mismatch` | 3 | Le daemon en marche a une autre version : `smf daemon restart` s'il est le plus ancien ; sinon relancer le client (le serveur MCP dans son hôte) ou mettre smf à jour |
 | `daemon_unavailable` | 3 | Service non installé (`start`, `stop`, `restart`), ou enregistré mais qui ne répond pas |
+| `daemon_interrupted` | 3 | Le daemon s'est arrêté pendant une écriture : son résultat est inconnu, le vérifier avant de la relancer |
+| `daemon_stopping` | 3 | Le daemon s'arrêtait ; la commande n'a pas commencé : la relancer |
+| `cli_only` | 3 | Un client a envoyé au daemon une commande réservée à la CLI |
 | `daemon_already_running` | 3 | `smf daemon run` alors qu'un daemon vous sert déjà |
 | `service_manager_unavailable` | 3 | Aucun gestionnaire de services dans la session |
-| `service_install_failed` | 3 | Le gestionnaire de services a refusé le service ; état précédent restauré |
+| `service_install_failed` | 3 | Le gestionnaire de services a refusé le service, ou une valeur ne peut pas entrer dans sa définition ; état précédent restauré |
 | `foreign_endpoint` | 4 | Le point de connexion ou son dossier appartient à un autre compte ou n'est pas privé |
 | `invalid_registry` | 3 | Registre illisible, trop gros ou malformé ; laissé intact |
 | `not_registered` | 1 | `unregister` d'une instance absente du registre |
-| `request_too_large` | 1 | Requête de plus de 256 Kio |
-| `request_timeout` | 3 | Commande de plus de 60 s ; sa transaction se termine quand même |
+| `request_too_large` | 1 | Requête de plus de 256 Kio ; la CLI l'exécute directement |
+| `response_too_large` | 1 | Sortie d'une écriture de plus de 16 Mio : elle s'est exécutée, vérifier son effet avant de la relancer (une lecture est relancée directement) |
+| `request_timeout` | 3 | Commande de plus de 60 s ; elle continue et peut encore s'appliquer |
 | `protocol_error` | 3 | Requête malformée |

@@ -130,26 +130,91 @@ public class CodexConfigFileTests
         Assert.Equal(content, CodexConfigFile.WithoutBlock(installed));
     }
 
-    /// <summary>Whatever the other tables, installing then removing gives back the same text.</summary>
+    [Theory]
+    [InlineData("\n")]
+    [InlineData("\r\n")]
+    public void CommentsAboveTheNextTableStayOnRemoval(string newline)
+    {
+        string before = $"[a]{newline}x = 1{newline}{newline}";
+        string after =
+            $"# docs server{newline}# second line{newline}[mcp_servers.docs]{newline}command = 'd'{newline}";
+        string block =
+            $"[mcp_servers.sermofur]{newline}# ours{newline}command = 'smf'{newline}args = ['mcp', 'serve']{newline}{newline}";
+        Assert.Equal(before + after, CodexConfigFile.WithoutBlock(before + block + after));
+        string updated = CodexConfigFile.WithBlock(before + block + after, "/opt/smf", Serve)!;
+        Assert.EndsWith(after, updated);
+        Assert.Contains("# ours", updated);
+    }
+
+    [Fact]
+    public void MissingFinalNewlineIsTheOnlyByteAddedForGood()
+    {
+        string content = "a = 1";
+        string installed = CodexConfigFile.WithBlock(content, "smf", Serve)!;
+        // Documented exception: the line break the header needs stays after removal.
+        Assert.Equal("a = 1\n", CodexConfigFile.WithoutBlock(installed));
+    }
+
+    /// <summary>
+    /// Whatever the other tables (with comments, sub-tables, CRLF, no final line break),
+    /// installing then removing gives back the same text, plus a final line break if it lacked
+    /// one.
+    /// </summary>
     [Property(MaxTest = 300)]
-    public Property InstallThenRemoveIsTheIdentity(NonEmptyString[] names, bool crlf)
+    public Property InstallThenRemoveIsTheIdentity(
+        NonEmptyString[] names,
+        bool crlf,
+        bool comments,
+        bool finalNewline
+    )
     {
         string newline = crlf ? "\r\n" : "\n";
-        string[] tables =
+        string content = Tables(Clean(names), newline, comments);
+        if (!finalNewline && content.Length > 0)
+        {
+            content = content.TrimEnd('\r', '\n');
+        }
+        string expected =
+            content.Length == 0 || content.EndsWith('\n') ? content : content + newline;
+        string installed = CodexConfigFile.WithBlock(content, "smf", Serve)!;
+        return (CodexConfigFile.WithoutBlock(installed) == expected).ToProperty();
+    }
+
+    /// <summary>A block between other tables goes away alone: what is around it stays.</summary>
+    [Property(MaxTest = 300)]
+    public Property RemovalFromTheMiddleKeepsTheRest(
+        NonEmptyString[] first,
+        NonEmptyString[] second,
+        bool crlf
+    )
+    {
+        string newline = crlf ? "\r\n" : "\n";
+        string before = Tables(Clean(first), newline, true);
+        // At least one table after the block: removal at the end of the file is the case above.
+        string after = Tables([.. Clean(second), "last"], newline, true);
+        string block =
+            $"[mcp_servers.sermofur]{newline}command = 'smf'{newline}args = ['mcp', 'serve']{newline}{newline}[mcp_servers.sermofur.env]{newline}K = 'v'{newline}{newline}";
+        return (
+            CodexConfigFile.WithoutBlock(before + block + after) == before + after
+        ).ToProperty();
+    }
+
+    private static string[] Clean(NonEmptyString[] names) =>
         [
             .. names
                 .Select(name => new string([.. name.Get.Where(char.IsAsciiLetterOrDigit)]))
                 .Where(name => name.Length > 0 && name != "sermofur")
                 .Distinct(),
         ];
-        string content = string.Concat(
-            tables.Select(name =>
-                $"[mcp_servers.{name}]{newline}command = '{name}'{newline}{newline}"
+
+    private static string Tables(string[] names, string newline, bool comments) =>
+        string.Concat(
+            names.Select(name =>
+                (comments ? $"# server {name}{newline}" : "")
+                + $"[mcp_servers.{name}]{newline}command = '{name}'{newline}"
+                + $"[mcp_servers.{name}.env]{newline}K = '{name}'  # kept{newline}{newline}"
             )
         );
-        string installed = CodexConfigFile.WithBlock(content, "smf", Serve)!;
-        return (CodexConfigFile.WithoutBlock(installed) == content).ToProperty();
-    }
 
     [Fact]
     public void CodexDeclarationThroughTheCli()

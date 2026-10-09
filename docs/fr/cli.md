@@ -58,7 +58,9 @@ Quand le daemon tourne et sert l'instance, toute commande sauf `daemon …`, `mc
 `doctor`, `--help` et `--version` passe par lui, avec la même sortie, les mêmes erreurs et les mêmes codes
 de sortie ; sinon la CLI l'exécute directement. `SERMOFUR_NO_DAEMON=1` force l'exécution directe.
 Un daemon d'une autre version arrête la commande en `daemon_version_mismatch` (exit 3) jusqu'à
-`smf daemon restart`. Les autres codes du daemon sont listés dans [daemon.md](daemon.md#erreurs).
+`smf daemon restart`. Une écriture interrompue par l'arrêt du daemon n'est jamais exécutée une
+seconde fois : `daemon_interrupted` (exit 3). Les autres codes du daemon sont listés dans
+[daemon.md](daemon.md#erreurs).
 
 L'usage affiché par `smf --help` est en anglais (`TEXT`, `RELATIVE_PATH`, `ORIGIN`…).
 
@@ -215,9 +217,9 @@ pour réécrire un mapping.
 | Exit | Signification |
 |---|---|
 | 0 | Succès, aide, ou doctor sain avec warnings |
-| 1 | Entrée invalide / not_found / conflit idempotent / mapping dupliqué / instance non enregistrée / requête trop grande |
+| 1 | Entrée invalide / not_found / conflit idempotent / mapping dupliqué / instance non enregistrée / requête trop grande / sortie d'une écriture trop grande pour revenir par le daemon |
 | 2 | Instance absente |
-| 3 | Stockage/version/permissions/projection à reconstruire, entrée `.sermofur` invalide (étrangère, endommagée, illisible), migration requise, daemon d'une autre version ou indisponible, gestionnaire de services indisponible ou qui refuse, `.mcp.json` inutilisable |
+| 3 | Stockage/version/permissions/projection à reconstruire, entrée `.sermofur` invalide (étrangère, endommagée, illisible), migration requise, daemon d'une autre version, indisponible, en cours d'arrêt ou interrompu pendant une écriture, commande réservée à la CLI envoyée au daemon, gestionnaire de services indisponible ou qui refuse, configuration du host MCP inutilisable (`.mcp.json`, `.codex/config.toml`) |
 | 4 | Frontière scope/chemin, instance imbriquée, entrée ou point de connexion du daemon d'un autre compte |
 | 5 | Doctor unhealthy |
 

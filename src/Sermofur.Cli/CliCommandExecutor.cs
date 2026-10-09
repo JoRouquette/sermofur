@@ -11,6 +11,15 @@ public sealed class CliCommandExecutor : ICommandExecutor
 {
     public CommandPlan Plan(IReadOnlyList<string> argv, string workingDirectory)
     {
+        if (CliRouter.LocalOnly(argv))
+        {
+            // The CLI never sends these; a client that does gets a refusal (FR-021).
+            throw new SermofurException(
+                "cli_only",
+                "This command runs only in the CLI itself, never through the daemon.",
+                3
+            );
+        }
         try
         {
             CommandArguments args = new CommandArguments([.. argv]);

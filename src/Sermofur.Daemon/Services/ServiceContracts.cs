@@ -84,6 +84,12 @@ public interface IServiceManager
 
     ServiceStatus Query();
 
+    /// <summary>
+    /// Throws <c>service_install_failed</c> when this manager cannot run the definition; called
+    /// before anything is stopped or written.
+    /// </summary>
+    void Validate(ServiceDefinition definition) { }
+
     /// <summary>Writes the definition, registers it and starts it; reverts on failure.</summary>
     void Install(ServiceDefinition definition);
 
@@ -106,11 +112,52 @@ public sealed record ProcessOutcome(int ExitCode, string Output, string Error)
     public bool Succeeded => ExitCode == 0;
 }
 
+/// <summary>
+/// Absolute path of a system tool. A bare name would be looked up in the current folder first
+/// (.NET on Unix, CreateProcess on Windows), so a file planted in a project could run instead.
+/// </summary>
+public static class SystemTool
+{
+    private static readonly string[] UnixFolders = ["/usr/bin", "/bin", "/usr/sbin", "/sbin"];
+
+    /// <summary>
+    /// The tool in the system folder of Windows, or in the usual Unix folders then the absolute
+    /// entries of <paramref name="searchPath"/>; null when it is nowhere.
+    /// </summary>
+    public static string? Resolve(string name, string? searchPath)
+    {
+        if (Path.IsPathFullyQualified(name))
+        {
+            return name;
+        }
+        if (OperatingSystem.IsWindows())
+        {
+            string file = Path.HasExtension(name) ? name : name + ".exe";
+            string candidate = Path.Combine(System.Environment.SystemDirectory, file);
+            return File.Exists(candidate) ? candidate : null;
+        }
+        IEnumerable<string> folders = UnixFolders.Concat(
+            (searchPath ?? "")
+                .Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries)
+                .Where(Path.IsPathFullyQualified)
+        );
+        return folders.Select(folder => Path.Combine(folder, name)).FirstOrDefault(File.Exists);
+    }
+}
+
 public sealed class SystemProcessRunner : IProcessRunner
 {
     public ProcessOutcome Run(string program, params string[] arguments)
     {
-        ProcessStartInfo start = new ProcessStartInfo(program)
+        string? path = SystemTool.Resolve(
+            program,
+            System.Environment.GetEnvironmentVariable("PATH")
+        );
+        if (path is null)
+        {
+            return new ProcessOutcome(-1, "", $"{program} was not found in the system folders.");
+        }
+        ProcessStartInfo start = new ProcessStartInfo(path)
         {
             RedirectStandardOutput = true,
             RedirectStandardError = true,
@@ -169,16 +216,18 @@ public static class InstalledDefinition
         }
     }
 
-    public static void Write(DaemonPaths paths, ServiceDefinition definition)
-    {
-        Directory.CreateDirectory(paths.StateDirectory);
-        System.IO.File.WriteAllBytes(
-            File(paths),
-            JsonSerializer.SerializeToUtf8Bytes(definition, Options)
-        );
-    }
+    public static void Write(DaemonPaths paths, ServiceDefinition definition) =>
+        // The Windows supervisor reads it at start: never half written.
+        AtomicFile.Write(File(paths), JsonSerializer.SerializeToUtf8Bytes(definition, Options));
 
-    public static void Delete(DaemonPaths paths) => System.IO.File.Delete(File(paths));
+    public static void Delete(DaemonPaths paths)
+    {
+        // Nothing installed, not even the state folder: nothing to remove.
+        if (System.IO.File.Exists(File(paths)))
+        {
+            System.IO.File.Delete(File(paths));
+        }
+    }
 }
 
 internal static class ServiceErrors

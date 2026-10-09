@@ -49,6 +49,7 @@ public sealed class WindowsScheduledTask(IProcessRunner runner, string userId, s
 
     public void Install(ServiceDefinition definition)
     {
+        Validate(definition);
         Directory.CreateDirectory(workDirectory);
         string file = Path.Combine(workDirectory, "task.xml");
         // schtasks reads the task XML as UTF-16.
@@ -78,6 +79,20 @@ public sealed class WindowsScheduledTask(IProcessRunner runner, string userId, s
         finally
         {
             File.Delete(file);
+        }
+    }
+
+    public void Validate(ServiceDefinition definition)
+    {
+        if (definition.Environment.ContainsKey(DaemonPaths.HomeVariable))
+        {
+            // The task starts without the variables of this shell: its daemon would serve the
+            // default folders, not the ones this variable names.
+            throw new Sermofur.Domain.SermofurException(
+                "service_install_failed",
+                $"{DaemonPaths.HomeVariable} is set; the scheduled task cannot carry it. Unset it to install the service, or run the daemon by hand with smf daemon run.",
+                3
+            );
         }
     }
 

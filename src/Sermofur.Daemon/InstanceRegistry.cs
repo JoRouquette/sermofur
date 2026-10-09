@@ -165,9 +165,7 @@ public sealed class InstanceRegistry(string file, InstanceManager? manager = nul
             new RegistryDocument { Version = FormatVersion, Instances = entries },
             Options
         );
-        string temporary = $"{file}.{Environment.ProcessId}.tmp";
-        System.IO.File.WriteAllBytes(temporary, content);
-        System.IO.File.Move(temporary, file, overwrite: true);
+        AtomicFile.Write(file, content);
     }
 
     private SermofurException Invalid(string reason) =>

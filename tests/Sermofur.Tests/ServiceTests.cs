@@ -134,6 +134,106 @@ public class ServiceTests
         Assert.Null(InstalledDefinition.Read(DaemonPaths.ForCurrentUser()));
     }
 
+    [Fact]
+    public void FailedReinstallRestoresThePreviousDefinition()
+    {
+        DaemonPaths paths = DaemonPaths.ForCurrentUser();
+        ServiceDefinition previous = new ServiceDefinition(
+            "/opt/old/smf",
+            ["daemon", "run"],
+            "0.3.9",
+            new Dictionary<string, string> { ["DOTNET_ROOT"] = "/opt/dotnet" }
+        );
+        InstalledDefinition.Write(paths, previous);
+        try
+        {
+            using FakeManager manager = new FakeManager { FailInstall = true };
+            CliResult result = Daemon(manager, "install", "--json");
+            Assert.Equal("service_install_failed", TestInstance.ErrorCode(result));
+            ServiceDefinition restored = InstalledDefinition.Read(paths)!;
+            Assert.Equal(
+                (previous.Executable, previous.Version, "/opt/dotnet"),
+                (restored.Executable, restored.Version, restored.Environment["DOTNET_ROOT"])
+            );
+        }
+        finally
+        {
+            InstalledDefinition.Delete(paths);
+        }
+    }
+
+    [Fact]
+    public async Task RefusedDefinitionLeavesTheRunningDaemonAlone()
+    {
+        using FakeManager running = new FakeManager();
+        running.Start();
+        using FakeManager refusing = new FakeManager { Rejects = true };
+        CliResult result = Daemon(refusing, "install", "--json");
+        Assert.Equal(
+            ("service_install_failed", 3),
+            (TestInstance.ErrorCode(result), result.ExitCode)
+        );
+        await using DaemonClient? still = await Connect(DaemonPaths.ForCurrentUser());
+        Assert.NotNull(still);
+        Assert.Null(InstalledDefinition.Read(DaemonPaths.ForCurrentUser()));
+    }
+
+    /// <summary>
+    /// A daemon still draining (endpoint already closed, lock still held) is waited for before
+    /// the service manager is called.
+    /// </summary>
+    [Fact]
+    public async Task StopWaitsForADrainingDaemonBeforeTheServiceManager()
+    {
+        DaemonPaths paths = DaemonPaths.ForCurrentUser();
+        Directory.CreateDirectory(paths.StateDirectory);
+        FileStream draining = new FileStream(
+            paths.LockFile,
+            FileMode.OpenOrCreate,
+            FileAccess.ReadWrite,
+            FileShare.None
+        );
+        using FakeManager manager = new FakeManager { StartsInstalled = true };
+        Task<CliResult> stop = Task.Run(() => Daemon(manager, "stop", "--json"));
+        try
+        {
+            await Task.Delay(800);
+            Assert.False(stop.IsCompleted);
+            Assert.Equal(0, manager.Stops);
+        }
+        finally
+        {
+            await draining.DisposeAsync();
+        }
+        CliResult result = await stop.WaitAsync(TimeSpan.FromSeconds(10));
+        Assert.Equal(0, result.ExitCode);
+        Assert.Equal(1, manager.Stops);
+    }
+
+    [Fact]
+    public void SystemdRefusesAnImpossibleUnitBeforeAnythingStops() =>
+        Assert.Equal(
+            "service_install_failed",
+            Assert
+                .Throws<SermofurException>(() =>
+                    new SystemdUserService(new NoRunner(), TestInstance.TempRoot).Validate(
+                        new ServiceDefinition(
+                            "/opt/smf",
+                            ["daemon", "run"],
+                            "0.4.0",
+                            new Dictionary<string, string> { ["PATH"] = "/bin\n/x" }
+                        )
+                    )
+                )
+                .Code
+        );
+
+    private sealed class NoRunner : IProcessRunner
+    {
+        public ProcessOutcome Run(string program, params string[] arguments) =>
+            throw new InvalidOperationException("Nothing may run.");
+    }
+
     /// <summary>SC-002 for the Windows path: a killed daemon is back within ten seconds.</summary>
     [Fact]
     public async Task SupervisorRestartsAKilledDaemonAndStopsCleanly()
@@ -269,7 +369,19 @@ public class ServiceTests
 
         public bool FailInstall { get; init; }
 
+        public bool Rejects { get; init; }
+
+        public int Stops { get; private set; }
+
         public int Installs { get; private set; }
+
+        public void Validate(ServiceDefinition definition)
+        {
+            if (Rejects)
+            {
+                throw new SermofurException("service_install_failed", "simulated rejection", 3);
+            }
+        }
 
         private bool installed;
 
@@ -300,8 +412,15 @@ public class ServiceTests
 
         public void Stop()
         {
+            Stops++;
             daemon?.Dispose();
             daemon = null;
+        }
+
+        /// <summary>Installed from the start, without any daemon running.</summary>
+        public bool StartsInstalled
+        {
+            init => installed = value;
         }
 
         public void Dispose() => Stop();

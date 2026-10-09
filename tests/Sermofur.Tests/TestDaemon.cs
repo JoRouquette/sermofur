@@ -80,6 +80,13 @@ public sealed class TestDaemon : IAsyncDisposable
             CancellationToken.None
         );
 
+    /// <summary>Asks the daemon to stop, as <c>smf daemon stop</c> does; completes when it exits.</summary>
+    public Task StopAsync()
+    {
+        stop.Cancel();
+        return serving;
+    }
+
     public async ValueTask DisposeAsync()
     {
         await stop.CancelAsync();

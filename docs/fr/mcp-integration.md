@@ -64,7 +64,11 @@ table hors des chaînes et refuse, en `invalid_mcp_config` et sans toucher au fi
 peut pas modifier sans risque : une chaîne multiligne jamais fermée, `sermofur` écrit comme clé
 (`sermofur = { … }` dans `[mcp_servers]`, ou une clé pointée `mcp_servers.sermofur…`), ou la table
 déclarée deux fois. `smf mcp uninstall --host codex [--scope user]` retire la table et ses
-sous-tables.
+sous-tables ; les commentaires écrits juste au-dessus de la table suivante restent avec elle.
+Installer puis désinstaller rend le fichier à l'octet près, à une exception : un fichier sans saut
+de ligne final en reçoit un, dont l'en-tête de table a besoin, et le garde. Un nouveau fichier de
+configuration est créé lisible par vous seul (Linux et macOS) ; un fichier existant garde ses
+droits.
 
 ## Outils
 
@@ -96,13 +100,18 @@ pas proposés. Les valeurs passées comme valeurs d'options de la CLI (`event`, 
 | Code | Que faire |
 |---|---|
 | `daemon_unavailable` | `smf daemon install` ou `smf daemon start` |
-| `daemon_version_mismatch` | `smf daemon restart`, puis redémarrer le serveur dans le host |
+| `daemon_version_mismatch` | Le message nomme le côté en retard : `smf daemon restart`, ou redémarrer le serveur dans le host |
+| `daemon_interrupted` | Le daemon s'est arrêté pendant l'appel : vérifier si l'écriture a eu lieu avant de rappeler |
+| `daemon_stopping` | Le daemon s'arrêtait ; rien n'a commencé, rappeler une fois qu'il est revenu |
 | `not_served` | `smf daemon register` dans le projet |
-| `no_instance` | `smf init` dans le projet |
+| `no_instance` | `smf init`, puis `smf daemon register`, dans le projet |
 | `invalid_input` | Entrée hors du schéma, ou valeur qui commence par `--` |
+| `request_too_large` / `response_too_large` | Entrée de plus de 256 Kio, ou sortie de plus de 16 Mio |
 
 Les autres codes sont ceux de la CLI (`not_found`, `idempotency_conflict`…). Le serveur reste en
-marche quel que soit l'état du daemon et ouvre une nouvelle session quand le daemon revient. Il
+marche quel que soit l'état du daemon et ouvre une nouvelle session quand le daemon revient ; un
+appel n'est jamais envoyé deux fois. Un appel que le host annule ferme la session, que l'appel
+suivant rouvre. Il
 n'écrit rien sur stdout hors du protocole ; son journal (celui du daemon) ne contient aucun
 argument ni aucun résultat.
 

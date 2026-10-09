@@ -114,10 +114,29 @@ public sealed class DaemonCommands(
             && version == ProductVersion.Current;
         if (!current)
         {
+            // A definition the manager cannot run is refused before the running daemon stops.
+            manager.Validate(definition);
             // Another version or executable: the running daemon makes way for the new one.
             RequestShutdown(paths);
-            manager.Install(definition);
+            // Written first: the Windows supervisor reads it as soon as the task starts.
+            ServiceDefinition? previous = InstalledDefinition.Read(paths);
             InstalledDefinition.Write(paths, definition);
+            try
+            {
+                manager.Install(definition);
+            }
+            catch
+            {
+                if (previous is null)
+                {
+                    InstalledDefinition.Delete(paths);
+                }
+                else
+                {
+                    InstalledDefinition.Write(paths, previous);
+                }
+                throw;
+            }
             WaitForDaemon(paths);
         }
         return Status(paths, manager);
@@ -248,12 +267,16 @@ public sealed class DaemonCommands(
         );
     }
 
-    /// <summary>Asks a daemon, of any version, to stop; nothing happens when none answers.</summary>
+    /// <summary>
+    /// Asks a daemon, of any version, to stop, and waits until it has drained its commands and
+    /// exited; nothing happens when none answers. The service manager is called only after, so it
+    /// never cuts a command short.
+    /// </summary>
     private static void RequestShutdown(DaemonPaths paths)
     {
         try
         {
-            ShutdownAsync(paths).Wait(TimeSpan.FromSeconds(5));
+            ShutdownAsync(paths).Wait(DaemonLimits.StopTimeout);
         }
         catch (AggregateException)
         {
@@ -272,6 +295,9 @@ public sealed class DaemonCommands(
         );
         if (stream is null)
         {
+            // No endpoint may mean a daemon already draining (it closes its endpoint first):
+            // wait for its lock all the same; with no daemon, the lock is free at once.
+            await DaemonLock.WaitForReleaseAsync(paths.LockFile, DaemonLimits.StopTimeout);
             return;
         }
         await using (stream)
@@ -283,16 +309,8 @@ public sealed class DaemonCommands(
             );
             await Framing.ReadAsync(stream, CancellationToken.None);
         }
-        // Give the daemon the time to release its endpoint.
-        Stopwatch waited = Stopwatch.StartNew();
-        while (
-            waited.Elapsed < TimeSpan.FromSeconds(5)
-            && Connect(paths, TimeSpan.FromMilliseconds(200)) is DaemonClient still
-        )
-        {
-            still.Dispose();
-            await Task.Delay(100);
-        }
+        // The endpoint closes at the start of the drain; the lock goes only when the daemon exits.
+        await DaemonLock.WaitForReleaseAsync(paths.LockFile, DaemonLimits.StopTimeout);
     }
 
     private void WaitForDaemon(DaemonPaths paths)
@@ -335,11 +353,7 @@ public sealed class DaemonCommands(
             typeof(DaemonCommands).Assembly.Location,
             supervise: false
         );
-        ProcessStartInfo start = new ProcessStartInfo(child.Executable) { UseShellExecute = false };
-        foreach (string argument in child.Arguments)
-        {
-            start.ArgumentList.Add(argument);
-        }
+        ProcessStartInfo start = Supervisor.ChildStart(child, InstalledDefinition.Read(paths));
         using CancellationTokenSource stop = new CancellationTokenSource();
         using PosixSignalRegistration terminate = PosixSignalRegistration.Create(
             PosixSignal.SIGTERM,
@@ -368,8 +382,7 @@ public sealed class DaemonCommands(
     /// <summary>Runs the daemon in the foreground until Ctrl+C, SIGTERM, a stop request or the end of the session.</summary>
     private int Serve(DaemonPaths paths, bool json)
     {
-        Directory.CreateDirectory(paths.StateDirectory);
-        using FileStream lockFile = AcquireLock(paths);
+        using FileStream lockFile = DaemonLock.Acquire(paths);
         FileOwnership owners = new FileOwnership();
         DaemonLog log = new DaemonLog(paths.LogFile);
         DaemonServer server = new DaemonServer(
@@ -412,23 +425,5 @@ public sealed class DaemonCommands(
         server.RunAsync(stop.Token).GetAwaiter().GetResult();
         output.Flush();
         return 0;
-    }
-
-    /// <summary>One daemon per user: an exclusive lock held for the life of the process (FR-018).</summary>
-    private static FileStream AcquireLock(DaemonPaths paths)
-    {
-        try
-        {
-            return new FileStream(
-                paths.LockFile,
-                FileMode.OpenOrCreate,
-                FileAccess.ReadWrite,
-                FileShare.None
-            );
-        }
-        catch (IOException)
-        {
-            throw IpcEndpoint.AlreadyRunning();
-        }
     }
 }

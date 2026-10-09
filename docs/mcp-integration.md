@@ -60,7 +60,11 @@ There is no full TOML parser behind the edit: the command finds table headers ou
 refuses, with `invalid_mcp_config` and the file untouched, what it cannot change safely: a
 multi-line string that is never closed, `sermofur` written as a key (`sermofur = { … }` in
 `[mcp_servers]`, or a dotted `mcp_servers.sermofur…` key), or the table declared twice.
-`smf mcp uninstall --host codex [--scope user]` removes the table and its sub-tables.
+`smf mcp uninstall --host codex [--scope user]` removes the table and its sub-tables; comments
+written just above the next table stay with it. Install then uninstall gives back the file byte
+for byte, with one exception: a file without a final line break gets one, as the table header
+needs it, and keeps it. A new configuration file is created readable by you alone (Linux and
+macOS); an existing one keeps its permissions.
 
 ## Tools
 
@@ -91,13 +95,18 @@ the user's origin and are not offered. Values passed as CLI option values (`even
 | Code | What to do |
 |---|---|
 | `daemon_unavailable` | `smf daemon install` or `smf daemon start` |
-| `daemon_version_mismatch` | `smf daemon restart`, then restart the server in the host |
+| `daemon_version_mismatch` | The message names the side that is behind: `smf daemon restart`, or restart the server in the host |
+| `daemon_interrupted` | The daemon stopped during the call: check whether the write happened before calling again |
+| `daemon_stopping` | The daemon was stopping; nothing started, call again once it is back |
 | `not_served` | `smf daemon register` in the project |
-| `no_instance` | `smf init` in the project |
+| `no_instance` | `smf init`, then `smf daemon register`, in the project |
 | `invalid_input` | Input outside the schema, or a value starting with `--` |
+| `request_too_large` / `response_too_large` | Input over 256 KiB, or output over 16 MiB |
 
 Other codes are those of the CLI (`not_found`, `idempotency_conflict`…). The server stays up
-whatever the state of the daemon and opens a new session when the daemon comes back. It writes
+whatever the state of the daemon and opens a new session when the daemon comes back; a call is
+never sent twice. A call the host cancels closes the session, which the next call opens again. It
+writes
 nothing to stdout outside the protocol; its journal (the daemon's) holds no argument and no
 result.
 

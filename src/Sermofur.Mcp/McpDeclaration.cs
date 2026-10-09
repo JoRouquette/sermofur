@@ -174,7 +174,12 @@ public static class McpDeclaration
     {
         Directory.CreateDirectory(Path.GetDirectoryName(file)!);
         byte[] body = System.Text.Encoding.UTF8.GetBytes(content);
-        Write(file, bom ? [0xEF, 0xBB, 0xBF, .. body] : body);
+        // A Codex configuration may hold the tokens of other servers: a new one is private.
+        Write(
+            file,
+            bom ? [0xEF, 0xBB, 0xBF, .. body] : body,
+            UnixFileMode.UserRead | UnixFileMode.UserWrite
+        );
     }
 
     public static DeclarationReport Install(string folder)
@@ -288,10 +293,6 @@ public static class McpDeclaration
         return pending;
     }
 
-    private static void Write(string file, byte[] content)
-    {
-        string temporary = $"{file}.{Environment.ProcessId}.tmp";
-        File.WriteAllBytes(temporary, content);
-        File.Move(temporary, file, overwrite: true);
-    }
+    private static void Write(string file, byte[] content, UnixFileMode? newFileMode = null) =>
+        AtomicFile.Write(file, content, newFileMode);
 }

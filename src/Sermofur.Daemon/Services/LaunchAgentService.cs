@@ -78,7 +78,10 @@ public sealed class LaunchAgentService(
     public void Uninstall()
     {
         runner.Run("launchctl", "bootout", Target);
-        File.Delete(PlistFile);
+        if (File.Exists(PlistFile))
+        {
+            File.Delete(PlistFile);
+        }
     }
 
     public void Start()
@@ -111,6 +114,10 @@ public sealed class LaunchAgentService(
         plist.Append("  <key>RunAtLoad</key><true/>\n");
         plist.Append("  <key>KeepAlive</key><dict><key>SuccessfulExit</key><false/></dict>\n");
         plist.Append("  <key>ThrottleInterval</key><integer>1</integer>\n");
+        // Time for the daemon to drain its started commands before launchd forces it.
+        plist.Append(
+            $"  <key>ExitTimeOut</key><integer>{(int)DaemonLimits.StopTimeout.TotalSeconds}</integer>\n"
+        );
         plist.Append("  <key>EnvironmentVariables</key>\n  <dict>\n");
         foreach (
             KeyValuePair<string, string> variable in definition.Environment.OrderBy(pair =>

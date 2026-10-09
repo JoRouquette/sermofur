@@ -121,6 +121,21 @@ and the MCP server when the instance root does not declare it.
   `--key` replays; service definitions (systemd, launchd, task XML and quoting); the service
   commands with a simulated manager; the supervisor bringing a killed daemon back; and, in CI only,
   the real service of each system installed, killed, piloted and removed (`RealServiceTests`).
+- Session ends (`DaemonSessionTests`): a shutdown during a write answers it, a write waiting for
+  the lock gets `daemon_stopping` and never runs; an accented output of about 600 KiB answered once and a
+  16 MiB one refused with `response_too_large`, the session going on; `daemon`, `mcp`, `init`,
+  `doctor` and help refused by the daemon (`cli_only`); another version reported before the
+  protocol, with the remedy of the side that is behind; a daemon closing after a `run`: the write
+  is not replayed directly (`daemon_interrupted`, nothing stored), the read runs directly; a
+  refused hello never followed by a direct run; an answer to another request refused; an MCP call
+  cancelled during a slow command, the next calls getting their own answers.
+- Service hardening (`ServiceHardeningTests`): system tools resolved by absolute path, never from
+  a relative folder; `$` escaped and line breaks refused in a systemd unit; removal of what was
+  never installed; a different `PATH` not reinstalling; `smf daemon stop` waiting for the lock of
+  a draining daemon before calling the service manager; a refused definition (Windows task,
+  systemd unit) stopping nothing; the Windows task refusing
+  `SERMOFUR_DAEMON_HOME`; the supervised daemon getting the recorded environment; atomic writes
+  keeping the permissions of a file (Linux and macOS) and leaving no temporary file.
 - The whole test run uses its own `SERMOFUR_DAEMON_HOME`: it never reaches the daemon of the
   developer.
 - MCP bridge (ADR 0017): the real protocol with the client of the official SDK against a
@@ -139,7 +154,9 @@ and the MCP server when the instance root does not declare it.
   sub-tables, every other line kept byte for byte, comments, profiles, array tables, multi-line
   strings holding a header-like line and array values left alone, CRLF files kept CRLF, Windows
   paths written as TOML literal strings; refusals (inline or dotted key, unclosed multi-line
-  string, table twice); FsCheck: install then remove gives back the same text; `--host`,
+  string, table twice); comments above the next table kept on removal; FsCheck: install then
+  remove gives back the same text (comments, sub-tables, CRLF), plus a final line break when the
+  file had none, the one documented exception; removal from the middle keeps the rest; `--host`,
   `--scope`, the user configuration under `CODEX_HOME`, doctor per host. The test run uses its own
   `CODEX_HOME`.
 

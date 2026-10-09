@@ -454,7 +454,7 @@ public static class CommandHelp
         new(
             "daemon stop",
             "",
-            "Stops the daemon; commands then run directly. Stop it before updating smf on Windows.",
+            "Stops the daemon; commands then run directly. Stop it before updating smf on Windows, and close the hosts that run smf mcp serve: both hold the files of the tool.",
             [],
             [],
             Entries(new HelpEntry("daemon_unavailable (3)", "The service is not installed.")),
@@ -561,7 +561,7 @@ public static class CommandHelp
         new(
             "mcp serve",
             "",
-            "The MCP server on stdio, started by the host (Claude Code), not by hand. Its tools run through the daemon in the scope of the project; what they write comes from an LLM.",
+            "The MCP server on stdio, started by the host (Claude Code, Codex), not by hand. Its tools run through the daemon in the scope of the project; what they write comes from an LLM.",
             [],
             [],
             [],

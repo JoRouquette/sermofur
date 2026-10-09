@@ -127,6 +127,23 @@ serveur MCP quand la racine de l'instance ne le déclare pas.
   de la tâche et guillemets) ; commandes de service avec un gestionnaire simulé ; superviseur qui
   relance un daemon tué ; et, en CI seulement, le vrai service de chaque système installé, tué,
   piloté et retiré (`RealServiceTests`).
+- Fins de session (`DaemonSessionTests`) : un arrêt pendant une écriture lui laisse répondre, une
+  écriture qui attend le verrou reçoit `daemon_stopping` et ne s'exécute jamais ; une sortie
+  accentuée d'environ 600 Kio rendue en une seule exécution, une de 16 Mio refusée en
+  `response_too_large`, la session continuant ; `daemon`, `mcp`, `init`, `doctor` et l'aide
+  refusés par le daemon (`cli_only`) ; une autre version signalée avant le protocole, avec le
+  remède du côté en retard ; un daemon qui ferme après un `run` : l'écriture n'est pas rejouée en
+  direct (`daemon_interrupted`, rien d'enregistré), la lecture s'exécute en direct ; un hello
+  refusé jamais suivi d'une exécution directe ; une réponse à une autre requête refusée ; un appel
+  MCP annulé pendant une commande lente, les appels suivants recevant leur propre réponse.
+- Durcissement des services (`ServiceHardeningTests`) : outils système résolus par chemin absolu,
+  jamais depuis un dossier relatif ; `$` échappé et sauts de ligne refusés dans une unité systemd ;
+  retrait de ce qui n'a jamais été installé ; un `PATH` différent qui ne réinstalle pas ;
+  `smf daemon stop` qui attend le verrou d'un daemon en vidange avant d'appeler le gestionnaire de
+  services ; une définition refusée (tâche Windows, unité systemd) qui n'arrête rien ; la tâche
+  Windows qui refuse `SERMOFUR_DAEMON_HOME` ; le daemon supervisé qui reçoit l'environnement
+  relevé ; écritures atomiques qui gardent les droits d'un fichier (Linux et macOS) et ne laissent
+  aucun fichier temporaire.
 - L'ensemble des tests utilise son propre `SERMOFUR_DAEMON_HOME` : il n'atteint jamais le daemon
   du développeur.
 - Pont MCP (ADR 0017) : le vrai protocole avec le client du SDK officiel contre un processus
@@ -147,7 +164,10 @@ serveur MCP quand la racine de l'instance ne le déclare pas.
   de tables, chaînes multilignes contenant une ligne qui ressemble à un en-tête et valeurs de
   tableaux laissés intacts, fichiers CRLF gardés en CRLF, chemins Windows écrits en chaînes
   littérales TOML ; refus (clé en ligne ou pointée, chaîne multiligne non fermée, table déclarée
-  deux fois) ; FsCheck : installer puis retirer rend le même texte ; `--host`, `--scope`, la
+  deux fois) ; commentaires au-dessus de la table suivante gardés au retrait ; FsCheck : installer
+  puis retirer rend le même texte (commentaires, sous-tables, CRLF), plus un saut de ligne final
+  quand le fichier n'en avait pas, seule exception documentée ; un retrait au milieu garde le
+  reste ; `--host`, `--scope`, la
   configuration utilisateur sous `CODEX_HOME`, doctor par host. Les tests utilisent leur propre
   `CODEX_HOME`.
 
