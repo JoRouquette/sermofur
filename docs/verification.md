@@ -136,6 +136,14 @@ and the MCP server when the instance root does not declare it.
   systemd unit) stopping nothing; the Windows task refusing
   `SERMOFUR_DAEMON_HOME`; the supervised daemon getting the recorded environment; atomic writes
   keeping the permissions of a file (Linux and macOS) and leaving no temporary file.
+- Stop path (`ServiceTests`, `ServiceHardeningTests`, `DaemonSessionTests`): the wait announced on
+  stderr while the JSON stays intact; a daemon that starts listening during the wait asked to stop;
+  a failed upgrade starting the previous, older daemon again without a false warning, and leaving a stopped service stopped; the second signal not cancelled (unit test of the handler); on
+  Windows, a client refused in well under its connect timeout during the drain; stoppers waiting
+  longer than the drain, with the same value in the systemd unit and the launchd plist; the
+  previous scheduled task rebuilt from its definition (accented paths included) when the new one
+  does not start, and the new one removed when nothing can be put back; a missing `schtasks.exe` reported as an unavailable service manager; launchd given time to
+  remove the agent, and a bootstrap in error 5 tried again.
 - The whole test run uses its own `SERMOFUR_DAEMON_HOME`: it never reaches the daemon of the
   developer.
 - MCP bridge (ADR 0017): the real protocol with the client of the official SDK against a

@@ -7,13 +7,17 @@ namespace Sermofur.Daemon.Services;
 /// macOS: a launchd agent of the user session, started at login and kept alive after an
 /// abnormal exit (research R2).
 /// </summary>
+/// <param name="sleep">Waits between two checks of launchd; replaceable in tests.</param>
 public sealed class LaunchAgentService(
     IProcessRunner runner,
     string agentDirectory,
     uint uid,
-    string logDirectory
+    string logDirectory,
+    Action<TimeSpan>? sleep = null
 ) : IServiceManager
 {
+    private readonly Action<TimeSpan> wait = sleep ?? Thread.Sleep;
+
     public const string Label = "io.github.jorouquette.sermofur";
 
     public string Name => "launchd agent";
@@ -51,15 +55,16 @@ public sealed class LaunchAgentService(
         );
     }
 
-    public void Install(ServiceDefinition definition)
+    // The previous unit or agent file is kept on disk and restored as is.
+    public void Install(ServiceDefinition definition, ServiceDefinition? previousDefinition)
     {
         string? previous = File.Exists(PlistFile) ? File.ReadAllText(PlistFile) : null;
         Directory.CreateDirectory(agentDirectory);
         Directory.CreateDirectory(logDirectory);
         // Loaded agents are reloaded, never stacked.
-        runner.Run("launchctl", "bootout", Target);
+        BootOut();
         File.WriteAllText(PlistFile, Plist(definition, logDirectory));
-        ProcessOutcome loaded = runner.Run("launchctl", "bootstrap", Domain, PlistFile);
+        ProcessOutcome loaded = Bootstrap();
         if (!loaded.Succeeded)
         {
             if (previous is null)
@@ -69,10 +74,41 @@ public sealed class LaunchAgentService(
             else
             {
                 File.WriteAllText(PlistFile, previous);
-                runner.Run("launchctl", "bootstrap", Domain, PlistFile);
+                Bootstrap();
             }
             throw ServiceErrors.Failed("launchctl bootstrap", loaded);
         }
+    }
+
+    /// <summary>
+    /// bootout returns before launchd has removed the service, and a bootstrap right after fails
+    /// with error 5: wait until the service is gone (5 s at most).
+    /// </summary>
+    private void BootOut()
+    {
+        runner.Run("launchctl", "bootout", Target);
+        for (int attempt = 0; attempt < 50; attempt++)
+        {
+            if (!runner.Run("launchctl", "print", Target).Succeeded)
+            {
+                return;
+            }
+            wait(TimeSpan.FromMilliseconds(100));
+        }
+    }
+
+    /// <summary>Loads the agent; error 5 (still being removed) is retried once, a second later.</summary>
+    private ProcessOutcome Bootstrap()
+    {
+        ProcessOutcome loaded = runner.Run("launchctl", "bootstrap", Domain, PlistFile);
+        bool stillRemoving =
+            loaded.ExitCode == 5 || loaded.Error.Contains("failed: 5:", StringComparison.Ordinal);
+        if (loaded.Succeeded || !stillRemoving)
+        {
+            return loaded;
+        }
+        wait(TimeSpan.FromSeconds(1));
+        return runner.Run("launchctl", "bootstrap", Domain, PlistFile);
     }
 
     public void Uninstall()
@@ -116,7 +152,7 @@ public sealed class LaunchAgentService(
         plist.Append("  <key>ThrottleInterval</key><integer>1</integer>\n");
         // Time for the daemon to drain its started commands before launchd forces it.
         plist.Append(
-            $"  <key>ExitTimeOut</key><integer>{(int)DaemonLimits.StopTimeout.TotalSeconds}</integer>\n"
+            $"  <key>ExitTimeOut</key><integer>{(int)DaemonLimits.Default.StopTimeout.TotalSeconds}</integer>\n"
         );
         plist.Append("  <key>EnvironmentVariables</key>\n  <dict>\n");
         foreach (

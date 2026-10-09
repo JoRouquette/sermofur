@@ -90,8 +90,13 @@ public interface IServiceManager
     /// </summary>
     void Validate(ServiceDefinition definition) { }
 
-    /// <summary>Writes the definition, registers it and starts it; reverts on failure.</summary>
-    void Install(ServiceDefinition definition);
+    /// <summary>
+    /// Writes the definition, registers it and starts it. On failure, puts the previous
+    /// registration back (<paramref name="previous"/>, null when there was none), without starting
+    /// it where the manager allows (launchd starts an agent as it loads it): the caller restores
+    /// its own state first, then starts it if it was running.
+    /// </summary>
+    void Install(ServiceDefinition definition, ServiceDefinition? previous);
 
     /// <summary>Stops and removes the service; nothing else.</summary>
     void Uninstall();

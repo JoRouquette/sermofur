@@ -28,16 +28,20 @@ les règles du moteur. Le pont MCP sera un second client du même daemon.
   version reçoit toujours `daemon_version_mismatch`, quel que soit le protocole de chacun.
 - Les écritures sur une instance passent une à une dans le daemon ; les lectures s'exécutent en
   parallèle. Un client qui s'en va annule sa commande en file d'attente ; une commande commencée
-  termine sa transaction. Un arrêt ferme le point de connexion, puis laisse les commandes
-  commencées répondre avant que le daemon ne se termine (un délai de requête plus 5 s) ; une
-  écriture qui attend encore le verrou reçoit `daemon_stopping`. Une commande encore en cours à
-  la fin de ce délai est coupée, et sa transaction annulée. Le daemon garde son fichier de verrou
-  jusqu'à sa fin : `smf daemon stop`, `restart`, `install` et `uninstall` attendent ce verrou
-  (même quand le point de connexion est déjà fermé) avant d'appeler le gestionnaire de services ;
-  systemd et launchd laissent le même délai ; le superviseur Windows l'attend sur Ctrl+C ou
+  termine sa transaction. Un arrêt cesse aussitôt de servir de nouveaux clients (sous Unix le
+  socket est supprimé ; sous Windows, où un nom de pipe vit autant que ses instances, une instance
+  continue d'accepter et ferme chaque connexion sans un mot, si bien qu'un client conclut
+  immédiatement « aucun daemon »), puis laisse les commandes commencées répondre avant que le
+  daemon ne se termine (un délai de requête plus 5 s) ; une écriture qui attend encore le verrou
+  reçoit `daemon_stopping`. Une commande encore en cours à la fin de ce délai est coupée, et sa
+  transaction annulée. Un second Ctrl+C ou SIGTERM termine le processus aussitôt. Le daemon garde
+  son fichier de verrou jusqu'à sa fin : `smf daemon stop`, `restart`, `install` et `uninstall`
+  attendent ce verrou (même quand le point de connexion est déjà fermé, en renvoyant l'arrêt à un
+  daemon qui se met à écouter en retard) avant d'appeler le gestionnaire de services ; systemd et
+  launchd laissent le même délai ; le superviseur Windows l'attend sur un premier Ctrl+C ou
   SIGTERM, mais une tâche terminée hors de `smf` (Planificateur de tâches, fin de session) arrête
-  le daemon tout de suite. Les rejeux
-  reposent sur les clés d'idempotence du moteur (`--key`), pas sur un cache du daemon.
+  le daemon tout de suite. Les rejeux reposent sur les clés d'idempotence du moteur (`--key`), pas
+  sur un cache du daemon.
 - `shutdown` est accepté avant tout `hello` et depuis toute version, pour qu'un `smf` plus récent
   puisse arrêter un daemon plus ancien.
 - Routage dans la CLI : `daemon …`, `mcp …`, `init`, `doctor`, l'aide et la version s'exécutent

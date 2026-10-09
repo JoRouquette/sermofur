@@ -26,14 +26,18 @@ the rules of the engine. The MCP bridge will be a second client of the same daem
   gets `daemon_version_mismatch`, whatever protocol either side speaks.
 - Writes to one instance run one at a time in the daemon; reads run concurrently. A client that
   leaves cancels its queued command; a started command completes its transaction. A shutdown
-  closes the endpoint, then lets started commands answer before the daemon exits (one request
-  timeout plus 5 s); a write still waiting for the lock gets `daemon_stopping`. A command still
-  running when that delay ends is cut, and its transaction rolled back. The daemon holds its lock
-  file until it exits: `smf daemon stop`, `restart`, `install` and `uninstall` wait for that lock
-  (even when the endpoint is already closed) before calling the service manager; systemd and
-  launchd give the same delay; the Windows supervisor waits for it on Ctrl+C or SIGTERM, but a
-  task ended outside `smf` (Task Scheduler, end of session) stops the daemon at once. Replays rely on the idempotency keys of the engine (`--key`), not on a cache
-  of the daemon.
+  stops serving new clients at once (on Unix the socket is removed; on Windows, where a pipe name
+  lives as long as its instances, one instance keeps accepting and closes every connection without
+  a word, so a client concludes "no daemon" immediately), then lets started commands answer before
+  the daemon exits (one request timeout plus 5 s); a write still waiting for the lock gets
+  `daemon_stopping`. A command still running when that delay ends is cut, and its transaction
+  rolled back. A second Ctrl+C or SIGTERM ends the process at once. The daemon holds its lock file
+  until it exits: `smf daemon stop`, `restart`, `install` and `uninstall` wait for that lock (even
+  when the endpoint is already closed, sending the stop again to a daemon that starts listening
+  late) before calling the service manager; systemd and launchd give the same delay; the Windows
+  supervisor waits for it on a first Ctrl+C or SIGTERM, but a task ended outside `smf` (Task
+  Scheduler, end of session) stops the daemon at once. Replays rely on the idempotency keys of the
+  engine (`--key`), not on a cache of the daemon.
 - `shutdown` is accepted before any `hello` and from any version, so that a newer `smf` can stop
   an older daemon.
 - Routing in the CLI: `daemon …`, `mcp …`, `init`, `doctor`, help and version always run in the

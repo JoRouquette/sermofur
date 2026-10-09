@@ -12,10 +12,12 @@ namespace Sermofur.Cli;
 /// <c>smf daemon …</c>: always run by the CLI itself, never through the daemon (FR-021).
 /// </summary>
 /// <param name="managers">Service manager for a set of paths; the one of this system by default.</param>
+/// <param name="error">Where progress and warnings go (stderr); never the JSON output.</param>
 public sealed class DaemonCommands(
     TextWriter output,
     Action<object, bool> write,
-    Func<DaemonPaths, IServiceManager>? managers = null
+    Func<DaemonPaths, IServiceManager>? managers = null,
+    TextWriter? error = null
 )
 {
     private static readonly string[] Subcommands =
@@ -116,6 +118,8 @@ public sealed class DaemonCommands(
         {
             // A definition the manager cannot run is refused before the running daemon stops.
             manager.Validate(definition);
+            // Whatever its version: only a daemon that ran is started again after a failure.
+            bool wasRunning = DaemonRuns(paths);
             // Another version or executable: the running daemon makes way for the new one.
             RequestShutdown(paths);
             // Written first: the Windows supervisor reads it as soon as the task starts.
@@ -123,7 +127,7 @@ public sealed class DaemonCommands(
             InstalledDefinition.Write(paths, definition);
             try
             {
-                manager.Install(definition);
+                manager.Install(definition, previous);
             }
             catch
             {
@@ -133,13 +137,78 @@ public sealed class DaemonCommands(
                 }
                 else
                 {
+                    // Restored before the previous service starts: its supervisor reads it.
                     InstalledDefinition.Write(paths, previous);
+                    if (wasRunning)
+                    {
+                        RestartPrevious(paths, manager);
+                    }
                 }
                 throw;
             }
             WaitForDaemon(paths);
         }
         return Status(paths, manager);
+    }
+
+    /// <summary>
+    /// After a failed reinstall, brings the previous service back, as far as it can: the error of
+    /// the install is the one reported, whatever happens here.
+    /// </summary>
+    private void RestartPrevious(DaemonPaths paths, IServiceManager manager)
+    {
+        try
+        {
+            if (!manager.Query().Installed)
+            {
+                // Nothing could be put back: no service to start.
+                error?.WriteLine("smf: no service is installed any more; run: smf daemon install");
+                return;
+            }
+            if (!DaemonRuns(paths))
+            {
+                manager.Start();
+            }
+            // The previous daemon usually runs an older version: any answer counts.
+            Stopwatch waited = Stopwatch.StartNew();
+            while (!DaemonRuns(paths))
+            {
+                if (waited.Elapsed >= StartTimeout)
+                {
+                    throw new SermofurException(
+                        "daemon_unavailable",
+                        $"no daemon answered within {StartTimeout.TotalSeconds:0} s",
+                        3
+                    );
+                }
+                Thread.Sleep(200);
+            }
+        }
+        catch (Exception exception) when (exception is SermofurException or IOException)
+        {
+            error?.WriteLine(
+                $"smf: the previous service could not be started again ({exception.Message}); run: smf daemon start"
+            );
+        }
+    }
+
+    /// <summary>True when a daemon of this account answers, whatever its version.</summary>
+    private static bool DaemonRuns(DaemonPaths paths)
+    {
+        try
+        {
+            return Answer(paths) is not null;
+        }
+        catch (SermofurException exception) when (exception.Code == "daemon_version_mismatch")
+        {
+            return true;
+        }
+        catch (Exception exception)
+            when (exception is SermofurException or IOException or OperationCanceledException)
+        {
+            // Closed between the welcome and the status, or not ours: not a running daemon.
+            return false;
+        }
     }
 
     private object Uninstall(DaemonPaths paths)
@@ -272,11 +341,12 @@ public sealed class DaemonCommands(
     /// exited; nothing happens when none answers. The service manager is called only after, so it
     /// never cuts a command short.
     /// </summary>
-    private static void RequestShutdown(DaemonPaths paths)
+    private void RequestShutdown(DaemonPaths paths)
     {
         try
         {
-            ShutdownAsync(paths).Wait(DaemonLimits.StopTimeout);
+            ShutdownAsync(paths, error)
+                .Wait(DaemonLimits.Default.StopTimeout + TimeSpan.FromSeconds(5));
         }
         catch (AggregateException)
         {
@@ -284,33 +354,90 @@ public sealed class DaemonCommands(
         }
     }
 
-    private static async Task ShutdownAsync(DaemonPaths paths)
+    /// <summary>
+    /// Asks the daemon to stop, then waits for its lock, which it holds until it has drained its
+    /// commands and exited. While the lock is held and no stop was delivered (a daemon that has
+    /// just started and does not listen yet), the request is sent again. Returns false when the
+    /// daemon is still there at the end of the delay.
+    /// </summary>
+    internal static async Task<bool> ShutdownAsync(DaemonPaths paths, TextWriter? progress)
     {
-        // A shutdown is accepted before any hello, from any version (contracts/ipc.md).
-        Stream? stream = await IpcEndpoint.ConnectAsync(
-            paths,
-            new FileOwnership(),
-            TimeSpan.FromSeconds(1),
-            CancellationToken.None
-        );
+        TimeSpan limit = DaemonLimits.Default.StopTimeout;
+        Stopwatch waited = Stopwatch.StartNew();
+        bool delivered = await AskToStopAsync(paths, TimeSpan.FromSeconds(1));
+        bool told = false;
+        while (DaemonLock.IsHeld(paths.LockFile))
+        {
+            if (waited.Elapsed >= limit)
+            {
+                progress?.WriteLine(
+                    $"smf: the daemon did not exit within {limit.TotalSeconds:0} s; it may be stopped by force."
+                );
+                return false;
+            }
+            if (!told && waited.Elapsed >= TimeSpan.FromSeconds(1))
+            {
+                progress?.WriteLine(
+                    $"smf: waiting for the daemon to finish its running commands ({limit.TotalSeconds:0} s at most)..."
+                );
+                told = true;
+            }
+            if (!delivered)
+            {
+                delivered = await AskToStopAsync(paths, TimeSpan.FromMilliseconds(200));
+            }
+            await Task.Delay(delivered ? 100 : 500);
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Sends a shutdown, accepted before any hello and from any version (contracts/ipc.md);
+    /// true when the daemon answered that it stops.
+    /// </summary>
+    private static async Task<bool> AskToStopAsync(DaemonPaths paths, TimeSpan timeout)
+    {
+        Stream? stream;
+        try
+        {
+            stream = await IpcEndpoint.ConnectAsync(
+                paths,
+                new FileOwnership(),
+                timeout,
+                CancellationToken.None
+            );
+        }
+        catch (SermofurException)
+        {
+            // Not an endpoint of ours: nothing to ask.
+            return false;
+        }
         if (stream is null)
         {
-            // No endpoint may mean a daemon already draining (it closes its endpoint first):
-            // wait for its lock all the same; with no daemon, the lock is free at once.
-            await DaemonLock.WaitForReleaseAsync(paths.LockFile, DaemonLimits.StopTimeout);
-            return;
+            return false;
         }
         await using (stream)
         {
-            await Framing.WriteAsync(
-                stream,
-                new IpcMessage { Kind = MessageKind.Shutdown },
-                CancellationToken.None
-            );
-            await Framing.ReadAsync(stream, CancellationToken.None);
+            try
+            {
+                await Framing.WriteAsync(
+                    stream,
+                    new IpcMessage { Kind = MessageKind.Shutdown },
+                    CancellationToken.None
+                );
+                using CancellationTokenSource answer = new CancellationTokenSource(
+                    TimeSpan.FromSeconds(2)
+                );
+                IpcMessage? reply = await Framing.ReadAsync(stream, answer.Token);
+                return reply?.Kind == MessageKind.Stopping;
+            }
+            catch (Exception exception)
+                when (exception is IOException or OperationCanceledException or SermofurException)
+            {
+                // A daemon already stopping closes the connection without a word.
+                return false;
+            }
         }
-        // The endpoint closes at the start of the drain; the lock goes only when the daemon exits.
-        await DaemonLock.WaitForReleaseAsync(paths.LockFile, DaemonLimits.StopTimeout);
     }
 
     private void WaitForDaemon(DaemonPaths paths)
@@ -355,26 +482,12 @@ public sealed class DaemonCommands(
         );
         ProcessStartInfo start = Supervisor.ChildStart(child, InstalledDefinition.Read(paths));
         using CancellationTokenSource stop = new CancellationTokenSource();
-        using PosixSignalRegistration terminate = PosixSignalRegistration.Create(
-            PosixSignal.SIGTERM,
-            context =>
-            {
-                context.Cancel = true;
-                stop.Cancel();
-            }
-        );
-        using PosixSignalRegistration interrupt = PosixSignalRegistration.Create(
-            PosixSignal.SIGINT,
-            context =>
-            {
-                context.Cancel = true;
-                stop.Cancel();
-            }
-        );
+        // A second signal ends the supervisor at once; its job object takes the daemon with it.
+        using IDisposable signals = SignalStop.Register(stop, null);
         Supervisor supervisor = new Supervisor(
             start,
             new DaemonLog(paths.LogFile),
-            () => ShutdownAsync(paths)
+            () => ShutdownAsync(paths, null)
         );
         return supervisor.Run(stop.Token);
     }
@@ -397,20 +510,15 @@ public sealed class DaemonCommands(
             owners
         );
         using CancellationTokenSource stop = new CancellationTokenSource();
-        using PosixSignalRegistration terminate = PosixSignalRegistration.Create(
-            PosixSignal.SIGTERM,
-            context =>
+        // The first signal drains the started commands; a second one ends the process at once.
+        using IDisposable signals = SignalStop.Register(
+            stop,
+            () =>
             {
-                context.Cancel = true;
-                stop.Cancel();
-            }
-        );
-        using PosixSignalRegistration interrupt = PosixSignalRegistration.Create(
-            PosixSignal.SIGINT,
-            context =>
-            {
-                context.Cancel = true;
-                stop.Cancel();
+                log.Write("draining");
+                error?.WriteLine(
+                    "smf: finishing the running commands; a second Ctrl+C or SIGTERM stops at once."
+                );
             }
         );
         // One line, even in JSON: a supervisor or a test reads it as the signal of readiness.

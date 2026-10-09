@@ -21,7 +21,7 @@ public sealed record DaemonLimits(TimeSpan HelloTimeout, TimeSpan RequestTimeout
     /// How long whoever stops the daemon waits for it to exit before forcing it (the CLI, the
     /// Windows supervisor, systemd and launchd): the drain plus a margin.
     /// </summary>
-    public static TimeSpan StopTimeout => Default.DrainTimeout + TimeSpan.FromSeconds(10);
+    public TimeSpan StopTimeout => DrainTimeout + TimeSpan.FromSeconds(10);
 }
 
 /// <summary>
@@ -98,9 +98,20 @@ public sealed class DaemonServer(
         }
         finally
         {
-            // The endpoint goes first: a new client finds no daemon at once and runs directly,
-            // instead of waiting for a hello nobody reads.
-            await listener.DisposeAsync();
+            // A new client must learn at once that no daemon serves it, instead of waiting for a
+            // hello nobody reads. On Unix, removing the socket is enough. On Windows the pipe name
+            // lives as long as session instances do, so one instance keeps accepting and closes
+            // every connection straight away.
+            using CancellationTokenSource refusing = new CancellationTokenSource();
+            Task refuser = Task.CompletedTask;
+            if (OperatingSystem.IsWindows())
+            {
+                refuser = RefuseAllAsync(listener, refusing.Token);
+            }
+            else
+            {
+                await listener.DisposeAsync();
+            }
             // Sessions end once their started command has answered; commands whose client got a
             // timeout still finish their transaction. One budget for both, from now on.
             Task drained = Task.WhenAll([.. sessions, .. inFlight.Keys]);
@@ -108,7 +119,40 @@ public sealed class DaemonServer(
             {
                 log.Write("drain_timeout");
             }
+            await refusing.CancelAsync();
+            await refuser;
+            if (OperatingSystem.IsWindows())
+            {
+                await listener.DisposeAsync();
+            }
             log.Write("stopped");
+        }
+    }
+
+    /// <summary>Accepts and closes every connection until cancelled: the daemon is stopping.</summary>
+    private static async Task RefuseAllAsync(IpcListener listener, CancellationToken cancellation)
+    {
+        while (!cancellation.IsCancellationRequested)
+        {
+            try
+            {
+                Stream stream = await listener.AcceptAsync(cancellation);
+                await stream.DisposeAsync();
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+            catch (Exception exception) when (exception is IOException or ObjectDisposedException)
+            {
+                // A client that left at once; keep refusing.
+            }
+            catch (Exception)
+            {
+                // No new instance could be made (name taken, rights): stop refusing; the drain
+                // and the exit go on, clients then fall back after their connect timeout.
+                return;
+            }
         }
     }
 
