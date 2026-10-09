@@ -1,4 +1,5 @@
 using System.Text;
+using Sermofur.Daemon;
 
 namespace Sermofur.Cli;
 
@@ -64,6 +65,11 @@ public static class CommandHelp
     private static readonly HelpEntry McpScope = new HelpEntry(
         "--scope project|user",
         "Codex only: configuration of the project (.codex/config.toml, loaded when the project is trusted) or of the user. Default: project."
+    );
+
+    private static readonly HelpEntry RegistryBusy = new HelpEntry(
+        "registry_busy (3)",
+        $"Another smf process has been changing the registry for {InstanceRegistry.DefaultLockTimeout.TotalSeconds:0} s, or another program holds it open; nothing changed, run again."
     );
 
     private static IReadOnlyList<HelpEntry> Entries(params HelpEntry[] entries) => entries;
@@ -472,7 +478,7 @@ public static class CommandHelp
         new(
             "daemon status",
             "",
-            "State of the daemon: absent, installed_stopped, running, version_mismatch, foreign_endpoint or service_manager_unavailable; version, process, start time, open instances, clients.",
+            $"State of the daemon: absent, installed_stopped, running, version_mismatch, foreign_endpoint or service_manager_unavailable; whether a running daemon answers within {DaemonCommands.DefaultStatusTimeout.TotalSeconds:0} s (answering), version, process, start time, open instances, clients.",
             [],
             [],
             [],
@@ -488,7 +494,8 @@ public static class CommandHelp
                 new HelpEntry(
                     "invalid_registry (3)",
                     "The registry cannot be read; it is left untouched."
-                )
+                ),
+                RegistryBusy
             ),
             "smf daemon register"
         ),
@@ -498,7 +505,10 @@ public static class CommandHelp
             "Stops serving an instance, found from the context directory or registered at that exact path.",
             [],
             [],
-            Entries(new HelpEntry("not_registered (1)", "No such instance in the registry.")),
+            Entries(
+                new HelpEntry("not_registered (1)", "No such instance in the registry."),
+                RegistryBusy
+            ),
             "smf daemon unregister --path ~/work"
         ),
         new(

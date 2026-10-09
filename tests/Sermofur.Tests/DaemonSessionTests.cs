@@ -21,7 +21,7 @@ public class DaemonSessionTests
     {
         using TestInstance fixture = new TestInstance();
         using ManualResetEventSlim release = new ManualResetEventSlim();
-        EchoExecutor executor = new EchoExecutor(release);
+        GatedExecutor executor = new GatedExecutor(release);
         await using TestDaemon daemon = TestDaemon.Start(executor);
         daemon.Registry.Register(fixture.Root, DateTimeOffset.Now);
         await using DaemonClient client = (await daemon.Connect(fixture.Root))!;
@@ -58,7 +58,7 @@ public class DaemonSessionTests
     {
         using TestInstance fixture = new TestInstance();
         using ManualResetEventSlim release = new ManualResetEventSlim();
-        EchoExecutor executor = new EchoExecutor(release);
+        GatedExecutor executor = new GatedExecutor(release);
         await using TestDaemon daemon = TestDaemon.Start(executor);
         daemon.Registry.Register(fixture.Root, DateTimeOffset.Now);
         await using DaemonClient holder = (await daemon.Connect(fixture.Root))!;
@@ -80,13 +80,13 @@ public class DaemonSessionTests
     public async Task LargeNonAsciiOutputIsAnsweredOnce()
     {
         using TestInstance fixture = new TestInstance();
-        EchoExecutor executor = new EchoExecutor(null);
+        GatedExecutor executor = new GatedExecutor(null);
         await using TestDaemon daemon = TestDaemon.Start(executor);
         daemon.Registry.Register(fixture.Root, DateTimeOffset.Now);
         await using DaemonClient client = (await daemon.Connect(fixture.Root))!;
         IpcMessage answer = await client.RunAsync(["big"], CancellationToken.None);
         Assert.Equal(MessageKind.Result, answer.Kind);
-        Assert.Equal(EchoExecutor.Big, answer.Stdout);
+        Assert.Equal(GatedExecutor.Big, answer.Stdout);
         IpcMessage huge = await client.RunAsync(["huge"], CancellationToken.None);
         Assert.Equal(("error", "response_too_large", 1), (huge.Kind, huge.Code, huge.ExitCode));
         // The session is still usable, and each command ran exactly once.
@@ -149,9 +149,9 @@ public class DaemonSessionTests
     public async Task InterruptedWriteIsNeverReplayedDirectly()
     {
         using TestInstance fixture = new TestInstance();
-        await using FakeDaemon fake = FakeDaemon.Start(
+        await using StubDaemon fake = new StubDaemon(
             DaemonPaths.ForCurrentUser(),
-            FakeDaemon.Close
+            StubDaemon.Close
         );
         using StringWriter output = new StringWriter();
         using StringWriter error = new StringWriter();
@@ -169,9 +169,9 @@ public class DaemonSessionTests
     public async Task InterruptedReadRunsDirectly()
     {
         using TestInstance fixture = new TestInstance();
-        await using FakeDaemon fake = FakeDaemon.Start(
+        await using StubDaemon fake = new StubDaemon(
             DaemonPaths.ForCurrentUser(),
-            FakeDaemon.Close
+            StubDaemon.Close
         );
         using StringWriter output = new StringWriter();
         using StringWriter error = new StringWriter();
@@ -184,9 +184,9 @@ public class DaemonSessionTests
     public async Task RefusedHelloIsNeverFollowedByADirectRun()
     {
         using TestInstance fixture = new TestInstance();
-        await using FakeDaemon fake = FakeDaemon.Start(
+        await using StubDaemon fake = new StubDaemon(
             DaemonPaths.ForCurrentUser(),
-            FakeDaemon.Close,
+            StubDaemon.Close,
             refuseHello: true
         );
         using StringWriter output = new StringWriter();
@@ -200,7 +200,7 @@ public class DaemonSessionTests
     [Fact]
     public async Task AnswerToAnotherRequestIsAProtocolError()
     {
-        await using FakeDaemon fake = FakeDaemon.StartAlone(FakeDaemon.WrongId);
+        await using StubDaemon fake = StubDaemon.StartAlone(StubDaemon.WrongId);
         await using DaemonClient client = (
             await DaemonClient.ConnectAsync(
                 fake.Paths,
@@ -222,7 +222,7 @@ public class DaemonSessionTests
     {
         using TestInstance fixture = new TestInstance();
         using ManualResetEventSlim release = new ManualResetEventSlim();
-        EchoExecutor executor = new EchoExecutor(release);
+        GatedExecutor executor = new GatedExecutor(release);
         await using TestDaemon daemon = TestDaemon.Start(executor);
         daemon.Registry.Register(fixture.Root, DateTimeOffset.Now);
         await using DaemonChannel channel = new DaemonChannel(
@@ -245,7 +245,7 @@ public class DaemonSessionTests
     [Fact]
     public async Task InterruptedMcpWriteIsReportedAndNeverSentAgain()
     {
-        await using FakeDaemon fake = FakeDaemon.StartAlone(FakeDaemon.Close);
+        await using StubDaemon fake = StubDaemon.StartAlone(StubDaemon.Close);
         await using DaemonChannel channel = new DaemonChannel(
             fake.Paths,
             ProductVersion.Current,
@@ -265,9 +265,9 @@ public class DaemonSessionTests
     public async Task OversizedReadRunsDirectlyButAnOversizedWriteIsNotReplayed()
     {
         using TestInstance fixture = new TestInstance();
-        await using FakeDaemon fake = FakeDaemon.Start(
+        await using StubDaemon fake = new StubDaemon(
             DaemonPaths.ForCurrentUser(),
-            FakeDaemon.TooLarge
+            StubDaemon.TooLarge
         );
         using StringWriter output = new StringWriter();
         using StringWriter error = new StringWriter();
@@ -322,220 +322,5 @@ public class DaemonSessionTests
         );
         // Two bytes per "é", not the six of "é".
         Assert.True(frame.Length < 2100, $"{frame.Length} bytes");
-    }
-
-    /// <summary>
-    /// Writes its first argument on stdout; "block" waits for the test; "big" is 300 KiB of
-    /// accented text; "huge" is over the answer limit; "write" anywhere plans a write.
-    /// </summary>
-    private sealed class EchoExecutor(ManualResetEventSlim? release) : ICommandExecutor
-    {
-        public static readonly string Big = string.Concat(Enumerable.Repeat("é€ ", 100_000));
-
-        private readonly TaskCompletionSource started = new(
-            TaskCreationOptions.RunContinuationsAsynchronously
-        );
-        private readonly Dictionary<string, TaskCompletionSource> planned = [];
-
-        public Task Started => started.Task;
-
-        public List<string> Executed { get; } = [];
-
-        public Task Planned(string command)
-        {
-            lock (planned)
-            {
-                if (!planned.TryGetValue(command, out TaskCompletionSource? source))
-                {
-                    source = new TaskCompletionSource(
-                        TaskCreationOptions.RunContinuationsAsynchronously
-                    );
-                    planned[command] = source;
-                }
-                return source.Task;
-            }
-        }
-
-        public CommandPlan Plan(IReadOnlyList<string> argv, string workingDirectory)
-        {
-            // Signalled just before the daemon waits for the write lock.
-            _ = Planned(argv[0]);
-            lock (planned)
-            {
-                planned[argv[0]].TrySetResult();
-            }
-            return new CommandPlan(workingDirectory, argv.Contains("write"));
-        }
-
-        public CommandOutcome Execute(IReadOnlyList<string> argv, string workingDirectory)
-        {
-            lock (Executed)
-            {
-                Executed.Add(argv[0]);
-            }
-            if (argv[0] == "block")
-            {
-                started.TrySetResult();
-                release?.Wait(TimeSpan.FromSeconds(30));
-            }
-            string output = argv[0] switch
-            {
-                "big" => Big,
-                "huge" => new string('x', Framing.MaxResponseBytes + 1),
-                _ => argv[0],
-            };
-            return new CommandOutcome(0, output, "");
-        }
-    }
-
-    /// <summary>
-    /// A daemon that welcomes any client, then handles each run with <c>behavior</c>: close
-    /// the session without answering, or answer another request.
-    /// </summary>
-    private sealed class FakeDaemon : IAsyncDisposable
-    {
-        public const string Close = "close";
-        public const string WrongId = "wrong_id";
-        public const string TooLarge = "too_large";
-
-        private readonly CancellationTokenSource stop = new();
-        private int runs;
-
-        /// <summary>Run frames received so far.</summary>
-        public int Runs => Volatile.Read(ref runs);
-        private readonly Task serving;
-        private readonly string? ownHome;
-
-        private FakeDaemon(DaemonPaths paths, string behavior, bool refuseHello, string? ownHome)
-        {
-            Paths = paths;
-            this.ownHome = ownHome;
-            IpcListener listener = IpcEndpoint
-                .ListenAsync(paths, new FileOwnership(), stop.Token)
-                .GetAwaiter()
-                .GetResult();
-            serving = Task.Run(() => ServeAsync(listener, behavior, refuseHello));
-        }
-
-        public DaemonPaths Paths { get; }
-
-        public static FakeDaemon Start(
-            DaemonPaths paths,
-            string behavior,
-            bool refuseHello = false,
-            string? ownHome = null
-        ) => new FakeDaemon(paths, behavior, refuseHello, ownHome);
-
-        /// <summary>A fake daemon on a home of its own, deleted when it stops.</summary>
-        public static FakeDaemon StartAlone(string behavior)
-        {
-            string home = TestDaemon.NewHome();
-            return new FakeDaemon(TestDaemon.PathsOf(home), behavior, false, home);
-        }
-
-        private async Task ServeAsync(IpcListener listener, string behavior, bool refuseHello)
-        {
-            await using (listener)
-            {
-                while (!stop.IsCancellationRequested)
-                {
-                    Stream stream;
-                    try
-                    {
-                        stream = await listener.AcceptAsync(stop.Token);
-                    }
-                    catch (Exception exception)
-                        when (exception is OperationCanceledException or IOException)
-                    {
-                        return;
-                    }
-                    await using (stream)
-                    {
-                        try
-                        {
-                            await Framing.ReadAsync(stream, stop.Token);
-                            if (refuseHello)
-                            {
-                                await Framing.WriteAsync(
-                                    stream,
-                                    IpcMessage.Failure("protocol_error", "Refused by the test."),
-                                    stop.Token
-                                );
-                                continue;
-                            }
-                            await Framing.WriteAsync(
-                                stream,
-                                new IpcMessage
-                                {
-                                    Kind = MessageKind.Welcome,
-                                    Protocol = IpcMessage.CurrentProtocol,
-                                    ToolVersion = ProductVersion.Current,
-                                },
-                                stop.Token
-                            );
-                            IpcMessage? run = await Framing.ReadAsync(stream, stop.Token);
-                            if (run?.Kind == MessageKind.Run)
-                            {
-                                Interlocked.Increment(ref runs);
-                            }
-                            if (behavior == TooLarge && run?.Id is long large)
-                            {
-                                await Framing.WriteAsync(
-                                    stream,
-                                    IpcMessage.Failure(
-                                        "response_too_large",
-                                        "Too large.",
-                                        large
-                                    ) with
-                                    {
-                                        ExitCode = 1,
-                                    },
-                                    stop.Token
-                                );
-                            }
-                            if (behavior == WrongId && run?.Id is long id)
-                            {
-                                await Framing.WriteAsync(
-                                    stream,
-                                    new IpcMessage
-                                    {
-                                        Kind = MessageKind.Result,
-                                        Id = id + 1,
-                                        ExitCode = 0,
-                                        Stdout = "",
-                                        Stderr = "",
-                                    },
-                                    stop.Token
-                                );
-                            }
-                        }
-                        catch (Exception exception)
-                            when (exception
-                                    is IOException
-                                        or OperationCanceledException
-                                        or SermofurException
-                            )
-                        {
-                            // The client went away.
-                        }
-                    }
-                }
-            }
-        }
-
-        public async ValueTask DisposeAsync()
-        {
-            await stop.CancelAsync();
-            try
-            {
-                await serving.WaitAsync(TimeSpan.FromSeconds(10));
-            }
-            catch (OperationCanceledException) { }
-            stop.Dispose();
-            if (ownHome is not null)
-            {
-                TestDaemon.DeleteHome(ownHome);
-            }
-        }
     }
 }

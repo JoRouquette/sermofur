@@ -27,13 +27,24 @@ les règles du moteur. Le pont MCP sera un second client du même daemon.
 - Le daemon contrôle d'abord la version de l'outil, puis le protocole : un client d'une autre
   version reçoit toujours `daemon_version_mismatch`, quel que soit le protocole de chacun.
 - Les écritures sur une instance passent une à une dans le daemon ; les lectures s'exécutent en
-  parallèle. Un client qui s'en va annule sa commande en file d'attente ; une commande commencée
+  parallèle. Au plus une commande par cœur du processeur moins un (deux au moins) s'exécute à la
+  fois, chacune sur un fil qui lui est propre : hellos, statut et arrêt n'attendent jamais derrière
+  elles. Une échéance par requête, à partir de son arrivée : une commande dont le tour ou la place
+  n'est pas venu dans le délai de requête, ou vient alors qu'il en reste moins d'un vingtième,
+  reçoit `daemon_busy` et n'a pas commencé ; une lecture attend une place 5 s au plus, puis reçoit
+  aussi `daemon_busy` (la CLI relance directement une lecture ; le pont MCP, qui n'exécute jamais
+  en direct, transmet l'erreur à son hôte, qui rappelle) ; une commande
+  commencée et pas terminée à ce moment reçoit `request_timeout` et continue. La CLI laisse au
+  daemon le délai de requête plus 10 s, puis tient la session pour perdue : une lecture est
+  relancée directement, une écriture reçoit `daemon_interrupted`. Le journal s'écrit en
+  arrière-plan et ne retient jamais une requête.
+  Un client qui s'en va annule sa commande en file d'attente ; une commande commencée
   termine sa transaction. Un arrêt cesse aussitôt de servir de nouveaux clients (sous Unix le
   socket est supprimé ; sous Windows, où un nom de pipe vit autant que ses instances, une instance
   continue d'accepter et ferme chaque connexion sans un mot, si bien qu'un client conclut
   immédiatement « aucun daemon »), puis laisse les commandes commencées répondre avant que le
-  daemon ne se termine (un délai de requête plus 5 s) ; une écriture qui attend encore le verrou
-  reçoit `daemon_stopping`. Une commande encore en cours à la fin de ce délai est coupée, et sa
+  daemon ne se termine (un délai de requête plus 5 s) ; une commande qui attend encore son tour ou
+  sa place reçoit `daemon_stopping`. Une commande encore en cours à la fin de ce délai est coupée, et sa
   transaction annulée. Un second Ctrl+C ou SIGTERM termine le processus aussitôt. Le daemon garde
   son fichier de verrou jusqu'à sa fin : `smf daemon stop`, `restart`, `install` et `uninstall`
   attendent ce verrou (même quand le point de connexion est déjà fermé, en renvoyant l'arrêt à un

@@ -460,6 +460,51 @@ public class ServiceTests
             CancellationToken.None
         );
 
+    [Fact]
+    public async Task StatusOfASilentDaemonSaysItRunsButDoesNotAnswer()
+    {
+        await using StubDaemon silent = new StubDaemon(DaemonPaths.ForCurrentUser());
+        using FakeManager manager = new FakeManager();
+        Stopwatch watch = Stopwatch.StartNew();
+        // Bounded from outside: without the status deadline, the call would never return.
+        CliResult result = await Task.Run(() => DaemonWith(manager, null, "status", "--json"))
+            .WaitAsync(TimeSpan.FromSeconds(30));
+        Assert.True(watch.Elapsed < TimeSpan.FromSeconds(6), $"{watch.ElapsedMilliseconds} ms");
+        JsonElement status = Json(result);
+        Assert.Equal("running", status.GetProperty("state").GetString());
+        Assert.False(status.GetProperty("answering").GetBoolean());
+    }
+
+    [Fact]
+    public async Task InstallReplacesADaemonThatDoesNotAnswer()
+    {
+        using FakeManager manager = new FakeManager();
+        Json(Daemon(manager, "install", "--json"));
+        // The installed daemon is replaced by one that welcomes clients and answers nothing.
+        manager.Stop();
+        StubDaemon silent = new StubDaemon(DaemonPaths.ForCurrentUser());
+        manager.BeforeStart = () => Silence(silent);
+        try
+        {
+            CliResult result = await Task.Run(() => DaemonWith(manager, null, "install", "--json"))
+                .WaitAsync(TimeSpan.FromSeconds(60));
+            JsonElement status = Json(result);
+            Assert.Equal(2, manager.Installs);
+            Assert.Equal("running", status.GetProperty("state").GetString());
+            Assert.True(status.GetProperty("answering").GetBoolean());
+        }
+        finally
+        {
+            await silent.DisposeAsync();
+            // The run shares one daemon home: leave no installed definition behind.
+            Daemon(manager, "uninstall", "--json");
+        }
+    }
+
+    /// <summary>Stops the silent daemon before the service starts its own, as a crash would.</summary>
+    private static void Silence(StubDaemon silent) =>
+        silent.DisposeAsync().AsTask().GetAwaiter().GetResult();
+
     private static Task<DaemonClient?> Connect(DaemonPaths paths) =>
         DaemonClient.ConnectAsync(
             paths,
@@ -494,6 +539,7 @@ public class ServiceTests
             )
             {
                 StartTimeout = TimeSpan.FromSeconds(10),
+                StatusTimeout = TimeSpan.FromSeconds(1),
             }.Run(new CommandArguments(["daemon", .. arguments]), json, TestInstance.TempRoot);
         }
         catch (SermofurException exception)
@@ -581,11 +627,15 @@ public class ServiceTests
         /// <summary>Version the simulated daemon answers with; the current one by default.</summary>
         public string DaemonVersion { get; init; } = ProductVersion.Current;
 
+        /// <summary>Runs before the simulated daemon starts (to clear the endpoint, for example).</summary>
+        public Action? BeforeStart { get; set; }
+
         public void Start()
         {
             // A daemon stopped by a shutdown request is started anew, as a service manager would.
             if (daemon is null || daemon.Serving.IsCompleted)
             {
+                BeforeStart?.Invoke();
                 Starts++;
                 daemon?.Dispose();
                 daemon = new TestDaemonOnPaths(DaemonPaths.ForCurrentUser(), DaemonVersion);

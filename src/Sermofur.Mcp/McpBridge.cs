@@ -43,8 +43,15 @@ public sealed class McpBridge(ICommandChannel channel, string version, DaemonLog
         await using StdioServerTransport transport = new StdioServerTransport(options);
         await using McpServer server = McpServer.Create(transport, options);
         log?.Write("mcp_started");
-        await server.RunAsync(stop);
-        log?.Write("mcp_stopped");
+        try
+        {
+            await server.RunAsync(stop);
+            log?.Write("mcp_stopped");
+        }
+        finally
+        {
+            log?.FlushBeforeExit();
+        }
     }
 
     public static ListToolsResult ListTools() =>

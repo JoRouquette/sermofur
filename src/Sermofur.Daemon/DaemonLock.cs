@@ -12,15 +12,10 @@ public static class DaemonLock
     /// <summary>Takes the lock, or throws <c>daemon_already_running</c>.</summary>
     public static FileStream Acquire(DaemonPaths paths)
     {
-        Directory.CreateDirectory(paths.StateDirectory);
+        FileTurn.CreatePrivateFolder(paths.StateDirectory);
         try
         {
-            return new FileStream(
-                paths.LockFile,
-                FileMode.OpenOrCreate,
-                FileAccess.ReadWrite,
-                FileShare.None
-            );
+            return FileTurn.Take(paths.LockFile);
         }
         catch (IOException)
         {

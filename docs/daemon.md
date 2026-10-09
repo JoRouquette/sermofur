@@ -42,8 +42,9 @@ is not registered run directly.
 If the daemon stops while it runs a command (crash, a Windows task ended outside `smf`, or a
 command still running when the shutdown delay ends), a read runs again directly; a write is never
 run twice: the CLI reports `daemon_interrupted`, and you check its result before running it
-again. A shutdown lets commands already started finish and answer (65 s at most); a write still
-waiting for its turn gets `daemon_stopping` and did not start. Meanwhile new commands find no
+again. A shutdown lets commands already started finish and answer (65 s at most); a command
+still waiting for its turn or for a place to run gets `daemon_stopping` and did not start (the
+CLI runs a read again directly). Meanwhile new commands find no
 daemon at once and run directly: on Linux and macOS the socket is removed; on Windows the pipe
 stays listed but closes every new connection. `smf daemon stop`, `restart`, `install` and
 `uninstall` wait for the daemon to exit (75 s at most) before they call the service manager, and
@@ -52,13 +53,25 @@ stderr, and they warn when the delay runs out; with `--json`, stderr keeps only 
 daemon that has just started and does not listen yet receives the stop request again until it
 answers.
 
+Under load, the daemon runs at most one command per processor core but one (two at least), each
+on a thread of its own; connections, status and stop never wait for a place. A command has 60 s
+from the moment it reaches the daemon: when its turn (a write behind other writes to the same
+instance) or its place has not come by then, or comes with less than 3 s left, it gets
+`daemon_busy` and did not start. A read waits 5 s at most for a place, then gets `daemon_busy`
+too; the CLI runs a read again directly. The CLI waits 70 s for an
+answer; past that, it treats the daemon as stopped during the command: a read runs again
+directly, a write reports `daemon_interrupted` (the daemon may still be running it).
+`smf daemon status` gives the daemon 5 s to answer, then reports it `running` with
+`"answering": false`; such a daemon is replaced by `smf daemon restart` or `smf daemon install`.
+The journal never holds up a command: lines are queued and written in the background.
+
 | Command | Effect |
 |---|---|
-| `smf daemon status [--json]` | `absent`, `installed_stopped`, `running`, `version_mismatch`, `foreign_endpoint`, `service_manager_unavailable`; version, process, start, open instances, clients |
+| `smf daemon status [--json]` | `absent`, `installed_stopped`, `running`, `version_mismatch`, `foreign_endpoint`, `service_manager_unavailable`; whether a running daemon answers, version, process, start, open instances, clients |
 | `smf daemon start` / `stop` / `restart` | Pilots the installed service |
 | `smf daemon register` / `unregister` | Adds or removes the instance found from the folder (or `--path`) |
 | `smf daemon instances` | Registered instances; `missing` for one no longer found |
-| `smf daemon run [--supervise]` | Serves in the foreground; the first Ctrl+C finishes the running commands, a second one stops at once |
+| `smf daemon run [--supervise]` | Serves in the foreground; the first Ctrl+C or SIGTERM lets the running commands finish, a second one stops at once |
 | `smf daemon uninstall` | Stops and removes the service; instances, backups and registry are kept |
 
 `smf doctor` reports the daemon: `ok` when it runs with your version, `warning` when it is absent
@@ -93,7 +106,11 @@ On Linux and macOS, files in use do not block their replacement: update, then ru
 
 The journal holds one JSON object per line (local time with its offset), three files of 1 MiB at
 most. It records events, error codes, client process IDs and durations, never the arguments or
-outputs of a command.
+outputs of a command. The daemon, the Windows supervisor and the MCP servers write it in turn,
+through `daemon.log.lock` beside it; `instances.json.lock` does the same for changes to the
+registry. Both stay in place and hold nothing. On Linux and macOS, these lock files and
+`daemon.lock` are readable by you only (one left by an older version is narrowed), and a missing
+configuration or state folder is created private to you; an existing folder keeps its rights.
 
 On Windows, a terminal started by a packaged (MSIX) application, such as some desktop apps, may
 write `%APPDATA%` into a private copy of that application: the registry it writes is then
@@ -117,16 +134,18 @@ agent on Linux and macOS, through the supervisor on Windows. A different `PATH` 
 |---|---|---|
 | `daemon_version_mismatch` | 3 | The running daemon has another version: `smf daemon restart` when it is the older one; otherwise restart the client (the MCP server in its host) or update smf |
 | `daemon_unavailable` | 3 | Service not installed (`start`, `stop`, `restart`), or registered but not answering |
-| `daemon_interrupted` | 3 | The daemon stopped during a write: its result is unknown, check before running it again |
+| `daemon_interrupted` | 3 | The daemon stopped during a write, or did not answer it within 70 s (it may still be running it): its result is unknown, check before running it again |
 | `daemon_stopping` | 3 | The daemon was stopping; the command did not start: run it again |
+| `daemon_busy` | 3 | The daemon could not start the command in time (writes ahead on the same instance, or every place taken: 5 s for a read, the 60 s deadline for a write); the command did not start: run it again (the CLI runs a read again directly) |
 | `cli_only` | 3 | A client sent the daemon a command that runs only in the CLI |
 | `daemon_already_running` | 3 | `smf daemon run` while a daemon already serves you |
 | `service_manager_unavailable` | 3 | No service manager in the session |
 | `service_install_failed` | 3 | The service manager refused the service, or a value cannot go into its definition; previous state restored: the previous registration is put back (on Windows, the previous task is rebuilt from its definition) and the previous daemon is started again if it was running (launchd starts it as it loads it) |
 | `foreign_endpoint` | 4 | The endpoint or its folder belongs to another account or is not private |
 | `invalid_registry` | 3 | Registry unreadable, too large or malformed; left untouched |
+| `registry_busy` | 3 | Another `smf` process has been changing the registry for 10 s, or (Windows) another program holds it open; nothing changed: run again |
 | `not_registered` | 1 | `unregister` of an instance that is not in the registry |
 | `request_too_large` | 1 | Request over 256 KiB; the CLI runs it directly |
 | `response_too_large` | 1 | Output of a write over 16 MiB: it ran, check its effect before running it again (a read runs again directly) |
-| `request_timeout` | 3 | Command over 60 s; it keeps running and may still apply |
+| `request_timeout` | 3 | Command started but not finished 60 s after it reached the daemon; it keeps running and may still apply |
 | `protocol_error` | 3 | Malformed request |
