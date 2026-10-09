@@ -155,6 +155,25 @@ serveur MCP quand la racine de l'instance ne le déclare pas.
   supprimée quand rien ne peut être remis en place ; un `schtasks.exe`
   introuvable signalé comme gestionnaire de services indisponible ; launchd qui a le temps de
   retirer l'agent, et un bootstrap en erreur 5 retenté.
+- Charge (`DaemonLoadTests`, `SharedFilesTests`, `ServiceTests`) : une écriture derrière une
+  écriture longue refusée en `daemon_busy` à l'échéance et jamais exécutée ; une lecture qui
+  attend une place refusée à sa propre limite, bien avant l'échéance ; une place venue trop tard
+  rendue sans démarrer, l'écriture suivante démarrant aussitôt ; une limite de zéro place refusée ; toutes les places prises, un hello et un statut servis pendant qu'une lecture
+  en surnombre attend, puis s'exécute ; une écriture qui s'en va pendant qu'elle attend une place
+  rend le tour de son instance ; une lecture qui attend une place refusée en `daemon_stopping` à
+  l'arrêt ; face à `daemon_stopping` ou `daemon_busy`, la CLI relance directement une lecture et
+  n'envoie jamais deux fois une écriture ; un daemon qui accueille et ne répond jamais : la CLI
+  relance directement une lecture et signale une écriture en `daemon_interrupted` sans
+  l'enregistrer, `smf daemon status` le donne en marche sans réponse, et `smf daemon install` le
+  remplace ; 24 recalls et une
+  écriture sur une vraie instance, tous servis ; huit enregistrements concurrents tous conservés ;
+  un registre tenu par un autre processus signalé `registry_busy`, et un registre ouvert par un
+  lecteur remplacé dès que le lecteur le lâche ; deux réécritures du registre de même date et de
+  même taille toutes deux vues par le daemon, un registre daté dans le futur lu sur sa seule
+  empreinte ; quatre écrivains d'un même journal qui gardent toutes leurs lignes à travers deux
+  rotations ; un journal dont un autre processus tient le tour ne retient jamais l'appelant ;
+  fichiers verrous et nouveaux dossiers privés sous Linux et macOS, et un verrou laissé ouvert aux
+  autres par une version plus ancienne restreint.
 - L'ensemble des tests utilise son propre `SERMOFUR_DAEMON_HOME` : il n'atteint jamais le daemon
   du développeur.
 - Pont MCP (ADR 0017) : le vrai protocole avec le client du SDK officiel contre un processus
@@ -190,6 +209,15 @@ serveur MCP quand la racine de l'instance ne le déclare pas.
 **2,9 ms** au 95e percentile à une commande sur une instance ouverte (limite de la spec : 50 ms).
 Sans daemon, la CLI paie une recherche dans le système de fichiers avant de s'exécuter directement
 (moins de 100 ms, `NoDaemonMeansNoClient`).
+
+`TwentyFourRecallsAndAWriteAllAnswerAndHellosStayInTime` : le 2026-10-09, même machine
+(12 processeurs logiques, donc 11 places), 24 recalls et une écriture envoyés d'un coup sur une
+instance de 40 claims ont tous été servis en 0,6 à 1 s en passage isolé ; le hello le plus lent a
+pris 30 à 45 ms (environ 220 ms au premier passage, à froid), contre les 500 ms au-delà
+desquelles la CLI s'exécute directement. Au milieu de la suite complète, la machine étant chargée
+par d'autres tests, un hello a pris une fois jusqu'à 1,8 s : tous les cœurs étant occupés, la CLI
+exécute alors simplement la commande directement. Le test tolère 5 s, pour qu'un runner de CI
+chargé ne le fasse pas échouer, et rapporte les valeurs observées.
 
 ## Performance du recall
 

@@ -98,6 +98,8 @@ the user's origin and are not offered. Values passed as CLI option values (`even
 | `daemon_version_mismatch` | The message names the side that is behind: `smf daemon restart`, or restart the server in the host |
 | `daemon_interrupted` | The daemon stopped during the call: check whether the write happened before calling again |
 | `daemon_stopping` | The daemon was stopping; nothing started, call again once it is back |
+| `daemon_busy` | The daemon could not start the command in time (writes ahead on the same instance, or every place to run taken: 5 s for a read, 60 s for a write); nothing started, call again |
+| `request_timeout` | The command started but did not finish within 60 s; it keeps running and may still apply: check before calling again |
 | `not_served` | `smf daemon register` in the project |
 | `no_instance` | `smf init`, then `smf daemon register`, in the project |
 | `invalid_input` | Input outside the schema, or a value starting with `--` |

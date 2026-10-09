@@ -24,8 +24,18 @@ public sealed class ServingGate(
     private readonly Dictionary<string, DateTimeOffset> open = new(
         OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal
     );
+
+    /// <summary>
+    /// Longer than the coarsest date of a file system in use (FAT: 2 s), so that two writes with
+    /// the same date and size are never both missed.
+    /// </summary>
+    private static readonly TimeSpan RecentWrite = TimeSpan.FromSeconds(3);
+
     private IReadOnlyList<RegisteredInstance> entries = [];
-    private DateTime loadedAt = DateTime.MinValue;
+
+    /// <summary>Stamp of the registry as last read; null before the first read.</summary>
+    private RegistryStamp? loaded;
+    private bool recent;
 
     public int OpenCount
     {
@@ -81,8 +91,8 @@ public sealed class ServingGate(
 
     private void Reload()
     {
-        DateTime written = registry.LastWriteUtc();
-        if (written == loadedAt)
+        RegistryStamp stamp = registry.Stamp();
+        if (stamp == loaded && !recent)
         {
             return;
         }
@@ -96,7 +106,12 @@ public sealed class ServingGate(
             refused?.Invoke(exception.Code);
             entries = [];
         }
-        loadedAt = written;
+        loaded = stamp;
+        // A file written within the last ticks of the file system may be written again with the
+        // same date and size: read it again next time, until it has aged. A date in the future
+        // (clock set back, restored file) counts as aged: the stamp alone decides.
+        TimeSpan age = DateTime.UtcNow - stamp.WrittenUtc;
+        recent = age >= TimeSpan.Zero && age < RecentWrite;
         foreach (string root in open.Keys.ToList())
         {
             if (!entries.Any(entry => InstanceRegistry.Same(entry.Root, root)))

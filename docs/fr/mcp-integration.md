@@ -103,6 +103,8 @@ pas proposés. Les valeurs passées comme valeurs d'options de la CLI (`event`, 
 | `daemon_version_mismatch` | Le message nomme le côté en retard : `smf daemon restart`, ou redémarrer le serveur dans le host |
 | `daemon_interrupted` | Le daemon s'est arrêté pendant l'appel : vérifier si l'écriture a eu lieu avant de rappeler |
 | `daemon_stopping` | Le daemon s'arrêtait ; rien n'a commencé, rappeler une fois qu'il est revenu |
+| `daemon_busy` | Le daemon n'a pas pu commencer la commande à temps (écritures devant sur la même instance, ou toutes les places prises : 5 s pour une lecture, 60 s pour une écriture) ; rien n'a commencé, rappeler |
+| `request_timeout` | La commande a commencé mais ne s'est pas terminée en 60 s ; elle continue et peut encore s'appliquer : vérifier avant de rappeler |
 | `not_served` | `smf daemon register` dans le projet |
 | `no_instance` | `smf init`, puis `smf daemon register`, dans le projet |
 | `invalid_input` | Entrée hors du schéma, ou valeur qui commence par `--` |

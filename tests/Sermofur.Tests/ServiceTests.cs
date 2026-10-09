@@ -269,7 +269,7 @@ public class ServiceTests
         {
             await Task.Delay(300);
             // The daemon holds its lock but only now opens its endpoint.
-            late = new TestDaemonOnPaths(paths);
+            late = new TestDaemonOnPaths(paths, holdsLock: false);
             await late.Serving.WaitAsync(TimeSpan.FromSeconds(10));
             Assert.Equal(0, manager.Stops);
         }
@@ -460,6 +460,51 @@ public class ServiceTests
             CancellationToken.None
         );
 
+    [Fact]
+    public async Task StatusOfASilentDaemonSaysItRunsButDoesNotAnswer()
+    {
+        await using StubDaemon silent = new StubDaemon(DaemonPaths.ForCurrentUser());
+        using FakeManager manager = new FakeManager();
+        Stopwatch watch = Stopwatch.StartNew();
+        // Bounded from outside: without the status deadline, the call would never return.
+        CliResult result = await Task.Run(() => DaemonWith(manager, null, "status", "--json"))
+            .WaitAsync(TimeSpan.FromSeconds(30));
+        Assert.True(watch.Elapsed < TimeSpan.FromSeconds(6), $"{watch.ElapsedMilliseconds} ms");
+        JsonElement status = Json(result);
+        Assert.Equal("running", status.GetProperty("state").GetString());
+        Assert.False(status.GetProperty("answering").GetBoolean());
+    }
+
+    [Fact]
+    public async Task InstallReplacesADaemonThatDoesNotAnswer()
+    {
+        using FakeManager manager = new FakeManager();
+        Json(Daemon(manager, "install", "--json"));
+        // The installed daemon is replaced by one that welcomes clients and answers nothing.
+        manager.Stop();
+        StubDaemon silent = new StubDaemon(DaemonPaths.ForCurrentUser());
+        manager.BeforeStart = () => Silence(silent);
+        try
+        {
+            CliResult result = await Task.Run(() => DaemonWith(manager, null, "install", "--json"))
+                .WaitAsync(TimeSpan.FromSeconds(60));
+            JsonElement status = Json(result);
+            Assert.Equal(2, manager.Installs);
+            Assert.Equal("running", status.GetProperty("state").GetString());
+            Assert.True(status.GetProperty("answering").GetBoolean());
+        }
+        finally
+        {
+            await silent.DisposeAsync();
+            // The run shares one daemon home: leave no installed definition behind.
+            Daemon(manager, "uninstall", "--json");
+        }
+    }
+
+    /// <summary>Stops the silent daemon before the service starts its own, as a crash would.</summary>
+    private static void Silence(StubDaemon silent) =>
+        silent.DisposeAsync().AsTask().GetAwaiter().GetResult();
+
     private static Task<DaemonClient?> Connect(DaemonPaths paths) =>
         DaemonClient.ConnectAsync(
             paths,
@@ -494,6 +539,7 @@ public class ServiceTests
             )
             {
                 StartTimeout = TimeSpan.FromSeconds(10),
+                StatusTimeout = TimeSpan.FromSeconds(1),
             }.Run(new CommandArguments(["daemon", .. arguments]), json, TestInstance.TempRoot);
         }
         catch (SermofurException exception)
@@ -581,11 +627,15 @@ public class ServiceTests
         /// <summary>Version the simulated daemon answers with; the current one by default.</summary>
         public string DaemonVersion { get; init; } = ProductVersion.Current;
 
+        /// <summary>Runs before the simulated daemon starts (to clear the endpoint, for example).</summary>
+        public Action? BeforeStart { get; set; }
+
         public void Start()
         {
             // A daemon stopped by a shutdown request is started anew, as a service manager would.
             if (daemon is null || daemon.Serving.IsCompleted)
             {
+                BeforeStart?.Invoke();
                 Starts++;
                 daemon?.Dispose();
                 daemon = new TestDaemonOnPaths(DaemonPaths.ForCurrentUser(), DaemonVersion);
@@ -617,7 +667,8 @@ public class ServiceTests
         /// <summary>Completes when the server stops, on Dispose or on a shutdown request.</summary>
         public Task Serving => serving;
 
-        public TestDaemonOnPaths(DaemonPaths paths, string? version = null)
+        /// <param name="holdsLock">False when the test itself holds the daemon lock.</param>
+        public TestDaemonOnPaths(DaemonPaths paths, string? version = null, bool holdsLock = true)
         {
             TaskCompletionSource listening = new(
                 TaskCreationOptions.RunContinuationsAsynchronously
@@ -631,7 +682,24 @@ public class ServiceTests
                 new FileOwnership()
             );
             server.Listening += () => listening.TrySetResult();
-            serving = Task.Run(() => server.RunAsync(stop.Token));
+            // Like smf daemon run, the server holds the daemon lock until it has exited: a
+            // stopper that waits for the lock knows the daemon is gone, and the simulated
+            // service manager never sees a daemon that is still finishing.
+            FileStream? daemonLock = holdsLock ? DaemonLock.Acquire(paths) : null;
+            serving = Task.Run(async () =>
+            {
+                try
+                {
+                    await server.RunAsync(stop.Token);
+                }
+                finally
+                {
+                    if (daemonLock is not null)
+                    {
+                        await daemonLock.DisposeAsync();
+                    }
+                }
+            });
             Task.WhenAny(listening.Task, serving).GetAwaiter().GetResult();
         }
 

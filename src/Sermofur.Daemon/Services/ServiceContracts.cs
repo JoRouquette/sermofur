@@ -221,9 +221,14 @@ public static class InstalledDefinition
         }
     }
 
-    public static void Write(DaemonPaths paths, ServiceDefinition definition) =>
+    public static void Write(DaemonPaths paths, ServiceDefinition definition)
+    {
+        // Usually the first file of the state folder: the folder is born private, like the one
+        // the daemon would create for its journal and its lock.
+        FileTurn.CreatePrivateFolder(paths.StateDirectory);
         // The Windows supervisor reads it at start: never half written.
         AtomicFile.Write(File(paths), JsonSerializer.SerializeToUtf8Bytes(definition, Options));
+    }
 
     public static void Delete(DaemonPaths paths)
     {

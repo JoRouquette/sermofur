@@ -144,6 +144,24 @@ and the MCP server when the instance root does not declare it.
   previous scheduled task rebuilt from its definition (accented paths included) when the new one
   does not start, and the new one removed when nothing can be put back; a missing `schtasks.exe` reported as an unavailable service manager; launchd given time to
   remove the agent, and a bootstrap in error 5 tried again.
+- Load (`DaemonLoadTests`, `SharedFilesTests`, `ServiceTests`): a write behind a long write
+  refused with `daemon_busy` at the deadline and never run; a read waiting for a place refused
+  after its own limit, long before the deadline; a place that comes too late given back without
+  starting, the next write starting at once; no place at all refused as a limit; with
+  every place taken, a hello and a status answered while an extra read waits, then runs; a write
+  that leaves while it waits for a place gives the turn of its instance back; a read waiting for
+  a place refused with `daemon_stopping` on shutdown; facing `daemon_stopping` or `daemon_busy`,
+  the CLI runs a read directly and never sends a write again; a daemon that welcomes and never
+  answers: the CLI runs a read directly and reports a write `daemon_interrupted` without storing
+  it, `smf daemon status` reports it running and not answering, and `smf daemon install`
+  replaces it; 24 recalls and a write on a
+  real instance all answered; eight concurrent registrations all kept; a registry held by another
+  process reported `registry_busy`, and one held open by a reader replaced once the reader lets
+  go; two rewrites of the registry with the same date and size both seen by the daemon, a
+  registry dated in the future read by its stamp only; four writers of one journal keeping all
+  their lines across two rotations; a journal whose turn another process holds never holding the
+  caller; lock files and new folders private on Linux and macOS, and a lock file left open to
+  others by an older version narrowed.
 - The whole test run uses its own `SERMOFUR_DAEMON_HOME`: it never reaches the daemon of the
   developer.
 - MCP bridge (ADR 0017): the real protocol with the client of the official SDK against a
@@ -175,6 +193,14 @@ and the MCP server when the instance root does not declare it.
 claims in ten seconds, none lost or doubled, no `storage_busy`; the daemon added **2.9 ms** at the
 95th percentile to a command on an open instance (limit of the spec: 50 ms). With no daemon, the
 CLI pays one file-system lookup before running directly (under 100 ms, `NoDaemonMeansNoClient`).
+
+`TwentyFourRecallsAndAWriteAllAnswerAndHellosStayInTime`: on 2026-10-09, same machine (12
+logical processors, so 11 places), 24 recalls and a write sent at once on an instance of 40 claims
+all answered in 0.6 to 1 s run alone; the slowest hello took 30 to 45 ms (about 220 ms on a
+first, cold run), against the 500 ms after which the CLI runs directly. Within the full suite,
+with other tests loading the machine, a hello took up to 1.8 s once: with every core busy, the
+CLI then simply runs the command directly. The test allows 5 s, so that a loaded CI runner does
+not fail it, and reports the values it saw.
 
 ## Recall performance
 

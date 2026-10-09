@@ -22,13 +22,62 @@ public sealed record DaemonLimits(TimeSpan HelloTimeout, TimeSpan RequestTimeout
     /// Windows supervisor, systemd and launchd): the drain plus a margin.
     /// </summary>
     public TimeSpan StopTimeout => DrainTimeout + TimeSpan.FromSeconds(10);
+
+    /// <summary>
+    /// Commands that run at the same time, each on a thread of its own: the thread pool stays
+    /// free for hellos, status and shutdown, which never wait for a place.
+    /// </summary>
+    public int MaxExecutions
+    {
+        get => maxExecutions;
+        init =>
+            maxExecutions =
+                value >= 1
+                    ? value
+                    : throw new ArgumentOutOfRangeException(
+                        nameof(MaxExecutions),
+                        value,
+                        "At least one command must be able to run."
+                    );
+    }
+
+    private readonly int maxExecutions = Math.Max(2, Environment.ProcessorCount - 1);
+
+    /// <summary>
+    /// Least time left before the deadline for a command to start: a command whose place comes
+    /// later gets <c>daemon_busy</c> instead of a <c>request_timeout</c> that leaves a write in
+    /// doubt. A twentieth of the request timeout (3 s by default) unless set.
+    /// </summary>
+    public TimeSpan MinimumRunTime
+    {
+        get => minimumRunTime ?? RequestTimeout / 20;
+        init => minimumRunTime = value;
+    }
+
+    private readonly TimeSpan? minimumRunTime;
+
+    /// <summary>
+    /// Longest a read waits for a place to run before <c>daemon_busy</c>: the CLI then runs it
+    /// directly, which costs less than waiting behind long commands. The daemon does not tell its
+    /// clients apart: an MCP read, which has no direct run, gets the same answer and its host
+    /// calls again. A write keeps the whole deadline, since it must not run beside the daemon.
+    /// </summary>
+    public TimeSpan ReadPlaceTimeout { get; init; } = TimeSpan.FromSeconds(5);
+
+    /// <summary>
+    /// How long a client waits for the answer to a command before treating the daemon as gone:
+    /// the request timeout plus the time to write the answer.
+    /// </summary>
+    public TimeSpan ClientTimeout => RequestTimeout + TimeSpan.FromSeconds(10);
 }
 
 /// <summary>
 /// The daemon: accepts clients on the local endpoint, checks the version and the protocol, and
 /// runs their commands through the executor of the CLI (contracts/ipc.md). Writes to one
-/// instance run one at a time; reads run concurrently (FR-014). A shutdown lets started commands
-/// finish and answer, within the request timeout.
+/// instance run one at a time; reads run concurrently (FR-014), up to
+/// <see cref="DaemonLimits.MaxExecutions"/> commands at once. A command that cannot start within
+/// the request timeout gets <c>daemon_busy</c>. A shutdown lets started commands finish and
+/// answer, within the request timeout.
 /// </summary>
 public sealed class DaemonServer(
     DaemonPaths paths,
@@ -42,11 +91,14 @@ public sealed class DaemonServer(
 {
     private static readonly TimeSpan AnswerTimeout = TimeSpan.FromSeconds(5);
 
-    private readonly DaemonLimits limits = limits ?? DaemonLimits.Default;
+    private readonly DaemonLimits limits = Resolve(limits);
     private readonly ConcurrentDictionary<string, SemaphoreSlim> writers = new(
         OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal
     );
     private readonly ConcurrentDictionary<Task, byte> inFlight = new();
+
+    // A field initializer cannot read another field: both resolve the parameter the same way.
+    private readonly SemaphoreSlim executions = new SemaphoreSlim(Resolve(limits).MaxExecutions);
     private readonly DateTimeOffset startedAt = DateTimeOffset.Now;
     private int clients;
     private CancellationTokenSource? lifetime;
@@ -126,6 +178,7 @@ public sealed class DaemonServer(
                 await listener.DisposeAsync();
             }
             log.Write("stopped");
+            log.FlushBeforeExit();
         }
     }
 
@@ -389,16 +442,21 @@ public sealed class DaemonServer(
         );
 
     private async Task<(IpcMessage Answer, bool Writes)> RunAsync(
-        IpcMessage request,
+        IpcMessage message,
         int? pid,
         CancellationToken clientGone,
         CancellationToken stop
     )
     {
-        long id = request.Id!.Value;
-        IReadOnlyList<string> argv = request.Argv!;
-        string cwd = request.Cwd!;
-        Stopwatch watch = Stopwatch.StartNew();
+        IReadOnlyList<string> argv = message.Argv!;
+        string cwd = message.Cwd!;
+        // One deadline from the arrival of the request: planning, the turn of a write, the place
+        // to run and the run itself all count against it.
+        using PendingRequest current = new PendingRequest(
+            message.Id!.Value,
+            pid,
+            limits.RequestTimeout
+        );
         CommandPlan plan;
         try
         {
@@ -406,50 +464,51 @@ public sealed class DaemonServer(
         }
         catch (SermofurException exception)
         {
-            log.Write("refused", exception.Code, pid);
-            return (Failure(exception.Code, exception.Message, id, exception.ExitCode), false);
+            log.Write("refused", exception.Code, current.Pid);
+            return (
+                Failure(exception.Code, exception.Message, current.Id, exception.ExitCode),
+                false
+            );
         }
         string? root = gate.Resolve(plan.Path);
         if (root is null)
         {
-            return (new IpcMessage { Kind = MessageKind.NotServing, Id = id }, plan.Writes);
+            return (new IpcMessage { Kind = MessageKind.NotServing, Id = current.Id }, plan.Writes);
         }
         SemaphoreSlim? writer = plan.Writes
             ? writers.GetOrAdd(root, _ => new SemaphoreSlim(1, 1))
             : null;
-        if (writer is not null)
+        IpcMessage? notStarted = await AcquireAsync(current, writer, clientGone, stop);
+        if (notStarted is not null)
         {
-            using CancellationTokenSource waiting = CancellationTokenSource.CreateLinkedTokenSource(
-                clientGone,
-                stop
-            );
-            try
-            {
-                await writer.WaitAsync(waiting.Token);
-            }
-            catch (OperationCanceledException) when (!clientGone.IsCancellationRequested)
-            {
-                // Nothing has started: the client may run the command again later.
-                log.Write("stopping", "daemon_stopping", pid, watch.ElapsedMilliseconds);
-                return (
-                    Failure(
-                        "daemon_stopping",
-                        "The daemon is stopping; the command did not start.",
-                        id,
-                        3
-                    ),
-                    true
-                );
-            }
+            return (notStarted, plan.Writes);
         }
+        // From here, this request holds a place to run and, for a write, the turn of its
+        // instance. The place goes back when the work ends. The turn goes back in the finally
+        // once the answer is known; when the client gets a timeout instead, the turn is handed
+        // to the work (writer set to null) and goes back when the work ends.
         try
         {
-            Task<CommandOutcome> work = Task.Run(
+            // A thread of its own: a command blocks while it runs, the pool must not.
+            Task<CommandOutcome> work = Task.Factory.StartNew(
                 () => executor.Execute(argv, cwd),
-                CancellationToken.None
+                CancellationToken.None,
+                TaskCreationOptions.LongRunning,
+                TaskScheduler.Default
             );
             Track(work);
-            Task done = await Task.WhenAny(work, Task.Delay(limits.RequestTimeout, clientGone));
+            ReleaseWhenDone(work, executions);
+            Task done;
+            using (
+                CancellationTokenSource waitEnd = CancellationTokenSource.CreateLinkedTokenSource(
+                    clientGone
+                )
+            )
+            {
+                done = await Task.WhenAny(work, Task.Delay(current.Left, waitEnd.Token));
+                // The timer of the deadline is not left running once the work has answered.
+                await waitEnd.CancelAsync();
+            }
             if (done != work)
             {
                 // The transaction finishes on its own; the client gets a timeout now.
@@ -457,15 +516,15 @@ public sealed class DaemonServer(
                 writer = null;
                 if (clientGone.IsCancellationRequested)
                 {
-                    log.Write("abandoned", null, pid, watch.ElapsedMilliseconds);
+                    log.Write("abandoned", null, current.Pid, current.ElapsedMilliseconds);
                     throw new OperationCanceledException(clientGone);
                 }
-                log.Write("timeout", "request_timeout", pid, watch.ElapsedMilliseconds);
+                log.Write("timeout", "request_timeout", current.Pid, current.ElapsedMilliseconds);
                 return (
                     Failure(
                         "request_timeout",
                         $"The command took longer than {limits.RequestTimeout.TotalSeconds:0} s; it keeps running and may still apply. Check before running it again.",
-                        id,
+                        current.Id,
                         3
                     ),
                     plan.Writes
@@ -475,13 +534,13 @@ public sealed class DaemonServer(
             log.Write(
                 "run",
                 outcome.ExitCode == 0 ? null : $"exit_{outcome.ExitCode}",
-                pid,
-                watch.ElapsedMilliseconds
+                current.Pid,
+                current.ElapsedMilliseconds
             );
             IpcMessage result = new IpcMessage
             {
                 Kind = MessageKind.Result,
-                Id = id,
+                Id = current.Id,
                 ExitCode = outcome.ExitCode,
                 Stdout = outcome.Stdout,
                 Stderr = outcome.Stderr,
@@ -494,6 +553,151 @@ public sealed class DaemonServer(
         }
     }
 
+    /// <summary>
+    /// Takes the turn of a write (when <paramref name="writer"/> is given), then a place to run.
+    /// Null when both are held. Otherwise nothing is held and the answer says that the command
+    /// did not start: <c>daemon_stopping</c> on shutdown; <c>daemon_busy</c> at the deadline, when
+    /// too little time is left to run, or for a read that waited
+    /// <see cref="DaemonLimits.ReadPlaceTimeout"/> for a place. The departure of the client is
+    /// thrown as a cancellation, with nothing held.
+    /// </summary>
+    private async Task<IpcMessage?> AcquireAsync(
+        PendingRequest current,
+        SemaphoreSlim? writer,
+        CancellationToken clientGone,
+        CancellationToken stop
+    )
+    {
+        // The turn first: a write in line holds no place to run.
+        if (writer is not null)
+        {
+            IpcMessage? noTurn = await WaitAsync(
+                writer,
+                current,
+                current.Deadline,
+                clientGone,
+                stop
+            );
+            if (noTurn is not null)
+            {
+                return noTurn;
+            }
+        }
+        // A read gives up on a place sooner: the CLI runs it directly at less cost.
+        using CancellationTokenSource placeLimit = CancellationTokenSource.CreateLinkedTokenSource(
+            current.Deadline
+        );
+        if (writer is null)
+        {
+            placeLimit.CancelAfter(limits.ReadPlaceTimeout);
+        }
+        IpcMessage? noPlace;
+        try
+        {
+            noPlace = await WaitAsync(executions, current, placeLimit.Token, clientGone, stop);
+        }
+        catch (OperationCanceledException)
+        {
+            // The client left while waiting for a place: its turn goes to the next write.
+            writer?.Release();
+            throw;
+        }
+        if (noPlace is null && current.Left < limits.MinimumRunTime)
+        {
+            // A place came at the very end: starting now would only end in request_timeout,
+            // leaving a write in doubt. Not starting is the clearer answer.
+            executions.Release();
+            noPlace = Busy(current);
+        }
+        if (noPlace is not null)
+        {
+            writer?.Release();
+        }
+        return noPlace;
+    }
+
+    /// <summary>
+    /// Waits for a turn or a place until <paramref name="limit"/>. Null once it is taken;
+    /// otherwise the answer to a command that did not start. The departure of the client is
+    /// thrown as a cancellation.
+    /// </summary>
+    private async Task<IpcMessage?> WaitAsync(
+        SemaphoreSlim semaphore,
+        PendingRequest current,
+        CancellationToken limit,
+        CancellationToken clientGone,
+        CancellationToken stop
+    )
+    {
+        using CancellationTokenSource waiting = CancellationTokenSource.CreateLinkedTokenSource(
+            limit,
+            clientGone,
+            stop
+        );
+        try
+        {
+            await semaphore.WaitAsync(waiting.Token);
+            return null;
+        }
+        catch (OperationCanceledException) when (stop.IsCancellationRequested)
+        {
+            // Nothing has started: the client may run the command again later.
+            log.Write("stopping", "daemon_stopping", current.Pid, current.ElapsedMilliseconds);
+            return Failure(
+                "daemon_stopping",
+                "The daemon is stopping; the command did not start.",
+                current.Id,
+                3
+            );
+        }
+        catch (OperationCanceledException)
+            when (limit.IsCancellationRequested && !clientGone.IsCancellationRequested)
+        {
+            return Busy(current);
+        }
+    }
+
+    private IpcMessage Busy(PendingRequest current)
+    {
+        log.Write("busy", "daemon_busy", current.Pid, current.ElapsedMilliseconds);
+        return Failure(
+            "daemon_busy",
+            "The daemon was too busy to start the command in time; it did not start. Run it again.",
+            current.Id,
+            3
+        );
+    }
+
+    /// <summary>
+    /// One request on its way: what the journal records about it, and its single deadline. The
+    /// timer of the deadline and the clock of the remaining time start together.
+    /// </summary>
+    private sealed class PendingRequest(long id, int? pid, TimeSpan timeout) : IDisposable
+    {
+        private readonly Stopwatch watch = Stopwatch.StartNew();
+        private readonly CancellationTokenSource deadline = new CancellationTokenSource(timeout);
+
+        public long Id => id;
+
+        public int? Pid => pid;
+
+        public CancellationToken Deadline => deadline.Token;
+
+        public long ElapsedMilliseconds => watch.ElapsedMilliseconds;
+
+        /// <summary>Time left before the deadline, never negative.</summary>
+        public TimeSpan Left
+        {
+            get
+            {
+                TimeSpan left = timeout - watch.Elapsed;
+                return left > TimeSpan.Zero ? left : TimeSpan.Zero;
+            }
+        }
+
+        public void Dispose() => deadline.Dispose();
+    }
+
     private void Track(Task work)
     {
         inFlight.TryAdd(work, 0);
@@ -503,14 +707,16 @@ public sealed class DaemonServer(
         );
     }
 
-    private static void ReleaseWhenDone(Task work, SemaphoreSlim? writer)
+    private static void ReleaseWhenDone(Task work, SemaphoreSlim? semaphore)
     {
-        if (writer is null)
+        if (semaphore is null)
         {
             return;
         }
-        _ = work.ContinueWith(_ => writer.Release(), TaskScheduler.Default);
+        _ = work.ContinueWith(_ => semaphore.Release(), TaskScheduler.Default);
     }
+
+    private static DaemonLimits Resolve(DaemonLimits? given) => given ?? DaemonLimits.Default;
 
     private static IpcMessage Failure(string code, string message, long? id, int exitCode) =>
         IpcMessage.Failure(code, message, id) with

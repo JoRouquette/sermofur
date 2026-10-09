@@ -71,7 +71,7 @@ public class DaemonRobustnessTests
     {
         using TestInstance fixture = new TestInstance();
         using ManualResetEventSlim release = new ManualResetEventSlim();
-        BlockingExecutor executor = new BlockingExecutor(release);
+        GatedExecutor executor = new GatedExecutor(release);
         await using TestDaemon daemon = TestDaemon.Start(
             executor,
             new DaemonLimits(TimeSpan.FromSeconds(10), TimeSpan.FromMilliseconds(300))
@@ -90,7 +90,7 @@ public class DaemonRobustnessTests
     {
         using TestInstance fixture = new TestInstance();
         using ManualResetEventSlim release = new ManualResetEventSlim();
-        BlockingExecutor executor = new BlockingExecutor(release);
+        GatedExecutor executor = new GatedExecutor(release);
         await using TestDaemon daemon = TestDaemon.Start(executor);
         daemon.Registry.Register(fixture.Root, DateTimeOffset.Now);
         await using DaemonClient holder = (await daemon.Connect(fixture.Root))!;
@@ -184,36 +184,5 @@ public class DaemonRobustnessTests
     {
         await using DaemonClient client = (await daemon.Connect(cwd))!;
         Assert.Equal(MessageKind.Status, (await client.StatusAsync(CancellationToken.None)).Kind);
-    }
-
-    /// <summary>
-    /// Plans "write" as a write; "block" waits for the test to release it; records what ran.
-    /// </summary>
-    private sealed class BlockingExecutor(ManualResetEventSlim release) : ICommandExecutor
-    {
-        private readonly TaskCompletionSource started = new(
-            TaskCreationOptions.RunContinuationsAsynchronously
-        );
-
-        public Task Started => started.Task;
-
-        public List<string> Executed { get; } = [];
-
-        public CommandPlan Plan(IReadOnlyList<string> argv, string workingDirectory) =>
-            new CommandPlan(workingDirectory, argv.Contains("write"));
-
-        public CommandOutcome Execute(IReadOnlyList<string> argv, string workingDirectory)
-        {
-            lock (Executed)
-            {
-                Executed.Add(argv[0]);
-            }
-            if (argv[0] == "block")
-            {
-                started.TrySetResult();
-                release.Wait(TimeSpan.FromSeconds(30));
-            }
-            return new CommandOutcome(0, "", "");
-        }
     }
 }

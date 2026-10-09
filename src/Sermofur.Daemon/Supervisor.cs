@@ -48,6 +48,18 @@ public sealed class Supervisor(
 
     public int Run(CancellationToken stop)
     {
+        try
+        {
+            return Supervise(stop);
+        }
+        finally
+        {
+            log.FlushBeforeExit();
+        }
+    }
+
+    private int Supervise(CancellationToken stop)
+    {
         using WindowsJob? job = OperatingSystem.IsWindows() ? WindowsJob.Create() : null;
         int quickFailures = 0;
         Queue<DateTimeOffset> restarts = new Queue<DateTimeOffset>();

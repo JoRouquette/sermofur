@@ -24,13 +24,22 @@ the rules of the engine. The MCP bridge will be a second client of the same daem
   `response_too_large` with the id; the session goes on.
 - The daemon checks the tool version first, then the protocol: a client of another version always
   gets `daemon_version_mismatch`, whatever protocol either side speaks.
-- Writes to one instance run one at a time in the daemon; reads run concurrently. A client that
+- Writes to one instance run one at a time in the daemon; reads run concurrently. At most one
+  command per processor core but one (two at least) runs at once, each on a thread of its own:
+  hellos, status and shutdown never wait behind them. One deadline per request, from its arrival:
+  a command whose turn or place has not come within the request timeout, or comes with less than
+  a twentieth of it left, gets `daemon_busy` and did not start; a read waits 5 s at most for a
+  place, then gets `daemon_busy` too (the CLI runs a read again directly; the MCP bridge, which
+  never runs directly, passes the error to its host, which calls again); a started command not finished by then gets `request_timeout` and keeps running.
+  The CLI gives the daemon the request timeout plus 10 s, then treats the session as lost: a read
+  runs again directly, a write gets `daemon_interrupted`. The journal is written in the
+  background and never holds up a request. A client that
   leaves cancels its queued command; a started command completes its transaction. A shutdown
   stops serving new clients at once (on Unix the socket is removed; on Windows, where a pipe name
   lives as long as its instances, one instance keeps accepting and closes every connection without
   a word, so a client concludes "no daemon" immediately), then lets started commands answer before
-  the daemon exits (one request timeout plus 5 s); a write still waiting for the lock gets
-  `daemon_stopping`. A command still running when that delay ends is cut, and its transaction
+  the daemon exits (one request timeout plus 5 s); a command still waiting for its turn or its
+  place gets `daemon_stopping`. A command still running when that delay ends is cut, and its transaction
   rolled back. A second Ctrl+C or SIGTERM ends the process at once. The daemon holds its lock file
   until it exits: `smf daemon stop`, `restart`, `install` and `uninstall` wait for that lock (even
   when the endpoint is already closed, sending the stop again to a daemon that starts listening

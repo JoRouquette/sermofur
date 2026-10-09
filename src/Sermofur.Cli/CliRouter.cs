@@ -9,12 +9,14 @@ namespace Sermofur.Cli;
 /// Sends a command to the daemon when it runs, has the version of this CLI and serves the
 /// instance; runs it directly otherwise (research R7, FR-010 to FR-013, FR-021).
 /// </summary>
-public sealed class CliRouter(TextWriter output, TextWriter error)
+public sealed class CliRouter(TextWriter output, TextWriter error, TimeSpan? answerTimeout = null)
 {
     /// <summary>Set to 1 to never try the daemon (diagnosis).</summary>
     public const string NoDaemonVariable = "SERMOFUR_NO_DAEMON";
 
     private static readonly TimeSpan ConnectTimeout = TimeSpan.FromMilliseconds(500);
+
+    private readonly TimeSpan answerTimeout = answerTimeout ?? DaemonLimits.Default.ClientTimeout;
 
     public int Run(string[] arguments, string workingDirectory)
     {
@@ -67,9 +69,14 @@ public sealed class CliRouter(TextWriter output, TextWriter error)
             return exitCode;
         }
         string code = answer.Code ?? "protocol_error";
-        if (code == "response_too_large" && !CommandRunner.Writes(new CommandArguments(arguments)))
+        if (
+            code is "response_too_large" or "daemon_stopping" or "daemon_busy"
+            && !CommandRunner.Writes(new CommandArguments(arguments))
+        )
         {
-            // A read can run again: directly, its output has no size limit.
+            // A read can run again directly: its output has no size limit there, a read that did
+            // not start in a stopping or busy daemon changes nothing, and reads never wait for
+            // the writer of the instance. A write is never sent twice.
             return Direct(arguments, workingDirectory);
         }
         WriteError(code, answer.Message ?? code, json);
@@ -130,7 +137,7 @@ public sealed class CliRouter(TextWriter output, TextWriter error)
         }
     }
 
-    private static IpcMessage? Send(string[] arguments, string workingDirectory)
+    private IpcMessage? Send(string[] arguments, string workingDirectory)
     {
         DaemonPaths paths = DaemonPaths.ForCurrentUser();
         FileOwnership owners = new FileOwnership();
@@ -165,15 +172,28 @@ public sealed class CliRouter(TextWriter output, TextWriter error)
             {
                 return null;
             }
+            // A daemon alive but stuck must not hold the CLI: past its own request timeout and
+            // the time to answer, it counts as gone mid-command.
+            using CancellationTokenSource deadline = new CancellationTokenSource(answerTimeout);
             try
             {
-                return client.RunAsync(arguments, CancellationToken.None).GetAwaiter().GetResult();
+                return client.RunAsync(arguments, deadline.Token).GetAwaiter().GetResult();
             }
             catch (SermofurException exception)
                 when (exception.Code is DaemonClient.InterruptedCode or "protocol_error")
             {
                 // The command was sent: the daemon may have run it.
                 throw new DaemonAnswer(exception);
+            }
+            catch (OperationCanceledException) when (deadline.IsCancellationRequested)
+            {
+                throw new DaemonAnswer(
+                    new SermofurException(
+                        DaemonClient.InterruptedCode,
+                        $"The daemon did not answer within {answerTimeout.TotalSeconds:0} s; the result of the command is unknown. Check before running it again.",
+                        3
+                    )
+                );
             }
         }
     }

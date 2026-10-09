@@ -112,7 +112,7 @@ public sealed class DaemonCommands(
         bool current =
             manager.Query().Installed
             && ServiceManagers.Same(InstalledDefinition.Read(paths), definition)
-            && Answer(paths) is { Version: string version }
+            && Answer(paths) is { Version: string version, Answering: true }
             && version == ProductVersion.Current;
         if (!current)
         {
@@ -193,7 +193,7 @@ public sealed class DaemonCommands(
     }
 
     /// <summary>True when a daemon of this account answers, whatever its version.</summary>
-    private static bool DaemonRuns(DaemonPaths paths)
+    private bool DaemonRuns(DaemonPaths paths)
     {
         try
         {
@@ -269,7 +269,7 @@ public sealed class DaemonCommands(
     }
 
     /// <summary>State, as described in contracts/cli.md.</summary>
-    private static object Status(DaemonPaths paths, IServiceManager manager)
+    private object Status(DaemonPaths paths, IServiceManager manager)
     {
         string? unavailable = manager.Unavailable();
         ServiceStatus service = unavailable is null
@@ -298,6 +298,7 @@ public sealed class DaemonCommands(
             manager = manager.Name,
             installed = service.Installed,
             running = answer is not null,
+            answering = answer?.Answering,
             version = answer?.Version,
             executable = definition?.Executable,
             pid = answer?.Pid,
@@ -314,18 +315,49 @@ public sealed class DaemonCommands(
         string? StartedAt,
         int? InstancesOpen,
         int? Clients,
-        string? Registry
-    );
+        string? Registry,
+        bool Answering = true
+    )
+    {
+        /// <summary>A daemon that welcomed the CLI but kept its status to itself.</summary>
+        public static DaemonAnswer Silent(string version) =>
+            new DaemonAnswer(
+                version,
+                Pid: null,
+                StartedAt: null,
+                InstancesOpen: null,
+                Clients: null,
+                Registry: null,
+                Answering: false
+            );
+    }
 
-    /// <summary>What a running daemon of this version says about itself, or null when none answers.</summary>
-    private static DaemonAnswer? Answer(DaemonPaths paths)
+    /// <summary>How long a daemon that welcomed the CLI has to answer a status.</summary>
+    public TimeSpan StatusTimeout { get; init; } = DefaultStatusTimeout;
+
+    public static readonly TimeSpan DefaultStatusTimeout = TimeSpan.FromSeconds(5);
+
+    /// <summary>
+    /// What a running daemon of this version says about itself, or null when none answers. A
+    /// daemon that welcomes the CLI but keeps its status to itself is running, not answering.
+    /// </summary>
+    private DaemonAnswer? Answer(DaemonPaths paths)
     {
         using DaemonClient? client = Connect(paths, TimeSpan.FromSeconds(1));
         if (client is null)
         {
             return null;
         }
-        IpcMessage status = client.StatusAsync(CancellationToken.None).GetAwaiter().GetResult();
+        using CancellationTokenSource limit = new CancellationTokenSource(StatusTimeout);
+        IpcMessage status;
+        try
+        {
+            status = client.StatusAsync(limit.Token).GetAwaiter().GetResult();
+        }
+        catch (OperationCanceledException) when (limit.IsCancellationRequested)
+        {
+            return DaemonAnswer.Silent(client.DaemonVersion);
+        }
         return new DaemonAnswer(
             client.DaemonVersion,
             status.Pid,
