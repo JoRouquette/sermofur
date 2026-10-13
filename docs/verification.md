@@ -185,6 +185,21 @@ and the MCP server when the instance root does not declare it.
   file had none, the one documented exception; removal from the middle keeps the rest; `--host`,
   `--scope`, the user configuration under `CODEX_HOME`, doctor per host. The test run uses its own
   `CODEX_HOME`.
+- Configuration writes (ADR 0016): a link in place of `instances.json` or `service.json` refused
+  with `unsafe_path` and the target left as it was, through `AtomicFile` and through each of the two
+  writers themselves (the registry and the recorded service); a `.mcp.json` or `config.toml` that is
+  a link, through one link and through two, written in its final target with the link still a link,
+  and `smf mcp install` naming the file it replaced; a followed chain refused when it leads nowhere,
+  to a folder straight away or after a step, in a circle, or past ten links, where ten are still
+  followed; a folder never written as a file; on Linux and macOS the final target keeping its own
+  permissions exactly, neither widened nor narrowed. A symbolic link to a file needs an elevated
+  session or developer mode on Windows, so these facts are reported as skipped without one.
+- Supervised environment: a `service.json` holding a variable nobody carries, a path variable that
+  is not absolute and a `PATH` of mixed entries gives the daemon the carried variables only, with
+  the absolute entries of `PATH` only, one journal line per variable left out whole and one for a
+  `PATH` kept with fewer entries. A `service.json` that is truncated, holds null fields, holds a
+  null argument, or does not run `daemon run` side by side and in that order reads as nothing
+  installed; one without an environment reads as one with no variable.
 
 ## Daemon measures
 

@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text;
 using Microsoft.Data.Sqlite;
 using Sermofur.Application;
 using Sermofur.Domain;
@@ -216,19 +217,9 @@ public static class InstanceMigration
     private static void WriteConfiguration(string root, InstanceConfiguration configuration)
     {
         string file = Path.Combine(root, InstanceManager.Marker, InstanceManager.ConfigurationFile);
+        // The marker and everything under it are refused as links (ADR 0010), and AtomicFile
+        // refuses one in place of the file itself.
         LocalPaths.RejectLinks(file);
-        string temporary = file + $".{Guid.NewGuid():N}.tmp";
-        try
-        {
-            File.WriteAllText(temporary, RecordJson.Write(configuration));
-            File.Move(temporary, file, overwrite: true);
-        }
-        finally
-        {
-            if (File.Exists(temporary))
-            {
-                File.Delete(temporary);
-            }
-        }
+        AtomicFile.Write(file, Encoding.UTF8.GetBytes(RecordJson.Write(configuration)));
     }
 }

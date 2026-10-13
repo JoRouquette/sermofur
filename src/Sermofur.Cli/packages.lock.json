@@ -109,7 +109,8 @@
         "type": "Project",
         "dependencies": {
           "ModelContextProtocol.Core": "[2.2.0, )",
-          "Sermofur.Daemon": "[0.0.0-dev, )"
+          "Sermofur.Daemon": "[0.0.0-dev, )",
+          "Sermofur.Infrastructure": "[0.0.0-dev, )"
         }
       }
     }

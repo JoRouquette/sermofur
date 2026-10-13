@@ -25,6 +25,15 @@ what remains to do (daemon, registration). The entry runs `smf mcp serve` when `
 put `smf` on the `PATH` before committing `.mcp.json`. `smf mcp uninstall` removes the entry and
 nothing else. `smf doctor` reports whether the instance root declares it (`mcp` check).
 
+A configuration of a host that is a link, as a manager of dotfiles makes it, is followed to its
+final target, and that file is replaced: the link stays a link and the file stays in the
+repository it came from (ADR 0016). The chain is followed wherever it leads, so `install` and
+`uninstall` carry the file they actually replaced in `replaced`, and name it in a line of `next`,
+whenever it is not the one you asked for: a link
+a cloned repository carries can point outside the project. What is refused instead, with
+`unsafe_path` (exit 4) and nothing written: a link that leads nowhere, to a folder, in a circle, or
+through more than ten steps. The same holds for the `config.toml` of Codex.
+
 Claude Code asks you to approve a server declared in `.mcp.json` the first time it starts in the
 project. The scope of the session is the project root, which Claude Code passes in
 `CLAUDE_PROJECT_DIR`; other hosts use the folder they start the server in.

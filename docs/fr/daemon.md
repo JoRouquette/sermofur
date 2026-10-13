@@ -117,6 +117,18 @@ restent en place et ne contiennent rien. Sous Linux et macOS, eux et `daemon.loc
 que par vous (celui qu'une version plus ancienne a laissé est restreint), et un dossier de
 configuration ou d'état manquant est créé privé ; un dossier existant garde ses droits.
 
+Chaque fichier de cet état est remplacé d'un seul coup, et jamais à travers un lien : un lien à la
+place d'`instances.json` ou de `service.json` échoue en `unsafe_path` (exit 4) et rien n'est écrit,
+car aucun lien à cet endroit n'a été posé par sermofur et le suivre écrirait hors de son propre
+dossier. La configuration d'un hôte MCP suit la règle inverse (ADR 0016).
+
+Un `service.json` dont la forme ne tient pas, tronqué ou édité à la main, se lit comme « rien
+d'installé » : aucune définition n'en est tirée, donc `smf daemon status` ne nomme plus
+l'exécutable installé, et `smf daemon install` en écrit un sain. Le service lui-même reste ce que
+son gestionnaire en dit, d'où viennent `installed` et `state` ; un daemon supervisé démarré avec un
+tel fichier ne transmet aucune variable, et le journal note une ligne
+`installed_definition_unsound`.
+
 Sous Windows, un terminal lancé par une application empaquetée (MSIX), comme certaines
 applications de bureau, peut écrire `%APPDATA%` dans une copie privée de cette application : le
 registre qu'il écrit est alors invisible du service, et `smf status` reste en mode direct.
@@ -130,9 +142,24 @@ lit le daemon.
 | `SERMOFUR_NO_DAEMON=1` | La CLI n'essaie jamais le daemon |
 | `SERMOFUR_DAEMON_HOME=<dossier>` | Registre, journal et point de connexion sous ce dossier (tests, essais) ; la tâche planifiée de Windows ne peut pas la transmettre, `install` la refuse donc sous Windows |
 
-Les variables relevées à l'installation (`DOTNET_ROOT`, `PATH`) parviennent au daemon : par l'unité
-ou l'agent sous Linux et macOS, par le superviseur sous Windows. Un `PATH` différent ne suffit pas
-à faire remplacer le service par `install`.
+Les variables relevées à l'installation (`DOTNET_ROOT`, `PATH`, et `SERMOFUR_DAEMON_HOME` là où le
+gestionnaire la transmet) parviennent au daemon : par l'unité ou l'agent sous Linux et macOS, par le
+superviseur sous Windows. Un `PATH` différent ne suffit pas à faire remplacer le service par
+`install`.
+
+Ces trois noms sont les seuls transmis, et le même filtre s'applique deux fois : quand `install`
+écrit le fichier, puis quand le superviseur Windows le relit, car `service.json` est un fichier que
+l'utilisateur a pu éditer. Une variable qu'il contient sous un autre nom est écartée, une variable
+de chemin qui n'est pas absolue est écartée, et `PATH` ne garde que ses entrées absolues (une entrée
+relative serait lue depuis le dossier de travail du daemon, et non depuis celui du shell qui a
+installé le service). Sous Linux et macOS, l'unité ou l'agent est écrit à l'installation depuis la
+définition filtrée et n'est plus relu ensuite : y éditer `service.json` ne change rien.
+
+Ce qui est écarté est toujours nommé, jamais valué. `smf daemon install` écrit une ligne sur la
+sortie d'erreur par variable qu'il ne transmet pas du tout, et une ligne pour un `PATH` qu'il
+transmet sans ses entrées qui ne sont pas des chemins absolus. Le superviseur note une ligne
+`supervised_variable_dropped` par variable écartée en entier, et une ligne
+`supervised_path_entries_dropped` pour un `PATH` conservé avec moins d'entrées qu'il n'en avait.
 
 ## Erreurs
 

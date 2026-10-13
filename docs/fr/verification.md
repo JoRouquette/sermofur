@@ -200,6 +200,23 @@ serveur MCP quand la racine de l'instance ne le déclare pas.
   reste ; `--host`, `--scope`, la
   configuration utilisateur sous `CODEX_HOME`, doctor par host. Les tests utilisent leur propre
   `CODEX_HOME`.
+- Écritures de configuration (ADR 0016) : un lien à la place d'`instances.json` ou de
+  `service.json` refusé en `unsafe_path`, la cible laissée telle quelle, par `AtomicFile` puis par
+  chacun des deux écrivains eux-mêmes (le registre et le service enregistré) ; un `.mcp.json` ou un
+  `config.toml` qui est un lien, par un maillon puis par deux, écrit dans sa cible finale, le lien
+  restant un lien, et `smf mcp install` qui nomme le fichier remplacé ; une chaîne suivie refusée
+  quand elle ne mène nulle part, vers un dossier d'emblée ou après un maillon, en boucle, ou au-delà
+  de dix maillons, dix étant encore suivis ; un dossier jamais écrit comme un fichier ; sous Linux
+  et macOS, la cible finale qui garde exactement ses propres droits, ni élargis ni restreints. Un
+  lien symbolique vers un fichier exige sous Windows une session élevée ou le mode développeur, donc
+  ces faits sont rapportés comme ignorés sans l'un des deux.
+- Environnement du daemon supervisé : un `service.json` contenant une variable que personne ne
+  transmet, une variable de chemin non absolue et un `PATH` d'entrées mêlées ne donne au daemon que
+  les variables transmises, et de `PATH` que ses entrées absolues, avec une ligne de journal par
+  variable écartée en entier et une pour un `PATH` conservé avec moins d'entrées. Un `service.json`
+  tronqué, aux champs nuls, portant un argument nul, ou qui ne lance pas `daemon run` côte à côte
+  et dans cet ordre, se lit comme « rien d'installé » ; un `service.json` sans environnement se lit
+  comme un `service.json` sans variable.
 
 ## Mesures du daemon
 

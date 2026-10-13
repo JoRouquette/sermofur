@@ -1,6 +1,7 @@
 using Sermofur.Daemon;
 using Sermofur.Daemon.Services;
 using Sermofur.Domain;
+using Sermofur.Infrastructure;
 
 namespace Sermofur.Tests;
 
@@ -164,11 +165,16 @@ public class ServiceHardeningTests
     public void SupervisedDaemonGetsTheRecordedEnvironment()
     {
         ServiceDefinition child = Definition([]);
+        // An absolute path of this operating system: a relative one is dropped on purpose
+        // (ConfigurationWriteTests).
+        string recorded = OperatingSystem.IsWindows()
+            ? @"C:\dotnet-recorded"
+            : "/opt/dotnet-recorded";
         System.Diagnostics.ProcessStartInfo start = Supervisor.ChildStart(
             child,
-            Definition(new() { ["DOTNET_ROOT"] = "/opt/dotnet-recorded" })
+            Definition(new() { ["DOTNET_ROOT"] = recorded })
         );
-        Assert.Equal("/opt/dotnet-recorded", start.Environment["DOTNET_ROOT"]);
+        Assert.Equal(recorded, start.Environment["DOTNET_ROOT"]);
         Assert.Equal(["daemon", "run"], start.ArgumentList);
         Assert.False(start.UseShellExecute);
     }
@@ -187,7 +193,7 @@ public class ServiceHardeningTests
             AtomicFile.Write(file, "a = 2\n"u8.ToArray());
             Assert.Equal(secret, File.GetUnixFileMode(file));
             string fresh = Path.Combine(folder, "new.toml");
-            AtomicFile.Write(fresh, "b = 1\n"u8.ToArray(), secret);
+            AtomicFile.Write(fresh, "b = 1\n"u8.ToArray(), new WriteOptions(secret));
             Assert.Equal(secret, File.GetUnixFileMode(fresh));
             Assert.Equal(
                 ["config.toml", "new.toml"],

@@ -14,16 +14,26 @@ public static class LocalPaths
     public static string ValidateDirectory(string path)
     {
         string full = Path.GetFullPath(path);
-        if (full.StartsWith("\\\\", StringComparison.Ordinal) || IsNetworkDrive(full))
-        {
-            throw new SermofurException("unsafe_path", "An instance requires a local disk.", 4);
-        }
+        RequireLocalDisk(full, "An instance requires a local disk.");
         if (!Directory.Exists(full))
         {
             throw new SermofurException("invalid_path", "The context directory must exist.");
         }
         RejectLinks(full);
         return Path.TrimEndingDirectorySeparator(full);
+    }
+
+    /// <summary>
+    /// Refuses a network share or a mapped network drive, with the reason of the caller: an
+    /// instance lives on a local disk only.
+    /// </summary>
+    public static void RequireLocalDisk(string path, string message)
+    {
+        string full = Path.GetFullPath(path);
+        if (full.StartsWith("\\\\", StringComparison.Ordinal) || IsNetworkDrive(full))
+        {
+            throw new SermofurException("unsafe_path", message, 4);
+        }
     }
 
     public static void RejectLinks(string path)
@@ -42,7 +52,11 @@ public static class LocalPaths
         }
     }
 
-    /// <summary>Single definition of the error raised for any link or junction.</summary>
+    /// <summary>
+    /// The error raised when a link or a junction is found on a path that is read or discovered
+    /// (ADR 0010). Replacing a file is another question, answered by <see cref="LinkPolicy"/>:
+    /// there a link may be refused or followed, each with its own message.
+    /// </summary>
     public static SermofurException LinkNotSupported() =>
         new("unsafe_path", "Links and junctions are not supported in this version.", 4);
 
