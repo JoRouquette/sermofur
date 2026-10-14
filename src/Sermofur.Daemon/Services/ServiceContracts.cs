@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Sermofur.Domain;
+using Sermofur.Infrastructure;
 
 namespace Sermofur.Daemon.Services;
 
@@ -18,11 +19,14 @@ public sealed record ServiceDefinition(
     [property: JsonPropertyName("environment")] IReadOnlyDictionary<string, string> Environment
 )
 {
+    /// <summary>The one carried variable that holds a list of paths, not a single one.</summary>
+    private const string PathVariable = "PATH";
+
     /// <summary>Variables copied from the installing process when they are set.</summary>
     public static readonly string[] CarriedVariables =
     [
         "DOTNET_ROOT",
-        "PATH",
+        PathVariable,
         DaemonPaths.HomeVariable,
     ];
 
@@ -31,10 +35,16 @@ public sealed record ServiceDefinition(
     /// the assembly path goes first in the arguments; launched through the tool shim, the shim
     /// itself is the executable.
     /// </summary>
+    /// <param name="dropped">Called with the name of each variable left out, never its value.</param>
+    /// <param name="narrowed">
+    /// Called with the name of a variable kept with fewer entries than it had, never its value.
+    /// </param>
     public static ServiceDefinition ForCurrentProcess(
         string version,
         string assemblyPath,
-        bool supervise
+        bool supervise,
+        Action<string>? dropped = null,
+        Action<string>? narrowed = null
     )
     {
         string process =
@@ -60,13 +70,81 @@ public sealed record ServiceDefinition(
         Dictionary<string, string> environment = [];
         foreach (string name in CarriedVariables)
         {
-            string? value = System.Environment.GetEnvironmentVariable(name);
-            if (!string.IsNullOrEmpty(value))
+            string? set = System.Environment.GetEnvironmentVariable(name);
+            string? value = Carried(name, set, narrowed);
+            if (value is not null)
             {
                 environment[name] = value;
+                continue;
+            }
+            // A variable the installing shell did hold, dropped here: the daemon starts without
+            // it, so the name is reported rather than lost.
+            if (!string.IsNullOrEmpty(set))
+            {
+                dropped?.Invoke(name);
             }
         }
         return new ServiceDefinition(process, arguments, version, environment);
+    }
+
+    /// <summary>
+    /// The variables of this definition that may reach a supervised daemon: the carried ones
+    /// only, each holding absolute paths. A recorded <c>service.json</c> is a file the user may
+    /// have edited, so what it holds is filtered again when it is read, not only when written.
+    /// </summary>
+    /// <param name="dropped">Called with the name of each variable left out, never its value.</param>
+    /// <param name="narrowed">
+    /// Called with the name of a variable kept with fewer entries than it had, never its value:
+    /// a PATH shortened in silence is what a daemon that no longer finds a tool looks like.
+    /// </param>
+    public IReadOnlyDictionary<string, string> CarriedEnvironment(
+        Action<string>? dropped = null,
+        Action<string>? narrowed = null
+    )
+    {
+        Dictionary<string, string> carried = [];
+        foreach (KeyValuePair<string, string> variable in Environment)
+        {
+            string? value = CarriedVariables.Contains(variable.Key, StringComparer.Ordinal)
+                ? Carried(variable.Key, variable.Value, narrowed)
+                : null;
+            if (value is null)
+            {
+                dropped?.Invoke(variable.Key);
+                continue;
+            }
+            carried[variable.Key] = value;
+        }
+        return carried;
+    }
+
+    /// <summary>
+    /// The value a variable may carry, or null when it carries nothing usable: a path variable
+    /// must be absolute, and PATH keeps only its absolute entries (a relative one would be read
+    /// from the working folder of the daemon, which is not the one of the installing shell).
+    /// </summary>
+    /// <param name="narrowed">Called with the name of a PATH that lost entries, never its value.</param>
+    private static string? Carried(string name, string? value, Action<string>? narrowed = null)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return null;
+        }
+        if (!name.Equals(PathVariable, StringComparison.Ordinal))
+        {
+            return Path.IsPathFullyQualified(value) ? value : null;
+        }
+        string[] held = value.Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries);
+        string[] entries = [.. held.Where(Path.IsPathFullyQualified)];
+        if (entries.Length == 0)
+        {
+            return null;
+        }
+        if (entries.Length != held.Length)
+        {
+            narrowed?.Invoke(name);
+        }
+        return string.Join(Path.PathSeparator, entries);
     }
 }
 
@@ -205,13 +283,21 @@ public static class InstalledDefinition
     public static string File(DaemonPaths paths) =>
         Path.Combine(paths.StateDirectory, "service.json");
 
+    /// <summary>
+    /// What was installed, or null when nothing was: no file, a file that is not JSON, or one
+    /// whose shape does not hold (truncated, edited by hand). An unusable definition reads as
+    /// "nothing installed", so status says so and install writes a sound one again, instead of
+    /// a failure outside the business errors.
+    /// </summary>
     public static ServiceDefinition? Read(DaemonPaths paths)
     {
         try
         {
             return System.IO.File.Exists(File(paths))
-                ? JsonSerializer.Deserialize<ServiceDefinition>(
-                    System.IO.File.ReadAllBytes(File(paths))
+                ? Sound(
+                    JsonSerializer.Deserialize<ServiceDefinition>(
+                        System.IO.File.ReadAllBytes(File(paths))
+                    )
                 )
                 : null;
         }
@@ -220,6 +306,60 @@ public static class InstalledDefinition
             return null;
         }
     }
+
+    /// <summary>
+    /// The definition when every field it is read for holds, null otherwise. This establishes
+    /// that something is installed, not that the recorded command is safe to run: nothing is
+    /// launched from a read definition, the supervisor builds its own and takes the environment
+    /// alone. JSON leaves the non-nullable members of a record null without a word, so they are
+    /// checked here. The path of the executable is not required to be absolute: a service manager
+    /// refuses a relative one itself (<see cref="IServiceManager.Validate"/>), and a definition
+    /// written by an older version is still worth reading for its version and its environment.
+    /// An environment left null is read as one with no variable.
+    /// </summary>
+    private static ServiceDefinition? Sound(ServiceDefinition? definition)
+    {
+        if (
+            definition is null
+            || string.IsNullOrWhiteSpace(definition.Executable)
+            || string.IsNullOrWhiteSpace(definition.Version)
+            || definition.Arguments is null
+            || !RunsDaemon(definition.Arguments)
+        )
+        {
+            return null;
+        }
+        return WithEnvironment(definition);
+    }
+
+    /// <summary>
+    /// Whether the arguments launch <c>daemon run</c>: the two words side by side and in that
+    /// order, as <see cref="ForCurrentProcess"/> writes them. A list holding a null, which JSON
+    /// allows, simply matches nothing.
+    /// </summary>
+    private static bool RunsDaemon(IReadOnlyList<string> arguments)
+    {
+        for (int index = 0; index + 1 < arguments.Count; index++)
+        {
+            if (
+                string.Equals(arguments[index], "daemon", StringComparison.Ordinal)
+                && string.Equals(arguments[index + 1], "run", StringComparison.Ordinal)
+            )
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /// <summary>The definition with an environment, empty when JSON left it null.</summary>
+    private static ServiceDefinition WithEnvironment(ServiceDefinition definition) =>
+        definition.Environment is null
+            ? definition with
+            {
+                Environment = new Dictionary<string, string>(),
+            }
+            : definition;
 
     public static void Write(DaemonPaths paths, ServiceDefinition definition)
     {

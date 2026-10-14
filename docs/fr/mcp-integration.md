@@ -26,6 +26,15 @@ machine : mettre `smf` dans le `PATH` avant de commiter `.mcp.json`. `smf mcp un
 l'entrée et rien d'autre. `smf doctor` signale si la racine de l'instance la déclare (contrôle
 `mcp`).
 
+La configuration d'un hôte qui est un lien, comme en pose un gestionnaire de dotfiles, est suivie
+jusqu'à sa cible finale, et c'est ce fichier qui est remplacé : le lien reste un lien et le fichier
+reste dans le dépôt dont il vient (ADR 0016). La chaîne est suivie où qu'elle mène, aussi `install`
+et `uninstall` portent le fichier qu'ils ont réellement remplacé dans `replaced` et le nomment
+dans une ligne de `next`, dès que ce n'est pas celui
+demandé : un lien porté par un dépôt cloné peut pointer hors du projet. Ce qui est refusé, en
+`unsafe_path` (exit 4) et sans rien écrire : un lien qui ne mène nulle part, vers un dossier, en
+boucle, ou par plus de dix maillons. Même règle pour le `config.toml` de Codex.
+
 Claude Code demande d'approuver un serveur déclaré dans `.mcp.json` la première fois qu'il démarre
 dans le projet. Le scope de la session est la racine du projet, que Claude Code transmet dans
 `CLAUDE_PROJECT_DIR` ; les autres hosts utilisent le dossier dans lequel ils démarrent le serveur.

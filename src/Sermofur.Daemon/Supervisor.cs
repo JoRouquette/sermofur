@@ -25,10 +25,19 @@ public sealed class Supervisor(
     /// <summary>
     /// Start of the supervised daemon. A scheduled task carries no environment: the variables
     /// recorded at install time (DOTNET_ROOT, PATH) reach the daemon through its supervisor.
+    /// Only the carried variables pass, and only with absolute paths
+    /// (<see cref="Services.ServiceDefinition.CarriedEnvironment"/>): <c>service.json</c> is a
+    /// file of the user, and the daemon must not inherit whatever else it holds.
     /// </summary>
+    /// <param name="dropped">Called with the name of each variable left out, never its value.</param>
+    /// <param name="narrowed">
+    /// Called with the name of a variable kept with fewer entries than it had, never its value.
+    /// </param>
     public static ProcessStartInfo ChildStart(
         Services.ServiceDefinition child,
-        Services.ServiceDefinition? installed
+        Services.ServiceDefinition? installed,
+        Action<string>? dropped = null,
+        Action<string>? narrowed = null
     )
     {
         ProcessStartInfo start = new ProcessStartInfo(child.Executable) { UseShellExecute = false };
@@ -37,8 +46,10 @@ public sealed class Supervisor(
             start.ArgumentList.Add(argument);
         }
         foreach (
-            KeyValuePair<string, string> variable in installed?.Environment
-                ?? new Dictionary<string, string>()
+            KeyValuePair<string, string> variable in installed?.CarriedEnvironment(
+                dropped,
+                narrowed
+            ) ?? new Dictionary<string, string>()
         )
         {
             start.Environment[variable.Key] = variable.Value;

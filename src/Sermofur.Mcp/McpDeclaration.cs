@@ -5,7 +5,11 @@ using Sermofur.Infrastructure;
 
 namespace Sermofur.Mcp;
 
-/// <summary>Result of <c>smf mcp install</c> or <c>uninstall</c>.</summary>
+/// <summary>
+/// Result of <c>smf mcp install</c> or <c>uninstall</c>. <c>File</c> is the configuration file
+/// asked for; <c>Replaced</c> names the file actually written when a followed link moved it
+/// elsewhere, and stays null when the write landed on <c>File</c> itself (ADR 0016).
+/// </summary>
 public sealed record DeclarationReport(
     string File,
     bool Changed,
@@ -13,7 +17,8 @@ public sealed record DeclarationReport(
     string? Command,
     bool Portable,
     IReadOnlyList<string> Next,
-    string Host = McpDeclaration.ClaudeCode
+    string Host = McpDeclaration.ClaudeCode,
+    string? Replaced = null
 );
 
 /// <summary>Declaration of the bridge to an MCP host (spec 005 FR-013, spec 006).</summary>
@@ -36,11 +41,8 @@ public static class McpDeclaration
         (string command, IReadOnlyList<string> arguments, bool portable) = Launcher();
         (string? current, bool bom) = ReadText(file);
         string? updated = CodexConfigFile.WithBlock(current, command, arguments);
-        if (updated is not null)
-        {
-            WriteText(file, updated, bom);
-        }
-        List<string> next = [.. Pending(folder)];
+        string? written = updated is null ? null : WriteText(file, updated, bom);
+        List<string> next = [.. Followed(file, written), .. Pending(folder)];
         if (!portable)
         {
             next.Add(
@@ -59,7 +61,8 @@ public static class McpDeclaration
             command,
             portable,
             next,
-            Codex
+            Codex,
+            Elsewhere(file, written)
         );
     }
 
@@ -73,11 +76,17 @@ public static class McpDeclaration
         string file = CodexFile(folder, scope);
         (string? current, bool bom) = ReadText(file);
         string? updated = current is null ? null : CodexConfigFile.WithoutBlock(current);
-        if (updated is not null)
-        {
-            WriteText(file, updated, bom);
-        }
-        return new DeclarationReport(file, updated is not null, false, null, true, [], Codex);
+        string? written = updated is null ? null : WriteText(file, updated, bom);
+        return new DeclarationReport(
+            file,
+            updated is not null,
+            false,
+            null,
+            true,
+            [.. Followed(file, written)],
+            Codex,
+            Elsewhere(file, written)
+        );
     }
 
     /// <summary>Hosts that declare the bridge for an instance root, with where.</summary>
@@ -170,12 +179,12 @@ public static class McpDeclaration
         }
     }
 
-    private static void WriteText(string file, string content, bool bom)
+    private static string WriteText(string file, string content, bool bom)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(file)!);
         byte[] body = System.Text.Encoding.UTF8.GetBytes(content);
         // A Codex configuration may hold the tokens of other servers: a new one is private.
-        Write(
+        return Write(
             file,
             bom ? [0xEF, 0xBB, 0xBF, .. body] : body,
             UnixFileMode.UserRead | UnixFileMode.UserWrite
@@ -188,11 +197,8 @@ public static class McpDeclaration
         (string command, IReadOnlyList<string> arguments, bool portable) = Launcher();
         byte[]? current = File.Exists(file) ? File.ReadAllBytes(file) : null;
         byte[]? updated = McpConfigFile.WithEntry(current, McpConfigFile.Entry(command, arguments));
-        if (updated is not null)
-        {
-            Write(file, updated);
-        }
-        List<string> next = [.. Pending(folder)];
+        string? written = updated is null ? null : Write(file, updated);
+        List<string> next = [.. Followed(file, written), .. Pending(folder)];
         if (!portable)
         {
             next.Add(
@@ -200,7 +206,15 @@ public static class McpDeclaration
             );
         }
         next.Add("Start claude in the project and approve the sermofur server.");
-        return new DeclarationReport(file, updated is not null, true, command, portable, next);
+        return new DeclarationReport(
+            file,
+            updated is not null,
+            true,
+            command,
+            portable,
+            next,
+            Replaced: Elsewhere(file, written)
+        );
     }
 
     public static DeclarationReport Uninstall(string folder)
@@ -209,11 +223,16 @@ public static class McpDeclaration
         byte[]? updated = File.Exists(file)
             ? McpConfigFile.WithoutEntry(File.ReadAllBytes(file))
             : null;
-        if (updated is not null)
-        {
-            Write(file, updated);
-        }
-        return new DeclarationReport(file, updated is not null, false, null, true, []);
+        string? written = updated is null ? null : Write(file, updated);
+        return new DeclarationReport(
+            file,
+            updated is not null,
+            false,
+            null,
+            true,
+            [.. Followed(file, written)],
+            Replaced: Elsewhere(file, written)
+        );
     }
 
     /// <summary>True when the root of an instance declares the bridge.</summary>
@@ -293,6 +312,32 @@ public static class McpDeclaration
         return pending;
     }
 
-    private static void Write(string file, byte[] content, UnixFileMode? newFileMode = null) =>
-        AtomicFile.Write(file, content, newFileMode);
+    /// <summary>
+    /// Writes a configuration of a host. A manager of dotfiles commonly links <c>.mcp.json</c>
+    /// or <c>config.toml</c> to a repository: the link is followed and its target replaced, so
+    /// the file stays where the user put it (ADR 0016).
+    /// </summary>
+    /// <returns>The file actually replaced, which a link may have moved elsewhere.</returns>
+    private static string Write(string file, byte[] content, UnixFileMode? newFileMode = null) =>
+        AtomicFile.Write(file, content, new WriteOptions(newFileMode, LinkPolicy.FollowToTarget));
+
+    /// <summary>
+    /// The file actually replaced when a followed link moved the write elsewhere, null when the
+    /// write landed on the file asked for: a chain is followed wherever it leads, so the file
+    /// replaced is named instead of being assumed (ADR 0016).
+    /// </summary>
+    private static string? Elsewhere(string file, string? written) =>
+        written is not null
+        && !string.Equals(written, Path.GetFullPath(file), LocalPaths.Comparison)
+            ? written
+            : null;
+
+    /// <summary>
+    /// The line reporting where the write landed, when a followed link moved it. The path is also
+    /// carried on its own, in <c>Replaced</c> of the report.
+    /// </summary>
+    private static IEnumerable<string> Followed(string file, string? written) =>
+        Elsewhere(file, written) is string replaced
+            ? [$"{file} is a link: the configuration was written in {replaced}."]
+            : [];
 }

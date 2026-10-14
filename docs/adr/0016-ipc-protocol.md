@@ -2,7 +2,8 @@ English | [Français](../fr/adr/0016-ipc-protocol.md)
 
 # ADR 0016-ipc-protocol — Local protocol 1 and routing of the CLI
 
-Date: 2026-10-08. Status: accepted, implemented in 0.4. Completes
+Date: 2026-10-08, configuration writes added on 2026-10-12. Status: accepted,
+implemented in 0.4 and 0.4.3. Completes
 [ADR 0003](0003-ipc-daemon.md) and [ADR 0015](0015-user-daemon.md).
 
 ## Context
@@ -60,11 +61,53 @@ the rules of the engine. The MCP bridge will be a second client of the same daem
 - On Windows, the endpoint is looked up by listing the pipe folder: opening the pipe to read its
   attributes would consume an instance of the server.
 
+## Configuration writes (0.4.3)
+Every configuration file is replaced in one step: a temporary file of a random name in the same
+folder, renamed over the target. A rename over a link replaces the link itself, so the real file is
+never written; the Unix mode read through a link is the mode of its target, given to a plain file.
+The files written this way do not have the same owner, so a write declares what a link in place of
+its target means.
+- **Refused** for the state of sermofur (`instances.json`, `service.json`): `unsafe_path` (exit 4),
+  nothing written. No link there was put by the product, and following one would write outside the
+  folder it owns. A symbolic link and a junction are what this sees; a hard link is another name of
+  the same file, which no attribute tells apart, so a write through one replaces that name alone.
+  Both writers hold this policy without being told to, and a test goes through each of them.
+- **Followed** for the configuration of a host (`.mcp.json`, the `config.toml` of Codex): the chain
+  of links is resolved and its final target is replaced, so the link stays a link and the file
+  stays in the repository a manager of dotfiles put it in. Refusing would break a working
+  installation; writing over the link would take the file out of that repository without a word.
+- A followed chain is refused, by its own reason, when it leads nowhere, to a folder, in a circle,
+  or through more than ten steps: writing anyway would leave a file the host does not read. A chain
+  that comes back to a path already walked is named a circle; one that keeps going is named too
+  long.
+- A followed chain is followed wherever it leads: nothing requires its final target to stay in the
+  project or in a folder of configuration. A link a repository carries can therefore send the write
+  elsewhere, so the write is never silent about where it landed: `smf mcp install` and `uninstall`
+  name the file actually replaced whenever it is not the one asked for.
+- The Unix mode is read from, and given back to, the final target, never through the link.
+- Only the target is looked at, not the folders above it: a folder of the path is a link on a
+  healthy system (`/var` on macOS), and refusing those would refuse the daemon its own state. The
+  discovery of an instance keeps refusing a link anywhere in its path (ADR 0010): that rule is
+  about what may be read, not about how a file is replaced.
+- One writer holds this (`AtomicFile`, in Infrastructure), and the instance writes of
+  Infrastructure (configuration of an instance, Markdown projections) use it instead of their own
+  temporary file.
+- The supervisor passes the daemon the carried variables only (`DOTNET_ROOT`, `PATH`,
+  `SERMOFUR_DAEMON_HOME`), with absolute paths only and `PATH` reduced to its absolute entries:
+  `service.json` is a file of the user, and a relative path would be read from the working folder
+  of the daemon. One journal line names each variable left out, never its value. A `service.json`
+  whose shape does not hold reads as nothing installed, rather than failing outside the business
+  errors.
+
 ## Alternatives
 JSON-RPC (no gain while the CLI is the only client). Passing the folder through `--path` (clashes
 with a `--path` already given). Running commands directly beside a daemon of another version (two
 writers of different versions).
 
 ## Consequences
+The cases of a refused or followed link chain, the permissions of a final target, the filtered
+environment and an unsound `service.json` are covered by tests on the three operating systems; on
+Windows a symbolic link to a file needs an elevated session or developer mode, so those facts are
+reported as skipped without one.
 A test replays real CLI commands with and without the daemon and compares outputs byte for byte;
 a load test measures the overhead (2.9 ms at the 95th percentile on Windows).

@@ -35,26 +35,24 @@ public sealed class MarkdownProjection(string root)
     public void Write(MemoryRecord record)
     {
         string target = PathFor(record);
+        // Refused as a link on the whole path (ADR 0010), as the configuration of the instance
+        // is; AtomicFile refuses one in place of the file itself.
         LocalPaths.RejectLinks(target);
-        Directory.CreateDirectory(Path.GetDirectoryName(target)!);
-        string temporary = target + $".{Guid.NewGuid():N}.tmp";
         try
         {
-            File.WriteAllText(temporary, Render(record), new UTF8Encoding(false));
-            File.Move(temporary, target, overwrite: true);
+            // A projection is rebuilt from the store, which is the authority: a flush to the
+            // disk for each record would buy nothing.
+            AtomicFile.Write(
+                target,
+                Encoding.UTF8.GetBytes(Render(record)),
+                new WriteOptions(Durable: false)
+            );
         }
         catch (Exception exception)
             when ((exception is IOException or UnauthorizedAccessException) && IsCurrentSafe(record)
             )
         {
             // A concurrent writer already published exactly the same projection.
-        }
-        finally
-        {
-            if (File.Exists(temporary))
-            {
-                File.Delete(temporary);
-            }
         }
     }
 

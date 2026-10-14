@@ -104,11 +104,29 @@ public sealed class DaemonCommands(
     private object Install(DaemonPaths paths)
     {
         IServiceManager manager = Usable(paths);
+        List<string> dropped = [];
+        List<string> narrowed = [];
         ServiceDefinition definition = ServiceDefinition.ForCurrentProcess(
             ProductVersion.Current,
             typeof(DaemonCommands).Assembly.Location,
-            supervise: OperatingSystem.IsWindows()
+            supervise: OperatingSystem.IsWindows(),
+            // The name of the variable, never its value: a daemon that starts without one is
+            // diagnosed from here, not by reading service.json.
+            dropped: dropped.Add,
+            narrowed: narrowed.Add
         );
+        foreach (string name in dropped)
+        {
+            error?.WriteLine(
+                $"smf: {name} is not carried to the service: its value is not an absolute path"
+            );
+        }
+        foreach (string name in narrowed)
+        {
+            error?.WriteLine(
+                $"smf: {name} is carried to the service without the entries that are not absolute paths"
+            );
+        }
         bool current =
             manager.Query().Installed
             && ServiceManagers.Same(InstalledDefinition.Read(paths), definition)
@@ -512,15 +530,25 @@ public sealed class DaemonCommands(
             typeof(DaemonCommands).Assembly.Location,
             supervise: false
         );
-        ProcessStartInfo start = Supervisor.ChildStart(child, InstalledDefinition.Read(paths));
+        DaemonLog log = new DaemonLog(paths.LogFile);
+        ServiceDefinition? installed = InstalledDefinition.Read(paths);
+        if (installed is null && File.Exists(InstalledDefinition.File(paths)))
+        {
+            // The file is there but its shape does not hold: the daemon starts with no
+            // environment at all, which is worth a line of its own.
+            log.Write("installed_definition_unsound");
+        }
+        ProcessStartInfo start = Supervisor.ChildStart(
+            child,
+            installed,
+            // The name of the variable, never its value: the journal is read by eye.
+            dropped: name => log.Write("supervised_variable_dropped", name),
+            narrowed: name => log.Write("supervised_path_entries_dropped", name)
+        );
         using CancellationTokenSource stop = new CancellationTokenSource();
         // A second signal ends the supervisor at once; its job object takes the daemon with it.
         using IDisposable signals = SignalStop.Register(stop, null);
-        Supervisor supervisor = new Supervisor(
-            start,
-            new DaemonLog(paths.LogFile),
-            () => ShutdownAsync(paths, null)
-        );
+        Supervisor supervisor = new Supervisor(start, log, () => ShutdownAsync(paths, null));
         return supervisor.Run(stop.Token);
     }
 
