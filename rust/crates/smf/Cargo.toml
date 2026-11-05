@@ -1,0 +1,19 @@
+[package]
+name = "smf"
+description = "Sermofur command line (Rust port)."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+sermofur-core = { path = "../sermofur-core" }
+
+[dev-dependencies]
+proptest = "1"
+serde_json = "1"

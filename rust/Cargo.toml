@@ -1,0 +1,19 @@
+[workspace]
+resolver = "3"
+members = ["crates/sermofur-core", "crates/smf"]
+
+[workspace.package]
+# Same value as the development version of the .NET build (Directory.Build.props), so that the
+# header and the documentation link of the help match the oracle byte for byte.
+version = "0.0.0-dev"
+edition = "2024"
+license = "Apache-2.0"
+repository = "https://github.com/JoRouquette/sermofur"
+publish = false
+
+[workspace.lints.rust]
+unsafe_code = "deny"
+warnings = "deny"
+
+[workspace.lints.clippy]
+all = { level = "deny", priority = -1 }

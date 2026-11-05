@@ -1,0 +1,5 @@
+{
+  "exitCode": 1,
+  "stderr": "smf: invalid_arguments: Argument limited to 16,384 characters without NUL.\n",
+  "stdout": ""
+}

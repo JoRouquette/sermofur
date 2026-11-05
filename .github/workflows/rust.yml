@@ -1,0 +1,55 @@
+name: rust
+
+# Checks of the Rust port (rust/). Separate from ci.yml, which belongs to the release policy:
+# this workflow neither releases nor publishes anything.
+
+on:
+  push:
+    branches: ["feat/**"]
+    paths:
+      - "rust/**"
+      - ".github/workflows/rust.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "rust/**"
+      - ".github/workflows/rust.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rust-${{ github.ref }}
+  cancel-in-progress: true
+
+# The toolchain is pinned: the workspace denies warnings, so a new lint of a newer release must
+# not turn the checks red by itself. Raise the version on purpose, in this line.
+env:
+  RUST_TOOLCHAIN: "1.99.1"
+
+jobs:
+  check:
+    name: check (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    defaults:
+      run:
+        working-directory: rust
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install the pinned toolchain
+        run: |
+          rustup toolchain install ${{ env.RUST_TOOLCHAIN }} --profile minimal --component rustfmt --component clippy --no-self-update
+          rustup default ${{ env.RUST_TOOLCHAIN }}
+      - name: Format
+        run: cargo fmt --all --check
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets --locked
+      - name: Test
+        run: cargo test --workspace --locked

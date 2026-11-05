@@ -1,0 +1,5 @@
+{
+  "exitCode": 1,
+  "stderr": "smf: invalid_arguments: Too many arguments: 128 at most.\n",
+  "stdout": ""
+}

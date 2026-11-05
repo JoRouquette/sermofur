@@ -1,0 +1,19 @@
+[package]
+name = "sermofur-core"
+description = "Sermofur core: domain, store, instance and memory services (layers 1 to 5 of the Rust port)."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+serde = "1"
+serde_json = "1"
+thiserror = "2"
+
+[dev-dependencies]
+proptest = "1"
