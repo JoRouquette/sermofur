@@ -4,6 +4,7 @@
 
 pub mod error;
 pub mod format;
+pub mod instance;
 pub mod json;
 pub mod limits;
 pub mod schema;

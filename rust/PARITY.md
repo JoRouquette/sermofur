@@ -9,7 +9,7 @@ Statut : `todo`, `partial`, `done`. Une ligne ne passe à `done` que si ses scé
 | 1b.0 | Formateurs .NET : `double` comme System.Text.Json (forme courte, exposant `E-07`), `DateTimeOffset` en JSON STJ, au format `O` et aux trois formats fixes, pour un instant et un décalage donnés ; lecture STJ ; table d'or produite par `rust/tools/format-oracle`. Hors lot : la lecture du décalage local courant (voir 7.2) | sermofur-core | n/a (or `formats.json`) | done |
 | 1b.0b | Montée rusqlite 0.40.2 / libsqlite3-sys 0.38.2 (SQLite 3.53.2, la plus proche de 3.53.4 de l'oracle ; décision A6) ; rejouer l'or du schéma | sermofur-core | SearchIndexTests | done |
 | 1b.1 | Schéma SQLite v2 : `create_database`, `validate` | sermofur-core | SearchIndexTests (FTS5) | done (3109a22) |
-| 1b.2 | `instance.json` (lecture bornée 64 Kio, erreurs `invalid_instance`, `unsupported_schema`, `migration_required`) | sermofur-core | InstanceTests, HardeningTests | todo |
+| 1b.2 | `instance.json` (lecture bornée 64 Kio, erreurs `invalid_instance`, `unsupported_schema`, `migration_required`), lecture STJ (BOM, doublons, casse, profondeur 64, GUID D) ; or `instance-config.json` de 111 cas produit par `rust/tools/config-oracle` ; `reject_links` sur tous les ancêtres | sermofur-core | InstanceTests, HardeningTests | done |
 | 1b.3 | Découverte en échec fermé : `ValidateDirectory`, `RejectLinks` sur tous les ancêtres, six états du marqueur | sermofur-core | InstanceTests | todo |
 | 1b.4 | `init` (staging, course entre processus), `root` | sermofur-core, smf | CliTests (init concurrent), InstanceTests | todo |
 | 1c.1 | Propriété du dossier : Unix (`statx`, `lstat`, `geteuid`) | sermofur-core | HardeningTests | todo |
