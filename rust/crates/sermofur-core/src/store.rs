@@ -498,6 +498,98 @@ impl Store {
         project(&self.root, next)?;
         Ok(Some(change.next))
     }
+
+    /// Rebuilds the search index in one `BEGIN IMMEDIATE` transaction (`RebuildIndex`): emptied,
+    /// claims and RETEX indexed again from the registry, then each source, in identifier order,
+    /// handed to `decide`, which returns its new state, if any, and its passages. A change is
+    /// written with its history; the passages are indexed when the source is indexed. Any error
+    /// rolls everything back. The projections of the changed sources are written after the
+    /// commit. Returns the changed sources.
+    pub fn rebuild_index(
+        &mut self,
+        mut decide: impl FnMut(
+            &MemoryRecord,
+        ) -> Result<(Option<SourceChange>, Vec<search::SearchDocument>)>,
+    ) -> Result<Vec<MemoryRecord>> {
+        let transaction = self
+            .connection
+            .transaction_with_behavior(TransactionBehavior::Immediate)
+            .map_err(|e| storage(&e))?;
+        search::clear(&transaction)?;
+        search::index_records(&transaction)?;
+        let ids: Vec<String> = {
+            let mut statement = transaction
+                .prepare("SELECT id FROM records WHERE kind='Source' ORDER BY id")
+                .map_err(|e| storage(&e))?;
+            statement
+                .query_map([], |row| row.get(0))
+                .and_then(Iterator::collect)
+                .map_err(|e| storage(&e))?
+        };
+        let mut changed = Vec::new();
+        for id in ids {
+            let payload: String = transaction
+                .query_row("SELECT payload FROM records WHERE id=?1", [&id], |row| {
+                    row.get(0)
+                })
+                .map_err(|e| storage(&e))?;
+            let source: MemoryRecord = read(&payload, &|_| 0)?;
+            let (change, passages) = decide(&source)?;
+            let current = match change {
+                Some(change) => {
+                    let next = &change.next;
+                    let written = transaction
+                        .execute(
+                            "UPDATE records SET payload=?1,revision=?2 WHERE id=?3 AND revision=?4",
+                            rusqlite::params![
+                                write(next)?,
+                                next.revision,
+                                next.id.hyphenated().to_string(),
+                                source.revision
+                            ],
+                        )
+                        .map_err(|e| storage(&e))?;
+                    if written != 1 {
+                        return Err(SermofurError::new(
+                            "storage_busy",
+                            "Source changed concurrently; retry.",
+                            3,
+                        ));
+                    }
+                    append_history(
+                        &transaction,
+                        Some(&source),
+                        next,
+                        &change.reason,
+                        Some(change.actor.clone()),
+                    )?;
+                    changed.push(change.next);
+                    changed.last().ok_or_else(invalid_storage)?
+                }
+                None => &source,
+            };
+            let json = current
+                .content_json
+                .as_deref()
+                .ok_or_else(invalid_storage)?;
+            if read::<SourceContent>(json, &|_| 0)?.status == crate::records::SourceStatus::Indexed
+            {
+                let scope_id = current.scope_id.as_deref().ok_or_else(invalid_storage)?;
+                search::insert(
+                    &transaction,
+                    current.id,
+                    scope_id,
+                    RecordKind::Source,
+                    &passages,
+                )?;
+            }
+        }
+        transaction.commit().map_err(|e| storage(&e))?;
+        for source in &changed {
+            project(&self.root, source)?;
+        }
+        Ok(changed)
+    }
 }
 
 /// `SourcePlacement.Holds`: whether `mapping` is the stored path `relative_path` or one of its

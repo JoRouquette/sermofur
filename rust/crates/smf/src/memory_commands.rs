@@ -1,6 +1,6 @@
 //! The commands of the memory of an instance, ported from `CommandRunner.Dispatch`,
 //! `CommandRunner.RunScope`, `MemoryCommands.cs` and `KnowledgeCommands.cs`: `status`, `scope`,
-//! `export`, `claim`, `evidence`, `retex`, `source`, `recall` and `challenge`. Each returns the
+//! `export`, `claim`, `evidence`, `retex`, `source`, `index`, `recall` and `challenge`. Each returns the
 //! JSON text of its answer.
 
 use std::path::Path;
@@ -138,6 +138,7 @@ pub fn dispatch(
         ),
         "retex" => run_memory(args, MemoryService::new(store, context)?, RecordKind::Retex),
         "source" => run_source(args, store, context, path),
+        "index" => run_index(args, store, context),
         "recall" => run_recall(args, store, context),
         "challenge" => run_challenge(args, store, context),
         _ => Err(SermofurError::invalid_arguments("Unknown command.")),
@@ -179,7 +180,7 @@ fn run_source(
             };
             args.validate_used()?;
             // `Path.GetFullPath(argument, path)`: the service sees the full form, bound included.
-            let file = sermofur_core::discovery::full_path(&crate::runner::combine(
+            let file = sermofur_core::discovery::get_full_path(&crate::runner::combine(
                 &args.positionals()[2],
                 path,
             ))?;
@@ -217,6 +218,24 @@ fn run_source(
             "Unknown source subcommand.",
         )),
     }
+}
+
+/// `KnowledgeCommands.Index`: `index rebuild`. The service checks the scope tree before the
+/// arguments.
+fn run_index(
+    args: &mut CommandArguments,
+    store: &mut Store,
+    context: &MemoryContext,
+) -> Result<String> {
+    let mut sources = SourceService::new(store, &file_reader, context)?;
+    args.require_count(2)?;
+    if args.positionals()[1] != "rebuild" {
+        return Err(SermofurError::invalid_arguments(
+            "Unknown index subcommand.",
+        ));
+    }
+    args.validate_used()?;
+    to_json(&sources.rebuild_index()?)
 }
 
 /// `KnowledgeCommands.Recall`. The service checks the scope tree before the arguments.

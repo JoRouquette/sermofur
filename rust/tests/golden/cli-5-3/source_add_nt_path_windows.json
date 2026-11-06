@@ -1,0 +1,134 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/",
+    "doc.md"
+  ],
+  "projections": {},
+  "steps": [
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"created\": true\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "init"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "file": "doc.md"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 4,
+        "stderr": "smf: scope_boundary: Source outside the instance.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "\\??\\<root>\\doc.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 4,
+        "stderr": "smf: scope_boundary: Source outside the instance.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "\\??\\<root>\\missing.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 4,
+        "stderr": "smf: scope_boundary: Source outside the instance.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "\\\\?\\<root>\\doc.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 3,
+        "stderr": "smf: invalid_storage_or_path: Invalid path or data; run doctor.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "--path",
+          "\\??\\<root>",
+          "status"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Command required.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "--path",
+          "\\??\\<root>"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "[]\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "list"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/instance.json",
+        "added .sermofur/memory.db"
+      ],
+      "step": {
+        "changes": true
+      }
+    }
+  ]
+}

@@ -23,7 +23,8 @@ use sermofur_core::records::{
     SourceContent, SourceRejection, SourceStatus, Volatility, read, write,
 };
 use sermofur_core::source_service::{
-    ReindexOutcome, SourceReader, SourceService, content, file_reader, narrower_scope, transition,
+    ReindexOutcome, SYSTEM_ACTOR, SourceReader, SourceService, content, file_reader,
+    narrower_scope, transition,
 };
 use sermofur_core::sources::SourceSnapshot;
 use sermofur_core::store::{Store, StoredScope};
@@ -774,6 +775,115 @@ fn a_file_declared_by_another_scope_is_refused() {
     ));
     // Code only, as the tests of the oracle: no golden file reaches this altered base.
     assert_eq!(code(f.add("workspace", &file)), "scope_boundary");
+}
+
+/// Port of `IndexRebuildRestoresADesynchronizedIndex` (service part; the command line is in
+/// `smf/tests/golden_cli_5_3.rs`, the `search_index` check of `doctor` comes with lot 6.2).
+#[test]
+fn index_rebuild_restores_a_desynchronized_index() {
+    let mut f = fixture();
+    let context = f.context("workspace");
+    MemoryService::new(&mut f.store, &context)
+        .expect("memory")
+        .create_claim(&claim("cache"), user(), None)
+        .expect("claim");
+    let file = f.write_file("doc.md", "cache chaud");
+    f.add("workspace", &file).expect("source");
+    f.tamper("DELETE FROM search");
+    assert_eq!(f.recall("workspace", "cache"), 0);
+    let rebuild = f.sources("workspace").rebuild_index().expect("rebuild");
+    assert_eq!(
+        (rebuild.indexed, rebuild.changed_sources),
+        (2, 0),
+        "{rebuild:?}"
+    );
+    assert_eq!(f.recall("workspace", "cache"), 2);
+}
+
+/// Port of `IndexRebuildReadsEverySourceAgainAndCountsOnlyVisibleObjects`.
+#[test]
+fn index_rebuild_reads_every_source_again_and_counts_only_visible_objects() {
+    let mut f = fixture();
+    f.client("a");
+    f.client("b");
+    let in_a = f.write_file("a/a.md", "texte de a");
+    f.add("a", &in_a).expect("source of a");
+    let in_b = f.write_file("b/b.md", "texte de b");
+    let source_b = f.add("b", &in_b).expect("source of b");
+    let context = f.context("b");
+    MemoryService::new(&mut f.store, &context)
+        .expect("memory")
+        .create_claim(&claim("claim de b"), user(), None)
+        .expect("claim");
+    fs::write(&in_b, "texte de b modifié").expect("changed");
+    let rebuild = f.sources("a").rebuild_index().expect("rebuild");
+    assert_eq!((rebuild.indexed, rebuild.changed_sources), (1, 0));
+    let history = f.sources("b").show(source_b.id).expect("show").history;
+    let reasons: Vec<&str> = history.iter().filter_map(|e| e.reason.as_deref()).collect();
+    assert_eq!(reasons, ["create", "modified"]);
+    // An instance operation: recorded under the system actor, not a user of one scope.
+    assert_eq!(history[1].actor.as_deref(), Some(SYSTEM_ACTOR));
+    assert_eq!(f.recall("b", "modifie"), 1);
+    let rebuild = f.sources("b").rebuild_index().expect("rebuild");
+    assert_eq!((rebuild.indexed, rebuild.changed_sources), (2, 0));
+}
+
+/// Port of `IndexRebuildDropsALostSourceAndRollsBackOnFailure`: the reader fails on `lost.md`
+/// in the middle of the transaction; whatever the order, the change of `kept.md` is rolled back.
+#[test]
+fn index_rebuild_drops_a_lost_source_and_rolls_back_on_failure() {
+    let mut f = fixture();
+    let kept = f.write_file("kept.md", "texte conservé");
+    let lost = f.write_file("lost.md", "texte perdu");
+    let kept_source = f.add("workspace", &kept).expect("kept");
+    let lost_source = f.add("workspace", &lost).expect("lost");
+    fs::write(&kept, "texte conservé et révisé").expect("revised");
+    let failing = |root: &Path, relative: &str| {
+        if relative == "lost.md" {
+            return Err(sermofur_core::error::SermofurError::new(
+                "invalid_storage_or_path",
+                "simulated read failure",
+                3,
+            ));
+        }
+        file_reader(root, relative)
+    };
+    let context = f.context("workspace");
+    let refused = SourceService::new(&mut f.store, &failing, &context)
+        .expect("service")
+        .rebuild_index();
+    assert_eq!(
+        refused.expect_err("failed").message,
+        "simulated read failure"
+    );
+    assert_eq!(
+        f.sources("workspace")
+            .show(kept_source.id)
+            .expect("show")
+            .history
+            .len(),
+        1
+    );
+    assert_eq!(f.recall("workspace", "révisé"), 0);
+    assert_eq!(f.recall("workspace", "conservé"), 1);
+    assert_eq!(f.recall("workspace", "perdu"), 1);
+
+    fs::remove_file(&lost).expect("lost");
+    let rebuild = f.sources("workspace").rebuild_index().expect("rebuild");
+    assert_eq!((rebuild.indexed, rebuild.changed_sources), (1, 2));
+    assert_eq!(f.recall("workspace", "perdu"), 0);
+    assert_eq!(f.recall("workspace", "révisé"), 1);
+    let history = f
+        .sources("workspace")
+        .show(lost_source.id)
+        .expect("show")
+        .history;
+    let entry = history.last().expect("entry");
+    assert_eq!(
+        (entry.reason.as_deref(), entry.actor.as_deref()),
+        (Some("missing"), Some(SYSTEM_ACTOR))
+    );
+    // The `search_index` check of `doctor` comes with lot 6.2.
 }
 
 proptest! {

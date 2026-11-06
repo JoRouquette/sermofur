@@ -32,10 +32,27 @@ enum MarkerState {
 /// `invalid_storage_or_path` (`CommandRunner.Run`), and so does the port. A NUL is refused
 /// everywhere (`PathInternal`); on Unix `std::path::absolute` would keep it.
 pub fn full_path(path: &Path) -> Result<PathBuf> {
-    if path.as_os_str().as_encoded_bytes().contains(&0)
-        || (cfg!(windows) && path.to_string_lossy().starts_with(r"\??\"))
-    {
+    if is_nt_path(path) {
         return Err(invalid_storage());
+    }
+    get_full_path(path)
+}
+
+/// Whether `path` is an NT path `\??\...` (Windows only).
+fn is_nt_path(path: &Path) -> bool {
+    cfg!(windows) && path.to_string_lossy().starts_with(r"\??\")
+}
+
+/// `Path.GetFullPath` itself: as [`full_path`], except that an NT path `\??\...`, extended for
+/// .NET, is returned as is, where the discovery refuses it. The command line takes the context
+/// folder (`--path`) and the file of `source add` through it; an NT file is then outside the
+/// instance (`scope_boundary`), as for .NET.
+pub fn get_full_path(path: &Path) -> Result<PathBuf> {
+    if path.as_os_str().as_encoded_bytes().contains(&0) {
+        return Err(invalid_storage());
+    }
+    if is_nt_path(path) {
+        return Ok(path.to_path_buf());
     }
     let full = std::path::absolute(path)
         .map(|full| normalize(&full))

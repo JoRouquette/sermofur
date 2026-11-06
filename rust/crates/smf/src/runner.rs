@@ -3,13 +3,13 @@
 //! Order of the checks, as in the .NET tool: help, then version, then parsing, then the command.
 //! Ported commands: `init` and `root` (lot 1b.4), `status`, `scope`, `export`, `claim`,
 //! `evidence` and `retex` (lot 3.4), `recall` (lot 4.2), `challenge` (lot 4.3), `source`
-//! (lot 5.2); the others answer `not_ported`.
+//! (lot 5.2), `index` (lot 5.3); the others answer `not_ported`.
 
 use std::io::Write;
 use std::path::{Path, PathBuf};
 
 use serde::Serialize;
-use sermofur_core::discovery::{discover, expand_short_names};
+use sermofur_core::discovery::{discover, expand_short_names, get_full_path};
 use sermofur_core::error::{Result, SermofurError};
 use sermofur_core::init::{Initialized, initialize};
 use sermofur_core::instance::{InstanceConfiguration, read_configuration};
@@ -76,9 +76,14 @@ impl From<Initialized> for InitBody {
 
 /// `Path.GetFullPath(path, basePath)` before normalization: a full path stays; on Windows a
 /// path relative to a drive (`D:sub`) joins the base on the same drive, and takes the root of
-/// its drive otherwise, without the hidden current folder of that drive; anything else joins
-/// the base (`PathBuf::join` already keeps the drive of the base for `\sub`).
+/// its drive otherwise, without the hidden current folder of that drive; an NT path `\??\...`
+/// stays as typed; anything else joins the base (`PathBuf::join` already keeps the drive of the
+/// base for `\sub`).
 pub(crate) fn combine(path: &str, base: &Path) -> PathBuf {
+    // An NT path `\??\...` is fully qualified for .NET: kept as typed.
+    if cfg!(windows) && path.starts_with(r"\??\") {
+        return PathBuf::from(path);
+    }
     let bytes = path.as_bytes();
     if cfg!(windows) && bytes.len() >= 2 && bytes[0].is_ascii_alphabetic() && bytes[1] == b':' {
         let rooted = bytes.get(2).is_some_and(|c| *c == b'\\' || *c == b'/');
@@ -149,12 +154,13 @@ fn execute(arguments: &[String], json: bool, out: &mut dyn Write) -> Result<i32>
         return Err(not_ported());
     }
     // `Path.GetFullPath(args.Option("path", workingDirectory), workingDirectory)`: a relative
-    // `--path` is taken from the working directory; discovery makes it full.
+    // `--path` is taken from the working directory, then normalized as `GetFullPath` does
+    // (`sub ` is `sub`), before any command; its `ArgumentException` is `invalid_storage_or_path`.
     // `Environment.CurrentDirectory` expands the short 8.3 names of the folder on Windows.
     let working_directory =
         expand_short_names(&std::env::current_dir().map_err(|_| invalid_storage())?);
     let path: PathBuf = match parsed.option("path") {
-        Some(value) => combine(value, &working_directory),
+        Some(value) => get_full_path(&combine(value, &working_directory))?,
         None => working_directory,
     };
     if parsed.positionals().is_empty() {
@@ -190,9 +196,6 @@ fn execute(arguments: &[String], json: bool, out: &mut dyn Write) -> Result<i32>
     let mut store = Store::open(&root, configuration.instance_id, !writes(&parsed))?;
     let scopes = store.read_scopes()?;
     let context = resolve_context(&path, &root, &scopes)?;
-    if command == "index" {
-        return Err(not_ported());
-    }
     let body = dispatch(&mut parsed, &mut store, &context, &configuration, &path)?;
     write_line(out, &body);
     Ok(0)
@@ -396,6 +399,7 @@ mod tests {
             (r"\Foo", r"C:\Foo"),
             (r"Foo", r"C:\Bar\Foo"),
             (r"D:\Foo", r"D:\Foo"),
+            (r"\??\D:\Foo", r"\??\D:\Foo"),
         ];
         for (path, expected) in cases {
             assert_eq!(

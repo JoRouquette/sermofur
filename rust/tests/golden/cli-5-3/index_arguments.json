@@ -1,0 +1,196 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/"
+  ],
+  "projections": {},
+  "steps": [
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"created\": true\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "init"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Wrong number of arguments.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "index"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"Wrong number of arguments.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "index",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Unknown index subcommand.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "index",
+          "frob"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Unknown index subcommand.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "index",
+          "REBUILD"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Wrong number of arguments.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "index",
+          "frob",
+          "extra"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Wrong number of arguments.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "index",
+          "rebuild",
+          "extra"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Unknown option for this command.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "index",
+          "rebuild",
+          "--actor",
+          "x"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Option value required.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "index",
+          "rebuild",
+          "--origin"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"Duplicate option.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "index",
+          "rebuild",
+          "--json",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"indexed\": 0,\n  \"changedSources\": 0\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "index",
+          "--",
+          "rebuild"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"indexed\": 0,\n  \"changedSources\": 0\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "index",
+          "rebuild",
+          "--path",
+          "."
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/instance.json",
+        "added .sermofur/memory.db"
+      ],
+      "step": {
+        "changes": true
+      }
+    }
+  ]
+}

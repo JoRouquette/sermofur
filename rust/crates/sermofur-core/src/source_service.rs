@@ -10,7 +10,7 @@ use serde::Serialize;
 use uuid::Uuid;
 
 use crate::casing::ordinal_ignore_case_equal;
-use crate::discovery::full_path;
+use crate::discovery::{full_path, get_full_path};
 use crate::error::{Result, SermofurError};
 use crate::format::DateTimeOffset;
 use crate::instance::invalid_storage;
@@ -72,6 +72,18 @@ pub struct ReindexEntry {
     pub outcome: ReindexOutcome,
     pub previous_hash: Option<String>,
     pub hash: Option<String>,
+}
+
+/// Actor recorded for the changes made by an index rebuild, an instance operation
+/// (`SourceService.SystemActor`).
+pub const SYSTEM_ACTOR: &str = "sermofur";
+
+/// Result of an index rebuild, counted on visible objects only (`IndexRebuild`).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct IndexRebuild {
+    pub indexed: usize,
+    pub changed_sources: usize,
 }
 
 /// A source with its history, as `source show` prints it (`SourceView`).
@@ -310,7 +322,8 @@ impl<'a> SourceService<'a> {
             return Err(SermofurError::new("invalid_input", TEXT_MESSAGE, 1));
         }
         let root = self.context.root.as_path();
-        let typed = full_path(file)?;
+        // `Path.GetFullPath`: an NT path stays as typed, then lies outside the instance.
+        let typed = get_full_path(file)?;
         if !contains(root, &typed) {
             return Err(boundary("Source outside the instance."));
         }
@@ -345,6 +358,39 @@ impl<'a> SourceService<'a> {
         }
         refuse_narrower(&relative, &self.context.scope_id, &self.scopes)?;
         Ok(relative)
+    }
+
+    /// Rebuilds the whole index in one write transaction: claims and RETEX from the registry,
+    /// then every source of the instance read again, one at a time, with the transitions of
+    /// [`Self::reindex`], recorded under [`SYSTEM_ACTOR`]. Counts cover visible objects only
+    /// (`RebuildIndex`).
+    pub fn rebuild_index(&mut self) -> Result<IndexRebuild> {
+        let root = self.context.root.clone();
+        let reader = self.reader;
+        let changed = self.store.rebuild_index(|source| {
+            // A missing path is the `NullReferenceException` of .NET (altered base only).
+            let path = content(source)?.relative_path.ok_or_else(invalid_storage)?;
+            let snapshot = reader(&root, &path)?;
+            let (change, _) = transition(source, &snapshot, SYSTEM_ACTOR)?;
+            Ok((change, snapshot.passages))
+        })?;
+        let mut indexed = 0;
+        for record in self.store.read_records(&self.context.visible, None)? {
+            indexed += usize::from(crate::search::is_indexed(&record)?);
+        }
+        let changed_sources = changed
+            .iter()
+            .filter(|source| {
+                source
+                    .scope_id
+                    .as_ref()
+                    .is_some_and(|scope| self.context.visible.contains(scope))
+            })
+            .count();
+        Ok(IndexRebuild {
+            indexed,
+            changed_sources,
+        })
     }
 
     /// Reads again the sources of the current scope, or one of them, and records what changed;
