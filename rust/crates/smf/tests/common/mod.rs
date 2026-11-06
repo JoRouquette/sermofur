@@ -99,6 +99,11 @@ pub enum Act {
     File(&'static str, &'static str),
     /// Removes a file; `{N}` as in [`Act::Run`].
     Remove(&'static str),
+    /// Writes a file of bytes that are not a literal text (invalid UTF-8, a large file).
+    Bytes(&'static str, fn() -> Vec<u8>),
+    /// Creates a link to a folder of the root: a junction on Windows (`mklink /J`, no privilege
+    /// needed), a symbolic link elsewhere. Removed before the folder, never followed.
+    Link(&'static str, &'static str),
     /// Writes a source of a scope through the store: its path and whether it is indexed.
     Source(&'static str, &'static str, bool),
     /// The history of the record printed by step N, read through the store.
@@ -290,7 +295,7 @@ fn ordered_by_random_ids(blocks: &[Vec<String>]) -> bool {
 }
 
 /// The elements of the arrays listed in the order of random identifiers (records of a
-/// top-level array, `evidence` and `files`), sorted as text, so that both runs compare. Other
+/// top-level array, `evidence`, `files` and the `sources` of `source reindex`), sorted as text, so that both runs compare. Other
 /// arrays (scopes, history, visible scopes) keep the order the program gave.
 pub fn sort_arrays(text: &str) -> String {
     let lines: Vec<&str> = text.split('\n').collect();
@@ -300,7 +305,7 @@ pub fn sort_arrays(text: &str) -> String {
         let line = lines[i];
         let trimmed = line.trim_start();
         let indent = line.len() - trimmed.len();
-        let opens = trimmed == "[" || trimmed == "\"evidence\": [" || trimmed == "\"files\": [";
+        let opens = ["[", "\"evidence\": [", "\"files\": [", "\"sources\": ["].contains(&trimmed);
         out.push(line.to_owned());
         i += 1;
         if !opens {
@@ -461,6 +466,30 @@ pub fn entries(root: &Path) -> Vec<String> {
     found
 }
 
+/// A link to a folder: a junction on Windows (`mklink /J`), a symbolic link elsewhere.
+pub fn directory_link(link: &Path, target: &Path) {
+    #[cfg(windows)]
+    {
+        let out = Command::new("cmd")
+            .args(["/C", "mklink", "/J"])
+            .arg(link)
+            .arg(target)
+            .output()
+            .expect("cmd");
+        assert!(out.status.success(), "mklink /J failed: {out:?}");
+    }
+    #[cfg(unix)]
+    std::os::unix::fs::symlink(target, link).expect("symlink");
+}
+
+/// Removes the link itself, never its target.
+pub fn remove_link(link: &Path) {
+    #[cfg(windows)]
+    fs::remove_dir(link).expect("junction removed");
+    #[cfg(unix)]
+    fs::remove_file(link).expect("link removed");
+}
+
 pub fn open_store(root: &Path, read_only: bool) -> Store {
     let configuration = read_configuration(root, false, |_| 0).expect("configuration");
     Store::open(root, configuration.instance_id, read_only).expect("store")
@@ -521,6 +550,7 @@ pub fn record(program: &str, scenario: &Scenario) -> Value {
     let mut ids: HashMap<usize, String> = HashMap::new();
     let mut steps = Vec::new();
     let mut baseline: BTreeMap<String, Vec<u8>> = BTreeMap::new();
+    let mut links = Vec::new();
     for (index, act) in scenario.acts.iter().enumerate() {
         let (label, output) = match act {
             Act::Run(cwd, arguments) => {
@@ -562,6 +592,15 @@ pub fn record(program: &str, scenario: &Scenario) -> Value {
                 fs::remove_file(root.join(substitute(path, &ids))).expect("remove");
                 (json!({ "remove": path }), Value::Null)
             }
+            Act::Bytes(path, bytes) => {
+                fs::write(root.join(path), bytes()).expect("file");
+                (json!({ "bytes": path }), Value::Null)
+            }
+            Act::Link(link, target) => {
+                directory_link(&root.join(link), &root.join(target));
+                links.push(root.join(link));
+                (json!({ "link": link, "target": target }), Value::Null)
+            }
             Act::Source(scope, path, indexed) => {
                 let text = write_source(root, scope, path, *indexed);
                 let value: Value = serde_json::from_str(&text).expect("JSON");
@@ -602,6 +641,9 @@ pub fn record(program: &str, scenario: &Scenario) -> Value {
             }
         };
         steps.push(json!({ "step": label, "output": output }));
+    }
+    for link in links {
+        remove_link(&link);
     }
     let mut listed: Vec<String> = entries(root)
         .iter()

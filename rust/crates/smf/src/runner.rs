@@ -2,8 +2,8 @@
 //!
 //! Order of the checks, as in the .NET tool: help, then version, then parsing, then the command.
 //! Ported commands: `init` and `root` (lot 1b.4), `status`, `scope`, `export`, `claim`,
-//! `evidence` and `retex` (lot 3.4), `recall` (lot 4.2), `challenge` (lot 4.3); the others
-//! answer `not_ported`.
+//! `evidence` and `retex` (lot 3.4), `recall` (lot 4.2), `challenge` (lot 4.3), `source`
+//! (lot 5.2); the others answer `not_ported`.
 
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -22,7 +22,7 @@ use crate::args::{
     CommandArguments, HELP, HELP_SHORTCUT, VERSION as VERSION_OPTION, VERSION_SHORTCUT,
 };
 use crate::help;
-use crate::memory_commands::{dispatch, is_knowledge_command, writes};
+use crate::memory_commands::{dispatch, writes};
 
 /// Exit code of a command that exists in the .NET tool but is not ported yet.
 const NOT_PORTED_EXIT_CODE: i32 = 70;
@@ -78,7 +78,7 @@ impl From<Initialized> for InitBody {
 /// path relative to a drive (`D:sub`) joins the base on the same drive, and takes the root of
 /// its drive otherwise, without the hidden current folder of that drive; anything else joins
 /// the base (`PathBuf::join` already keeps the drive of the base for `\sub`).
-fn combine(path: &str, base: &Path) -> PathBuf {
+pub(crate) fn combine(path: &str, base: &Path) -> PathBuf {
     let bytes = path.as_bytes();
     if cfg!(windows) && bytes.len() >= 2 && bytes[0].is_ascii_alphabetic() && bytes[1] == b':' {
         let rooted = bytes.get(2).is_some_and(|c| *c == b'\\' || *c == b'/');
@@ -190,10 +190,10 @@ fn execute(arguments: &[String], json: bool, out: &mut dyn Write) -> Result<i32>
     let mut store = Store::open(&root, configuration.instance_id, !writes(&parsed))?;
     let scopes = store.read_scopes()?;
     let context = resolve_context(&path, &root, &scopes)?;
-    if is_knowledge_command(&command) && !matches!(command.as_str(), "recall" | "challenge") {
+    if command == "index" {
         return Err(not_ported());
     }
-    let body = dispatch(&mut parsed, &mut store, &context, &configuration)?;
+    let body = dispatch(&mut parsed, &mut store, &context, &configuration, &path)?;
     write_line(out, &body);
     Ok(0)
 }

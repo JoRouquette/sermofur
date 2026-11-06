@@ -411,6 +411,95 @@ impl Store {
     }
 }
 
+/// The new state of a source and the reason and actor of its history entry (`SourceChange`).
+#[derive(Clone, Debug)]
+pub struct SourceChange {
+    pub next: MemoryRecord,
+    pub reason: String,
+    pub actor: String,
+}
+
+impl Store {
+    /// Creates or updates the source stored at `relative_path`, in one `BEGIN IMMEDIATE`
+    /// transaction (`SaveSource`). `decide` receives the source registered at that exact path,
+    /// whatever its scope, and the scopes, both read under the lock, and returns the new state,
+    /// `None` to leave it, or an error to refuse. The search entries of the source are replaced
+    /// by `passages` when the new state is indexed, removed otherwise. Returns the saved source,
+    /// or the current one when nothing changed.
+    pub fn save_source(
+        &mut self,
+        relative_path: &str,
+        decide: impl FnOnce(Option<&MemoryRecord>, &[StoredScope]) -> Result<Option<SourceChange>>,
+        passages: &[search::SearchDocument],
+    ) -> Result<Option<MemoryRecord>> {
+        let transaction = self
+            .connection
+            .transaction_with_behavior(TransactionBehavior::Immediate)
+            .map_err(|e| storage(&e))?;
+        // Exact comparison: the service stores the names found on disk.
+        let previous = transaction
+            .query_row(
+                "SELECT payload FROM records WHERE kind='Source' AND source_path=?1",
+                [relative_path],
+                |row| row.get::<_, String>(0),
+            )
+            .map(Some)
+            .or_else(|error| match error {
+                rusqlite::Error::QueryReturnedNoRows => Ok(None),
+                other => Err(storage(&other)),
+            })?
+            .map(|payload| read::<MemoryRecord>(&payload, &|_| 0))
+            .transpose()?;
+        let scopes = read_scopes(&transaction)?;
+        let Some(change) = decide(previous.as_ref(), &scopes)? else {
+            transaction.commit().map_err(|e| storage(&e))?;
+            return Ok(previous);
+        };
+        let next = &change.next;
+        let scope_id = next.scope_id.clone().ok_or_else(invalid_storage)?;
+        let id = next.id.hyphenated().to_string();
+        let written = match &previous {
+            None => transaction.execute(
+                "INSERT INTO records(id,scope_id,kind,claim_id,payload,revision,source_path) VALUES(?1,?2,'Source',NULL,?3,?4,?5)",
+                rusqlite::params![id, scope_id, write(next)?, next.revision, relative_path],
+            ),
+            Some(previous) => transaction.execute(
+                "UPDATE records SET payload=?1,revision=?2 WHERE id=?3 AND revision=?4",
+                rusqlite::params![write(next)?, next.revision, id, previous.revision],
+            ),
+        }
+        .map_err(|e| storage(&e))?;
+        if written != 1 {
+            return Err(SermofurError::new(
+                "storage_busy",
+                "Source changed concurrently; retry.",
+                3,
+            ));
+        }
+        search::remove(&transaction, next.id)?;
+        let json = next.content_json.as_deref().ok_or_else(invalid_storage)?;
+        if read::<SourceContent>(json, &|_| 0)?.status == crate::records::SourceStatus::Indexed {
+            search::insert(
+                &transaction,
+                next.id,
+                &scope_id,
+                RecordKind::Source,
+                passages,
+            )?;
+        }
+        append_history(
+            &transaction,
+            previous.as_ref(),
+            next,
+            &change.reason,
+            Some(change.actor.clone()),
+        )?;
+        transaction.commit().map_err(|e| storage(&e))?;
+        project(&self.root, next)?;
+        Ok(Some(change.next))
+    }
+}
+
 /// `SourcePlacement.Holds`: whether `mapping` is the stored path `relative_path` or one of its
 /// parent folders, compared as `LocalPaths.Comparison` (without case on Windows only).
 pub fn holds(mapping: &str, relative_path: &str) -> bool {

@@ -1,0 +1,717 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/",
+    ".sermofur/records/<g2>.md",
+    ".sermofur/records/<g3>.md",
+    ".sermofur/records/<g4>.md"
+  ],
+  "projections": {
+    "<g2>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 2,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Source <g2>\n\n```json\n{\n  \"relativePath\": \"doc.md\",\n  \"status\": \"missing\",\n  \"hash\": \"3016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\",\n  \"size\": 7,\n  \"indexedAt\": \"<date>\",\n  \"passages\": 0,\n  \"rejection\": null\n}\n```\n",
+    "<g3>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g3>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Claim <g3>\n\n```json\n{\n  \"text\": \"le contenu existe\",\n  \"category\": \"semantic\",\n  \"volatility\": \"evolving\",\n  \"lastVerified\": null,\n  \"reviewAfter\": null\n}\n```\n",
+    "<g4>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g4>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Evidence <g4>\n\n```json\n{\n  \"claimId\": \"<g3>\",\n  \"kind\": \"local_documentation\",\n  \"reference\": \"doc.md\",\n  \"lineageId\": \"doc\",\n  \"relation\": \"supports\",\n  \"sourceId\": \"<g2>\",\n  \"sourceHash\": \"3016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\"\n}\n```\n"
+  },
+  "steps": [
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"created\": true\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "init"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "file": "doc.md"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022doc.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u00223016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\\u0022,\\n  \\u0022size\\u0022: 7,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "doc.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g3>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022le contenu existe\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "add",
+          "le contenu existe",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/instance.json",
+        "added .sermofur/memory.db",
+        "added .sermofur/records/<g2>.md",
+        "added .sermofur/records/<g3>.md"
+      ],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Source subcommand required.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"Source subcommand required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Unknown source subcommand.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "frob"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Wrong number of arguments.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Wrong number of arguments.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Option value required.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "doc.md",
+          "--origin"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Invalid ActorKind value.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "doc.md",
+          "--origin",
+          "robot"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022doc.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u00223016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\\u0022,\\n  \\u0022size\\u0022: 7,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "doc.md",
+          "--origin",
+          "U_s-er"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Wrong number of arguments.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "a",
+          "b",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Invalid ActorKind value.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "missing.md",
+          "--origin",
+          "robot"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Unknown option for this command.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "doc.md",
+          "--origin",
+          "user",
+          "--key",
+          "k"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_input: Text required, limited to 16,384 characters without NUL.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "doc.md",
+          "--origin",
+          "user",
+          "--actor",
+          ""
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_input: Text required, limited to 16,384 characters without NUL.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "doc.md",
+          "--origin",
+          "user",
+          "--actor",
+          "  "
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_input: Text required, limited to 16,384 characters without NUL.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "missing.md",
+          "--origin",
+          "user",
+          "--actor",
+          " "
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Wrong number of arguments.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "list",
+          "extra"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Unknown option for this command.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "list",
+          "--actor",
+          "x"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Wrong number of arguments.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "show"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: GUID identifier required.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "show",
+          "x"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: GUID identifier required.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "show",
+          "00000000-0000-0000-0000-000000000000"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: not_found: Object missing or inaccessible.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "show",
+          "0f8fad5b-d9cb-469f-a165-70867728950e"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"source\": {\n    \"id\": \"<g2>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"source\",\n    \"status\": \"active\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022doc.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u00223016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\\u0022,\\n  \\u0022size\\u0022: 7,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  },\n  \"history\": [\n    {\n      \"sequence\": 1,\n      \"objectId\": \"<g2>\",\n      \"scopeId\": \"workspace\",\n      \"previousState\": null,\n      \"newState\": \"{\\n  \\u0022id\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022source\\u0022,\\n  \\u0022status\\u0022: \\u0022active\\u0022,\\n  \\u0022revision\\u0022: 1,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022relativePath\\\\u0022: \\\\u0022doc.md\\\\u0022,\\\\n  \\\\u0022status\\\\u0022: \\\\u0022indexed\\\\u0022,\\\\n  \\\\u0022hash\\\\u0022: \\\\u00223016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\\\\u0022,\\\\n  \\\\u0022size\\\\u0022: 7,\\\\n  \\\\u0022indexedAt\\\\u0022: \\\\u0022<date>\\\\u0022,\\\\n  \\\\u0022passages\\\\u0022: 1,\\\\n  \\\\u0022rejection\\\\u0022: null\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022local-user\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n      \"reason\": \"create\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "show",
+          "{2:B}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: not_found: Object missing or inaccessible.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "show",
+          "{3}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: not_found: Object missing or inaccessible.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "{2}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Wrong number of arguments.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "show",
+          "{2}",
+          "extra"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Wrong number of arguments.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "reindex",
+          "a",
+          "b"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: GUID identifier required.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "reindex",
+          "x"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: not_found: Object missing or inaccessible.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "reindex",
+          "0f8fad5b-d9cb-469f-a165-70867728950e"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: not_found: Object missing or inaccessible.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "reindex",
+          "{3}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_input: Text required, limited to 16,384 characters without NUL.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "reindex",
+          "--actor",
+          ""
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_input: Text required, limited to 16,384 characters without NUL.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "reindex",
+          "--actor",
+          "   "
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Unknown option for this command.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "reindex",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"Option value required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "reindex",
+          "--json",
+          "--actor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"sources\": [\n    {\n      \"id\": \"<g2>\",\n      \"path\": \"doc.md\",\n      \"outcome\": \"unchanged\",\n      \"previousHash\": \"3016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\",\n      \"hash\": \"3016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "reindex",
+          "{2:X}",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "[\n  {\n    \"id\": \"<g2>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"source\",\n    \"status\": \"active\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022doc.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u00223016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\\u0022,\\n  \\u0022size\\u0022: 7,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  }\n]\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "--",
+          "list"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g4>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g3>\\u0022,\\n  \\u0022kind\\u0022: \\u0022local_documentation\\u0022,\\n  \\u0022reference\\u0022: \\u0022doc.md\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022doc\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022sourceHash\\u0022: \\u00223016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\\u0022\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{3}",
+          "local_documentation",
+          "doc.md",
+          "--lineage",
+          "doc",
+          "--origin",
+          "user",
+          "--source",
+          "{2}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "remove": "doc.md"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"sources\": [\n    {\n      \"id\": \"<g2>\",\n      \"path\": \"doc.md\",\n      \"outcome\": \"missing\",\n      \"previousHash\": \"3016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\",\n      \"hash\": \"3016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "reindex"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: source_unavailable: The cited source is missing, unreadable or rejected; reindex it first.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{3}",
+          "local_documentation",
+          "doc.md",
+          "--lineage",
+          "doc2",
+          "--origin",
+          "user",
+          "--source",
+          "{2}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"target\": {\n    \"claimId\": \"<g3>\",\n    \"text\": \"le contenu existe\",\n    \"status\": \"proposed\"\n  },\n  \"signals\": [\n    {\n      \"type\": \"source_unavailable\",\n      \"objectId\": \"<g3>\",\n      \"explanation\": \"Source doc.md cited by evidence \\u0022doc.md\\u0022 is missing since its last reindexing.\",\n      \"evidenceId\": \"<g4>\",\n      \"sourceId\": \"<g2>\",\n      \"recordedHash\": \"3016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\",\n      \"currentHash\": null\n    }\n  ],\n  \"toConfront\": []\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "{3}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/records/<g4>.md",
+        "changed .sermofur/memory.db",
+        "changed .sermofur/records/<g2>.md"
+      ],
+      "step": {
+        "changes": true
+      }
+    }
+  ]
+}

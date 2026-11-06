@@ -31,7 +31,7 @@ enum MarkerState {
 /// kept as is by `GetFullPath`, then refused by `DriveInfo`), the CLI answers
 /// `invalid_storage_or_path` (`CommandRunner.Run`), and so does the port. A NUL is refused
 /// everywhere (`PathInternal`); on Unix `std::path::absolute` would keep it.
-pub(crate) fn full_path(path: &Path) -> Result<PathBuf> {
+pub fn full_path(path: &Path) -> Result<PathBuf> {
     if path.as_os_str().as_encoded_bytes().contains(&0)
         || (cfg!(windows) && path.to_string_lossy().starts_with(r"\??\"))
     {

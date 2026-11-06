@@ -1,0 +1,323 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/",
+    ".sermofur/records/<g2>.md",
+    ".sermofur/records/<g3>.md",
+    ".sermofur/records/<g4>.md",
+    "Doc.md",
+    "Dossier/",
+    "Dossier/Éte.md",
+    "Dossier/Été.md",
+    "client/",
+    "client/notes.md"
+  ],
+  "projections": {
+    "<g2>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Source <g2>\n\n```json\n{\n  \"relativePath\": \"Doc.md\",\n  \"status\": \"indexed\",\n  \"hash\": \"3016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\",\n  \"size\": 7,\n  \"indexedAt\": \"<date>\",\n  \"passages\": 1,\n  \"rejection\": null\n}\n```\n",
+    "<g3>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g3>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Source <g3>\n\n```json\n{\n  \"relativePath\": \"Dossier/Été.md\",\n  \"status\": \"indexed\",\n  \"hash\": \"5158c26535bf1eed6bf9bbb12024a24ced417ac86ed5b0b009886b27eba9fd10\",\n  \"size\": 9,\n  \"indexedAt\": \"<date>\",\n  \"passages\": 1,\n  \"rejection\": null\n}\n```\n",
+    "<g4>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g4>\",\n  \"scopeId\": \"c\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Source <g4>\n\n```json\n{\n  \"relativePath\": \"client/notes.md\",\n  \"status\": \"indexed\",\n  \"hash\": \"22b3a2847c0ae8bc6d04bd32325dc2c10aaed98e758f23f31e927bfdb61788df\",\n  \"size\": 16,\n  \"indexedAt\": \"<date>\",\n  \"passages\": 1,\n  \"rejection\": null\n}\n```\n"
+  },
+  "steps": [
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"created\": true\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "init"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "file": "Doc.md"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022Doc.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u00223016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\\u0022,\\n  \\u0022size\\u0022: 7,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "doc.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022Doc.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u00223016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\\u0022,\\n  \\u0022size\\u0022: 7,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "DOC.MD",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022Doc.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u00223016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\\u0022,\\n  \\u0022size\\u0022: 7,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "<root>/dOC.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": "Dossier"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "file": "Dossier/Été.md"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g3>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022Dossier/Été.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u00225158c26535bf1eed6bf9bbb12024a24ced417ac86ed5b0b009886b27eba9fd10\\u0022,\\n  \\u0022size\\u0022: 9,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "dossier/été.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g3>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022Dossier/Été.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u00225158c26535bf1eed6bf9bbb12024a24ced417ac86ed5b0b009886b27eba9fd10\\u0022,\\n  \\u0022size\\u0022: 9,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "DOSSIER/ÉTÉ.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "file": "Dossier/Éte.md"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_path: Source file missing or not a file.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "dossier/eté.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_path: Source file missing or not a file.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "dossier/éte.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "[\n  {\n    \"id\": \"<g2>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"source\",\n    \"status\": \"active\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022Doc.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u00223016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\\u0022,\\n  \\u0022size\\u0022: 7,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  },\n  {\n    \"id\": \"<g3>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"source\",\n    \"status\": \"active\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022Dossier/Été.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u00225158c26535bf1eed6bf9bbb12024a24ced417ac86ed5b0b009886b27eba9fd10\\u0022,\\n  \\u0022size\\u0022: 9,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  }\n]\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "list"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"sources\": [\n    {\n      \"id\": \"<g2>\",\n      \"path\": \"Doc.md\",\n      \"outcome\": \"unchanged\",\n      \"previousHash\": \"3016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\",\n      \"hash\": \"3016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\"\n    },\n    {\n      \"id\": \"<g3>\",\n      \"path\": \"Dossier/Été.md\",\n      \"outcome\": \"unchanged\",\n      \"previousHash\": \"5158c26535bf1eed6bf9bbb12024a24ced417ac86ed5b0b009886b27eba9fd10\",\n      \"hash\": \"5158c26535bf1eed6bf9bbb12024a24ced417ac86ed5b0b009886b27eba9fd10\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "reindex"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/instance.json",
+        "added .sermofur/memory.db",
+        "added .sermofur/records/<g2>.md",
+        "added .sermofur/records/<g3>.md"
+      ],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": "client"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "file": "client/notes.md"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"c\",\n  \"kind\": \"client\",\n  \"parentId\": \"workspace\",\n  \"relativePath\": \"client\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "c",
+          "client",
+          "workspace",
+          "CLIENT"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 4,
+        "stderr": "smf: scope_boundary: The file belongs to a narrower scope; add it from that scope's directory.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "client/notes.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 4,
+        "stderr": "smf: scope_boundary: The file belongs to a narrower scope; add it from that scope's directory.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "CLIENT/notes.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g4>\",\n  \"scopeId\": \"c\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022client/notes.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u002222b3a2847c0ae8bc6d04bd32325dc2c10aaed98e758f23f31e927bfdb61788df\\u0022,\\n  \\u0022size\\u0022: 16,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "NOTES.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": "client"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "[\n  {\n    \"id\": \"<g2>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"source\",\n    \"status\": \"active\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022Doc.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u00223016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\\u0022,\\n  \\u0022size\\u0022: 7,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  },\n  {\n    \"id\": \"<g3>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"source\",\n    \"status\": \"active\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022Dossier/Été.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u00225158c26535bf1eed6bf9bbb12024a24ced417ac86ed5b0b009886b27eba9fd10\\u0022,\\n  \\u0022size\\u0022: 9,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  },\n  {\n    \"id\": \"<g4>\",\n    \"scopeId\": \"c\",\n    \"kind\": \"source\",\n    \"status\": \"active\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022client/notes.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u002222b3a2847c0ae8bc6d04bd32325dc2c10aaed98e758f23f31e927bfdb61788df\\u0022,\\n  \\u0022size\\u0022: 16,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  }\n]\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "list"
+        ],
+        "cwd": "client"
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/records/<g4>.md",
+        "changed .sermofur/memory.db"
+      ],
+      "step": {
+        "changes": true
+      }
+    }
+  ]
+}

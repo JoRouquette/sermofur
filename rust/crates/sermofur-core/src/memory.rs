@@ -307,14 +307,18 @@ mod tests {
     use crate::store::Store;
 
     /// An instance with the clients `a` and `b` under the temporary directory, removed on drop.
+    /// Fields drop in order: the store closes its database before `_cleanup` removes the folder.
     struct Fixture {
         root: PathBuf,
         store: Store,
+        _cleanup: Cleanup,
     }
 
-    impl Drop for Fixture {
+    struct Cleanup(PathBuf);
+
+    impl Drop for Cleanup {
         fn drop(&mut self) {
-            let _ = std::fs::remove_dir_all(&self.root);
+            let _ = std::fs::remove_dir_all(&self.0);
         }
     }
 
@@ -341,7 +345,11 @@ mod tests {
             };
             store.add_scope(&scope, |_| Ok(())).expect("scope");
         }
-        Fixture { root, store }
+        Fixture {
+            _cleanup: Cleanup(root.clone()),
+            root,
+            store,
+        }
     }
 
     fn claim(text: String) -> ClaimContent {

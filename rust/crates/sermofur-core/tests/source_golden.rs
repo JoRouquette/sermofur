@@ -486,7 +486,8 @@ proptest! {
     }
 
     /// A text without NUL and not blank is indexed with no rejection; the hash and the size
-    /// describe the bytes, BOM included; the BOM changes the hash, never the passages.
+    /// describe the bytes, BOM included; the passages are the split of the text, with or
+    /// without the BOM.
     #[test]
     fn text_is_indexed_with_or_without_a_bom(text in prop_oneof![
         "[a-z é\n\r\t😀\u{a0}]{0,300}",
@@ -497,18 +498,14 @@ proptest! {
         let plain = snapshot(text.as_bytes());
         let with_bom = snapshot(&with_bom_bytes);
         for (shot, bytes) in [(&plain, text.as_bytes()), (&with_bom, &with_bom_bytes[..])] {
-            if bytes.len() > sermofur_core::sources::MAX_BYTES {
-                continue;
-            }
             prop_assert_eq!(shot.status, sermofur_core::records::SourceStatus::Indexed);
             prop_assert_eq!(shot.rejection, None);
             prop_assert_eq!(&shot.hash, &sha256(bytes));
             prop_assert_eq!(shot.size, bytes.len() as i64);
             prop_assert!(!shot.passages.is_empty());
         }
-        if with_bom_bytes.len() <= sermofur_core::sources::MAX_BYTES {
-            prop_assert_eq!(&with_bom.passages, &plain.passages);
-        }
+        prop_assert_eq!(&plain.passages, &split(&text));
+        prop_assert_eq!(&with_bom.passages, &plain.passages);
     }
 
     /// Passages are bounded, numbered from 0, never blank, and keep every character that is

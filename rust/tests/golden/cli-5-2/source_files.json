@@ -1,0 +1,529 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/",
+    ".sermofur/records/<g2>.md",
+    ".sermofur/records/<g3>.md",
+    ".sermofur/records/<g4>.md",
+    "binary.md",
+    "bom.md",
+    "empty.md",
+    "large.md",
+    "largest.md",
+    "latin1.md",
+    "sub/",
+    "sub/long.md"
+  ],
+  "projections": {
+    "<g2>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Source <g2>\n\n```json\n{\n  \"relativePath\": \"largest.md\",\n  \"status\": \"indexed\",\n  \"hash\": \"9bc1b2a288b26af7257a36277ae3816a7d4f16e89c1e7e77d0a5c48bad62b360\",\n  \"size\": 1048576,\n  \"indexedAt\": \"<date>\",\n  \"passages\": 525,\n  \"rejection\": null\n}\n```\n",
+    "<g3>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g3>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Source <g3>\n\n```json\n{\n  \"relativePath\": \"bom.md\",\n  \"status\": \"indexed\",\n  \"hash\": \"5ef170bc3a0cf0947937284fa877e821efb5a8f921c8f6212cdec278b92efd32\",\n  \"size\": 11,\n  \"indexedAt\": \"<date>\",\n  \"passages\": 1,\n  \"rejection\": null\n}\n```\n",
+    "<g4>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g4>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Source <g4>\n\n```json\n{\n  \"relativePath\": \"sub/long.md\",\n  \"status\": \"indexed\",\n  \"hash\": \"9fc9bbd3bf2b740c321f10bab6258e1125758d1f773c22c83570baf6dcef8b40\",\n  \"size\": 28,\n  \"indexedAt\": \"<date>\",\n  \"passages\": 1,\n  \"rejection\": null\n}\n```\n"
+  },
+  "steps": [
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"created\": true\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "init"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": "sub"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "file": "empty.md"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "file": "binary.md"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "bytes": "latin1.md"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "bytes": "large.md"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "bytes": "largest.md"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "bytes": "bom.md"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "file": "sub/long.md"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: source_rejected: Source is empty.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "empty.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: source_rejected: Source is not UTF-8 text (binary, NUL byte or special file).\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "binary.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"source_rejected\",\n  \"message\": \"Source is not UTF-8 text (binary, NUL byte or special file).\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "latin1.md",
+          "--origin",
+          "user",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: source_rejected: Source larger than 1 MiB.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "large.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_path: Source file missing or not a file.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "missing.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_path: Source file missing or not a file.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "sub",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_path: Source file missing or not a file.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          ".",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_path: Source file missing or not a file.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_path: Source file missing or not a file.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "  ",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_path: Source file missing or not a file.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "<root>",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 4,
+        "stderr": "smf: scope_boundary: Source outside the instance.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "../outside.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 4,
+        "stderr": "smf: unsafe_path: Sermofur's own files cannot be sources.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          ".sermofur/instance.json",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 4,
+        "stderr": "smf: unsafe_path: Sermofur's own files cannot be sources.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          ".sermofur",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 4,
+        "stderr": "smf: unsafe_path: Sermofur's own files cannot be sources.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          ".SERMOFUR/instance.json",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 4,
+        "stderr": "smf: unsafe_path: Sermofur's own files cannot be sources.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          ".Sermofur/memory.db",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 4,
+        "stderr": "smf: unsafe_path: Sermofur's own files cannot be sources.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "sub/../.sermofur/memory.db",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/instance.json",
+        "added .sermofur/memory.db"
+      ],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022largest.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u00229bc1b2a288b26af7257a36277ae3816a7d4f16e89c1e7e77d0a5c48bad62b360\\u0022,\\n  \\u0022size\\u0022: 1048576,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 525,\\n  \\u0022rejection\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "largest.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g3>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022bom.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u00225ef170bc3a0cf0947937284fa877e821efb5a8f921c8f6212cdec278b92efd32\\u0022,\\n  \\u0022size\\u0022: 11,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "bom.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g4>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022sub/long.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u00229fc9bbd3bf2b740c321f10bab6258e1125758d1f773c22c83570baf6dcef8b40\\u0022,\\n  \\u0022size\\u0022: 28,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "<root>/sub/long.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g4>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022sub/long.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u00229fc9bbd3bf2b740c321f10bab6258e1125758d1f773c22c83570baf6dcef8b40\\u0022,\\n  \\u0022size\\u0022: 28,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "../sub/./long.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": "sub"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g4>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022sub/long.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u00229fc9bbd3bf2b740c321f10bab6258e1125758d1f773c22c83570baf6dcef8b40\\u0022,\\n  \\u0022size\\u0022: 28,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "long.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": "sub"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g4>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022sub/long.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u00229fc9bbd3bf2b740c321f10bab6258e1125758d1f773c22c83570baf6dcef8b40\\u0022,\\n  \\u0022size\\u0022: 28,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "<sub/../×2334>sub/long.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g4>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022sub/long.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u00229fc9bbd3bf2b740c321f10bab6258e1125758d1f773c22c83570baf6dcef8b40\\u0022,\\n  \\u0022size\\u0022: 28,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "--path",
+          "sub",
+          "source",
+          "add",
+          "long.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "[\n  {\n    \"id\": \"<g2>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"source\",\n    \"status\": \"active\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022largest.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u00229bc1b2a288b26af7257a36277ae3816a7d4f16e89c1e7e77d0a5c48bad62b360\\u0022,\\n  \\u0022size\\u0022: 1048576,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 525,\\n  \\u0022rejection\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  },\n  {\n    \"id\": \"<g3>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"source\",\n    \"status\": \"active\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022bom.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u00225ef170bc3a0cf0947937284fa877e821efb5a8f921c8f6212cdec278b92efd32\\u0022,\\n  \\u0022size\\u0022: 11,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  },\n  {\n    \"id\": \"<g4>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"source\",\n    \"status\": \"active\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022sub/long.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u00229fc9bbd3bf2b740c321f10bab6258e1125758d1f773c22c83570baf6dcef8b40\\u0022,\\n  \\u0022size\\u0022: 28,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  }\n]\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "list"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"query\": \"paragraphe\",\n  \"results\": [\n    {\n      \"kind\": \"source\",\n      \"id\": \"<g4>\",\n      \"scopeId\": \"workspace\",\n      \"status\": \"active\",\n      \"applicable\": true,\n      \"confidence\": null,\n      \"excerpt\": \"mot  autre paragraphe  fin\",\n      \"matchedTerms\": [\n        \"paragraphe\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": \"<date>\",\n        \"hash\": \"9fc9bbd3bf2b740c321f10bab6258e1125758d1f773c22c83570baf6dcef8b40\",\n        \"sourceStatus\": \"indexed\"\n      },\n      \"score\": 2.647302,\n      \"path\": \"sub/long.md\"\n    }\n  ],\n  \"excluded\": 0\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "paragraphe"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/records/<g2>.md",
+        "added .sermofur/records/<g3>.md",
+        "added .sermofur/records/<g4>.md",
+        "changed .sermofur/memory.db"
+      ],
+      "step": {
+        "changes": true
+      }
+    }
+  ]
+}

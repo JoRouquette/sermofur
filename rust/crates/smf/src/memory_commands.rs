@@ -1,7 +1,9 @@
 //! The commands of the memory of an instance, ported from `CommandRunner.Dispatch`,
 //! `CommandRunner.RunScope`, `MemoryCommands.cs` and `KnowledgeCommands.cs`: `status`, `scope`,
-//! `export`, `claim`, `evidence`, `retex`, `recall` and `challenge`. Each returns the JSON text
-//! of its answer.
+//! `export`, `claim`, `evidence`, `retex`, `source`, `recall` and `challenge`. Each returns the
+//! JSON text of its answer.
+
+use std::path::Path;
 
 use serde::Serialize;
 use sermofur_core::challenge::{challenge_claim, challenge_text};
@@ -17,6 +19,7 @@ use sermofur_core::records::{
     MemoryCategory, Provenance, RecordKind, RetexContent, Scope, ScopeKind, Volatility,
 };
 use sermofur_core::scopes;
+use sermofur_core::source_service::{ReindexEntry, SourceService, file_reader};
 use sermofur_core::store::Store;
 
 use crate::args::CommandArguments;
@@ -36,11 +39,6 @@ pub fn writes(args: &CommandArguments) -> bool {
         "recall" | "challenge" => false,
         _ => matches!(action, Some("add" | "invalidate")),
     }
-}
-
-/// `KnowledgeCommands.IsKnowledgeCommand`.
-pub fn is_knowledge_command(command: &str) -> bool {
-    matches!(command, "source" | "index" | "recall" | "challenge")
 }
 
 /// `CommandArguments.ParseEnum<T>`: `_` and `-` removed, then the .NET name of a member,
@@ -98,6 +96,7 @@ pub fn dispatch(
     store: &mut Store,
     context: &MemoryContext,
     configuration: &InstanceConfiguration,
+    path: &Path,
 ) -> Result<String> {
     let command = args.positionals()[0].clone();
     match command.as_str() {
@@ -138,9 +137,85 @@ pub fn dispatch(
             RecordKind::Evidence,
         ),
         "retex" => run_memory(args, MemoryService::new(store, context)?, RecordKind::Retex),
+        "source" => run_source(args, store, context, path),
         "recall" => run_recall(args, store, context),
         "challenge" => run_challenge(args, store, context),
         _ => Err(SermofurError::invalid_arguments("Unknown command.")),
+    }
+}
+
+#[derive(Serialize)]
+struct ReindexBody {
+    sources: Vec<ReindexEntry>,
+}
+
+/// `KnowledgeCommands.Source`. The service checks the scope tree before the arguments; a
+/// relative file is taken from the context folder (`--path`), like the scope.
+fn run_source(
+    args: &mut CommandArguments,
+    store: &mut Store,
+    context: &MemoryContext,
+    path: &Path,
+) -> Result<String> {
+    let mut sources = SourceService::new(store, &file_reader, context)?;
+    if args.positionals().len() < 2 {
+        return Err(SermofurError::invalid_arguments(
+            "Source subcommand required.",
+        ));
+    }
+    let action = args.positionals()[1].clone();
+    match action.as_str() {
+        "add" => {
+            args.require_count(3)?;
+            let origin = parse_enum::<ActorKind>(
+                &args.required("origin")?,
+                "ActorKind",
+                "invalid_arguments",
+            )?;
+            let provenance = Provenance {
+                origin,
+                actor: Some(args.option_or("actor", LOCAL_USER)),
+                timestamp: DateTimeOffset::now_utc(),
+            };
+            args.validate_used()?;
+            // `Path.GetFullPath(argument, path)`: the service sees the full form, bound included.
+            let file = sermofur_core::discovery::full_path(&crate::runner::combine(
+                &args.positionals()[2],
+                path,
+            ))?;
+            to_json(&sources.add(&file, provenance)?)
+        }
+        "list" => {
+            args.require_count(2)?;
+            args.validate_used()?;
+            to_json(&sources.list()?)
+        }
+        "show" => {
+            args.require_count(3)?;
+            args.validate_used()?;
+            to_json(&sources.show(parse_id(&args.positionals()[2])?)?)
+        }
+        "reindex" => {
+            let count = args.positionals().len();
+            if !(2..=3).contains(&count) {
+                return Err(SermofurError::invalid_arguments(
+                    "Wrong number of arguments.",
+                ));
+            }
+            let id = if count == 3 {
+                Some(parse_id(&args.positionals()[2])?)
+            } else {
+                None
+            };
+            let actor = args.option_or("actor", LOCAL_USER);
+            args.validate_used()?;
+            to_json(&ReindexBody {
+                sources: sources.reindex(id, &actor)?,
+            })
+        }
+        _ => Err(SermofurError::invalid_arguments(
+            "Unknown source subcommand.",
+        )),
     }
 }
 
