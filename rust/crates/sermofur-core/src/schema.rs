@@ -47,7 +47,7 @@ CREATE VIRTUAL TABLE search_terms USING fts5vocab(search, instance);
 /// Maps a SQLite failure like `CommandRunner.Run` does in .NET: `storage_busy` for a database
 /// that stays busy or locked, `storage_error` otherwise, with a fixed message (the raw SQLite
 /// text may hold paths) and exit code 3.
-fn storage(error: &rusqlite::Error) -> SermofurError {
+pub(crate) fn storage(error: &rusqlite::Error) -> SermofurError {
     let busy = matches!(
         error,
         rusqlite::Error::SqliteFailure(failure, _)

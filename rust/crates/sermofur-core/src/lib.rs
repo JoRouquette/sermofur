@@ -18,6 +18,7 @@ pub mod records;
 pub mod schema;
 pub mod scope_policy;
 mod stj;
+pub mod store;
 
 mod dotnet_escape_table;
 #[cfg(windows)]
