@@ -4,6 +4,7 @@
 
 pub mod atomic;
 mod casing;
+pub mod challenge;
 pub mod collation;
 pub mod confidence;
 pub mod discovery;

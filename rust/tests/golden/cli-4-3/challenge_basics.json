@@ -1,0 +1,387 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/",
+    ".sermofur/records/<g2>.md",
+    ".sermofur/records/<g3>.md",
+    ".sermofur/records/<g4>.md",
+    ".sermofur/records/<g5>.md",
+    ".sermofur/records/<g6>.md",
+    ".sermofur/records/<g7>.md"
+  ],
+  "projections": {
+    "<g2>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Claim <g2>\n\n```json\n{\n  \"text\": \"le port est 8080\",\n  \"category\": \"semantic\",\n  \"volatility\": \"evolving\",\n  \"lastVerified\": null,\n  \"reviewAfter\": null\n}\n```\n",
+    "<g3>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g3>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Evidence <g3>\n\n```json\n{\n  \"claimId\": \"<g2>\",\n  \"kind\": \"human_observation\",\n  \"reference\": \"netstat\",\n  \"lineageId\": \"obs\",\n  \"relation\": \"contradicts\",\n  \"sourceId\": null,\n  \"sourceHash\": null\n}\n```\n",
+    "<g4>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g4>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"invalidated\",\n  \"revision\": 2,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Claim <g4>\n\n```json\n{\n  \"text\": \"le port 8080 est ouvert\",\n  \"category\": \"semantic\",\n  \"volatility\": \"evolving\",\n  \"lastVerified\": null,\n  \"reviewAfter\": null\n}\n```\n",
+    "<g5>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g5>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"llm\",\n    \"actor\": \"claude\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Evidence <g5>\n\n```json\n{\n  \"claimId\": \"<g4>\",\n  \"kind\": \"llm_assertion\",\n  \"reference\": \"le port est \\u00229090\\u0022\",\n  \"lineageId\": \"llm\",\n  \"relation\": \"contradicts\",\n  \"sourceId\": null,\n  \"sourceHash\": null\n}\n```\n",
+    "<g6>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g6>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Evidence <g6>\n\n```json\n{\n  \"claimId\": \"<g2>\",\n  \"kind\": \"source_code\",\n  \"reference\": \"app.json\",\n  \"lineageId\": \"code\",\n  \"relation\": \"supports\",\n  \"sourceId\": null,\n  \"sourceHash\": null\n}\n```\n",
+    "<g7>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g7>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Claim <g7>\n\n```json\n{\n  \"text\": \"!? \\u0022 --\",\n  \"category\": \"semantic\",\n  \"volatility\": \"evolving\",\n  \"lastVerified\": null,\n  \"reviewAfter\": null\n}\n```\n"
+  },
+  "steps": [
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"created\": true\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "init"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022le port est 8080\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "add",
+          "le port est 8080",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g3>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022human_observation\\u0022,\\n  \\u0022reference\\u0022: \\u0022netstat\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022obs\\u0022,\\n  \\u0022relation\\u0022: \\u0022contradicts\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "evidence",
+          "add",
+          "{1}",
+          "human_observation",
+          "netstat",
+          "--lineage",
+          "obs",
+          "--origin",
+          "user",
+          "--contradicts"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g4>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022le port 8080 est ouvert\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "add",
+          "le port 8080 est ouvert",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g5>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g4>\\u0022,\\n  \\u0022kind\\u0022: \\u0022llm_assertion\\u0022,\\n  \\u0022reference\\u0022: \\u0022le port est \\\\u00229090\\\\u0022\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022llm\\u0022,\\n  \\u0022relation\\u0022: \\u0022contradicts\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"llm\",\n    \"actor\": \"claude\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{3}",
+          "llm_assertion",
+          "le port est \"9090\"",
+          "--lineage",
+          "llm",
+          "--origin",
+          "llm",
+          "--actor",
+          "claude",
+          "--contradicts"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g6>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022source_code\\u0022,\\n  \\u0022reference\\u0022: \\u0022app.json\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022code\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{1}",
+          "source_code",
+          "app.json",
+          "--lineage",
+          "code",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/instance.json",
+        "added .sermofur/memory.db",
+        "added .sermofur/records/<g2>.md",
+        "added .sermofur/records/<g3>.md",
+        "added .sermofur/records/<g4>.md",
+        "added .sermofur/records/<g5>.md",
+        "added .sermofur/records/<g6>.md"
+      ],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"target\": {\n    \"claimId\": \"<g2>\",\n    \"text\": \"le port est 8080\",\n    \"status\": \"proposed\"\n  },\n  \"signals\": [\n    {\n      \"type\": \"contradiction\",\n      \"objectId\": \"<g2>\",\n      \"explanation\": \"Contradicted by human_observation evidence \\u0022netstat\\u0022 (origin obs, user local-user, <date>).\",\n      \"evidenceId\": \"<g3>\",\n      \"sourceId\": null,\n      \"recordedHash\": null,\n      \"currentHash\": null\n    }\n  ],\n  \"toConfront\": [\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g4>\",\n      \"scopeId\": \"workspace\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"low\",\n        \"reasons\": [\n          \"No independent evidence available.\",\n          \"Contradicted by an LLM assertion: noted, not an independent refutation.\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 0\n      },\n      \"excerpt\": \"le port 8080 est ouvert\",\n      \"matchedTerms\": [\n        \"le\",\n        \"port\",\n        \"est\",\n        \"8080\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 0.697578,\n      \"path\": null\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "challenge",
+          "{1}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"target\": {\n    \"claimId\": \"<g2>\",\n    \"text\": \"le port est 8080\",\n    \"status\": \"proposed\"\n  },\n  \"signals\": [\n    {\n      \"type\": \"contradiction\",\n      \"objectId\": \"<g2>\",\n      \"explanation\": \"Contradicted by human_observation evidence \\u0022netstat\\u0022 (origin obs, user local-user, <date>).\",\n      \"evidenceId\": \"<g3>\",\n      \"sourceId\": null,\n      \"recordedHash\": null,\n      \"currentHash\": null\n    }\n  ],\n  \"toConfront\": [\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g4>\",\n      \"scopeId\": \"workspace\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"low\",\n        \"reasons\": [\n          \"No independent evidence available.\",\n          \"Contradicted by an LLM assertion: noted, not an independent refutation.\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 0\n      },\n      \"excerpt\": \"le port 8080 est ouvert\",\n      \"matchedTerms\": [\n        \"le\",\n        \"port\",\n        \"est\",\n        \"8080\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 0.697578,\n      \"path\": null\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "{1}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"target\": {\n    \"claimId\": \"<g4>\",\n    \"text\": \"le port 8080 est ouvert\",\n    \"status\": \"proposed\"\n  },\n  \"signals\": [\n    {\n      \"type\": \"contradiction\",\n      \"objectId\": \"<g4>\",\n      \"explanation\": \"Contradicted by llm_assertion evidence \\u0022le port est \\u00229090\\u0022\\u0022 (origin llm, llm claude, <date>). LLM assertion: noted, not an independent refutation.\",\n      \"evidenceId\": \"<g5>\",\n      \"sourceId\": null,\n      \"recordedHash\": null,\n      \"currentHash\": null\n    }\n  ],\n  \"toConfront\": [\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g2>\",\n      \"scopeId\": \"workspace\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"medium\",\n        \"reasons\": [\n          \"Origin code: support High; repetitions grouped.\",\n          \"Contested by 1 independent origin(s).\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 1\n      },\n      \"excerpt\": \"le port est 8080\",\n      \"matchedTerms\": [\n        \"le\",\n        \"port\",\n        \"8080\",\n        \"est\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 0.840416,\n      \"path\": null\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "{3}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"target\": {\n    \"claimId\": null,\n    \"text\": \"port 8080\",\n    \"status\": null\n  },\n  \"signals\": [],\n  \"toConfront\": [\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g2>\",\n      \"scopeId\": \"workspace\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"medium\",\n        \"reasons\": [\n          \"Origin code: support High; repetitions grouped.\",\n          \"Contested by 1 independent origin(s).\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 1\n      },\n      \"excerpt\": \"le port est 8080\",\n      \"matchedTerms\": [\n        \"port\",\n        \"8080\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 0.420208,\n      \"path\": null\n    },\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g4>\",\n      \"scopeId\": \"workspace\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"low\",\n        \"reasons\": [\n          \"No independent evidence available.\",\n          \"Contradicted by an LLM assertion: noted, not an independent refutation.\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 0\n      },\n      \"excerpt\": \"le port 8080 est ouvert\",\n      \"matchedTerms\": [\n        \"port\",\n        \"8080\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 0.348789,\n      \"path\": null\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "challenge",
+          "--text",
+          "port 8080"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"target\": {\n    \"claimId\": null,\n    \"text\": \"port 8080\",\n    \"status\": null\n  },\n  \"signals\": [],\n  \"toConfront\": [\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g2>\",\n      \"scopeId\": \"workspace\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"medium\",\n        \"reasons\": [\n          \"Origin code: support High; repetitions grouped.\",\n          \"Contested by 1 independent origin(s).\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 1\n      },\n      \"excerpt\": \"le port est 8080\",\n      \"matchedTerms\": [\n        \"port\",\n        \"8080\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 0.420208,\n      \"path\": null\n    },\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g4>\",\n      \"scopeId\": \"workspace\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"low\",\n        \"reasons\": [\n          \"No independent evidence available.\",\n          \"Contradicted by an LLM assertion: noted, not an independent refutation.\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 0\n      },\n      \"excerpt\": \"le port 8080 est ouvert\",\n      \"matchedTerms\": [\n        \"port\",\n        \"8080\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 0.348789,\n      \"path\": null\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "--text",
+          "port 8080"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"target\": {\n    \"claimId\": null,\n    \"text\": \"introuvable\",\n    \"status\": null\n  },\n  \"signals\": [],\n  \"toConfront\": []\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "--text",
+          "introuvable"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"target\": {\n    \"claimId\": null,\n    \"text\": \"\\u0022port\\u0022 OR *\",\n    \"status\": null\n  },\n  \"signals\": [],\n  \"toConfront\": [\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g2>\",\n      \"scopeId\": \"workspace\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"medium\",\n        \"reasons\": [\n          \"Origin code: support High; repetitions grouped.\",\n          \"Contested by 1 independent origin(s).\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 1\n      },\n      \"excerpt\": \"le port est 8080\",\n      \"matchedTerms\": [\n        \"port\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 0.210104,\n      \"path\": null\n    },\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g4>\",\n      \"scopeId\": \"workspace\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"low\",\n        \"reasons\": [\n          \"No independent evidence available.\",\n          \"Contradicted by an LLM assertion: noted, not an independent refutation.\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 0\n      },\n      \"excerpt\": \"le port 8080 est ouvert\",\n      \"matchedTerms\": [\n        \"port\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 0.174395,\n      \"path\": null\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "--text",
+          "\"port\" OR *"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g4>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"invalidated\",\n  \"revision\": 2,\n  \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022le port 8080 est ouvert\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "invalidate",
+          "{3}",
+          "--reason",
+          "fermé"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [
+        "changed .sermofur/memory.db",
+        "changed .sermofur/records/<g4>.md"
+      ],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"target\": {\n    \"claimId\": \"<g4>\",\n    \"text\": \"le port 8080 est ouvert\",\n    \"status\": \"invalidated\"\n  },\n  \"signals\": [\n    {\n      \"type\": \"not_applicable\",\n      \"objectId\": \"<g4>\",\n      \"explanation\": \"Claim invalidated: fermé.\",\n      \"evidenceId\": null,\n      \"sourceId\": null,\n      \"recordedHash\": null,\n      \"currentHash\": null\n    },\n    {\n      \"type\": \"contradiction\",\n      \"objectId\": \"<g4>\",\n      \"explanation\": \"Contradicted by llm_assertion evidence \\u0022le port est \\u00229090\\u0022\\u0022 (origin llm, llm claude, <date>). LLM assertion: noted, not an independent refutation.\",\n      \"evidenceId\": \"<g5>\",\n      \"sourceId\": null,\n      \"recordedHash\": null,\n      \"currentHash\": null\n    }\n  ],\n  \"toConfront\": [\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g2>\",\n      \"scopeId\": \"workspace\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"medium\",\n        \"reasons\": [\n          \"Origin code: support High; repetitions grouped.\",\n          \"Contested by 1 independent origin(s).\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 1\n      },\n      \"excerpt\": \"le port est 8080\",\n      \"matchedTerms\": [\n        \"le\",\n        \"port\",\n        \"8080\",\n        \"est\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 0.840416,\n      \"path\": null\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "{3}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"target\": {\n    \"claimId\": \"<g2>\",\n    \"text\": \"le port est 8080\",\n    \"status\": \"proposed\"\n  },\n  \"signals\": [\n    {\n      \"type\": \"contradiction\",\n      \"objectId\": \"<g2>\",\n      \"explanation\": \"Contradicted by human_observation evidence \\u0022netstat\\u0022 (origin obs, user local-user, <date>).\",\n      \"evidenceId\": \"<g3>\",\n      \"sourceId\": null,\n      \"recordedHash\": null,\n      \"currentHash\": null\n    }\n  ],\n  \"toConfront\": []\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "{1}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"target\": {\n    \"claimId\": null,\n    \"text\": \"port ouvert\",\n    \"status\": null\n  },\n  \"signals\": [],\n  \"toConfront\": [\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g2>\",\n      \"scopeId\": \"workspace\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"medium\",\n        \"reasons\": [\n          \"Origin code: support High; repetitions grouped.\",\n          \"Contested by 1 independent origin(s).\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 1\n      },\n      \"excerpt\": \"le port est 8080\",\n      \"matchedTerms\": [\n        \"port\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 0.210104,\n      \"path\": null\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "--text",
+          "port ouvert"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g7>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022!? \\\\u0022 --\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "add",
+          "!? \" --",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/records/<g7>.md",
+        "changed .sermofur/memory.db"
+      ],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_input: The question holds no searchable term.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "{19}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_input\",\n  \"message\": \"The question holds no searchable term.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "{19}",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [],
+      "step": {
+        "changes": true
+      }
+    }
+  ]
+}

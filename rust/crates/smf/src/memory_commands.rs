@@ -1,8 +1,10 @@
 //! The commands of the memory of an instance, ported from `CommandRunner.Dispatch`,
 //! `CommandRunner.RunScope`, `MemoryCommands.cs` and `KnowledgeCommands.cs`: `status`, `scope`,
-//! `export`, `claim`, `evidence`, `retex` and `recall`. Each returns the JSON text of its answer.
+//! `export`, `claim`, `evidence`, `retex`, `recall` and `challenge`. Each returns the JSON text
+//! of its answer.
 
 use serde::Serialize;
+use sermofur_core::challenge::{challenge_claim, challenge_text};
 use sermofur_core::error::{Result, SermofurError};
 use sermofur_core::format::DateTimeOffset;
 use sermofur_core::guid::{self, Uuid};
@@ -137,6 +139,7 @@ pub fn dispatch(
         ),
         "retex" => run_memory(args, MemoryService::new(store, context)?, RecordKind::Retex),
         "recall" => run_recall(args, store, context),
+        "challenge" => run_challenge(args, store, context),
         _ => Err(SermofurError::invalid_arguments("Unknown command.")),
     }
 }
@@ -167,6 +170,26 @@ fn run_recall(
         limit,
         DateTimeOffset::now_utc(),
     )?)
+}
+
+/// `KnowledgeCommands.Challenge`: `--text TEXT` alone, or a claim identifier. The service checks
+/// the scope tree before the arguments.
+fn run_challenge(
+    args: &mut CommandArguments,
+    store: &Store,
+    context: &MemoryContext,
+) -> Result<String> {
+    let context = context.checked(store)?;
+    let text = args.option("text").map(str::to_owned);
+    args.validate_used()?;
+    let now = DateTimeOffset::now_utc();
+    if let Some(text) = text {
+        args.require_count(1)?;
+        return to_json(&challenge_text(store, &context, &text, now)?);
+    }
+    args.require_count(2)?;
+    let id = parse_id(&args.positionals()[1])?;
+    to_json(&challenge_claim(store, &context, id, now)?)
 }
 
 fn run_scope(
@@ -362,6 +385,7 @@ mod tests {
             &["claim", "show", "x"],
             &["scope", "current"],
             &["recall", "add"],
+            &["challenge", "add"],
             &["source", "list"],
             &["frob", "add"],
         ] {

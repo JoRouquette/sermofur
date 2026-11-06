@@ -169,7 +169,7 @@ pub(crate) fn guid_text<S: Serializer>(
     serializer.serialize_str(&value.hyphenated().to_string())
 }
 
-fn optional_guid_text<S: Serializer>(
+pub(crate) fn optional_guid_text<S: Serializer>(
     value: &Option<Uuid>,
     serializer: S,
 ) -> std::result::Result<S::Ok, S::Error> {

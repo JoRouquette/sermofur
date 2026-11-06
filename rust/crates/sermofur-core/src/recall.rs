@@ -344,7 +344,7 @@ fn find(store: &Store, id: Uuid, visible: &HashSet<String>) -> Result<MemoryReco
 }
 
 /// The .NET name of a member in lowercase (`ToString().ToLowerInvariant()`).
-fn lower_name<E: DotNetEnum + PartialEq>(member: E) -> String {
+pub(crate) fn lower_name<E: DotNetEnum + PartialEq>(member: E) -> String {
     E::NAMES
         .iter()
         .find(|(_, _, m)| *m == member)

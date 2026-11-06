@@ -2,7 +2,8 @@
 //!
 //! Order of the checks, as in the .NET tool: help, then version, then parsing, then the command.
 //! Ported commands: `init` and `root` (lot 1b.4), `status`, `scope`, `export`, `claim`,
-//! `evidence` and `retex` (lot 3.4), `recall` (lot 4.2); the others answer `not_ported`.
+//! `evidence` and `retex` (lot 3.4), `recall` (lot 4.2), `challenge` (lot 4.3); the others
+//! answer `not_ported`.
 
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -189,7 +190,7 @@ fn execute(arguments: &[String], json: bool, out: &mut dyn Write) -> Result<i32>
     let mut store = Store::open(&root, configuration.instance_id, !writes(&parsed))?;
     let scopes = store.read_scopes()?;
     let context = resolve_context(&path, &root, &scopes)?;
-    if is_knowledge_command(&command) && command != "recall" {
+    if is_knowledge_command(&command) && !matches!(command.as_str(), "recall" | "challenge") {
         return Err(not_ported());
     }
     let body = dispatch(&mut parsed, &mut store, &context, &configuration)?;
