@@ -57,26 +57,57 @@ if (OperatingSystem.IsWindows())
     );
     new DirectoryInfo(Under("no-read-control")).SetAccessControl(denied);
 }
+else
+{
+    Directory.CreateDirectory(Under("dir"));
+    File.WriteAllText(Under("file.txt"), "x");
+    File.CreateSymbolicLink(Under("link-file"), Under("file.txt"));
+    Directory.CreateSymbolicLink(Under("link-dir"), Under("dir"));
+    File.CreateSymbolicLink(Under("link-dangling"), Under("nowhere"));
+    using Process mkfifo = Process.Start("mkfifo", [Under("fifo")])!;
+    mkfifo.WaitForExit();
+    // A folder that cannot be searched: its children cannot be read (EACCES), unless as root.
+    Directory.CreateDirectory(Under("locked"));
+    File.SetUnixFileMode(Under("locked"), UnixFileMode.None);
+}
 
 string system = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
-List<(string Name, string Path)> cases =
-[
-    ("dir", Under("dir")),
-    ("dir_trailing_separator", Under("dir") + Path.DirectorySeparatorChar),
-    ("file", Under("file.txt")),
-    ("file_trailing_dot", Under("file.txt.")),
-    ("file_trailing_separator", Under("file.txt") + Path.DirectorySeparatorChar),
-    ("absent", Under("absent")),
-    ("absent_parent", Under("absent/child")),
-    ("through_file", Under("file.txt/child")),
-    ("link_to_file", Under("link-file")),
-    ("link_to_dir", Under("link-dir")),
-    ("link_dangling", Under("link-dangling")),
-    ("junction", Under("junction")),
-    ("no_read_control", Under("no-read-control")),
-    ("system_dir", system),
-    ("system_file", Path.Combine(system, "System32", "kernel32.dll")),
-];
+List<(string Name, string Path)> cases = OperatingSystem.IsWindows()
+    ?
+    [
+        ("dir", Under("dir")),
+        ("dir_trailing_separator", Under("dir") + Path.DirectorySeparatorChar),
+        ("file", Under("file.txt")),
+        ("file_trailing_dot", Under("file.txt.")),
+        ("file_trailing_separator", Under("file.txt") + Path.DirectorySeparatorChar),
+        ("absent", Under("absent")),
+        ("absent_parent", Under("absent/child")),
+        ("through_file", Under("file.txt/child")),
+        ("link_to_file", Under("link-file")),
+        ("link_to_dir", Under("link-dir")),
+        ("link_dangling", Under("link-dangling")),
+        ("junction", Under("junction")),
+        ("no_read_control", Under("no-read-control")),
+        ("system_dir", system),
+        ("system_file", Path.Combine(system, "System32", "kernel32.dll")),
+    ]
+    :
+    [
+        ("dir", Under("dir")),
+        ("dir_trailing_separator", Under("dir") + Path.DirectorySeparatorChar),
+        ("file", Under("file.txt")),
+        ("file_trailing_separator", Under("file.txt") + Path.DirectorySeparatorChar),
+        ("absent", Under("absent")),
+        ("absent_parent", Under("absent/child")),
+        ("through_file", Under("file.txt/child")),
+        ("link_to_file", Under("link-file")),
+        ("link_to_dir", Under("link-dir")),
+        ("link_dangling", Under("link-dangling")),
+        ("fifo", Under("fifo")),
+        ("no_search_parent", Under("locked/child")),
+        ("system_dir", "/"),
+        ("system_file", "/etc/passwd"),
+    ];
 
 JsonArray rows = [];
 FileOwnership ownership = new FileOwnership();
@@ -113,6 +144,17 @@ if (OperatingSystem.IsWindows())
     }
     Directory.Delete(Under("link-dir"));
     Directory.Delete(Under("junction"));
+}
+else
+{
+    File.SetUnixFileMode(
+        Under("locked"),
+        UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute
+    );
+    foreach (string link in new[] { "link-file", "link-dangling", "link-dir" })
+    {
+        File.Delete(Under(link));
+    }
 }
 Directory.Delete(scratch, recursive: true);
 

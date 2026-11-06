@@ -510,6 +510,7 @@ version = "0.0.0-dev"
 dependencies = [
  "proptest",
  "rusqlite",
+ "rustix",
  "serde",
  "serde_json",
  "thiserror",

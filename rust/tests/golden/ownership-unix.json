@@ -1,0 +1,99 @@
+{
+  "generator": "rust/tools/ownership-oracle",
+  "runtime": ".NET 10.0.14",
+  "os": "unix",
+  "cases": [
+    {
+      "name": "dir",
+      "status": {
+        "isRegularFile": false,
+        "isDirectory": true,
+        "isOwnedByCurrentUser": true
+      }
+    },
+    {
+      "name": "dir_trailing_separator",
+      "status": {
+        "isRegularFile": false,
+        "isDirectory": true,
+        "isOwnedByCurrentUser": true
+      }
+    },
+    {
+      "name": "file",
+      "status": {
+        "isRegularFile": true,
+        "isDirectory": false,
+        "isOwnedByCurrentUser": true
+      }
+    },
+    {
+      "name": "file_trailing_separator",
+      "status": null
+    },
+    {
+      "name": "absent",
+      "status": null
+    },
+    {
+      "name": "absent_parent",
+      "status": null
+    },
+    {
+      "name": "through_file",
+      "status": null
+    },
+    {
+      "name": "link_to_file",
+      "status": {
+        "isRegularFile": false,
+        "isDirectory": false,
+        "isOwnedByCurrentUser": true
+      }
+    },
+    {
+      "name": "link_to_dir",
+      "status": {
+        "isRegularFile": false,
+        "isDirectory": false,
+        "isOwnedByCurrentUser": true
+      }
+    },
+    {
+      "name": "link_dangling",
+      "status": {
+        "isRegularFile": false,
+        "isDirectory": false,
+        "isOwnedByCurrentUser": true
+      }
+    },
+    {
+      "name": "fifo",
+      "status": {
+        "isRegularFile": false,
+        "isDirectory": false,
+        "isOwnedByCurrentUser": true
+      }
+    },
+    {
+      "name": "no_search_parent",
+      "error": true
+    },
+    {
+      "name": "system_dir",
+      "status": {
+        "isRegularFile": false,
+        "isDirectory": true,
+        "isOwnedByCurrentUser": false
+      }
+    },
+    {
+      "name": "system_file",
+      "status": {
+        "isRegularFile": true,
+        "isDirectory": false,
+        "isOwnedByCurrentUser": false
+      }
+    }
+  ]
+}

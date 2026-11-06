@@ -83,12 +83,46 @@ fn inspect(path: &Path) -> io::Result<Option<EntryStatus>> {
     }))
 }
 
-/// Unix: ported by lot 1c.1. Until then the owner is never trusted.
-#[cfg(not(windows))]
+/// Linux and macOS: the type and the owner of the entry itself, read without following a link
+/// (`statx` with `AT_SYMLINK_NOFOLLOW` on Linux, `lstat` on macOS in the .NET tool), against the
+/// effective user. `ENOENT` and `ENOTDIR` mean "absent"; any other failure is an error. On musl
+/// the .NET tool cannot load `statx` and fails closed, so the port does too.
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+fn inspect(path: &Path) -> io::Result<Option<EntryStatus>> {
+    use std::os::unix::fs::MetadataExt;
+
+    const NO_SUCH_ENTRY: i32 = 2;
+    const NOT_A_DIRECTORY: i32 = 20;
+    const TYPE_MASK: u32 = 0xF000;
+    const REGULAR_FILE: u32 = 0x8000;
+    const DIRECTORY: u32 = 0x4000;
+    if cfg!(target_env = "musl") {
+        return Err(io::Error::other(
+            "File owner unavailable on this C library (glibc 2.28+ required).",
+        ));
+    }
+    let metadata = match std::fs::symlink_metadata(path) {
+        Ok(metadata) => metadata,
+        Err(error) if matches!(error.raw_os_error(), Some(NO_SUCH_ENTRY | NOT_A_DIRECTORY)) => {
+            return Ok(None);
+        }
+        Err(error) => return Err(error),
+    };
+    let kind = metadata.mode() & TYPE_MASK;
+    Ok(Some(EntryStatus {
+        is_regular_file: kind == REGULAR_FILE,
+        is_directory: kind == DIRECTORY,
+        is_owned_by_current_user: metadata.uid() == rustix::process::geteuid().as_raw(),
+    }))
+}
+
+/// Any other system: the .NET tool throws `PlatformNotSupportedException`; the owner is never
+/// trusted.
+#[cfg(not(any(windows, target_os = "linux", target_os = "macos")))]
 fn inspect(_path: &Path) -> io::Result<Option<EntryStatus>> {
     Err(io::Error::new(
         io::ErrorKind::Unsupported,
-        "File ownership on Unix is ported by lot 1c.1.",
+        "File ownership is checked on Windows, Linux and macOS.",
     ))
 }
 
