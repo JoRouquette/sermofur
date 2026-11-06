@@ -13,7 +13,7 @@ Statut : `todo`, `partial`, `done`. Une ligne ne passe à `done` que si ses scé
 | 1b.3 | Découverte en échec fermé : `ValidateDirectory`, `RejectLinks` sur tous les ancêtres, six états du marqueur | sermofur-core | InstanceTests | todo |
 | 1b.4 | `init` (staging, course entre processus), `root` | sermofur-core, smf | CliTests (init concurrent), InstanceTests | todo |
 | 1c.1 | Propriété du dossier : Unix (`statx`, `lstat`, `geteuid`) | sermofur-core | HardeningTests | todo |
-| 1c.2 | Propriété du dossier : Windows (SID propriétaire, Administrateurs), module dérogatoire `windows-sys` unique (décision A1 ; dérogation à inscrire avec l'accord de John) | sermofur-core | HardeningTests (ElevatedWindowsFact) | todo |
+| 1c.2 | Propriété du dossier : Windows (SID propriétaire lu par `GetNamedSecurityInfoW`, Administrateurs activé ou en refus seul comme `WindowsIdentity`), module dérogatoire `windows.rs` ; or `ownership.json` de 15 cas produit par `rust/tools/ownership-oracle` ; port de `RealOwnersAreCheckedOnWindows` (session élevée seulement) | sermofur-core | HardeningTests (ElevatedWindowsFact) | done (test élevé en CI seulement) |
 | 1c.3 | `LocalPaths` : normalisation de mapping, `CanonicalCase` (casse, NFC/NFD, 8.3), UNC et lecteur réseau | sermofur-core | InstanceTests, SourceTests, PropertyTests | todo |
 | 1c.4 | `AtomicFile` : temporaire, flush durable, renommage, liens et jonctions refusés ou suivis (10), mode Unix ; or `atomic-file.json` de 22 scénarios produit sous Windows par `rust/tools/atomic-oracle` | sermofur-core | ConfigurationWriteTests | done (Windows ; test des modes Unix en CI seulement) |
 | 2.1 | Énumérations, enregistrements, formes JSON (snake_case, camelCase) | sermofur-core | DomainTests | todo |
@@ -57,13 +57,16 @@ Décision de John du 2026-11-06 (comité) : fidélité stricte. Les écarts E1 �
 
 ## Dérogations `unsafe`
 
-(aucune ; propriété du dossier sous Windows en attente de décision de John)
+| Module | Appels | Raison | Décision |
+|---|---|---|---|
+| `crates/sermofur-core/src/windows.rs` (seul module avec `#![allow(unsafe_code)]`) | `GetNamedSecurityInfoW`, `GetLengthSid`, `LocalFree`, `OpenProcessToken`, `GetCurrentProcess`, `GetTokenInformation`, `CloseHandle` ; à venir : `GetLongPathNameW` (1c.3) | La bibliothèque std ne lit ni le propriétaire d'un fichier ni le jeton du processus. Chaque bloc porte un `// SAFETY:` ; aucun pointeur brut ne sort du module | Décision A1 du comité, inscription acceptée par John le 2026-11-06 |
 
 ## Dépendances
 
 | Crate | Raison | Licence |
 |---|---|---|
 | rusqlite 0.40.2 (bundled, libsqlite3-sys 0.38.2) | SQLite 3.53.2 avec FTS5 et fts5vocab, la plus proche de la 3.53.4 de l'oracle (décision A6 du 2026-11-06) ; version verrouillée par le test `bundled_sqlite_is_the_version_chosen_for_parity` ; la montée ferme CVE-2025-7709 et CVE-2026-11822/11824 (FTS5) de la 3.50.2 précédente. Tire `rsqlite-vfs` 0.1.1 et `sqlite-wasm-rs` 0.5.5 pour la seule cible wasm32-unknown-unknown, non compilées ici : MIT, aucun avis RustSec au 2026-11-06, `rsqlite-vfs` sans dépôt déclaré | MIT |
+| windows-sys 0.61.2 (Windows seulement ; features Win32_Foundation, Win32_Security, Win32_Security_Authorization, Win32_System_Threading) | appels du module dérogatoire `windows.rs` ; déjà dans `Cargo.lock` par tempfile, aucune crate nouvelle ; crate officielle de Microsoft, aucun avis RustSec au 2026-11-06 | MIT/Apache-2.0 |
 | uuid | identité d'instance | MIT/Apache-2.0 |
 | serde, serde_json, thiserror | sérialisation, erreurs | MIT/Apache-2.0 |
 | proptest (dev) | propriétés portées de FsCheck | MIT/Apache-2.0 |

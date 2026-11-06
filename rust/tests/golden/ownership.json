@@ -1,0 +1,107 @@
+{
+  "generator": "rust/tools/ownership-oracle",
+  "runtime": ".NET 10.0.5",
+  "os": "windows",
+  "cases": [
+    {
+      "name": "dir",
+      "status": {
+        "isRegularFile": false,
+        "isDirectory": true,
+        "isOwnedByCurrentUser": true
+      }
+    },
+    {
+      "name": "dir_trailing_separator",
+      "status": {
+        "isRegularFile": false,
+        "isDirectory": true,
+        "isOwnedByCurrentUser": true
+      }
+    },
+    {
+      "name": "file",
+      "status": {
+        "isRegularFile": true,
+        "isDirectory": false,
+        "isOwnedByCurrentUser": true
+      }
+    },
+    {
+      "name": "file_trailing_dot",
+      "status": {
+        "isRegularFile": true,
+        "isDirectory": false,
+        "isOwnedByCurrentUser": true
+      }
+    },
+    {
+      "name": "file_trailing_separator",
+      "status": null
+    },
+    {
+      "name": "absent",
+      "status": null
+    },
+    {
+      "name": "absent_parent",
+      "status": null
+    },
+    {
+      "name": "through_file",
+      "status": null
+    },
+    {
+      "name": "link_to_file",
+      "status": {
+        "isRegularFile": true,
+        "isDirectory": false,
+        "isOwnedByCurrentUser": true
+      }
+    },
+    {
+      "name": "link_to_dir",
+      "status": {
+        "isRegularFile": false,
+        "isDirectory": true,
+        "isOwnedByCurrentUser": true
+      }
+    },
+    {
+      "name": "link_dangling",
+      "status": {
+        "isRegularFile": true,
+        "isDirectory": false,
+        "isOwnedByCurrentUser": true
+      }
+    },
+    {
+      "name": "junction",
+      "status": {
+        "isRegularFile": false,
+        "isDirectory": true,
+        "isOwnedByCurrentUser": true
+      }
+    },
+    {
+      "name": "no_read_control",
+      "error": true
+    },
+    {
+      "name": "system_dir",
+      "status": {
+        "isRegularFile": false,
+        "isDirectory": true,
+        "isOwnedByCurrentUser": false
+      }
+    },
+    {
+      "name": "system_file",
+      "status": {
+        "isRegularFile": true,
+        "isDirectory": false,
+        "isOwnedByCurrentUser": false
+      }
+    }
+  ]
+}

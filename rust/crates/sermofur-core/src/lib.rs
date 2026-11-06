@@ -8,9 +8,12 @@ pub mod format;
 pub mod instance;
 pub mod json;
 pub mod limits;
+pub mod ownership;
 pub mod schema;
 
 mod dotnet_escape_table;
+#[cfg(windows)]
+mod windows;
 
 /// The line break of the platform, as `Environment.NewLine` and `TextWriter.WriteLine` give it
 /// in .NET: `\r\n` on Windows, `\n` elsewhere. The JSON writer of the .NET tool uses it between
