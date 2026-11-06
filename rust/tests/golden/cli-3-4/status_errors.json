@@ -1,0 +1,107 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json"
+  ],
+  "projections": {},
+  "steps": [
+    {
+      "output": {
+        "exitCode": 2,
+        "stderr": "smf: no_instance: No .sermofur instance in the parent folders.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "status"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 2,
+        "stderr": "{\n  \"code\": \"no_instance\",\n  \"message\": \"No .sermofur instance in the parent folders.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "status",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 2,
+        "stderr": "smf: no_instance: No .sermofur instance in the parent folders.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "frobnicate"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": ".sermofur"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "file": ".sermofur/instance.json"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 3,
+        "stderr": "smf: migration_required: Instance in format 1; back it up if you wish, then run smf migrate.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "status"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 3,
+        "stderr": "{\n  \"code\": \"migration_required\",\n  \"message\": \"Instance in format 1; back it up if you wish, then run smf migrate.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "list",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 3,
+        "stderr": "smf: migration_required: Instance in format 1; back it up if you wish, then run smf migrate.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "c",
+          "client",
+          "workspace",
+          "c"
+        ],
+        "cwd": ""
+      }
+    }
+  ]
+}

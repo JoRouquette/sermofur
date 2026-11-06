@@ -1,0 +1,252 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/",
+    "a/",
+    "a/b/",
+    "d/",
+    "e/",
+    "e/f/"
+  ],
+  "projections": {},
+  "steps": [
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"created\": true\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "init"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": "a/b"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": "d"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": "e/f"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"a\",\n  \"kind\": \"client\",\n  \"parentId\": \"workspace\",\n  \"relativePath\": \"a\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "a",
+          "Cli-ent",
+          "workspace",
+          "a"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"d\",\n  \"kind\": \"client\",\n  \"parentId\": \"workspace\",\n  \"relativePath\": \"d\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "d",
+          "_client_",
+          "workspace",
+          "d\\"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"e\",\n  \"kind\": \"client\",\n  \"parentId\": \"workspace\",\n  \"relativePath\": \"e\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "e",
+          "client",
+          "workspace",
+          "e/./f/.."
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"b\",\n  \"kind\": \"project\",\n  \"parentId\": \"a\",\n  \"relativePath\": \"a/b\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "b",
+          "PROJECT",
+          "a",
+          "a/b"
+        ],
+        "cwd": "a"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"rb\",\n  \"kind\": \"repository\",\n  \"parentId\": \"b\",\n  \"relativePath\": \"a/b\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "rb",
+          "repository",
+          "b",
+          "a/b"
+        ],
+        "cwd": "a/b"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 4,
+        "stderr": "smf: scope_boundary: The new scope must be a child of the current context.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "rb2",
+          "repository",
+          "b",
+          "a/b"
+        ],
+        "cwd": "a/b"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"f\",\n  \"kind\": \"project\",\n  \"parentId\": \"e\",\n  \"relativePath\": \"e/f\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "f",
+          "project",
+          "e",
+          "e/f"
+        ],
+        "cwd": "e"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_scope: Scope kind incompatible with its parent.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "g",
+          "project",
+          "f",
+          "e/f"
+        ],
+        "cwd": "e/f"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 4,
+        "stderr": "smf: scope_boundary: Child mapping must lie inside its parent; only a repository may share its project's path.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "fr",
+          "repository",
+          "f",
+          "."
+        ],
+        "cwd": "e/f"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "[\n  {\n    \"id\": \"workspace\",\n    \"kind\": \"workspace\",\n    \"parentId\": null,\n    \"relativePath\": null\n  }\n]\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "list"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "[\n  {\n    \"id\": \"a\",\n    \"kind\": \"client\",\n    \"parentId\": \"workspace\",\n    \"relativePath\": \"a\"\n  },\n  {\n    \"id\": \"b\",\n    \"kind\": \"project\",\n    \"parentId\": \"a\",\n    \"relativePath\": \"a/b\"\n  },\n  {\n    \"id\": \"rb\",\n    \"kind\": \"repository\",\n    \"parentId\": \"b\",\n    \"relativePath\": \"a/b\"\n  },\n  {\n    \"id\": \"workspace\",\n    \"kind\": \"workspace\",\n    \"parentId\": null,\n    \"relativePath\": null\n  }\n]\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "list"
+        ],
+        "cwd": "a/b"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "[\n  {\n    \"id\": \"e\",\n    \"kind\": \"client\",\n    \"parentId\": \"workspace\",\n    \"relativePath\": \"e\"\n  },\n  {\n    \"id\": \"f\",\n    \"kind\": \"project\",\n    \"parentId\": \"e\",\n    \"relativePath\": \"e/f\"\n  },\n  {\n    \"id\": \"workspace\",\n    \"kind\": \"workspace\",\n    \"parentId\": null,\n    \"relativePath\": null\n  }\n]\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "list",
+          "--json"
+        ],
+        "cwd": "e/f"
+      }
+    }
+  ]
+}

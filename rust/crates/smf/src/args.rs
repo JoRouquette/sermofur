@@ -93,6 +93,25 @@ impl CommandArguments {
         self.options.get(name).and_then(|value| value.as_deref())
     }
 
+    /// The value of an option, or `fallback` when it is absent; owned, so that the arguments
+    /// can be read again.
+    pub fn option_or(&mut self, name: &str, fallback: &str) -> String {
+        self.option(name).unwrap_or(fallback).to_owned()
+    }
+
+    /// The value of an option that the command requires (`Required`).
+    pub fn required(&mut self, name: &str) -> Result<String> {
+        self.option(name)
+            .map(str::to_owned)
+            .ok_or_else(|| SermofurError::invalid_arguments(format!("Option --{name} required.")))
+    }
+
+    /// Presence of a flag, marked as used (`Flag`).
+    pub fn flag(&mut self, name: &str) -> bool {
+        self.used.insert(name.to_string());
+        self.options.contains_key(name)
+    }
+
     /// Refuses a command line whose number of positional arguments is not `count`
     /// (`RequireCount`).
     pub fn require_count(&self, count: usize) -> Result<()> {

@@ -2,6 +2,7 @@
 
 mod args;
 mod help;
+mod memory_commands;
 mod runner;
 #[cfg(test)]
 mod test_support;

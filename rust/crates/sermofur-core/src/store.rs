@@ -3,8 +3,8 @@
 //! invalidation, each write in one `BEGIN IMMEDIATE` transaction.
 //!
 //! After each write, the Markdown projection of the record is rewritten; a failure there leaves
-//! the record saved and reports `projection_pending`. Not yet ported here: the move of sources
-//! into a new scope (lot 5.2).
+//! the record saved and reports `projection_pending`. A new scope takes the sources of its
+//! ancestors that lie under its mapping (`RescopeSources`).
 
 use std::collections::HashSet;
 use std::path::{Path, PathBuf};
@@ -19,10 +19,10 @@ use crate::instance::invalid_storage;
 use crate::projection::{is_current_safe, project};
 use crate::records::{
     ClaimContent, DotNetEnum, EvidenceContent, HistoryEntry, KnowledgeStatus, MemoryRecord,
-    RecordKind, RetexContent, Scope, ScopeKind, read, write,
+    RecordKind, RetexContent, Scope, ScopeKind, SourceContent, read, write,
 };
 use crate::schema::{SEARCH_TOKENIZER, storage};
-use crate::scope_policy::{ScopeLike, kind_value, validate_tree};
+use crate::scope_policy::{ScopeLike, kind_value, validate_tree, visible_ancestors};
 
 /// A row of the `scopes` table. The kind keeps the text stored and the value `Enum.Parse`
 /// gives it, which may be undefined (a number).
@@ -51,7 +51,7 @@ impl StoredScope {
         })
     }
 
-    fn from_scope(scope: &Scope) -> Self {
+    pub(crate) fn from_scope(scope: &Scope) -> Self {
         StoredScope {
             id: scope.id.clone(),
             kind: kind_value(scope.kind),
@@ -223,8 +223,12 @@ impl Store {
                 ],
             )
             .map_err(|e| storage(&e))?;
-        // ponytail: sources of ancestors are moved into the new scope by lot 5.2.
-        transaction.commit().map_err(|e| storage(&e))
+        let moved = rescope_sources(&transaction, scope, &scopes)?;
+        transaction.commit().map_err(|e| storage(&e))?;
+        for source in &moved {
+            project(&self.root, source)?;
+        }
+        Ok(())
     }
 
     /// The records of the visible scopes, of one kind or all, ordered by identifier.
@@ -437,6 +441,94 @@ impl Store {
         project(&self.root, &updated)?;
         Ok(updated)
     }
+}
+
+/// `SourcePlacement.Holds`: whether `mapping` is the stored path `relative_path` or one of its
+/// parent folders, compared as `LocalPaths.Comparison` (without case on Windows only).
+pub fn holds(mapping: &str, relative_path: &str) -> bool {
+    let directory = mapping.trim_matches('/');
+    if directory.is_empty() {
+        return true;
+    }
+    let fold = |text: &str| -> Vec<u16> {
+        let units: Vec<u16> = text.encode_utf16().collect();
+        if cfg!(windows) {
+            crate::casing::ordinal_fold(&units)
+        } else {
+            units
+        }
+    };
+    let path = fold(relative_path);
+    let prefix = fold(&format!("{directory}/"));
+    path == fold(directory) || path.starts_with(&prefix)
+}
+
+/// Moves into `scope`, in the transaction, the sources of its ancestors whose file lies under
+/// its mapping (`RescopeSources`), and returns them as moved; `scopes` includes `scope`.
+fn rescope_sources(
+    connection: &Connection,
+    scope: &Scope,
+    scopes: &[StoredScope],
+) -> Result<Vec<MemoryRecord>> {
+    let Some(mapping) = scope.relative_path.as_deref() else {
+        return Ok(Vec::new());
+    };
+    let ancestors = visible_ancestors(&scope.id, scopes)?;
+    let payloads: Vec<String> = {
+        let mut statement = connection
+            .prepare("SELECT payload FROM records WHERE kind='Source'")
+            .map_err(|e| storage(&e))?;
+        statement
+            .query_map([], |row| row.get::<_, String>(0))
+            .and_then(Iterator::collect)
+            .map_err(|e| storage(&e))?
+    };
+    let mut moved = Vec::new();
+    for payload in payloads {
+        let source: MemoryRecord = read(&payload, &|_| 0)?;
+        let Some(owner) = source.scope_id.as_deref() else {
+            continue;
+        };
+        if owner == scope.id || !ancestors.contains(owner) {
+            continue;
+        }
+        let json = source.content_json.as_deref().ok_or_else(invalid_storage)?;
+        let content: SourceContent = read(json, &|_| 0)?;
+        // A missing path is the `NullReferenceException` of .NET, unless the mapping is the root.
+        let held = match content.relative_path.as_deref() {
+            Some(path) => holds(mapping, path),
+            None if mapping.trim_matches('/').is_empty() => true,
+            None => return Err(invalid_storage()),
+        };
+        if !held {
+            continue;
+        }
+        let mut next = source.clone();
+        next.scope_id = Some(scope.id.clone());
+        next.revision = source.revision + 1;
+        let id = source.id.hyphenated().to_string();
+        connection
+            .execute(
+                "UPDATE records SET scope_id=?1,payload=?2,revision=?3 WHERE id=?4",
+                rusqlite::params![scope.id, write(&next)?, next.revision, id],
+            )
+            .map_err(|e| storage(&e))?;
+        connection
+            .execute(
+                "UPDATE search SET scope_id=?1 WHERE object_id=?2",
+                rusqlite::params![scope.id, id],
+            )
+            .map_err(|e| storage(&e))?;
+        append_history(
+            connection,
+            Some(&source),
+            &next,
+            &format!("rescoped to {}", scope.id),
+            Some("sermofur".to_owned()),
+        )?;
+        moved.push(next);
+    }
+    Ok(moved)
 }
 
 fn read_scopes(connection: &Connection) -> Result<Vec<StoredScope>> {

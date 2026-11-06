@@ -1,7 +1,8 @@
 //! Runs one command line, ported from `CommandRunner.Run`.
 //!
 //! Order of the checks, as in the .NET tool: help, then version, then parsing, then the command.
-//! Ported commands: `init` and `root` (lot 1b.4); the others answer `not_ported`.
+//! Ported commands: `init` and `root` (lot 1b.4), `status`, `scope`, `export`, `claim`,
+//! `evidence` and `retex` (lot 3.4); the others answer `not_ported`.
 
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -10,13 +11,17 @@ use serde::Serialize;
 use sermofur_core::discovery::{discover, expand_short_names};
 use sermofur_core::error::{Result, SermofurError};
 use sermofur_core::init::{Initialized, initialize};
+use sermofur_core::instance::{InstanceConfiguration, read_configuration};
+use sermofur_core::memory::resolve_context;
 use sermofur_core::ownership::SystemOwnership;
+use sermofur_core::store::Store;
 use sermofur_core::{NEW_LINE, VERSION, json};
 
 use crate::args::{
     CommandArguments, HELP, HELP_SHORTCUT, VERSION as VERSION_OPTION, VERSION_SHORTCUT,
 };
 use crate::help;
+use crate::memory_commands::{dispatch, is_knowledge_command, writes};
 
 /// Exit code of a command that exists in the .NET tool but is not ported yet.
 const NOT_PORTED_EXIT_CODE: i32 = 70;
@@ -39,23 +44,30 @@ struct InitBody {
     created: bool,
 }
 
+/// `InstanceConfiguration` as `RecordJson` writes it.
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
-struct ConfigurationBody {
+pub(crate) struct ConfigurationBody {
     schema_version: i32,
     instance_id: String,
     created_at: sermofur_core::format::DateTimeOffset,
+}
+
+impl From<&InstanceConfiguration> for ConfigurationBody {
+    fn from(value: &InstanceConfiguration) -> Self {
+        ConfigurationBody {
+            schema_version: value.schema_version,
+            instance_id: value.instance_id.hyphenated().to_string(),
+            created_at: value.created_at,
+        }
+    }
 }
 
 impl From<Initialized> for InitBody {
     fn from(value: Initialized) -> Self {
         InitBody {
             root: text(&value.root),
-            configuration: ConfigurationBody {
-                schema_version: value.configuration.schema_version,
-                instance_id: value.configuration.instance_id.hyphenated().to_string(),
-                created_at: value.configuration.created_at,
-            },
+            configuration: ConfigurationBody::from(&value.configuration),
             created: value.created,
         }
     }
@@ -128,6 +140,13 @@ fn execute(arguments: &[String], json: bool, out: &mut dyn Write) -> Result<i32>
         return Ok(0);
     }
     let mut parsed = CommandArguments::parse(arguments)?;
+    if parsed
+        .positionals()
+        .first()
+        .is_some_and(|command| command == "daemon" || command == "mcp")
+    {
+        return Err(not_ported());
+    }
     // `Path.GetFullPath(args.Option("path", workingDirectory), workingDirectory)`: a relative
     // `--path` is taken from the working directory; discovery makes it full.
     // `Environment.CurrentDirectory` expands the short 8.3 names of the folder on Windows.
@@ -148,8 +167,11 @@ fn execute(arguments: &[String], json: bool, out: &mut dyn Write) -> Result<i32>
         write_line(out, &to_json(&body)?);
         return Ok(0);
     }
+    if command == "doctor" {
+        return Err(not_ported());
+    }
+    let root = discover(&path, &SystemOwnership)?;
     if command == "root" {
-        let root = discover(&path, &SystemOwnership)?;
         parsed.require_count(1)?;
         parsed.validate_used()?;
         let shown = if json {
@@ -160,11 +182,34 @@ fn execute(arguments: &[String], json: bool, out: &mut dyn Write) -> Result<i32>
         write_line(out, &shown);
         return Ok(0);
     }
-    Err(SermofurError::new(
+    if command == "migrate" {
+        return Err(not_ported());
+    }
+    let configuration = read_configuration(&root, false, local_offset)?;
+    let mut store = Store::open(&root, configuration.instance_id, !writes(&parsed))?;
+    let scopes = store.read_scopes()?;
+    let context = resolve_context(&path, &root, &scopes)?;
+    if is_knowledge_command(&command) {
+        return Err(not_ported());
+    }
+    let body = dispatch(&mut parsed, &mut store, &context, &configuration)?;
+    write_line(out, &body);
+    Ok(0)
+}
+
+/// The offset of local time, which reads a `createdAt` written without offset.
+// ponytail: UTC until lot 7.2 ports the local offset (DateTimeOffset.Now).
+fn local_offset(_utc_ticks: i64) -> i16 {
+    0
+}
+
+/// A command of the .NET tool that the port does not run yet.
+fn not_ported() -> SermofurError {
+    SermofurError::new(
         "not_ported",
         "This command is not ported to Rust yet.",
         NOT_PORTED_EXIT_CODE,
-    ))
+    )
 }
 
 /// `invalid_storage_or_path`, exit 3: what `CommandRunner.Run` answers to an IO failure.

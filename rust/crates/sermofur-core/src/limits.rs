@@ -12,6 +12,12 @@ pub const ARGUMENT_COUNT_MESSAGE: &str = "Too many arguments: 128 at most.";
 /// Message for an out-of-bounds command-line argument.
 pub const ARGUMENT_MESSAGE: &str = "Argument limited to 16,384 characters without NUL.";
 
+/// Message for an empty or out-of-bounds memory text.
+pub const TEXT_MESSAGE: &str = "Text required, limited to 16,384 characters without NUL.";
+
+/// Message for an out-of-bounds scope identifier, parent or mapping.
+pub const SCOPE_MESSAGE: &str = "Identifier or mapping limited to 16,384 characters without NUL.";
+
 /// True if the value is longer than [`MAX_TEXT_LENGTH`] or contains a NUL character.
 ///
 /// The .NET code counts `string.Length`, that is UTF-16 code units, not characters and not
