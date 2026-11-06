@@ -4,6 +4,7 @@
 
 pub mod atomic;
 mod casing;
+pub mod confidence;
 pub mod discovery;
 pub mod error;
 pub mod format;
