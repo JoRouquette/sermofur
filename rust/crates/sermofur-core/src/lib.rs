@@ -15,6 +15,7 @@ pub mod local_paths;
 pub mod ownership;
 pub mod records;
 pub mod schema;
+pub mod scope_policy;
 mod stj;
 
 mod dotnet_escape_table;
