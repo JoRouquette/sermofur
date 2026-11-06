@@ -7,7 +7,7 @@ Statut : `todo`, `partial`, `done`. Une ligne ne passe à `done` que si ses scé
 | 0 | Inventaire : commandes, options, codes, outils MCP, écarts (`INVENTAIRE.md`) | n/a | n/a | done (validé par John le 2026-11-06) |
 | 1a | Parseur, aide générale, version, bornes, JSON .NET | sermofur-core, smf | PropertyTests, CliTests (grammaire) | done (ea8f121) |
 | 1b.0 | Formateurs .NET : `double` comme System.Text.Json (forme courte, exposant `E-07`), `DateTimeOffset` en JSON STJ, au format `O` et aux trois formats fixes, pour un instant et un décalage donnés ; lecture STJ ; table d'or produite par `rust/tools/format-oracle`. Hors lot : la lecture du décalage local courant (voir 7.2) | sermofur-core | n/a (or `formats.json`) | done |
-| 1b.0b | Montée rusqlite 0.40.2 / libsqlite3-sys 0.38.2 (SQLite 3.53.2, la plus proche de 3.53.4 de l'oracle ; décision A6) ; rejouer l'or du schéma | sermofur-core | SearchIndexTests | todo |
+| 1b.0b | Montée rusqlite 0.40.2 / libsqlite3-sys 0.38.2 (SQLite 3.53.2, la plus proche de 3.53.4 de l'oracle ; décision A6) ; rejouer l'or du schéma | sermofur-core | SearchIndexTests | done |
 | 1b.1 | Schéma SQLite v2 : `create_database`, `validate` | sermofur-core | SearchIndexTests (FTS5) | done (3109a22) |
 | 1b.2 | `instance.json` (lecture bornée 64 Kio, erreurs `invalid_instance`, `unsupported_schema`, `migration_required`) | sermofur-core | InstanceTests, HardeningTests | todo |
 | 1b.3 | Découverte en échec fermé : `ValidateDirectory`, `RejectLinks` sur tous les ancêtres, six états du marqueur | sermofur-core | InstanceTests | todo |
@@ -62,7 +62,7 @@ Décision de John du 2026-11-06 (comité) : fidélité stricte. Les écarts E1 �
 
 | Crate | Raison | Licence |
 |---|---|---|
-| rusqlite (bundled) | SQLite avec FTS5 et fts5vocab, même moteur que le .NET | MIT |
+| rusqlite 0.40.2 (bundled, libsqlite3-sys 0.38.2) | SQLite 3.53.2 avec FTS5 et fts5vocab, la plus proche de la 3.53.4 de l'oracle (décision A6 du 2026-11-06) ; version verrouillée par le test `bundled_sqlite_is_the_version_chosen_for_parity` ; la montée ferme CVE-2025-7709 et CVE-2026-11822/11824 (FTS5) de la 3.50.2 précédente. Tire `rsqlite-vfs` 0.1.1 et `sqlite-wasm-rs` 0.5.5 pour la seule cible wasm32-unknown-unknown, non compilées ici : MIT, aucun avis RustSec au 2026-11-06, `rsqlite-vfs` sans dépôt déclaré | MIT |
 | uuid | identité d'instance | MIT/Apache-2.0 |
 | serde, serde_json, thiserror | sérialisation, erreurs | MIT/Apache-2.0 |
 | proptest (dev) | propriétés portées de FsCheck | MIT/Apache-2.0 |

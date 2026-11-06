@@ -86,3 +86,14 @@ fn the_rust_schema_equals_the_dotnet_schema() {
     schema::create_database(&database, Uuid::new_v4()).expect("created");
     assert_eq!(describe(&database), golden);
 }
+
+/// The bundled engine is the SQLite closest to the oracle's 3.53.4 (decision A6 of 2026-11-06,
+/// `rust/PARITY.md`, lot 1b.0b). A `cargo update` that changes it must be deliberate.
+#[test]
+fn bundled_sqlite_is_the_version_chosen_for_parity() {
+    let connection = Connection::open_in_memory().expect("an in-memory database opens");
+    let version: String = connection
+        .query_row("SELECT sqlite_version()", [], |row| row.get(0))
+        .expect("the version is readable");
+    assert_eq!(version, "3.53.2");
+}
