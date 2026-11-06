@@ -115,6 +115,7 @@ fn show(text: &str, root: &Path) -> String {
     let root = root.to_str().expect("UTF-8");
     let text = text
         .replace("\r\n", "\n")
+        .replace(&root.replace('\\', "\\\\"), "<root>")
         .replace(root, "<root>")
         .replace('\\', "/");
     let key = "\"timestamp\": \"";
@@ -441,6 +442,65 @@ fn the_store_answers_like_the_dotnet_store() {
             store.create_record(&orphan, Some("k3")).map(Some),
             r,
         ));
+        // Markdown projection: a stale file is rewritten by a replay, export rebuilds every
+        // visible one, and a file in place of the records folder leaves the record saved but
+        // not projected.
+        let records = root.join(".sermofur").join("records");
+        let md = |n: u32| records.join(format!("{}.md", id(n).hyphenated()));
+        std::fs::write(md(10), "stale").expect("stale file");
+        steps.push(outcome(
+            "idem_replay_rewrites_stale",
+            store
+                .create_record(&claim(10, "acme", "Clé", user.clone()), Some("k1"))
+                .map(Some),
+            r,
+        ));
+        // The bytes of three projections before any export, carriage returns shown as <CR>.
+        for (name, n) in [
+            ("projection_after_replay", 10),
+            ("projection_after_invalidate", 2),
+            ("projection_after_create", 16),
+        ] {
+            let text = std::fs::read_to_string(md(n)).expect("projection");
+            steps.push(json!({ "step": name, "result": show(&text.replace('\r', "<CR>"), r) }));
+        }
+        std::fs::remove_file(md(1)).expect("removed");
+        let paths = |result: Result<Vec<PathBuf>>| {
+            result.map(|paths| {
+                Some(
+                    paths
+                        .iter()
+                        .map(|p| p.to_str().expect("UTF-8").to_owned())
+                        .collect::<Vec<_>>(),
+                )
+            })
+        };
+        steps.push(outcome("export_acme", paths(store.export(&acme)), r));
+        let moved = root.join(".sermofur").join("records-moved");
+        std::fs::rename(&records, &moved).expect("moved");
+        std::fs::write(&records, "not a folder").expect("blocking file");
+        steps.push(outcome(
+            "create_projection_pending",
+            store
+                .create_record(&claim(19, "acme", "Sans projection", user.clone()), None)
+                .map(Some),
+            r,
+        ));
+        steps.push(outcome(
+            "invalidate_projection_pending",
+            store
+                .invalidate_record(id(19), "acme", "x", "john")
+                .map(Some),
+            r,
+        ));
+        steps.push(outcome(
+            "export_projection_pending",
+            paths(store.export(&acme)),
+            r,
+        ));
+        std::fs::remove_file(&records).expect("unblocked");
+        std::fs::rename(&moved, &records).expect("restored");
+        steps.push(outcome("export_all", paths(store.export(&all)), r));
     }
     {
         let raw = Connection::open(&database).expect("raw");
@@ -517,6 +577,26 @@ fn the_store_answers_like_the_dotnet_store() {
             ));
         }
     }
+    let mut files: Vec<PathBuf> = std::fs::read_dir(root.join(".sermofur").join("records"))
+        .expect("records")
+        .map(|e| e.expect("entry").path())
+        .collect();
+    files.sort();
+    let projections: serde_json::Map<String, Value> = files
+        .iter()
+        .map(|f| {
+            let name = f.file_name().expect("name").to_string_lossy().into_owned();
+            let text = std::fs::read_to_string(f).expect("projection");
+            (name, json!(show(&text, r)))
+        })
+        .collect();
+    if !same(&Value::Object(projections.clone()), &golden["projections"]) {
+        mismatches.push(format!(
+            "projections:\n  expected {}\n  got      {}",
+            golden["projections"],
+            Value::Object(projections)
+        ));
+    }
     assert!(mismatches.is_empty(), "{}", mismatches.join("\n"));
 }
 
@@ -541,4 +621,57 @@ fn a_held_write_lock_is_storage_busy() {
         .expect_err("busy");
     assert_eq!((error.code.as_str(), error.exit_code), ("storage_busy", 3));
     holder.execute_batch("ROLLBACK;").expect("released");
+}
+
+/// A link in place of `.sermofur/records` refuses the projection: the record is saved, the
+/// answer is `projection_pending`, and nothing is written in the folder the link points to.
+#[test]
+fn a_link_on_the_records_folder_is_never_followed() {
+    let scratch =
+        Scratch(std::env::temp_dir().join(format!("sermofur-link-{}", Uuid::new_v4().simple())));
+    let root = scratch.0.join("instance");
+    let outside = scratch.0.join("outside");
+    std::fs::create_dir_all(root.join(".sermofur")).expect("marker");
+    std::fs::create_dir_all(&outside).expect("outside");
+    let instance = Uuid::new_v4();
+    sermofur_core::schema::create_database(&root.join(".sermofur").join("memory.db"), instance)
+        .expect("created");
+    let records = root.join(".sermofur").join("records");
+    #[cfg(windows)]
+    {
+        let out = std::process::Command::new("cmd")
+            .args(["/C", "mklink", "/J"])
+            .arg(&records)
+            .arg(&outside)
+            .output()
+            .expect("cmd runs");
+        assert!(out.status.success(), "mklink /J failed: {out:?}");
+    }
+    #[cfg(unix)]
+    std::os::unix::fs::symlink(&outside, &records).expect("symlink");
+    let mut store = Store::open(&root, instance, false).expect("opened");
+    let error = store
+        .create_record(
+            &claim(1, "workspace", "x", provenance(ActorKind::User, "john")),
+            None,
+        )
+        .expect_err("refused");
+    assert_eq!(
+        (error.code.as_str(), error.exit_code),
+        ("projection_pending", 3)
+    );
+    let visible = HashSet::from(["workspace".to_owned()]);
+    assert!(
+        store.find_record(id(1), &visible).expect("read").is_some(),
+        "the record is saved"
+    );
+    assert_eq!(
+        std::fs::read_dir(&outside).expect("outside").count(),
+        0,
+        "nothing written outside"
+    );
+    // `remove_dir` takes the link away without following it.
+    std::fs::remove_dir(&records)
+        .or_else(|_| std::fs::remove_file(&records))
+        .expect("link removed");
 }

@@ -14,6 +14,7 @@ pub mod json;
 pub mod limits;
 pub mod local_paths;
 pub mod ownership;
+pub mod projection;
 pub mod records;
 pub mod schema;
 pub mod scope_policy;

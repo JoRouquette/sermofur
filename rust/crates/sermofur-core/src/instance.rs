@@ -159,7 +159,7 @@ fn interpret(
 
 /// `File.ReadAllText`: the byte order mark picks UTF-8, UTF-16 or UTF-32 (the BOM is dropped);
 /// without one the text is UTF-8. Invalid sequences become U+FFFD.
-fn decode(bytes: &[u8]) -> String {
+pub(crate) fn decode(bytes: &[u8]) -> String {
     // StreamReader flushes an incomplete last unit as one U+FFFD.
     let units16 = |data: &[u8], little: bool| -> String {
         let (chunks, rest) = data.as_chunks::<2>();

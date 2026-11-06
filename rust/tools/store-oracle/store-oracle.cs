@@ -65,7 +65,10 @@ MemoryRecord Retex(int n, string scope) =>
 
 string Show(string text) =>
     Regex.Replace(
-        text.Replace("\r\n", "\n").Replace(root, "<root>").Replace('\\', '/'),
+        text.Replace("\r\n", "\n")
+            .Replace(root.Replace("\\", "\\\\"), "<root>")
+            .Replace(root, "<root>")
+            .Replace('\\', '/'),
         "\"timestamp\": \"[^\"]*\"",
         "\"timestamp\": \"<date>\""
     );
@@ -222,6 +225,33 @@ using (
 }
 store = new SqliteStore(root, instance);
 Step("idem_orphan", () => store.CreateRecord(Claim(18, "acme", "Orpheline", user), "k3"));
+
+// Markdown projection: a stale file is rewritten by a replay, export rebuilds every visible
+// one, and a file in place of the records folder leaves the record saved but not projected.
+string records = Path.Combine(root, ".sermofur", "records");
+File.WriteAllText(Path.Combine(records, Id(10) + ".md"), "stale");
+Step("idem_replay_rewrites_stale", () => store.CreateRecord(Claim(10, "acme", "Clé", user), "k1"));
+
+// The bytes of three projections before any export, carriage returns shown as <CR>: after the
+// stale replay, after an invalidation (revision 2), after a creation.
+string Projection(int n) =>
+    File.ReadAllText(Path.Combine(records, Id(n) + ".md")).Replace("\r", "<CR>");
+Step("projection_after_replay", () => Projection(10));
+Step("projection_after_invalidate", () => Projection(2));
+Step("projection_after_create", () => Projection(16));
+File.Delete(Path.Combine(records, Id(1) + ".md"));
+Step("export_acme", () => store.Export(acme));
+Directory.Move(records, records + "-moved");
+File.WriteAllText(records, "not a folder");
+Step(
+    "create_projection_pending",
+    () => store.CreateRecord(Claim(19, "acme", "Sans projection", user), null)
+);
+Step("invalidate_projection_pending", () => store.InvalidateRecord(Id(19), "acme", "x", "john"));
+Step("export_projection_pending", () => store.Export(acme));
+File.Delete(records);
+Directory.Move(records + "-moved", records);
+Step("export_all", () => store.Export(all));
 store.Dispose();
 
 // A scope row whose kind is a number: Enum.Parse accepts it, and ValidateTree refuses it.
@@ -289,6 +319,17 @@ JsonArray tables =
     Table("SELECT object_id,scope_id,kind,passage,length,text FROM search ORDER BY rowid"),
     Table("SELECT scope_id,operation,key,content_hash,object_id FROM idempotency ORDER BY key"),
 ];
+
+// The projection files: name and text, sorted by name.
+JsonObject projections = [];
+foreach (
+    string file in Directory
+        .EnumerateFiles(Path.Combine(root, ".sermofur", "records"))
+        .Order(StringComparer.Ordinal)
+)
+{
+    projections[Path.GetFileName(file)] = Show(File.ReadAllText(file));
+}
 SqliteConnection.ClearAllPools();
 Directory.Delete(root, recursive: true);
 
@@ -298,6 +339,7 @@ JsonObject result = new()
     ["runtime"] = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription,
     ["steps"] = steps,
     ["tables"] = tables,
+    ["projections"] = projections,
 };
 File.WriteAllText(
     args[0],

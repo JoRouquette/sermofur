@@ -2,11 +2,12 @@
 //! (`rust/tests/golden/store.json` is the truth): scopes, records, evidence links, history and
 //! invalidation, each write in one `BEGIN IMMEDIATE` transaction.
 //!
-//! Not yet ported here: the Markdown projection after each write (lot 3.3) and the move of
-//! sources into a new scope (lot 5.2).
+//! After each write, the Markdown projection of the record is rewritten; a failure there leaves
+//! the record saved and reports `projection_pending`. Not yet ported here: the move of sources
+//! into a new scope (lot 5.2).
 
 use std::collections::HashSet;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use rusqlite::{Connection, ToSql, TransactionBehavior};
 use uuid::Uuid;
@@ -15,6 +16,7 @@ use crate::error::{Result, SermofurError};
 use crate::format::DateTimeOffset;
 use crate::init::open_store;
 use crate::instance::invalid_storage;
+use crate::projection::{is_current_safe, project};
 use crate::records::{
     ClaimContent, DotNetEnum, EvidenceContent, HistoryEntry, KnowledgeStatus, MemoryRecord,
     RecordKind, RetexContent, Scope, ScopeKind, read, write,
@@ -178,6 +180,7 @@ fn not_found() -> SermofurError {
 /// The store of one instance.
 pub struct Store {
     connection: Connection,
+    root: PathBuf,
 }
 
 impl Store {
@@ -185,6 +188,7 @@ impl Store {
     pub fn open(root: &Path, instance_id: Uuid, read_only: bool) -> Result<Self> {
         Ok(Store {
             connection: open_store(root, instance_id, read_only)?,
+            root: root.to_path_buf(),
         })
     }
 
@@ -294,7 +298,9 @@ impl Store {
                 find_idempotent(&transaction, candidate, &scope_id, key, &fingerprint)?
         {
             transaction.commit().map_err(|e| storage(&e))?;
-            // ponytail: lot 3.3 rewrites the projection of `existing` when it is not current.
+            if !is_current_safe(&self.root, &existing)? {
+                project(&self.root, &existing)?;
+            }
             return Ok(existing);
         }
         let claim_id = if candidate.kind == RecordKind::Evidence {
@@ -369,8 +375,21 @@ impl Store {
                 .map_err(|e| storage(&e))?;
         }
         transaction.commit().map_err(|e| storage(&e))?;
-        // ponytail: the Markdown projection is written by lot 3.3.
+        project(&self.root, candidate)?;
         Ok(candidate.clone())
+    }
+
+    /// Rewrites the projection of every visible record and returns their paths (`Export`); the
+    /// first failure stops with `projection_pending`.
+    pub fn export(&self, visible: &HashSet<String>) -> Result<Vec<PathBuf>> {
+        let records = self.read_records(visible, None)?;
+        for record in &records {
+            project(&self.root, record)?;
+        }
+        Ok(records
+            .iter()
+            .map(|record| crate::projection::path_for(&self.root, record))
+            .collect())
     }
 
     /// Invalidates a claim of `scope_id`, once: a second call returns it unchanged.
@@ -415,7 +434,7 @@ impl Store {
             Some(actor.to_owned()),
         )?;
         transaction.commit().map_err(|e| storage(&e))?;
-        // ponytail: the Markdown projection is written by lot 3.3.
+        project(&self.root, &updated)?;
         Ok(updated)
     }
 }
