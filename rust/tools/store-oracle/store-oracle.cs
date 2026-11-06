@@ -180,6 +180,48 @@ Step("invalidate_other_scope", () => store.InvalidateRecord(Id(1), "acme", "x", 
 Step("invalidate_retex", () => store.InvalidateRecord(Id(3), "web", "x", "john"));
 Step("invalidate_unknown", () => store.InvalidateRecord(Id(98), "acme", "x", "john"));
 Step("history_after", () => store.ReadHistory(Id(2), acme));
+
+// Idempotency keys: per scope and operation; the fingerprint ignores the identifier.
+Step("idem_create", () => store.CreateRecord(Claim(10, "acme", "Clé", user), "k1"));
+Step("idem_replay", () => store.CreateRecord(Claim(10, "acme", "Clé", user), "k1"));
+Step("idem_replay_other_id", () => store.CreateRecord(Claim(11, "acme", "Clé", user), "k1"));
+Step("idem_conflict", () => store.CreateRecord(Claim(12, "acme", "Autre clé", user), "k1"));
+Step("idem_conflict_actor", () => store.CreateRecord(Claim(15, "acme", "Clé", llm), "k1"));
+Step("idem_other_scope", () => store.CreateRecord(Claim(13, "workspace", "Clé", user), "k1"));
+Step("idem_other_operation", () => store.CreateRecord(Retex(14, "web"), "k1"));
+Step("idem_evidence", () => store.CreateRecord(Evidence(16, "acme", Id(10)), "k2"));
+Step("idem_evidence_replay", () => store.CreateRecord(Evidence(17, "acme", Id(10)), "k2"));
+store.Dispose();
+
+// An idempotency row whose object is gone: the replay finds it orphaned.
+using (
+    SqliteConnection raw = new SqliteConnection(
+        $"Data Source={database};Pooling=False;Foreign Keys=False"
+    )
+)
+{
+    raw.Open();
+    MemoryRecord orphan = Claim(18, "acme", "Orpheline", user);
+    string hash = MarkdownProjection.Hash(
+        RecordJson.Write(
+            new
+            {
+                orphan.ScopeId,
+                orphan.Kind,
+                orphan.ContentJson,
+                orphan.Provenance.Origin,
+                orphan.Provenance.Actor,
+            }
+        )
+    );
+    using SqliteCommand insert = raw.CreateCommand();
+    insert.CommandText =
+        "INSERT INTO idempotency VALUES('acme','Claim','k3',$hash,'00000000-0000-4000-8000-000000000097')";
+    insert.Parameters.AddWithValue("$hash", hash);
+    insert.ExecuteNonQuery();
+}
+store = new SqliteStore(root, instance);
+Step("idem_orphan", () => store.CreateRecord(Claim(18, "acme", "Orpheline", user), "k3"));
 store.Dispose();
 
 // A scope row whose kind is a number: Enum.Parse accepts it, and ValidateTree refuses it.

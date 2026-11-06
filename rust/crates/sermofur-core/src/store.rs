@@ -2,8 +2,8 @@
 //! (`rust/tests/golden/store.json` is the truth): scopes, records, evidence links, history and
 //! invalidation, each write in one `BEGIN IMMEDIATE` transaction.
 //!
-//! Not yet ported here: idempotency keys (lot 3.2), the Markdown projection after each write
-//! (lot 3.3) and the move of sources into a new scope (lot 5.2).
+//! Not yet ported here: the Markdown projection after each write (lot 3.3) and the move of
+//! sources into a new scope (lot 5.2).
 
 use std::collections::HashSet;
 use std::path::Path;
@@ -275,13 +275,28 @@ impl Store {
     }
 
     /// Creates a record with its search passages and its first history entry, in one
-    /// transaction. Evidence must cite a claim of its own scope.
-    pub fn create_record(&mut self, candidate: &MemoryRecord) -> Result<MemoryRecord> {
+    /// transaction. Evidence must cite a claim of its own scope. With an idempotency `key`, a
+    /// second creation of the same content in the same scope and operation returns the first
+    /// record; other content under that key is `idempotency_conflict`.
+    pub fn create_record(
+        &mut self,
+        candidate: &MemoryRecord,
+        key: Option<&str>,
+    ) -> Result<MemoryRecord> {
         let transaction = self
             .connection
             .transaction_with_behavior(TransactionBehavior::Immediate)
             .map_err(|e| storage(&e))?;
         let scope_id = candidate.scope_id.clone().ok_or_else(invalid_storage)?;
+        let fingerprint = fingerprint(candidate)?;
+        if let Some(key) = key
+            && let Some(existing) =
+                find_idempotent(&transaction, candidate, &scope_id, key, &fingerprint)?
+        {
+            transaction.commit().map_err(|e| storage(&e))?;
+            // ponytail: lot 3.3 rewrites the projection of `existing` when it is not current.
+            return Ok(existing);
+        }
         let claim_id = if candidate.kind == RecordKind::Evidence {
             let json = candidate
                 .content_json
@@ -339,6 +354,20 @@ impl Store {
             .actor
             .clone();
         append_history(&transaction, None, candidate, "create", actor)?;
+        if let Some(key) = key {
+            transaction
+                .execute(
+                    "INSERT INTO idempotency VALUES(?1,?2,?3,?4,?5)",
+                    rusqlite::params![
+                        scope_id,
+                        dotnet_name(candidate.kind),
+                        key,
+                        fingerprint,
+                        candidate.id.hyphenated().to_string()
+                    ],
+                )
+                .map_err(|e| storage(&e))?;
+        }
         transaction.commit().map_err(|e| storage(&e))?;
         // ponytail: the Markdown projection is written by lot 3.3.
         Ok(candidate.clone())
@@ -479,4 +508,78 @@ fn append_history(
         )
         .map_err(|e| storage(&e))?;
     Ok(())
+}
+
+/// The content a key stands for (`CreateRecord`): the upper-case SHA-256 of the JSON of
+/// `{ ScopeId, Kind, ContentJson, Origin, Actor }`, as `RecordJson` writes it (indented, with
+/// the line break of the platform), so the identifier and the instant do not count.
+fn fingerprint(candidate: &MemoryRecord) -> Result<String> {
+    #[derive(serde::Serialize)]
+    #[serde(rename_all = "camelCase")]
+    struct Fingerprint<'a> {
+        scope_id: &'a Option<String>,
+        kind: RecordKind,
+        content_json: &'a Option<String>,
+        origin: crate::records::ActorKind,
+        actor: &'a Option<String>,
+    }
+    let provenance = candidate.provenance.as_ref().ok_or_else(invalid_storage)?;
+    let json = write(&Fingerprint {
+        scope_id: &candidate.scope_id,
+        kind: candidate.kind,
+        content_json: &candidate.content_json,
+        origin: provenance.origin,
+        actor: &provenance.actor,
+    })?;
+    Ok(sha256_upper(json.as_bytes()))
+}
+
+/// `Convert.ToHexString(SHA256.HashData(bytes))`: 64 upper-case hexadecimal digits.
+pub fn sha256_upper(bytes: &[u8]) -> String {
+    use sha2::Digest;
+    use std::fmt::Write as _;
+    sha2::Sha256::digest(bytes)
+        .iter()
+        .fold(String::with_capacity(64), |mut out, byte| {
+            let _ = write!(out, "{byte:02X}");
+            out
+        })
+}
+
+/// The record a key already stands for (`FindIdempotent`), or `None` for a new key.
+fn find_idempotent(
+    connection: &Connection,
+    candidate: &MemoryRecord,
+    scope_id: &str,
+    key: &str,
+    fingerprint: &str,
+) -> Result<Option<MemoryRecord>> {
+    let row: Option<(String, String)> = connection
+        .query_row(
+            "SELECT content_hash,object_id FROM idempotency WHERE scope_id=?1 AND operation=?2 AND key=?3",
+            rusqlite::params![scope_id, dotnet_name(candidate.kind), key],
+            |row| Ok((row.get(0)?, row.get(1)?)),
+        )
+        .map(Some)
+        .or_else(|error| match error {
+            rusqlite::Error::QueryReturnedNoRows => Ok(None),
+            other => Err(storage(&other)),
+        })?;
+    let Some((hash, object_id)) = row else {
+        return Ok(None);
+    };
+    if hash != fingerprint {
+        return Err(SermofurError::new(
+            "idempotency_conflict",
+            "Key reused with different content.",
+            1,
+        ));
+    }
+    // `Guid.Parse` reads more formats than the D the store writes; a bad value is its
+    // `FormatException`, which the CLI does not catch either: refused as corrupt storage.
+    let id = Uuid::parse_str(&object_id).map_err(|_| invalid_storage())?;
+    let own = HashSet::from([scope_id.to_owned()]);
+    find_record(connection, id, &own)?
+        .map(Some)
+        .ok_or_else(|| SermofurError::new("orphan_idempotency", "Orphan idempotency reference.", 3))
 }

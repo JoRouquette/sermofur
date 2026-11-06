@@ -186,7 +186,14 @@ fn scopes_json(store: &Store) -> Result<Option<Vec<Scope>>> {
 
 #[test]
 fn the_store_answers_like_the_dotnet_store() {
-    let path = concat!(env!("CARGO_MANIFEST_DIR"), "/../../tests/golden/store.json");
+    // The fingerprints of idempotency keys hash JSON written with the line break of the
+    // platform, so each system has its table.
+    let file = if cfg!(windows) {
+        "store.json"
+    } else {
+        "store-unix.json"
+    };
+    let path = format!("{}/../../tests/golden/{file}", env!("CARGO_MANIFEST_DIR"));
     let golden: Value =
         serde_json::from_str(&std::fs::read_to_string(path).expect("golden file")).expect("JSON");
     let scratch =
@@ -260,7 +267,11 @@ fn the_store_answers_like_the_dotnet_store() {
         ));
         steps.push(outcome("scopes_after", scopes_json(&store), r));
         let mut create = |name: &str, candidate: MemoryRecord, steps: &mut Vec<Value>| {
-            steps.push(outcome(name, store.create_record(&candidate).map(Some), r));
+            steps.push(outcome(
+                name,
+                store.create_record(&candidate, None).map(Some),
+                r,
+            ));
         };
         create(
             "create_claim_workspace",
@@ -352,6 +363,82 @@ fn the_store_answers_like_the_dotnet_store() {
         steps.push(outcome(
             "history_after",
             store.read_history(id(2), &acme).map(Some),
+            r,
+        ));
+        let keyed = [
+            ("idem_create", claim(10, "acme", "Clé", user.clone()), "k1"),
+            ("idem_replay", claim(10, "acme", "Clé", user.clone()), "k1"),
+            (
+                "idem_replay_other_id",
+                claim(11, "acme", "Clé", user.clone()),
+                "k1",
+            ),
+            (
+                "idem_conflict",
+                claim(12, "acme", "Autre clé", user.clone()),
+                "k1",
+            ),
+            (
+                "idem_conflict_actor",
+                claim(15, "acme", "Clé", llm.clone()),
+                "k1",
+            ),
+            (
+                "idem_other_scope",
+                claim(13, "workspace", "Clé", user.clone()),
+                "k1",
+            ),
+            ("idem_other_operation", retex(14, "web"), "k1"),
+            ("idem_evidence", evidence(16, "acme", id(10)), "k2"),
+            ("idem_evidence_replay", evidence(17, "acme", id(10)), "k2"),
+        ];
+        for (name, candidate, key) in keyed {
+            steps.push(outcome(
+                name,
+                store.create_record(&candidate, Some(key)).map(Some),
+                r,
+            ));
+        }
+    }
+    {
+        // An idempotency row whose object is gone, with the fingerprint of the replay.
+        let raw = Connection::open(&database).expect("raw");
+        raw.execute_batch("PRAGMA foreign_keys=OFF;")
+            .expect("no foreign keys");
+        let orphan = claim(18, "acme", "Orpheline", user.clone());
+        let hash = {
+            #[derive(Serialize)]
+            #[serde(rename_all = "camelCase")]
+            struct F<'a> {
+                scope_id: &'a Option<String>,
+                kind: RecordKind,
+                content_json: &'a Option<String>,
+                origin: ActorKind,
+                actor: &'a Option<String>,
+            }
+            let p = orphan.provenance.as_ref().expect("provenance");
+            sermofur_core::store::sha256_upper(
+                write(&F {
+                    scope_id: &orphan.scope_id,
+                    kind: orphan.kind,
+                    content_json: &orphan.content_json,
+                    origin: p.origin,
+                    actor: &p.actor,
+                })
+                .expect("json")
+                .as_bytes(),
+            )
+        };
+        raw.execute(
+            "INSERT INTO idempotency VALUES('acme','Claim','k3',?1,'00000000-0000-4000-8000-000000000097')",
+            [hash],
+        )
+        .expect("orphan row");
+        drop(raw);
+        let mut store = Store::open(&root, instance, false).expect("opened");
+        steps.push(outcome(
+            "idem_orphan",
+            store.create_record(&orphan, Some("k3")).map(Some),
             r,
         ));
     }
@@ -447,12 +534,10 @@ fn a_held_write_lock_is_storage_busy() {
     holder.execute_batch("BEGIN IMMEDIATE;").expect("lock held");
     let mut store = Store::open(&scratch.0, instance, false).expect("opened");
     let error = store
-        .create_record(&claim(
-            1,
-            "workspace",
-            "x",
-            provenance(ActorKind::User, "john"),
-        ))
+        .create_record(
+            &claim(1, "workspace", "x", provenance(ActorKind::User, "john")),
+            None,
+        )
         .expect_err("busy");
     assert_eq!((error.code.as_str(), error.exit_code), ("storage_busy", 3));
     holder.execute_batch("ROLLBACK;").expect("released");

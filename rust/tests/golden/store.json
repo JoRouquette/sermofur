@@ -137,6 +137,52 @@
       "result": "[\n  {\n    \u0022sequence\u0022: 2,\n    \u0022objectId\u0022: \u002200000000-0000-4000-8000-000000000002\u0022,\n    \u0022scopeId\u0022: \u0022acme\u0022,\n    \u0022previousState\u0022: null,\n    \u0022newState\u0022: \u0022{/r/n  /u0022id/u0022: /u002200000000-0000-4000-8000-000000000002/u0022,/r/n  /u0022scopeId/u0022: /u0022acme/u0022,/r/n  /u0022kind/u0022: /u0022claim/u0022,/r/n  /u0022status/u0022: /u0022active/u0022,/r/n  /u0022revision/u0022: 1,/r/n  /u0022contentJson/u0022: /u0022{//r//n  //u0022text//u0022: //u0022La facture part le 5//u0022,//r//n  //u0022category//u0022: //u0022semantic//u0022,//r//n  //u0022volatility//u0022: //u0022stable//u0022,//r//n  //u0022lastVerified//u0022: null,//r//n  //u0022reviewAfter//u0022: null//r//n}/u0022,/r/n  /u0022provenance/u0022: {/r/n    /u0022origin/u0022: /u0022llm/u0022,/r/n    /u0022actor/u0022: /u0022claude/u0022,/r/n    /u0022timestamp/u0022: /u00222026-03-04T05:06:07/u002B01:00/u0022/r/n  }/r/n}\u0022,\n    \u0022reason\u0022: \u0022create\u0022,\n    \u0022actor\u0022: \u0022claude\u0022,\n    \u0022timestamp\u0022: \u0022\u003Cdate\u003E\u0022\n  },\n  {\n    \u0022sequence\u0022: 5,\n    \u0022objectId\u0022: \u002200000000-0000-4000-8000-000000000002\u0022,\n    \u0022scopeId\u0022: \u0022acme\u0022,\n    \u0022previousState\u0022: \u0022{/r/n  /u0022id/u0022: /u002200000000-0000-4000-8000-000000000002/u0022,/r/n  /u0022scopeId/u0022: /u0022acme/u0022,/r/n  /u0022kind/u0022: /u0022claim/u0022,/r/n  /u0022status/u0022: /u0022active/u0022,/r/n  /u0022revision/u0022: 1,/r/n  /u0022contentJson/u0022: /u0022{//r//n  //u0022text//u0022: //u0022La facture part le 5//u0022,//r//n  //u0022category//u0022: //u0022semantic//u0022,//r//n  //u0022volatility//u0022: //u0022stable//u0022,//r//n  //u0022lastVerified//u0022: null,//r//n  //u0022reviewAfter//u0022: null//r//n}/u0022,/r/n  /u0022provenance/u0022: {/r/n    /u0022origin/u0022: /u0022llm/u0022,/r/n    /u0022actor/u0022: /u0022claude/u0022,/r/n    /u0022timestamp/u0022: /u00222026-03-04T05:06:07/u002B01:00/u0022/r/n  }/r/n}\u0022,\n    \u0022newState\u0022: \u0022{/r/n  /u0022id/u0022: /u002200000000-0000-4000-8000-000000000002/u0022,/r/n  /u0022scopeId/u0022: /u0022acme/u0022,/r/n  /u0022kind/u0022: /u0022claim/u0022,/r/n  /u0022status/u0022: /u0022invalidated/u0022,/r/n  /u0022revision/u0022: 2,/r/n  /u0022contentJson/u0022: /u0022{//r//n  //u0022text//u0022: //u0022La facture part le 5//u0022,//r//n  //u0022category//u0022: //u0022semantic//u0022,//r//n  //u0022volatility//u0022: //u0022stable//u0022,//r//n  //u0022lastVerified//u0022: null,//r//n  //u0022reviewAfter//u0022: null//r//n}/u0022,/r/n  /u0022provenance/u0022: {/r/n    /u0022origin/u0022: /u0022llm/u0022,/r/n    /u0022actor/u0022: /u0022claude/u0022,/r/n    /u0022timestamp/u0022: /u00222026-03-04T05:06:07/u002B01:00/u0022/r/n  }/r/n}\u0022,\n    \u0022reason\u0022: \u0022Obsol\u00E8te\u0022,\n    \u0022actor\u0022: \u0022john\u0022,\n    \u0022timestamp\u0022: \u0022\u003Cdate\u003E\u0022\n  }\n]"
     },
     {
+      "step": "idem_create",
+      "result": "{\n  \u0022id\u0022: \u002200000000-0000-4000-8000-000000000010\u0022,\n  \u0022scopeId\u0022: \u0022acme\u0022,\n  \u0022kind\u0022: \u0022claim\u0022,\n  \u0022status\u0022: \u0022active\u0022,\n  \u0022revision\u0022: 1,\n  \u0022contentJson\u0022: \u0022{/r/n  /u0022text/u0022: /u0022Cl\u00E9/u0022,/r/n  /u0022category/u0022: /u0022semantic/u0022,/r/n  /u0022volatility/u0022: /u0022stable/u0022,/r/n  /u0022lastVerified/u0022: null,/r/n  /u0022reviewAfter/u0022: null/r/n}\u0022,\n  \u0022provenance\u0022: {\n    \u0022origin\u0022: \u0022user\u0022,\n    \u0022actor\u0022: \u0022john\u0022,\n    \u0022timestamp\u0022: \u0022\u003Cdate\u003E\u0022\n  }\n}"
+    },
+    {
+      "step": "idem_replay",
+      "result": "{\n  \u0022id\u0022: \u002200000000-0000-4000-8000-000000000010\u0022,\n  \u0022scopeId\u0022: \u0022acme\u0022,\n  \u0022kind\u0022: \u0022claim\u0022,\n  \u0022status\u0022: \u0022active\u0022,\n  \u0022revision\u0022: 1,\n  \u0022contentJson\u0022: \u0022{/r/n  /u0022text/u0022: /u0022Cl\u00E9/u0022,/r/n  /u0022category/u0022: /u0022semantic/u0022,/r/n  /u0022volatility/u0022: /u0022stable/u0022,/r/n  /u0022lastVerified/u0022: null,/r/n  /u0022reviewAfter/u0022: null/r/n}\u0022,\n  \u0022provenance\u0022: {\n    \u0022origin\u0022: \u0022user\u0022,\n    \u0022actor\u0022: \u0022john\u0022,\n    \u0022timestamp\u0022: \u0022\u003Cdate\u003E\u0022\n  }\n}"
+    },
+    {
+      "step": "idem_replay_other_id",
+      "result": "{\n  \u0022id\u0022: \u002200000000-0000-4000-8000-000000000010\u0022,\n  \u0022scopeId\u0022: \u0022acme\u0022,\n  \u0022kind\u0022: \u0022claim\u0022,\n  \u0022status\u0022: \u0022active\u0022,\n  \u0022revision\u0022: 1,\n  \u0022contentJson\u0022: \u0022{/r/n  /u0022text/u0022: /u0022Cl\u00E9/u0022,/r/n  /u0022category/u0022: /u0022semantic/u0022,/r/n  /u0022volatility/u0022: /u0022stable/u0022,/r/n  /u0022lastVerified/u0022: null,/r/n  /u0022reviewAfter/u0022: null/r/n}\u0022,\n  \u0022provenance\u0022: {\n    \u0022origin\u0022: \u0022user\u0022,\n    \u0022actor\u0022: \u0022john\u0022,\n    \u0022timestamp\u0022: \u0022\u003Cdate\u003E\u0022\n  }\n}"
+    },
+    {
+      "step": "idem_conflict",
+      "code": "idempotency_conflict",
+      "message": "Key reused with different content.",
+      "exitCode": 1
+    },
+    {
+      "step": "idem_conflict_actor",
+      "code": "idempotency_conflict",
+      "message": "Key reused with different content.",
+      "exitCode": 1
+    },
+    {
+      "step": "idem_other_scope",
+      "result": "{\n  \u0022id\u0022: \u002200000000-0000-4000-8000-000000000013\u0022,\n  \u0022scopeId\u0022: \u0022workspace\u0022,\n  \u0022kind\u0022: \u0022claim\u0022,\n  \u0022status\u0022: \u0022active\u0022,\n  \u0022revision\u0022: 1,\n  \u0022contentJson\u0022: \u0022{/r/n  /u0022text/u0022: /u0022Cl\u00E9/u0022,/r/n  /u0022category/u0022: /u0022semantic/u0022,/r/n  /u0022volatility/u0022: /u0022stable/u0022,/r/n  /u0022lastVerified/u0022: null,/r/n  /u0022reviewAfter/u0022: null/r/n}\u0022,\n  \u0022provenance\u0022: {\n    \u0022origin\u0022: \u0022user\u0022,\n    \u0022actor\u0022: \u0022john\u0022,\n    \u0022timestamp\u0022: \u0022\u003Cdate\u003E\u0022\n  }\n}"
+    },
+    {
+      "step": "idem_other_operation",
+      "result": "{\n  \u0022id\u0022: \u002200000000-0000-4000-8000-000000000014\u0022,\n  \u0022scopeId\u0022: \u0022web\u0022,\n  \u0022kind\u0022: \u0022retex\u0022,\n  \u0022status\u0022: \u0022active\u0022,\n  \u0022revision\u0022: 1,\n  \u0022contentJson\u0022: \u0022{/r/n  /u0022event/u0022: /u0022D\u00E9ploiement rat\u00E9/u0022,/r/n  /u0022impact/u0022: /u0022Service coup\u00E9/u0022,/r/n  /u0022nextAction/u0022: /u0022Ajouter un test/u0022/r/n}\u0022,\n  \u0022provenance\u0022: {\n    \u0022origin\u0022: \u0022user\u0022,\n    \u0022actor\u0022: \u0022john\u0022,\n    \u0022timestamp\u0022: \u0022\u003Cdate\u003E\u0022\n  }\n}"
+    },
+    {
+      "step": "idem_evidence",
+      "result": "{\n  \u0022id\u0022: \u002200000000-0000-4000-8000-000000000016\u0022,\n  \u0022scopeId\u0022: \u0022acme\u0022,\n  \u0022kind\u0022: \u0022evidence\u0022,\n  \u0022status\u0022: \u0022active\u0022,\n  \u0022revision\u0022: 1,\n  \u0022contentJson\u0022: \u0022{/r/n  /u0022claimId/u0022: /u002200000000-0000-4000-8000-000000000010/u0022,/r/n  /u0022kind/u0022: /u0022source_code/u0022,/r/n  /u0022reference/u0022: /u0022src/a.cs/u0022,/r/n  /u0022lineageId/u0022: /u0022lineage/u0022,/r/n  /u0022relation/u0022: /u0022supports/u0022,/r/n  /u0022sourceId/u0022: null,/r/n  /u0022sourceHash/u0022: null/r/n}\u0022,\n  \u0022provenance\u0022: {\n    \u0022origin\u0022: \u0022user\u0022,\n    \u0022actor\u0022: \u0022john\u0022,\n    \u0022timestamp\u0022: \u0022\u003Cdate\u003E\u0022\n  }\n}"
+    },
+    {
+      "step": "idem_evidence_replay",
+      "result": "{\n  \u0022id\u0022: \u002200000000-0000-4000-8000-000000000016\u0022,\n  \u0022scopeId\u0022: \u0022acme\u0022,\n  \u0022kind\u0022: \u0022evidence\u0022,\n  \u0022status\u0022: \u0022active\u0022,\n  \u0022revision\u0022: 1,\n  \u0022contentJson\u0022: \u0022{/r/n  /u0022claimId/u0022: /u002200000000-0000-4000-8000-000000000010/u0022,/r/n  /u0022kind/u0022: /u0022source_code/u0022,/r/n  /u0022reference/u0022: /u0022src/a.cs/u0022,/r/n  /u0022lineageId/u0022: /u0022lineage/u0022,/r/n  /u0022relation/u0022: /u0022supports/u0022,/r/n  /u0022sourceId/u0022: null,/r/n  /u0022sourceHash/u0022: null/r/n}\u0022,\n  \u0022provenance\u0022: {\n    \u0022origin\u0022: \u0022user\u0022,\n    \u0022actor\u0022: \u0022john\u0022,\n    \u0022timestamp\u0022: \u0022\u003Cdate\u003E\u0022\n  }\n}"
+    },
+    {
+      "step": "idem_orphan",
+      "code": "orphan_idempotency",
+      "message": "Orphan idempotency reference.",
+      "exitCode": 3
+    },
+    {
       "step": "scopes_numeric_kind",
       "exception": "System.Text.Json.JsonException"
     },
@@ -228,6 +274,42 @@
           "{\n  \u0022id\u0022: \u002200000000-0000-4000-8000-000000000004\u0022,\n  \u0022scopeId\u0022: \u0022acme\u0022,\n  \u0022kind\u0022: \u0022evidence\u0022,\n  \u0022status\u0022: \u0022active\u0022,\n  \u0022revision\u0022: 1,\n  \u0022contentJson\u0022: \u0022{/r/n  /u0022claimId/u0022: /u002200000000-0000-4000-8000-000000000002/u0022,/r/n  /u0022kind/u0022: /u0022source_code/u0022,/r/n  /u0022reference/u0022: /u0022src/a.cs/u0022,/r/n  /u0022lineageId/u0022: /u0022lineage/u0022,/r/n  /u0022relation/u0022: /u0022supports/u0022,/r/n  /u0022sourceId/u0022: null,/r/n  /u0022sourceHash/u0022: null/r/n}\u0022,\n  \u0022provenance\u0022: {\n    \u0022origin\u0022: \u0022user\u0022,\n    \u0022actor\u0022: \u0022john\u0022,\n    \u0022timestamp\u0022: \u0022\u003Cdate\u003E\u0022\n  }\n}",
           1,
           null
+        ],
+        [
+          "00000000-0000-4000-8000-000000000010",
+          "acme",
+          "Claim",
+          null,
+          "{\n  \u0022id\u0022: \u002200000000-0000-4000-8000-000000000010\u0022,\n  \u0022scopeId\u0022: \u0022acme\u0022,\n  \u0022kind\u0022: \u0022claim\u0022,\n  \u0022status\u0022: \u0022active\u0022,\n  \u0022revision\u0022: 1,\n  \u0022contentJson\u0022: \u0022{/r/n  /u0022text/u0022: /u0022Cl\u00E9/u0022,/r/n  /u0022category/u0022: /u0022semantic/u0022,/r/n  /u0022volatility/u0022: /u0022stable/u0022,/r/n  /u0022lastVerified/u0022: null,/r/n  /u0022reviewAfter/u0022: null/r/n}\u0022,\n  \u0022provenance\u0022: {\n    \u0022origin\u0022: \u0022user\u0022,\n    \u0022actor\u0022: \u0022john\u0022,\n    \u0022timestamp\u0022: \u0022\u003Cdate\u003E\u0022\n  }\n}",
+          1,
+          null
+        ],
+        [
+          "00000000-0000-4000-8000-000000000013",
+          "workspace",
+          "Claim",
+          null,
+          "{\n  \u0022id\u0022: \u002200000000-0000-4000-8000-000000000013\u0022,\n  \u0022scopeId\u0022: \u0022workspace\u0022,\n  \u0022kind\u0022: \u0022claim\u0022,\n  \u0022status\u0022: \u0022active\u0022,\n  \u0022revision\u0022: 1,\n  \u0022contentJson\u0022: \u0022{/r/n  /u0022text/u0022: /u0022Cl\u00E9/u0022,/r/n  /u0022category/u0022: /u0022semantic/u0022,/r/n  /u0022volatility/u0022: /u0022stable/u0022,/r/n  /u0022lastVerified/u0022: null,/r/n  /u0022reviewAfter/u0022: null/r/n}\u0022,\n  \u0022provenance\u0022: {\n    \u0022origin\u0022: \u0022user\u0022,\n    \u0022actor\u0022: \u0022john\u0022,\n    \u0022timestamp\u0022: \u0022\u003Cdate\u003E\u0022\n  }\n}",
+          1,
+          null
+        ],
+        [
+          "00000000-0000-4000-8000-000000000014",
+          "web",
+          "Retex",
+          null,
+          "{\n  \u0022id\u0022: \u002200000000-0000-4000-8000-000000000014\u0022,\n  \u0022scopeId\u0022: \u0022web\u0022,\n  \u0022kind\u0022: \u0022retex\u0022,\n  \u0022status\u0022: \u0022active\u0022,\n  \u0022revision\u0022: 1,\n  \u0022contentJson\u0022: \u0022{/r/n  /u0022event/u0022: /u0022D\u00E9ploiement rat\u00E9/u0022,/r/n  /u0022impact/u0022: /u0022Service coup\u00E9/u0022,/r/n  /u0022nextAction/u0022: /u0022Ajouter un test/u0022/r/n}\u0022,\n  \u0022provenance\u0022: {\n    \u0022origin\u0022: \u0022user\u0022,\n    \u0022actor\u0022: \u0022john\u0022,\n    \u0022timestamp\u0022: \u0022\u003Cdate\u003E\u0022\n  }\n}",
+          1,
+          null
+        ],
+        [
+          "00000000-0000-4000-8000-000000000016",
+          "acme",
+          "Evidence",
+          "00000000-0000-4000-8000-000000000010",
+          "{\n  \u0022id\u0022: \u002200000000-0000-4000-8000-000000000016\u0022,\n  \u0022scopeId\u0022: \u0022acme\u0022,\n  \u0022kind\u0022: \u0022evidence\u0022,\n  \u0022status\u0022: \u0022active\u0022,\n  \u0022revision\u0022: 1,\n  \u0022contentJson\u0022: \u0022{/r/n  /u0022claimId/u0022: /u002200000000-0000-4000-8000-000000000010/u0022,/r/n  /u0022kind/u0022: /u0022source_code/u0022,/r/n  /u0022reference/u0022: /u0022src/a.cs/u0022,/r/n  /u0022lineageId/u0022: /u0022lineage/u0022,/r/n  /u0022relation/u0022: /u0022supports/u0022,/r/n  /u0022sourceId/u0022: null,/r/n  /u0022sourceHash/u0022: null/r/n}\u0022,\n  \u0022provenance\u0022: {\n    \u0022origin\u0022: \u0022user\u0022,\n    \u0022actor\u0022: \u0022john\u0022,\n    \u0022timestamp\u0022: \u0022\u003Cdate\u003E\u0022\n  }\n}",
+          1,
+          null
         ]
       ]
     },
@@ -263,6 +345,30 @@
           "00000000-0000-4000-8000-000000000002",
           "acme",
           "{\n  \u0022sequence\u0022: 0,\n  \u0022objectId\u0022: \u002200000000-0000-4000-8000-000000000002\u0022,\n  \u0022scopeId\u0022: \u0022acme\u0022,\n  \u0022previousState\u0022: \u0022{/r/n  /u0022id/u0022: /u002200000000-0000-4000-8000-000000000002/u0022,/r/n  /u0022scopeId/u0022: /u0022acme/u0022,/r/n  /u0022kind/u0022: /u0022claim/u0022,/r/n  /u0022status/u0022: /u0022active/u0022,/r/n  /u0022revision/u0022: 1,/r/n  /u0022contentJson/u0022: /u0022{//r//n  //u0022text//u0022: //u0022La facture part le 5//u0022,//r//n  //u0022category//u0022: //u0022semantic//u0022,//r//n  //u0022volatility//u0022: //u0022stable//u0022,//r//n  //u0022lastVerified//u0022: null,//r//n  //u0022reviewAfter//u0022: null//r//n}/u0022,/r/n  /u0022provenance/u0022: {/r/n    /u0022origin/u0022: /u0022llm/u0022,/r/n    /u0022actor/u0022: /u0022claude/u0022,/r/n    /u0022timestamp/u0022: /u00222026-03-04T05:06:07/u002B01:00/u0022/r/n  }/r/n}\u0022,\n  \u0022newState\u0022: \u0022{/r/n  /u0022id/u0022: /u002200000000-0000-4000-8000-000000000002/u0022,/r/n  /u0022scopeId/u0022: /u0022acme/u0022,/r/n  /u0022kind/u0022: /u0022claim/u0022,/r/n  /u0022status/u0022: /u0022invalidated/u0022,/r/n  /u0022revision/u0022: 2,/r/n  /u0022contentJson/u0022: /u0022{//r//n  //u0022text//u0022: //u0022La facture part le 5//u0022,//r//n  //u0022category//u0022: //u0022semantic//u0022,//r//n  //u0022volatility//u0022: //u0022stable//u0022,//r//n  //u0022lastVerified//u0022: null,//r//n  //u0022reviewAfter//u0022: null//r//n}/u0022,/r/n  /u0022provenance/u0022: {/r/n    /u0022origin/u0022: /u0022llm/u0022,/r/n    /u0022actor/u0022: /u0022claude/u0022,/r/n    /u0022timestamp/u0022: /u00222026-03-04T05:06:07/u002B01:00/u0022/r/n  }/r/n}\u0022,\n  \u0022reason\u0022: \u0022Obsol\u00E8te\u0022,\n  \u0022actor\u0022: \u0022john\u0022,\n  \u0022timestamp\u0022: \u0022\u003Cdate\u003E\u0022\n}"
+        ],
+        [
+          6,
+          "00000000-0000-4000-8000-000000000010",
+          "acme",
+          "{\n  \u0022sequence\u0022: 0,\n  \u0022objectId\u0022: \u002200000000-0000-4000-8000-000000000010\u0022,\n  \u0022scopeId\u0022: \u0022acme\u0022,\n  \u0022previousState\u0022: null,\n  \u0022newState\u0022: \u0022{/r/n  /u0022id/u0022: /u002200000000-0000-4000-8000-000000000010/u0022,/r/n  /u0022scopeId/u0022: /u0022acme/u0022,/r/n  /u0022kind/u0022: /u0022claim/u0022,/r/n  /u0022status/u0022: /u0022active/u0022,/r/n  /u0022revision/u0022: 1,/r/n  /u0022contentJson/u0022: /u0022{//r//n  //u0022text//u0022: //u0022Cl\u00E9//u0022,//r//n  //u0022category//u0022: //u0022semantic//u0022,//r//n  //u0022volatility//u0022: //u0022stable//u0022,//r//n  //u0022lastVerified//u0022: null,//r//n  //u0022reviewAfter//u0022: null//r//n}/u0022,/r/n  /u0022provenance/u0022: {/r/n    /u0022origin/u0022: /u0022user/u0022,/r/n    /u0022actor/u0022: /u0022john/u0022,/r/n    /u0022timestamp/u0022: /u00222026-03-04T05:06:07/u002B01:00/u0022/r/n  }/r/n}\u0022,\n  \u0022reason\u0022: \u0022create\u0022,\n  \u0022actor\u0022: \u0022john\u0022,\n  \u0022timestamp\u0022: \u0022\u003Cdate\u003E\u0022\n}"
+        ],
+        [
+          7,
+          "00000000-0000-4000-8000-000000000013",
+          "workspace",
+          "{\n  \u0022sequence\u0022: 0,\n  \u0022objectId\u0022: \u002200000000-0000-4000-8000-000000000013\u0022,\n  \u0022scopeId\u0022: \u0022workspace\u0022,\n  \u0022previousState\u0022: null,\n  \u0022newState\u0022: \u0022{/r/n  /u0022id/u0022: /u002200000000-0000-4000-8000-000000000013/u0022,/r/n  /u0022scopeId/u0022: /u0022workspace/u0022,/r/n  /u0022kind/u0022: /u0022claim/u0022,/r/n  /u0022status/u0022: /u0022active/u0022,/r/n  /u0022revision/u0022: 1,/r/n  /u0022contentJson/u0022: /u0022{//r//n  //u0022text//u0022: //u0022Cl\u00E9//u0022,//r//n  //u0022category//u0022: //u0022semantic//u0022,//r//n  //u0022volatility//u0022: //u0022stable//u0022,//r//n  //u0022lastVerified//u0022: null,//r//n  //u0022reviewAfter//u0022: null//r//n}/u0022,/r/n  /u0022provenance/u0022: {/r/n    /u0022origin/u0022: /u0022user/u0022,/r/n    /u0022actor/u0022: /u0022john/u0022,/r/n    /u0022timestamp/u0022: /u00222026-03-04T05:06:07/u002B01:00/u0022/r/n  }/r/n}\u0022,\n  \u0022reason\u0022: \u0022create\u0022,\n  \u0022actor\u0022: \u0022john\u0022,\n  \u0022timestamp\u0022: \u0022\u003Cdate\u003E\u0022\n}"
+        ],
+        [
+          8,
+          "00000000-0000-4000-8000-000000000014",
+          "web",
+          "{\n  \u0022sequence\u0022: 0,\n  \u0022objectId\u0022: \u002200000000-0000-4000-8000-000000000014\u0022,\n  \u0022scopeId\u0022: \u0022web\u0022,\n  \u0022previousState\u0022: null,\n  \u0022newState\u0022: \u0022{/r/n  /u0022id/u0022: /u002200000000-0000-4000-8000-000000000014/u0022,/r/n  /u0022scopeId/u0022: /u0022web/u0022,/r/n  /u0022kind/u0022: /u0022retex/u0022,/r/n  /u0022status/u0022: /u0022active/u0022,/r/n  /u0022revision/u0022: 1,/r/n  /u0022contentJson/u0022: /u0022{//r//n  //u0022event//u0022: //u0022D\u00E9ploiement rat\u00E9//u0022,//r//n  //u0022impact//u0022: //u0022Service coup\u00E9//u0022,//r//n  //u0022nextAction//u0022: //u0022Ajouter un test//u0022//r//n}/u0022,/r/n  /u0022provenance/u0022: {/r/n    /u0022origin/u0022: /u0022user/u0022,/r/n    /u0022actor/u0022: /u0022john/u0022,/r/n    /u0022timestamp/u0022: /u00222026-03-04T05:06:07/u002B01:00/u0022/r/n  }/r/n}\u0022,\n  \u0022reason\u0022: \u0022create\u0022,\n  \u0022actor\u0022: \u0022john\u0022,\n  \u0022timestamp\u0022: \u0022\u003Cdate\u003E\u0022\n}"
+        ],
+        [
+          9,
+          "00000000-0000-4000-8000-000000000016",
+          "acme",
+          "{\n  \u0022sequence\u0022: 0,\n  \u0022objectId\u0022: \u002200000000-0000-4000-8000-000000000016\u0022,\n  \u0022scopeId\u0022: \u0022acme\u0022,\n  \u0022previousState\u0022: null,\n  \u0022newState\u0022: \u0022{/r/n  /u0022id/u0022: /u002200000000-0000-4000-8000-000000000016/u0022,/r/n  /u0022scopeId/u0022: /u0022acme/u0022,/r/n  /u0022kind/u0022: /u0022evidence/u0022,/r/n  /u0022status/u0022: /u0022active/u0022,/r/n  /u0022revision/u0022: 1,/r/n  /u0022contentJson/u0022: /u0022{//r//n  //u0022claimId//u0022: //u002200000000-0000-4000-8000-000000000010//u0022,//r//n  //u0022kind//u0022: //u0022source_code//u0022,//r//n  //u0022reference//u0022: //u0022src/a.cs//u0022,//r//n  //u0022lineageId//u0022: //u0022lineage//u0022,//r//n  //u0022relation//u0022: //u0022supports//u0022,//r//n  //u0022sourceId//u0022: null,//r//n  //u0022sourceHash//u0022: null//r//n}/u0022,/r/n  /u0022provenance/u0022: {/r/n    /u0022origin/u0022: /u0022user/u0022,/r/n    /u0022actor/u0022: /u0022john/u0022,/r/n    /u0022timestamp/u0022: /u00222026-03-04T05:06:07/u002B01:00/u0022/r/n  }/r/n}\u0022,\n  \u0022reason\u0022: \u0022create\u0022,\n  \u0022actor\u0022: \u0022john\u0022,\n  \u0022timestamp\u0022: \u0022\u003Cdate\u003E\u0022\n}"
         ]
       ]
     },
@@ -292,12 +398,72 @@
           0,
           7,
           "D\u00E9ploiement rat\u00E9\nService coup\u00E9\nAjouter un test"
+        ],
+        [
+          "00000000-0000-4000-8000-000000000010",
+          "acme",
+          "claim",
+          0,
+          1,
+          "Cl\u00E9"
+        ],
+        [
+          "00000000-0000-4000-8000-000000000013",
+          "workspace",
+          "claim",
+          0,
+          1,
+          "Cl\u00E9"
+        ],
+        [
+          "00000000-0000-4000-8000-000000000014",
+          "web",
+          "retex",
+          0,
+          7,
+          "D\u00E9ploiement rat\u00E9\nService coup\u00E9\nAjouter un test"
         ]
       ]
     },
     {
       "sql": "SELECT scope_id,operation,key,content_hash,object_id FROM idempotency ORDER BY key",
-      "rows": []
+      "rows": [
+        [
+          "acme",
+          "Claim",
+          "k1",
+          "52852F7ECE366C89ABD7BE928D30A3DD145142735A86E1E3A9FED77849E1AA20",
+          "00000000-0000-4000-8000-000000000010"
+        ],
+        [
+          "workspace",
+          "Claim",
+          "k1",
+          "37FC74A0982CB8530B94221C71057AC40365BC70C54ECC30429D1382F4EEE9DC",
+          "00000000-0000-4000-8000-000000000013"
+        ],
+        [
+          "web",
+          "Retex",
+          "k1",
+          "2D22FF60557D19F166A1D580B6E60081291DFA3BBC00DCBA0073A37C07EA4FB7",
+          "00000000-0000-4000-8000-000000000014"
+        ],
+        [
+          "acme",
+          "Evidence",
+          "k2",
+          "0B3DF36F11AB6707DC133D0BC7EA67BED250F98A84E90AFDB89F8D922B5EA955",
+          "00000000-0000-4000-8000-000000000016"
+        ],
+        [
+          "acme",
+          "Claim",
+          "k3",
+          "89B05A6FDE7034EE992C7CB830971636FA457BC8E087E50EC5876B7E9CA3A906",
+          "00000000-0000-4000-8000-000000000097"
+        ]
+      ]
     }
   ]
 }
