@@ -125,7 +125,7 @@ Confiance (`Sermofur.Application/MemoryService.cs:170-268`), 15 règles :
   - Windows : tâche planifiée `schtasks` avec superviseur (job object `KILL_ON_JOB_CLOSE`) ;
   - Linux : unité `systemd --user` ;
   - macOS : LaunchAgent.
-  Variables enregistrées dans `service.json` : `DOTNET_ROOT`, `PATH`, `SERMOFUR_DAEMON_HOME`, chemins absolus seulement (`ServiceContracts.cs:26-88`). Le superviseur les ajoute sans vider l'environnement hérité (voir E3). Sous Windows, `SERMOFUR_DAEMON_HOME` défini fait échouer l'installation en `service_install_failed` (`WindowsScheduledTask.cs:112-124`).
+  Variables enregistrées dans `service.json` : `DOTNET_ROOT`, `PATH`, `SERMOFUR_DAEMON_HOME`, chemins absolus seulement (`ServiceContracts.cs:26-88`). Le superviseur les ajoute sans vider l'environnement hérité (voir E3). Sous Windows, si `SERMOFUR_DAEMON_HOME` est porté (chemin absolu), l'installation échoue en `service_install_failed`, exit 3 ; une valeur relative est écartée avec un avertissement (`WindowsScheduledTask.cs:112-124`, `ServiceContracts.cs:127-136`, `DaemonCommands.cs:130-138`).
 
 ## 8. MCP
 
@@ -171,7 +171,7 @@ En cours d'arbitrage au comité du 2026-11-06 (E3, E4) ; les autres sont à déc
 | E7 | GUID vide : `invalid_input` attendu côté MCP, `invalid_arguments` obtenu via la CLI | `ToolInput.cs:150-153`, `CA:183-186` | reproduire |
 | E8 | `.mcp.json` : une entrée `sermofur` modifiée perd les clés ajoutées par l'utilisateur ; Codex les garde | `McpConfigFile.cs:48-50` | reproduire |
 | E9 | Doc : liens refusés sur `.sermofur` seulement ; code : sur tout ancêtre | `LocalPaths.cs:22, 39-53` | reproduire le code |
-| E10 | Docs périmées : `verification.md:240` (canonicalisation), `cli.md:32` (« 0.1 »), `scope-model.md:31` (« lexical »), ADR 0005 (format 1), ADR 0017 (« une ou deux commandes ») ; mêmes textes ailleurs : `docs/fr/cli.md:34`, `docs/fr/verification.md:262`, `docs/fr/scope-model.md:32`, `docs/fr/adr/0005`, `docs/fr/adr/0017-mcp-bridge.md:17`, `docs/architecture.md:55`, `docs/fr/architecture.md:57` ; dans `verification.md`, le mot « lexically » est à la ligne 241 | — | hors portage |
+| E10 | Docs périmées : `verification.md:241` (canonicalisation), `cli.md:32` (« 0.1 »), `scope-model.md:31` (« lexical »), ADR 0005 (format 1), ADR 0017 (« une ou deux commandes ») ; mêmes textes ailleurs : `docs/fr/cli.md:34`, `docs/fr/verification.md:262`, `docs/fr/scope-model.md:32`, `docs/fr/adr/0005`, `docs/fr/adr/0017-mcp-bridge.md:17`, `docs/architecture.md:55`, `docs/fr/architecture.md:57` | — | hors portage |
 | E11 | `PARITY.md` citait `docs/mcp.md`, qui n'existe pas : le fichier est `docs/mcp-integration.md` | — | corrigé |
 | E12 | `schema::open` refuse un chemin vide (déjà listé dans `PARITY.md`) | — | décision de John |
 
