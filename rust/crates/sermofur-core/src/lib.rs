@@ -25,6 +25,7 @@ pub mod schema;
 pub mod scope_policy;
 pub mod scopes;
 pub mod search;
+pub mod sources;
 mod stj;
 pub mod store;
 
