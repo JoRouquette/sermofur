@@ -15,7 +15,7 @@ Statut : `todo`, `partial`, `done`. Une ligne ne passe à `done` que si ses scé
 | 1c.1 | Propriété du dossier : Unix (`statx`, `lstat`, `geteuid`) | sermofur-core | HardeningTests | todo |
 | 1c.2 | Propriété du dossier : Windows (SID propriétaire, Administrateurs), module dérogatoire `windows-sys` unique (décision A1 ; dérogation à inscrire avec l'accord de John) | sermofur-core | HardeningTests (ElevatedWindowsFact) | todo |
 | 1c.3 | `LocalPaths` : normalisation de mapping, `CanonicalCase` (casse, NFC/NFD, 8.3), UNC et lecteur réseau | sermofur-core | InstanceTests, SourceTests, PropertyTests | todo |
-| 1c.4 | `AtomicFile` : temporaire, flush durable, renommage, liens refusés ou suivis (10), mode Unix | sermofur-core | ConfigurationWriteTests | todo |
+| 1c.4 | `AtomicFile` : temporaire, flush durable, renommage, liens et jonctions refusés ou suivis (10), mode Unix ; or `atomic-file.json` de 22 scénarios produit sous Windows par `rust/tools/atomic-oracle` | sermofur-core | ConfigurationWriteTests | done (Windows ; test des modes Unix en CI seulement) |
 | 2.1 | Énumérations, enregistrements, formes JSON (snake_case, camelCase) | sermofur-core | DomainTests | todo |
 | 2.2 | `ScopePolicy` : racine, parenté, cycles, visibilité | sermofur-core | DomainTests (arbres générés) | todo |
 | 2.3 | Confiance : 15 règles et textes de raisons | sermofur-core | DomainTests, ChallengeTests | todo |
@@ -33,7 +33,7 @@ Statut : `todo`, `partial`, `done`. Une ligne ne passe à `done` que si ses scé
 | 6.1 | `migrate` 1→2 : sauvegarde en ligne, reprise, course | sermofur-core, smf | MigrationTests (fixture `instance-v1`) | todo |
 | 6.2 | `doctor` : 18 contrôles dans l'ordre, sortie texte et JSON, exit 5 | sermofur-core, smf | DoctorTests, ScopeTests, SourceTests | todo |
 | 7.1 | Trames, messages du protocole 1, limites | sermofur-daemon | FramingTests | todo |
-| 7.2 | Chemins (`DaemonPaths`), verrou, journal tournant, registre `instances.json` ; décalage local courant (`DateTimeOffset.Now`) et choix de la dépendance de date `chrono` ou `time` après prototype (A5 ; report proposé à John le 2026-11-06, à valider) | sermofur-daemon | DaemonPathsTests, RegistryTests, SharedFilesTests | todo |
+| 7.2 | Chemins (`DaemonPaths`), verrou, journal tournant, registre `instances.json` ; décalage local courant (`DateTimeOffset.Now`) et choix de la dépendance de date `chrono` ou `time` après prototype (A5 ; report validé par John le 2026-11-06) | sermofur-daemon | DaemonPathsTests, RegistryTests, SharedFilesTests | todo |
 | 7.3 | Point de terminaison (tokio) : tube nommé `CurrentUserOnly` sur le SID Owner, comme l'oracle (Windows) ; socket 0600 et `peer_cred` (Unix) | sermofur-daemon | DaemonTests, HardeningTests | todo |
 | 7.4 | Serveur (tokio, cœur synchrone par `spawn_blocking`) : session, tour d'écriture (le permis passe dans la tâche bloquante et reste suivi pour le drain : une échéance ne libère jamais le tour), échéances, drain, signaux ; `daemon run` | sermofur-daemon, smf | DaemonTests, DaemonSessionTests, DaemonLoadTests, DaemonRobustnessTests | todo |
 | 7.5 | Client et routeur CLI : sonde, repli direct, relance des lectures, `SERMOFUR_NO_DAEMON` | sermofur-daemon, smf | RouterTests | todo |
@@ -52,6 +52,7 @@ Décision de John du 2026-11-06 (comité) : fidélité stricte. Les écarts E1 �
 
 - E4 corrigé : `daemon install` traite `daemon_version_mismatch` comme « pas à jour » et remplace le démon, comme `DaemonRuns` (`DaemonCommands.cs:218-223`), au lieu d'échouer (`DaemonCommands.cs:130-134`).
 - Doubles (lot 1b.0), décision de John du 2026-11-06 : .NET 10.0.5 écrit 2^-25 (`2.980232238769531E-08`) et 2^-958 (`4.104536801298376E-289`) en un texte qui se relit comme le double précédent. Le Rust écrit la forme la plus courte qui se relit exactement. Inatteignable : seuls des scores arrondis à 6 décimales sont écrits. Le test d'or isole ces deux lignes et échoue sur une troisième.
+- `instance.json` non régulier (lot 1b.2), décision de John du 2026-11-06 : sous Unix, un FIFO, une socket ou un périphérique nommé `instance.json` bloque le .NET (`File.Exists` vrai, `ReadAllText` attend). Le Rust répond `invalid_instance`, « Instance configuration missing. », exit 3. Aucun or possible.
 - `schema::open` refuse un chemin de base vide (`invalid_path`, exit 1) ; le .NET ouvre une base temporaire. Jamais voulu, jamais atteint par la CLI (le chemin est toujours `<racine>/.sermofur/memory.db`). Décision de John à confirmer.
 
 ## Dérogations `unsafe`

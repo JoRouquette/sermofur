@@ -70,7 +70,7 @@ pub fn reject_links(path: &Path) -> Result<()> {
 
 /// `Path.GetFullPath` removes `.` and `..` lexically, without looking at the disk; `..` at the
 /// root stays at the root. `std::path::absolute` keeps `..` on Unix, so it is removed here.
-fn normalize(path: &Path) -> PathBuf {
+pub(crate) fn normalize(path: &Path) -> PathBuf {
     let mut out = PathBuf::new();
     for component in path.components() {
         match component {
