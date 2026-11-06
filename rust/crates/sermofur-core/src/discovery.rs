@@ -30,7 +30,7 @@ enum MarkerState {
 /// Where .NET throws `ArgumentException` (an empty path; on Windows an NT path `\??\X:\...`,
 /// kept as is by `GetFullPath`, then refused by `DriveInfo`), the CLI answers
 /// `invalid_storage_or_path` (`CommandRunner.Run`), and so does the port.
-fn full_path(path: &Path) -> Result<PathBuf> {
+pub(crate) fn full_path(path: &Path) -> Result<PathBuf> {
     if cfg!(windows) && path.to_string_lossy().starts_with(r"\??\") {
         return Err(invalid_storage());
     }

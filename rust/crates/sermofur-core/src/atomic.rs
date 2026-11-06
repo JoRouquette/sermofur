@@ -224,22 +224,13 @@ fn unlinked(full: &Path, shown: &Path) -> Result<PathBuf> {
     Ok(full.to_path_buf())
 }
 
-/// Comparison of `LocalPaths.Comparison`: `OrdinalIgnoreCase` on Windows (simple uppercase
-/// of each char), ordinal elsewhere.
-fn key(path: &Path) -> String {
-    let text = path.to_string_lossy();
+/// Comparison of `LocalPaths.Comparison`: `OrdinalIgnoreCase` on Windows, ordinal elsewhere.
+fn key(path: &Path) -> Vec<u16> {
+    let units: Vec<u16> = path.to_string_lossy().encode_utf16().collect();
     if cfg!(windows) {
-        text.chars()
-            .map(|c| {
-                let mut upper = c.to_uppercase();
-                match (upper.next(), upper.next()) {
-                    (Some(u), None) => u,
-                    _ => c,
-                }
-            })
-            .collect()
+        crate::casing::ordinal_fold(&units)
     } else {
-        text.into_owned()
+        units
     }
 }
 

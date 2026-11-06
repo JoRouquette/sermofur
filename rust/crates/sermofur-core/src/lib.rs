@@ -3,6 +3,7 @@
 //! The Rust port is verified against the .NET `smf` 0.4.3 used as an oracle.
 
 pub mod atomic;
+mod casing;
 pub mod discovery;
 pub mod error;
 pub mod format;
@@ -10,6 +11,7 @@ pub mod init;
 pub mod instance;
 pub mod json;
 pub mod limits;
+pub mod local_paths;
 pub mod ownership;
 pub mod schema;
 
