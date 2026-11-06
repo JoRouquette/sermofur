@@ -4,6 +4,7 @@
 
 pub mod atomic;
 mod casing;
+pub mod collation;
 pub mod confidence;
 pub mod discovery;
 pub mod error;
@@ -17,6 +18,7 @@ pub mod local_paths;
 pub mod memory;
 pub mod ownership;
 pub mod projection;
+pub mod recall;
 pub mod records;
 pub mod schema;
 pub mod scope_policy;

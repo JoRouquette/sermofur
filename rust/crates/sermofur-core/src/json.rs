@@ -136,6 +136,12 @@ impl Formatter for DotNetFormatter {
         self.inner.end_object_value(writer)
     }
 
+    // Doubles in the layout of `System.Text.Json` (`serde_json` writes non-finite ones as null).
+    fn write_f64<W: ?Sized + io::Write>(&mut self, writer: &mut W, value: f64) -> io::Result<()> {
+        let text = crate::format::json_double(value).unwrap_or_else(|| "null".to_owned());
+        writer.write_all(text.as_bytes())
+    }
+
     // Strings: `serde_json` hands over the runs of characters it does not escape itself...
     fn write_string_fragment<W: ?Sized + io::Write>(
         &mut self,

@@ -1,6 +1,6 @@
 //! The commands of the memory of an instance, ported from `CommandRunner.Dispatch`,
-//! `CommandRunner.RunScope` and `MemoryCommands.cs`: `status`, `scope`, `export`, `claim`,
-//! `evidence` and `retex`. Each returns the JSON text of its answer.
+//! `CommandRunner.RunScope`, `MemoryCommands.cs` and `KnowledgeCommands.cs`: `status`, `scope`,
+//! `export`, `claim`, `evidence`, `retex` and `recall`. Each returns the JSON text of its answer.
 
 use serde::Serialize;
 use sermofur_core::error::{Result, SermofurError};
@@ -9,6 +9,7 @@ use sermofur_core::guid::{self, Uuid};
 use sermofur_core::instance::InstanceConfiguration;
 use sermofur_core::json;
 use sermofur_core::memory::{MemoryContext, MemoryService};
+use sermofur_core::recall::{MAX_RESULTS, limit_error, recall};
 use sermofur_core::records::{
     ActorKind, ClaimContent, DotNetEnum, EvidenceContent, EvidenceKind, EvidenceRelation,
     MemoryCategory, Provenance, RecordKind, RetexContent, Scope, ScopeKind, Volatility,
@@ -135,8 +136,37 @@ pub fn dispatch(
             RecordKind::Evidence,
         ),
         "retex" => run_memory(args, MemoryService::new(store, context)?, RecordKind::Retex),
+        "recall" => run_recall(args, store, context),
         _ => Err(SermofurError::invalid_arguments("Unknown command.")),
     }
+}
+
+/// `KnowledgeCommands.Recall`. The service checks the scope tree before the arguments.
+fn run_recall(
+    args: &mut CommandArguments,
+    store: &Store,
+    context: &MemoryContext,
+) -> Result<String> {
+    let context = context.checked(store)?;
+    args.require_count(2)?;
+    let limit = args.option("limit").map(str::to_owned);
+    args.validate_used()?;
+    // `int.TryParse(limit, NumberStyles.None, ...)`: ASCII digits only, within `int`.
+    let limit = match limit {
+        None => MAX_RESULTS,
+        Some(text) if !text.is_empty() && text.bytes().all(|b| b.is_ascii_digit()) => {
+            text.parse().map_err(|_| limit_error())?
+        }
+        Some(_) => return Err(limit_error()),
+    };
+    let question = args.positionals()[1].clone();
+    to_json(&recall(
+        store,
+        &context,
+        &question,
+        limit,
+        DateTimeOffset::now_utc(),
+    )?)
 }
 
 fn run_scope(

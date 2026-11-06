@@ -391,3 +391,64 @@ fn query_tokens_match_the_tokens_of_the_index() {
         );
     }
 }
+
+/// Properties of `query_terms` on arbitrary text, on one store holding two claims: no error and
+/// no panic, at most 32 terms, pairwise distinct, each non-empty and without whitespace, the
+/// same terms when the terms are asked again, and hits read on an empty and on a non-empty set
+/// of visible scopes.
+#[test]
+fn query_terms_hold_on_arbitrary_text() {
+    use proptest::prelude::*;
+    use proptest::test_runner::{Config, TestRunner};
+
+    let (scratch, _database, id) = instance("query-terms");
+    let mut store = Store::open(&scratch.0, id, false).expect("opened");
+    for text in ["Déploiement à chaud du cache", "cache froid 42 ﬁn"] {
+        let content = ClaimContent {
+            text: Some(text.to_owned()),
+            category: MemoryCategory::Semantic,
+            volatility: Volatility::Stable,
+            last_verified: None,
+            review_after: None,
+        };
+        let claim = MemoryRecord {
+            id: Uuid::new_v4(),
+            scope_id: Some("workspace".to_owned()),
+            kind: RecordKind::Claim,
+            status: KnowledgeStatus::Active,
+            revision: 1,
+            content_json: Some(write(&content).expect("json")),
+            provenance: Some(Provenance {
+                origin: ActorKind::User,
+                actor: Some("john".to_owned()),
+                timestamp: sermofur_core::format::DateTimeOffset::now_utc(),
+            }),
+        };
+        store.create_record(&claim, None).expect("created");
+    }
+    let strategy = prop_oneof![
+        any::<String>(),
+        r"\PC{0,300}",
+        "([a-zA-Zéç0-9]{1,3}[ ,.;-]{1,2}){0,80}",
+        r"((cache|déploiement|CHAUD|fin|ﬁn|42|x|y)( |\t|\n|, )){0,60}",
+    ];
+    let mut runner = TestRunner::new(Config::with_cases(256));
+    let none = HashSet::new();
+    let some = HashSet::from(["workspace".to_owned(), "elsewhere".to_owned()]);
+    runner
+        .run(&strategy, |text| {
+            let terms = search::query_terms(&store, &text).expect("terms");
+            prop_assert!(terms.len() <= search::MAX_QUERY_TERMS);
+            let distinct: HashSet<&String> = terms.iter().collect();
+            prop_assert_eq!(distinct.len(), terms.len());
+            for term in &terms {
+                prop_assert!(!term.is_empty() && !term.chars().any(char::is_whitespace));
+            }
+            let again = search::query_terms(&store, &terms.join(" ")).expect("terms again");
+            prop_assert_eq!(&again, &terms);
+            store.hits(&terms, &none).expect("hits, nothing visible");
+            store.hits(&terms, &some).expect("hits");
+            Ok(())
+        })
+        .expect("properties");
+}

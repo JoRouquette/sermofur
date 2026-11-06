@@ -1,0 +1,380 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/",
+    ".sermofur/records/<g2>.md",
+    ".sermofur/records/<g3>.md",
+    ".sermofur/records/<g4>.md",
+    ".sermofur/records/<g5>.md",
+    ".sermofur/records/<g6>.md",
+    ".sermofur/records/<g7>.md",
+    "a/",
+    "a/p/",
+    "b/"
+  ],
+  "projections": {
+    "<g2>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g2>\",\n  \"scopeId\": \"a\",\n  \"kind\": \"claim\",\n  \"status\": \"invalidated\",\n  \"revision\": 2,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Claim <g2>\n\n```json\n{\n  \"text\": \"migration de la base postgres\",\n  \"category\": \"semantic\",\n  \"volatility\": \"evolving\",\n  \"lastVerified\": null,\n  \"reviewAfter\": null\n}\n```\n",
+    "<g3>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g3>\",\n  \"scopeId\": \"a\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Claim <g3>\n\n```json\n{\n  \"text\": \"postgres tourne en version 16\",\n  \"category\": \"semantic\",\n  \"volatility\": \"evolving\",\n  \"lastVerified\": null,\n  \"reviewAfter\": null\n}\n```\n",
+    "<g4>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g4>\",\n  \"scopeId\": \"p\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Claim <g4>\n\n```json\n{\n  \"text\": \"la migration se fait la nuit\",\n  \"category\": \"semantic\",\n  \"volatility\": \"evolving\",\n  \"lastVerified\": null,\n  \"reviewAfter\": null\n}\n```\n",
+    "<g5>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g5>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Claim <g5>\n\n```json\n{\n  \"text\": \"postgres partout\",\n  \"category\": \"semantic\",\n  \"volatility\": \"evolving\",\n  \"lastVerified\": null,\n  \"reviewAfter\": null\n}\n```\n",
+    "<g6>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g6>\",\n  \"scopeId\": \"b\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Claim <g6>\n\n```json\n{\n  \"text\": \"postgres postgres migration\",\n  \"category\": \"semantic\",\n  \"volatility\": \"evolving\",\n  \"lastVerified\": null,\n  \"reviewAfter\": null\n}\n```\n",
+    "<g7>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g7>\",\n  \"scopeId\": \"a\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Evidence <g7>\n\n```json\n{\n  \"claimId\": \"<g3>\",\n  \"kind\": \"source_code\",\n  \"reference\": \"db.cs\",\n  \"lineageId\": \"code\",\n  \"relation\": \"supports\",\n  \"sourceId\": null,\n  \"sourceHash\": null\n}\n```\n"
+  },
+  "steps": [
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"created\": true\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "init"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": "a"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": "b"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": "a/p"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"a\",\n  \"kind\": \"client\",\n  \"parentId\": \"workspace\",\n  \"relativePath\": \"a\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "a",
+          "client",
+          "workspace",
+          "a"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"b\",\n  \"kind\": \"client\",\n  \"parentId\": \"workspace\",\n  \"relativePath\": \"b\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "b",
+          "client",
+          "workspace",
+          "b"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"p\",\n  \"kind\": \"project\",\n  \"parentId\": \"a\",\n  \"relativePath\": \"a/p\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "p",
+          "project",
+          "a",
+          "a/p"
+        ],
+        "cwd": "a"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g2>\",\n  \"scopeId\": \"a\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022migration de la base postgres\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "add",
+          "migration de la base postgres",
+          "--origin",
+          "user"
+        ],
+        "cwd": "a"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g3>\",\n  \"scopeId\": \"a\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022postgres tourne en version 16\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "add",
+          "postgres tourne en version 16",
+          "--origin",
+          "user"
+        ],
+        "cwd": "a"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g4>\",\n  \"scopeId\": \"p\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022la migration se fait la nuit\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "add",
+          "la migration se fait la nuit",
+          "--origin",
+          "user"
+        ],
+        "cwd": "a/p"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g5>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022postgres partout\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "add",
+          "postgres partout",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"query\": \"migration postgres\",\n  \"results\": [\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g2>\",\n      \"scopeId\": \"a\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"low\",\n        \"reasons\": [\n          \"No independent evidence available.\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 0\n      },\n      \"excerpt\": \"migration de la base postgres\",\n      \"matchedTerms\": [\n        \"migration\",\n        \"postgres\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 1.010966,\n      \"path\": null\n    },\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g5>\",\n      \"scopeId\": \"workspace\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"low\",\n        \"reasons\": [\n          \"No independent evidence available.\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 0\n      },\n      \"excerpt\": \"postgres partout\",\n      \"matchedTerms\": [\n        \"postgres\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 0.167868,\n      \"path\": null\n    },\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g3>\",\n      \"scopeId\": \"a\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"low\",\n        \"reasons\": [\n          \"No independent evidence available.\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 0\n      },\n      \"excerpt\": \"postgres tourne en version 16\",\n      \"matchedTerms\": [\n        \"postgres\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 0.121142,\n      \"path\": null\n    }\n  ],\n  \"excluded\": 0\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "migration postgres"
+        ],
+        "cwd": "a"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g6>\",\n  \"scopeId\": \"b\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022postgres postgres migration\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "add",
+          "postgres postgres migration",
+          "--origin",
+          "user"
+        ],
+        "cwd": "b"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"query\": \"migration postgres\",\n  \"results\": [\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g2>\",\n      \"scopeId\": \"a\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"low\",\n        \"reasons\": [\n          \"No independent evidence available.\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 0\n      },\n      \"excerpt\": \"migration de la base postgres\",\n      \"matchedTerms\": [\n        \"migration\",\n        \"postgres\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 1.010966,\n      \"path\": null\n    },\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g5>\",\n      \"scopeId\": \"workspace\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"low\",\n        \"reasons\": [\n          \"No independent evidence available.\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 0\n      },\n      \"excerpt\": \"postgres partout\",\n      \"matchedTerms\": [\n        \"postgres\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 0.167868,\n      \"path\": null\n    },\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g3>\",\n      \"scopeId\": \"a\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"low\",\n        \"reasons\": [\n          \"No independent evidence available.\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 0\n      },\n      \"excerpt\": \"postgres tourne en version 16\",\n      \"matchedTerms\": [\n        \"postgres\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 0.121142,\n      \"path\": null\n    }\n  ],\n  \"excluded\": 0\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "migration postgres"
+        ],
+        "cwd": "a"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"query\": \"migration postgres\",\n  \"results\": [\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g6>\",\n      \"scopeId\": \"b\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"low\",\n        \"reasons\": [\n          \"No independent evidence available.\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 0\n      },\n      \"excerpt\": \"postgres postgres migration\",\n      \"matchedTerms\": [\n        \"migration\",\n        \"postgres\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 0.878066,\n      \"path\": null\n    },\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g5>\",\n      \"scopeId\": \"workspace\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"low\",\n        \"reasons\": [\n          \"No independent evidence available.\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 0\n      },\n      \"excerpt\": \"postgres partout\",\n      \"matchedTerms\": [\n        \"postgres\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 0.198568,\n      \"path\": null\n    }\n  ],\n  \"excluded\": 0\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "migration postgres"
+        ],
+        "cwd": "b"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"query\": \"migration postgres\",\n  \"results\": [\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g2>\",\n      \"scopeId\": \"a\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"low\",\n        \"reasons\": [\n          \"No independent evidence available.\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 0\n      },\n      \"excerpt\": \"migration de la base postgres\",\n      \"matchedTerms\": [\n        \"migration\",\n        \"postgres\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 1.004178,\n      \"path\": null\n    },\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g4>\",\n      \"scopeId\": \"p\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"low\",\n        \"reasons\": [\n          \"No independent evidence available.\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 0\n      },\n      \"excerpt\": \"la migration se fait la nuit\",\n      \"matchedTerms\": [\n        \"migration\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 0.60997,\n      \"path\": null\n    },\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g5>\",\n      \"scopeId\": \"workspace\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"low\",\n        \"reasons\": [\n          \"No independent evidence available.\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 0\n      },\n      \"excerpt\": \"postgres partout\",\n      \"matchedTerms\": [\n        \"postgres\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 0.461579,\n      \"path\": null\n    }\n  ],\n  \"excluded\": 0\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "migration postgres"
+        ],
+        "cwd": "a/p"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"query\": \"migration postgres\",\n  \"results\": [\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g5>\",\n      \"scopeId\": \"workspace\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"low\",\n        \"reasons\": [\n          \"No independent evidence available.\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 0\n      },\n      \"excerpt\": \"postgres partout\",\n      \"matchedTerms\": [\n        \"postgres\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 0.287682,\n      \"path\": null\n    }\n  ],\n  \"excluded\": 0\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "migration postgres"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g7>\",\n  \"scopeId\": \"a\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g3>\\u0022,\\n  \\u0022kind\\u0022: \\u0022source_code\\u0022,\\n  \\u0022reference\\u0022: \\u0022db.cs\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022code\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{8}",
+          "source_code",
+          "db.cs",
+          "--lineage",
+          "code",
+          "--origin",
+          "user"
+        ],
+        "cwd": "a"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"query\": \"migration postgres\",\n  \"results\": [\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g2>\",\n      \"scopeId\": \"a\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"low\",\n        \"reasons\": [\n          \"No independent evidence available.\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 0\n      },\n      \"excerpt\": \"migration de la base postgres\",\n      \"matchedTerms\": [\n        \"migration\",\n        \"postgres\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 1.010966,\n      \"path\": null\n    },\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g5>\",\n      \"scopeId\": \"workspace\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"low\",\n        \"reasons\": [\n          \"No independent evidence available.\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 0\n      },\n      \"excerpt\": \"postgres partout\",\n      \"matchedTerms\": [\n        \"postgres\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 0.167868,\n      \"path\": null\n    },\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g3>\",\n      \"scopeId\": \"a\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"high\",\n        \"reasons\": [\n          \"Origin code: support High; repetitions grouped.\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 1\n      },\n      \"excerpt\": \"postgres tourne en version 16\",\n      \"matchedTerms\": [\n        \"postgres\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 0.14537,\n      \"path\": null\n    }\n  ],\n  \"excluded\": 0\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "migration postgres"
+        ],
+        "cwd": "a"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g2>\",\n  \"scopeId\": \"a\",\n  \"kind\": \"claim\",\n  \"status\": \"invalidated\",\n  \"revision\": 2,\n  \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022migration de la base postgres\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "invalidate",
+          "{7}",
+          "--reason",
+          "migrée"
+        ],
+        "cwd": "a"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"query\": \"migration postgres\",\n  \"results\": [\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g5>\",\n      \"scopeId\": \"workspace\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"low\",\n        \"reasons\": [\n          \"No independent evidence available.\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 0\n      },\n      \"excerpt\": \"postgres partout\",\n      \"matchedTerms\": [\n        \"postgres\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 0.167868,\n      \"path\": null\n    },\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g3>\",\n      \"scopeId\": \"a\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"high\",\n        \"reasons\": [\n          \"Origin code: support High; repetitions grouped.\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 1\n      },\n      \"excerpt\": \"postgres tourne en version 16\",\n      \"matchedTerms\": [\n        \"postgres\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 0.14537,\n      \"path\": null\n    },\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g2>\",\n      \"scopeId\": \"a\",\n      \"status\": \"invalidated\",\n      \"applicable\": false,\n      \"confidence\": {\n        \"level\": \"low\",\n        \"reasons\": [\n          \"Knowledge not applicable: invalidated or superseded.\"\n        ],\n        \"independentOrigins\": 0\n      },\n      \"excerpt\": \"migration de la base postgres\",\n      \"matchedTerms\": [\n        \"migration\",\n        \"postgres\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 1.010966,\n      \"path\": null\n    }\n  ],\n  \"excluded\": 0\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "migration postgres"
+        ],
+        "cwd": "a"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"query\": \"migration postgres\",\n  \"results\": [\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g5>\",\n      \"scopeId\": \"workspace\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"low\",\n        \"reasons\": [\n          \"No independent evidence available.\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 0\n      },\n      \"excerpt\": \"postgres partout\",\n      \"matchedTerms\": [\n        \"postgres\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 0.167868,\n      \"path\": null\n    }\n  ],\n  \"excluded\": 1\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "migration postgres",
+          "--limit",
+          "1"
+        ],
+        "cwd": "a"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"query\": \"base\",\n  \"results\": [\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g2>\",\n      \"scopeId\": \"a\",\n      \"status\": \"invalidated\",\n      \"applicable\": false,\n      \"confidence\": {\n        \"level\": \"low\",\n        \"reasons\": [\n          \"Knowledge not applicable: invalidated or superseded.\"\n        ],\n        \"independentOrigins\": 0\n      },\n      \"excerpt\": \"migration de la base postgres\",\n      \"matchedTerms\": [\n        \"base\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 0.889824,\n      \"path\": null\n    }\n  ],\n  \"excluded\": 0\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "base",
+          "--limit",
+          "1"
+        ],
+        "cwd": "a"
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/instance.json",
+        "added .sermofur/memory.db",
+        "added .sermofur/records/<g2>.md",
+        "added .sermofur/records/<g3>.md",
+        "added .sermofur/records/<g4>.md",
+        "added .sermofur/records/<g5>.md",
+        "added .sermofur/records/<g6>.md",
+        "added .sermofur/records/<g7>.md"
+      ],
+      "step": {
+        "changes": true
+      }
+    }
+  ]
+}

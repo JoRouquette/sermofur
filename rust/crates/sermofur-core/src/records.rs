@@ -162,7 +162,10 @@ fn optional_enum<E: DotNetEnum>(node: &Node) -> Result<Option<E>> {
     }
 }
 
-fn guid_text<S: Serializer>(value: &Uuid, serializer: S) -> std::result::Result<S::Ok, S::Error> {
+pub(crate) fn guid_text<S: Serializer>(
+    value: &Uuid,
+    serializer: S,
+) -> std::result::Result<S::Ok, S::Error> {
     serializer.serialize_str(&value.hyphenated().to_string())
 }
 
