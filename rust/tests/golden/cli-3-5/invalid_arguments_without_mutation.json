@@ -1,0 +1,200 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/"
+  ],
+  "projections": {},
+  "steps": [
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"created\": true\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "init"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/instance.json",
+        "added .sermofur/memory.db"
+      ],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"Unknown option for this command.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "claim",
+          "add",
+          "x",
+          "--origin",
+          "user",
+          "--scope",
+          "someone"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"Unknown option for this command.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "status",
+          "--unknown",
+          "value"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "claim",
+          "show",
+          "not-an-id"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_scope\",\n  \"message\": \"Invalid ScopeKind value.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "scope",
+          "add",
+          "x",
+          "99",
+          "workspace",
+          "x"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_scope\",\n  \"message\": \"Scope identifier: slug of 1 to 64 characters.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "scope",
+          "add",
+          "Bad",
+          "client",
+          "workspace",
+          "x"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"Option --origin required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "claim",
+          "add",
+          "x"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"Option --origin required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "claim",
+          "add",
+          "--",
+          "x",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"Invalid ActorKind value.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "claim",
+          "add",
+          "x",
+          "--origin",
+          "machine"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"Option --origin required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "claim",
+          "add",
+          "always review before commit",
+          "--category",
+          "decisions"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [],
+      "step": {
+        "changes": true
+      }
+    }
+  ]
+}

@@ -304,6 +304,34 @@ mod tests {
         assert_eq!(text_err, "smf: invalid_arguments: Option value required.\n");
     }
 
+    /// Port of `ArgumentContainingNulIsRejectedBeforeAnyCommand`: in process, since a NUL
+    /// cannot reach the arguments of a real process. The bound is checked before the path is
+    /// read, so the missing folder is never touched.
+    #[test]
+    fn an_argument_containing_nul_is_rejected_before_any_command() {
+        let missing = std::env::temp_dir().join(format!(
+            "sermofur-nul-{}",
+            sermofur_core::guid::Uuid::new_v4().simple()
+        ));
+        let missing = missing.to_str().expect("UTF-8 path");
+        let (code, out, err) = run_capture(&[
+            "--path",
+            missing,
+            "--json",
+            "claim",
+            "add",
+            "before\0after",
+            "--origin",
+            "user",
+        ]);
+        assert_eq!((code, out.as_str()), (1, ""));
+        assert_eq!(
+            err,
+            "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"Argument limited to 16,384 characters without NUL.\"\n}\n"
+        );
+        assert!(!std::path::Path::new(missing).exists());
+    }
+
     #[test]
     fn no_command_is_an_error_but_no_arguments_is_help() {
         let (code, _, err) = run_capture(&["--json"]);

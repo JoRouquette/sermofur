@@ -41,7 +41,10 @@ pub fn is_knowledge_command(command: &str) -> bool {
 }
 
 /// `CommandArguments.ParseEnum<T>`: `_` and `-` removed, then the .NET name of a member,
-/// without case; `type_name` names the enumeration in the message.
+/// without case; `type_name` names the enumeration in the message. The .NET guards
+/// (`All(char.IsLetter)`, then `Enum.TryParse` with `OrdinalIgnoreCase` and `IsDefined`) accept
+/// exactly these names: every name is ASCII letters, and `OrdinalIgnoreCase` folds no other
+/// character onto one (`ſ`, `ı` and the Kelvin sign stay: `cli-3-5/soft_enums.json`).
 pub fn parse_enum<E: DotNetEnum>(value: &str, type_name: &str, code: &str) -> Result<E> {
     let normalized: String = value.chars().filter(|c| *c != '_' && *c != '-').collect();
     E::NAMES
@@ -98,7 +101,7 @@ pub fn dispatch(
         "status" => {
             args.require_count(1)?;
             args.validate_used()?;
-            let records = MemoryService::new(store, context).list(None)?;
+            let records = MemoryService::new(store, context)?.list(None)?;
             let count = |kind: RecordKind| records.iter().filter(|r| r.kind == kind).count();
             to_json(&StatusBody {
                 root: context.root.to_string_lossy().into_owned(),
@@ -117,7 +120,7 @@ pub fn dispatch(
         "export" => {
             args.require_count(1)?;
             args.validate_used()?;
-            let files = MemoryService::new(store, context).export()?;
+            let files = MemoryService::new(store, context)?.export()?;
             to_json(&ExportBody {
                 files: files
                     .iter()
@@ -125,13 +128,13 @@ pub fn dispatch(
                     .collect(),
             })
         }
-        "claim" => run_memory(args, MemoryService::new(store, context), RecordKind::Claim),
+        "claim" => run_memory(args, MemoryService::new(store, context)?, RecordKind::Claim),
         "evidence" => run_memory(
             args,
-            MemoryService::new(store, context),
+            MemoryService::new(store, context)?,
             RecordKind::Evidence,
         ),
-        "retex" => run_memory(args, MemoryService::new(store, context), RecordKind::Retex),
+        "retex" => run_memory(args, MemoryService::new(store, context)?, RecordKind::Retex),
         _ => Err(SermofurError::invalid_arguments("Unknown command.")),
     }
 }
@@ -162,7 +165,7 @@ fn run_scope(
     args.require_count(2)?;
     args.validate_used()?;
     match action.as_str() {
-        "current" => to_json(&scopes::current(context)),
+        "current" => to_json(&scopes::current(store, context)?),
         "list" | "tree" => to_json(&scopes::list(store, context)?),
         _ => Err(SermofurError::invalid_arguments(
             "Unknown scope subcommand.",

@@ -35,18 +35,21 @@ pub struct ScopeContextView {
     pub visible: Vec<String>,
 }
 
-/// `Current`.
-pub fn current(context: &MemoryContext) -> ScopeContextView {
-    let mut visible: Vec<String> = context.visible.iter().cloned().collect();
+/// `Current`, with the visible scopes recomputed from the store.
+pub fn current(store: &Store, context: &MemoryContext) -> Result<ScopeContextView> {
+    let context = context.checked(store)?;
+    let mut visible: Vec<String> = context.visible.into_iter().collect();
     visible.sort();
-    ScopeContextView {
-        scope: context.scope_id.clone(),
+    Ok(ScopeContextView {
+        scope: context.scope_id,
         visible,
-    }
+    })
 }
 
-/// `List`: the visible scopes, without siblings or descendants.
+/// `List`: the visible scopes, without siblings or descendants; visibility is recomputed from
+/// the store.
 pub fn list(store: &Store, context: &MemoryContext) -> Result<Vec<Scope>> {
+    let context = context.checked(store)?;
     store
         .read_scopes()?
         .iter()

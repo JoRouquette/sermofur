@@ -39,6 +39,19 @@ pub struct MemoryContext {
     pub visible: HashSet<String>,
 }
 
+impl MemoryContext {
+    /// The context with its visible scopes recomputed from the store, as the constructors of
+    /// `MemoryService` and `ScopeService` do: the list of the caller is never trusted.
+    pub fn checked(&self, store: &Store) -> Result<MemoryContext> {
+        let scopes = store.read_scopes()?;
+        validate_tree(&scopes)?;
+        Ok(MemoryContext {
+            visible: visible_ancestors(&self.scope_id, &scopes)?,
+            ..self.clone()
+        })
+    }
+}
+
 /// `ResolveContext`: the scope whose mapping is the longest one holding `path`, the workspace
 /// otherwise. Mappings are compared lexically; only the one selected must exist on disk.
 pub fn resolve_context(path: &Path, root: &Path, scopes: &[StoredScope]) -> Result<MemoryContext> {
@@ -109,12 +122,14 @@ pub struct ClaimExplanation {
 /// `MemoryService`: the records of the scopes the context sees.
 pub struct MemoryService<'a> {
     store: &'a mut Store,
-    context: &'a MemoryContext,
+    context: MemoryContext,
 }
 
 impl<'a> MemoryService<'a> {
-    pub fn new(store: &'a mut Store, context: &'a MemoryContext) -> Self {
-        Self { store, context }
+    /// The service of `context`, whose visible scopes are recomputed from the store.
+    pub fn new(store: &'a mut Store, context: &MemoryContext) -> Result<Self> {
+        let context = context.checked(store)?;
+        Ok(Self { store, context })
     }
 
     /// The visible records, of one kind or all.
@@ -273,5 +288,114 @@ impl<'a> MemoryService<'a> {
     /// Rewrites the projection of every visible record; their paths.
     pub fn export(&self) -> Result<Vec<PathBuf>> {
         self.store.export(&self.context.visible)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::collections::HashSet;
+    use std::path::PathBuf;
+
+    use uuid::Uuid;
+
+    use super::{MemoryContext, MemoryService, resolve_context};
+    use crate::format::DateTimeOffset;
+    use crate::init::initialize;
+    use crate::records::{
+        ActorKind, ClaimContent, MemoryCategory, Provenance, Scope, ScopeKind, Volatility,
+    };
+    use crate::store::Store;
+
+    /// An instance with the clients `a` and `b` under the temporary directory, removed on drop.
+    struct Fixture {
+        root: PathBuf,
+        store: Store,
+    }
+
+    impl Drop for Fixture {
+        fn drop(&mut self) {
+            let _ = std::fs::remove_dir_all(&self.root);
+        }
+    }
+
+    fn fixture() -> Fixture {
+        let temp = std::env::temp_dir();
+        // The discovery compares long names: the 8.3 names of the folder are expanded.
+        let temp = if cfg!(windows) {
+            crate::discovery::expand_short_names(&temp)
+        } else {
+            std::fs::canonicalize(temp).expect("temp")
+        };
+        let root = temp.join(format!("sermofur-memory-unit-{}", Uuid::new_v4().simple()));
+        std::fs::create_dir_all(&root).expect("root");
+        let initialized = initialize(&root).expect("init");
+        let mut store =
+            Store::open(&root, initialized.configuration.instance_id, false).expect("store");
+        for id in ["a", "b"] {
+            std::fs::create_dir(root.join(id)).expect("client folder");
+            let scope = Scope {
+                id: id.to_owned(),
+                kind: ScopeKind::Client,
+                parent_id: Some("workspace".to_owned()),
+                relative_path: Some(id.to_owned()),
+            };
+            store.add_scope(&scope, |_| Ok(())).expect("scope");
+        }
+        Fixture { root, store }
+    }
+
+    fn claim(text: String) -> ClaimContent {
+        ClaimContent {
+            text: Some(text),
+            category: MemoryCategory::Semantic,
+            volatility: Volatility::Evolving,
+            last_verified: None,
+            review_after: None,
+        }
+    }
+
+    fn user() -> Provenance {
+        Provenance {
+            origin: ActorKind::User,
+            actor: Some("local-user".to_owned()),
+            timestamp: DateTimeOffset::now_utc(),
+        }
+    }
+
+    /// Port of `ServiceRecomputesVisibilityInsteadOfTrustingCallerList`.
+    #[test]
+    fn the_service_recomputes_visibility_instead_of_trusting_the_caller() {
+        let mut f = fixture();
+        let scopes = f.store.read_scopes().expect("scopes");
+        let a = resolve_context(&f.root.join("a"), &f.root, &scopes).expect("context a");
+        let id = MemoryService::new(&mut f.store, &a)
+            .expect("service")
+            .create_claim(&claim("private-a".to_owned()), user(), None)
+            .expect("claim")
+            .id;
+        let forged = MemoryContext {
+            root: f.root.clone(),
+            scope_id: "b".to_owned(),
+            visible: HashSet::from(["workspace", "a", "b"].map(str::to_owned)),
+        };
+        let memory = MemoryService::new(&mut f.store, &forged).expect("service");
+        assert!(memory.list(None).expect("list").is_empty());
+        assert_eq!(memory.get(id).expect_err("hidden").code, "not_found");
+    }
+
+    /// Port of the text part of `OversizedAndMalformedInputsCannotCreateObjects`: the service
+    /// bound holds on its own, behind the bound of the command line. An out-of-range category
+    /// cannot be built in Rust.
+    #[test]
+    fn an_oversized_text_creates_nothing() {
+        let mut f = fixture();
+        let scopes = f.store.read_scopes().expect("scopes");
+        let workspace = resolve_context(&f.root, &f.root, &scopes).expect("context");
+        let mut memory = MemoryService::new(&mut f.store, &workspace).expect("service");
+        let error = memory
+            .create_claim(&claim("x".repeat(16_385)), user(), None)
+            .expect_err("too long");
+        assert_eq!(error.code, "invalid_input");
+        assert!(memory.list(None).expect("list").is_empty());
     }
 }

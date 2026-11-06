@@ -1,0 +1,1639 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/"
+  ],
+  "projections": {},
+  "steps": [
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"created\": true\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "init"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/instance.json",
+        "added .sermofur/memory.db"
+      ],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "6(!i'1",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "&gGDVxV>C5@",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "ktBoW?_,F+~mviF35u#O:*_GBz%IqQ",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "!ME^=wZU}%jwl$<1~_Rt",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "FZxj%@!J3:fk&2HNC\";i|x>-SK7mgp!D",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "fT/e]`xkcv9b:/m(zazhEr;WR",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "+N5RdPNM[pck<js9/N",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "rKSM0O#[Iw75#;Nzbb4X-DSX}`;yOJuCzKAJ$)",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "?VVmzr`\\XO;sLH:2/,5ZC=[gwX.Zrun",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          ")j~Q6l6y'|:G5\\9l5WDZ",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "[QCC.ZOcM5P@b<B^x!yKI*#8Qq",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "uU0&?%=@B6+#L)`0",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "W_yd-\\-\\'a3P=[0y&W=N",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "$6o}",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "vZ)J.}5FdQ1p=?KpU5an17Z?",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "]xMXB0*Q):,boN7:RNT<R?8Q%A)Cb'AM2`",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "4tobnk4BdZ",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "%Pb#V~WY4-G\"th`hX*&^j4RaL",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "^)-rT_%?vZg",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "c**V[%uIX?^k?=.CsfV?N<K:JO<~I",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "3I6/[9swC+u['g~y6O!qyh#\"OG",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "o?WAfZS!AY}uU",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "4UyL/4R.vD)rT5\\[",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "jROz1$w.",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "w5,YW*@sUR=,Q",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "vXU",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "v428#Ykv`Fjl~\\G8`(mukht!kNVIo/A7L|%b",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "Tq*7=8C~07A(p]98%G^\"a[c",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "Ghi",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "H`~BD:J/[s[)f=G^\\H",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "g|$T",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "3Fzc:Mh",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "l`KH_v,Y_D\\u9N`:4R$}i'G;",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "Vj=8I",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          ";_RJ^f$t/Zk",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "Kd6&H$D.t",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "rw5F6@AL1DL9xM4r",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "z",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "[#C^\\xM2iFsP5DytW",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "+VW[?v0!Xp6+TV+2[$",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "^+!uqb+,aJcgkXLBoTdn[=fdUOzN",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "w>zZKFn_,Y+.KSfl#Ay]cl2hbvtW@kl1!/\"Nj-",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "1\\@M,)V7[CMP",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "t7dkCpG>LO!aK",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "8XM_E)rMmia",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "G'Svhe",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "NkVU`[ZkZ|o)Jg$",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "}[+537z9O}w\\Vs73+qmGPHH:\"R`&P&[r[mGZ",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "aT7hO_K`_",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "&gVt2cuj/E2?0Ci0I-s",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "N34:nvv[md2F-s1ZDwjUz",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "X.$HPU]n&Bnt6Wn~}cRnrBW]PF4%0$T\"Uw",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "xg4BRTQ",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "yWeO4|N)*,V5@ib?@agLvj'M\\s",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "a+\"b",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "OwBG+C9<",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "Q9_ZY>mg8PLg-",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "m=s}WU_(y`f6P5Op^pivD\"Y(:,s",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "hC?1b,WS5}cu!n!$",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "L._~]Va=",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "kN]=s?.exIJ(6k~r",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "Y:QC40gCD;9gM,bDTgOch7Pj_5f^][fsU]M",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "n'q8O9dkxGU",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "P-@iGj)(Uq~Uv_[.}(>M*1!",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "H%.gAYQ\\YUXQM>&)F]3gdUbG!$PSC",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          ")BtHQ>TpukT@aEgpK],J\"E%8[(9nzm\"KZ`CFC3m",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "aO-b^",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "q1HbV.BlbQo]:$J[Ch",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "`1zI\"_7QU950heieP*",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "h",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "WUK.v4t#}Z_z=t.7bw\"C",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "X'$Lx!RV>'QXOusVsw\\A'",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "Y?zbHQA|9:m_-cU2m@;:jia]x\\&",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "\"T$R-g]7L#jkJ$#SO(R8)xQ&Eb)8-\"v",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "*:6ope[Hn~!ePfj",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "cU+4NW!Q2CUjBqO/iG~]d?N:9\\lhUfYBGn",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "EH",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "]t,K<wDY<NucX8HgPb;'GHGm\\Ef'xb0/",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "Lc;5n7`DZvO?-POpa6\\?Wc?",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          ".l+Mysa;C",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "CZb`JAy/",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "vTn%2c6`#A;rK4Mw/YR)~\\}<8Ce!91E[L}q",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "J#x)07<V9;=\\8",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "2pW@x^Ij\"",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "S",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "4;ecM[#&09X-mzEiNM9nQzr[Y:^",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "k[*oH!h|B&[)}MA[E",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "z`0=h>7%c>9Dr",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "ztARoHz8XPK\\p",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "+",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "sY+SQ",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "qN61b7;%eA39*(",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "}(WIk*1@)}[?O8w:E#Qn.\\u6\\6r`",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "3~}4?i}7\\`Svgo2fYZ\\b(1<bX,sbZ$A,m;CD1$",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "XLf!_D5t<",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "3d2<qQ`}ke68E-c,cp3Gg?f}Fo\\wb!],^FA>M_",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "@MeE,FM95Q?cyVTmT4uN-Tp",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "&c/Q7nh5C3t?S8lAH_yzi%BpC:PB<Pb3m`;",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "b7W)sdp",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "`1,Q}_vvTB",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [],
+      "step": {
+        "changes": true
+      }
+    }
+  ]
+}

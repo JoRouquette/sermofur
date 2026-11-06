@@ -1,5 +1,6 @@
 //! `Guid.TryParse` of .NET, for identifiers typed on the command line
-//! (`rust/tests/golden/cli-3-4/guid_forms.json` is the truth): blanks around trimmed, then the
+//! (`rust/tests/golden/guid.json`, from `rust/tools/guid-oracle`, and
+//! `rust/tests/golden/cli-3-4/guid_forms.json` are the truth): blanks around trimmed, then the
 //! formats N (32 digits), D (8-4-4-4-12), B (`{D}`), P (`(D)`) and X
 //! (`{0x…,0x…,0x…,{0x…,…}}`), with the compatibility leniencies of the .NET parser: in D, B and
 //! P the first four groups may start with `+` and/or `0x`; in X blanks are allowed anywhere,
@@ -149,7 +150,54 @@ pub fn try_parse(text: &str) -> Option<Uuid> {
 
 #[cfg(test)]
 mod tests {
-    use super::try_parse;
+    use proptest::prelude::*;
+
+    use super::{Uuid, try_parse};
+
+    /// `Guid.ToString("X")`: `{0xaaaaaaaa,0xbbbb,0xcccc,{0xdd,…}}`.
+    fn x_form(id: Uuid) -> String {
+        let (a, b, c, rest) = id.as_fields();
+        let bytes: Vec<String> = rest.iter().map(|byte| format!("0x{byte:02x}")).collect();
+        format!("{{0x{a:08x},0x{b:04x},0x{c:04x},{{{}}}}}", bytes.join(","))
+    }
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(2000))]
+
+        #[test]
+        fn arbitrary_text_never_panics(text in "\\PC{0,80}") {
+            let _ = try_parse(&text);
+        }
+
+        // Text made of the characters of the formats, X above all: every index path of the
+        // parser, near its accepted syntax.
+        #[test]
+        fn text_near_the_x_syntax_never_panics(
+            text in "[{}0xX,a-fA-F0-9+ \t()-]{0,80}",
+            tail in "\\{0[xX][0-9a-fA-F+xX, {}]{0,70}",
+        ) {
+            let _ = try_parse(&text);
+            let _ = try_parse(&tail);
+        }
+
+        // Every format of `Guid.ToString` reads back the value it was written from.
+        #[test]
+        fn every_format_round_trips(value in any::<u128>()) {
+            let id = Uuid::from_u128(value);
+            let d = id.hyphenated().to_string();
+            for form in [
+                id.simple().to_string(),
+                d.clone(),
+                id.braced().to_string(),
+                format!("({d})"),
+                x_form(id),
+                d.to_uppercase(),
+                x_form(id).to_uppercase(),
+            ] {
+                prop_assert_eq!(try_parse(&form), Some(id), "{}", form);
+            }
+        }
+    }
 
     #[test]
     fn the_usual_forms_read_the_same_value() {
