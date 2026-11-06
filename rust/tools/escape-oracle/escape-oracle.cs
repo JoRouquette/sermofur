@@ -56,10 +56,13 @@ for (int cp = 0; cp <= 0xFFFF; cp++)
         specials.Add($"[{cp}, {JsonSerializer.Serialize(escaped)}]");
     }
 }
+
 // A surrogate in the middle of a run cannot be told from a gap: keep ranges honest by
 // splitting at the surrogate block, which no Rust string can hold.
 string escapedBmp =
-    "\"specials\": [\n      " + string.Join(",\n      ", specials) + "\n    ],\n"
+    "\"specials\": [\n      "
+    + string.Join(",\n      ", specials)
+    + "\n    ],\n"
     + "    \"unicodeEscapedRanges\": [\n      "
     + string.Join(",\n      ", ranges.Select(r => $"[{r.Start}, {r.End}]"))
     + "\n    ]";
