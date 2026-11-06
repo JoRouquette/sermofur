@@ -112,6 +112,18 @@ pub struct DateTimeOffset {
     offset_minutes: i16,
 }
 
+/// Written as `System.Text.Json` writes a `DateTimeOffset` ([`DateTimeOffset::to_json_text`]):
+/// `WriteStringValue(DateTimeOffset)` formats the text itself, without the string encoder, so
+/// the `+` of the offset stays as it is. The text holds only digits and `-:T.+`, so it goes out
+/// as a raw JSON string.
+impl serde::Serialize for DateTimeOffset {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        let raw = serde_json::value::RawValue::from_string(format!("\"{}\"", self.to_json_text()))
+            .map_err(serde::ser::Error::custom)?;
+        raw.serialize(serializer)
+    }
+}
+
 impl DateTimeOffset {
     /// Builds a value, or `None` where the .NET constructor throws: the offset is beyond ±14:00,
     /// or the UTC ticks or the local ticks fall outside `0..=DateTime.MaxValue.Ticks`.

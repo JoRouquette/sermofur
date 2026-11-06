@@ -6,6 +6,7 @@
     ".sermofur/records/"
   ],
   "exitCode": 0,
+  "instanceJson": "{\n  \"schemaVersion\": 2,\n  \"instanceId\": \"<guid>\",\n  \"createdAt\": \"<date>\"\n}",
   "stderr": "",
   "stdout": "{\n  \"root\": \"<root>\"\n}\n"
 }

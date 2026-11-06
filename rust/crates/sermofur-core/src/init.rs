@@ -67,7 +67,7 @@ pub struct Initialized {
 struct ConfigurationJson {
     schema_version: i32,
     instance_id: String,
-    created_at: String,
+    created_at: DateTimeOffset,
 }
 
 /// The JSON text of a configuration, as `RecordJson` writes it.
@@ -75,7 +75,7 @@ pub fn configuration_json(configuration: &InstanceConfiguration) -> Result<Strin
     json::to_string(&ConfigurationJson {
         schema_version: configuration.schema_version,
         instance_id: configuration.instance_id.hyphenated().to_string(),
-        created_at: configuration.created_at.to_json_text(),
+        created_at: configuration.created_at,
     })
     .map_err(|_| invalid_storage())
 }

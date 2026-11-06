@@ -4,6 +4,7 @@
     ".sermofur/instance.json"
   ],
   "exitCode": 0,
+  "instanceJson": "{\"schemaVersion\":1,\"instanceId\":\"0f8fad5b-d9cb-469f-a165-70867728950e\",\"createdAt\":\"2026-01-02T03:04:05+00:00\"}",
   "stderr": "",
   "stdout": "{\n  \"root\": \"<root>\"\n}\n"
 }

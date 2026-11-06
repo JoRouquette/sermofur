@@ -44,7 +44,7 @@ struct InitBody {
 struct ConfigurationBody {
     schema_version: i32,
     instance_id: String,
-    created_at: String,
+    created_at: sermofur_core::format::DateTimeOffset,
 }
 
 impl From<Initialized> for InitBody {
@@ -54,7 +54,7 @@ impl From<Initialized> for InitBody {
             configuration: ConfigurationBody {
                 schema_version: value.configuration.schema_version,
                 instance_id: value.configuration.instance_id.hyphenated().to_string(),
-                created_at: value.configuration.created_at.to_json_text(),
+                created_at: value.configuration.created_at,
             },
             created: value.created,
         }

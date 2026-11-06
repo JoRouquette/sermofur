@@ -1,0 +1,549 @@
+{
+  "generator": "rust/tools/record-oracle",
+  "runtime": ".NET 10.0.5",
+  "writes": [
+    {
+      "type": "Scope",
+      "json": "{\r\n  \u0022id\u0022: \u0022s-Workspace\u0022,\r\n  \u0022kind\u0022: \u0022workspace\u0022,\r\n  \u0022parentId\u0022: null,\r\n  \u0022relativePath\u0022: null\r\n}"
+    },
+    {
+      "type": "Scope",
+      "json": "{\r\n  \u0022id\u0022: \u0022s-Client\u0022,\r\n  \u0022kind\u0022: \u0022client\u0022,\r\n  \u0022parentId\u0022: \u0022workspace\u0022,\r\n  \u0022relativePath\u0022: null\r\n}"
+    },
+    {
+      "type": "Scope",
+      "json": "{\r\n  \u0022id\u0022: \u0022s-Project\u0022,\r\n  \u0022kind\u0022: \u0022project\u0022,\r\n  \u0022parentId\u0022: \u0022workspace\u0022,\r\n  \u0022relativePath\u0022: null\r\n}"
+    },
+    {
+      "type": "Scope",
+      "json": "{\r\n  \u0022id\u0022: \u0022s-Repository\u0022,\r\n  \u0022kind\u0022: \u0022repository\u0022,\r\n  \u0022parentId\u0022: \u0022workspace\u0022,\r\n  \u0022relativePath\u0022: \u0022src/app\u0022\r\n}"
+    },
+    {
+      "type": "Scope",
+      "json": "{\r\n  \u0022id\u0022: \u0022s-Task\u0022,\r\n  \u0022kind\u0022: \u0022task\u0022,\r\n  \u0022parentId\u0022: \u0022workspace\u0022,\r\n  \u0022relativePath\u0022: null\r\n}"
+    },
+    {
+      "type": "InstanceConfiguration",
+      "json": "{\r\n  \u0022schemaVersion\u0022: 2,\r\n  \u0022instanceId\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022createdAt\u0022: \u00222026-11-06T20:00:00.1234567\u002B00:00\u0022\r\n}"
+    },
+    {
+      "type": "Provenance",
+      "json": "{\r\n  \u0022origin\u0022: \u0022user\u0022,\r\n  \u0022actor\u0022: \u0022john \\u003Ca\\u0026b\\u003E \\u0027x\\u0027 \\u0060y\\u0060 \\u002B\u0022,\r\n  \u0022timestamp\u0022: \u00222026-01-02T03:04:05.678\u002B02:00\u0022\r\n}"
+    },
+    {
+      "type": "Provenance",
+      "json": "{\r\n  \u0022origin\u0022: \u0022llm\u0022,\r\n  \u0022actor\u0022: \u0022john \\u003Ca\\u0026b\\u003E \\u0027x\\u0027 \\u0060y\\u0060 \\u002B\u0022,\r\n  \u0022timestamp\u0022: \u00222026-01-02T03:04:05.678\u002B02:00\u0022\r\n}"
+    },
+    {
+      "type": "ClaimContent",
+      "json": "{\r\n  \u0022text\u0022: \u0022Le caf\u00E9 \\u0022noir\\u0022 \u00E9t\u00E9 \\uD83D\\uDE00\\n\\t\u0022,\r\n  \u0022category\u0022: \u0022episodic\u0022,\r\n  \u0022volatility\u0022: \u0022stable\u0022,\r\n  \u0022lastVerified\u0022: null,\r\n  \u0022reviewAfter\u0022: null\r\n}"
+    },
+    {
+      "type": "ClaimContent",
+      "json": "{\r\n  \u0022text\u0022: \u0022Le caf\u00E9 \\u0022noir\\u0022 \u00E9t\u00E9 \\uD83D\\uDE00\\n\\t\u0022,\r\n  \u0022category\u0022: \u0022episodic\u0022,\r\n  \u0022volatility\u0022: \u0022evolving\u0022,\r\n  \u0022lastVerified\u0022: null,\r\n  \u0022reviewAfter\u0022: null\r\n}"
+    },
+    {
+      "type": "ClaimContent",
+      "json": "{\r\n  \u0022text\u0022: \u0022Le caf\u00E9 \\u0022noir\\u0022 \u00E9t\u00E9 \\uD83D\\uDE00\\n\\t\u0022,\r\n  \u0022category\u0022: \u0022episodic\u0022,\r\n  \u0022volatility\u0022: \u0022volatile\u0022,\r\n  \u0022lastVerified\u0022: null,\r\n  \u0022reviewAfter\u0022: \u00222026-11-06T20:00:00.1234567\u002B00:00\u0022\r\n}"
+    },
+    {
+      "type": "ClaimContent",
+      "json": "{\r\n  \u0022text\u0022: \u0022Le caf\u00E9 \\u0022noir\\u0022 \u00E9t\u00E9 \\uD83D\\uDE00\\n\\t\u0022,\r\n  \u0022category\u0022: \u0022semantic\u0022,\r\n  \u0022volatility\u0022: \u0022stable\u0022,\r\n  \u0022lastVerified\u0022: null,\r\n  \u0022reviewAfter\u0022: null\r\n}"
+    },
+    {
+      "type": "ClaimContent",
+      "json": "{\r\n  \u0022text\u0022: \u0022Le caf\u00E9 \\u0022noir\\u0022 \u00E9t\u00E9 \\uD83D\\uDE00\\n\\t\u0022,\r\n  \u0022category\u0022: \u0022semantic\u0022,\r\n  \u0022volatility\u0022: \u0022evolving\u0022,\r\n  \u0022lastVerified\u0022: null,\r\n  \u0022reviewAfter\u0022: null\r\n}"
+    },
+    {
+      "type": "ClaimContent",
+      "json": "{\r\n  \u0022text\u0022: \u0022Le caf\u00E9 \\u0022noir\\u0022 \u00E9t\u00E9 \\uD83D\\uDE00\\n\\t\u0022,\r\n  \u0022category\u0022: \u0022semantic\u0022,\r\n  \u0022volatility\u0022: \u0022volatile\u0022,\r\n  \u0022lastVerified\u0022: null,\r\n  \u0022reviewAfter\u0022: \u00222026-11-06T20:00:00.1234567\u002B00:00\u0022\r\n}"
+    },
+    {
+      "type": "ClaimContent",
+      "json": "{\r\n  \u0022text\u0022: \u0022Le caf\u00E9 \\u0022noir\\u0022 \u00E9t\u00E9 \\uD83D\\uDE00\\n\\t\u0022,\r\n  \u0022category\u0022: \u0022procedural\u0022,\r\n  \u0022volatility\u0022: \u0022stable\u0022,\r\n  \u0022lastVerified\u0022: null,\r\n  \u0022reviewAfter\u0022: null\r\n}"
+    },
+    {
+      "type": "ClaimContent",
+      "json": "{\r\n  \u0022text\u0022: \u0022Le caf\u00E9 \\u0022noir\\u0022 \u00E9t\u00E9 \\uD83D\\uDE00\\n\\t\u0022,\r\n  \u0022category\u0022: \u0022procedural\u0022,\r\n  \u0022volatility\u0022: \u0022evolving\u0022,\r\n  \u0022lastVerified\u0022: null,\r\n  \u0022reviewAfter\u0022: null\r\n}"
+    },
+    {
+      "type": "ClaimContent",
+      "json": "{\r\n  \u0022text\u0022: \u0022Le caf\u00E9 \\u0022noir\\u0022 \u00E9t\u00E9 \\uD83D\\uDE00\\n\\t\u0022,\r\n  \u0022category\u0022: \u0022procedural\u0022,\r\n  \u0022volatility\u0022: \u0022volatile\u0022,\r\n  \u0022lastVerified\u0022: null,\r\n  \u0022reviewAfter\u0022: \u00222026-11-06T20:00:00.1234567\u002B00:00\u0022\r\n}"
+    },
+    {
+      "type": "ClaimContent",
+      "json": "{\r\n  \u0022text\u0022: \u0022Le caf\u00E9 \\u0022noir\\u0022 \u00E9t\u00E9 \\uD83D\\uDE00\\n\\t\u0022,\r\n  \u0022category\u0022: \u0022preferences\u0022,\r\n  \u0022volatility\u0022: \u0022stable\u0022,\r\n  \u0022lastVerified\u0022: null,\r\n  \u0022reviewAfter\u0022: null\r\n}"
+    },
+    {
+      "type": "ClaimContent",
+      "json": "{\r\n  \u0022text\u0022: \u0022Le caf\u00E9 \\u0022noir\\u0022 \u00E9t\u00E9 \\uD83D\\uDE00\\n\\t\u0022,\r\n  \u0022category\u0022: \u0022preferences\u0022,\r\n  \u0022volatility\u0022: \u0022evolving\u0022,\r\n  \u0022lastVerified\u0022: null,\r\n  \u0022reviewAfter\u0022: null\r\n}"
+    },
+    {
+      "type": "ClaimContent",
+      "json": "{\r\n  \u0022text\u0022: \u0022Le caf\u00E9 \\u0022noir\\u0022 \u00E9t\u00E9 \\uD83D\\uDE00\\n\\t\u0022,\r\n  \u0022category\u0022: \u0022preferences\u0022,\r\n  \u0022volatility\u0022: \u0022volatile\u0022,\r\n  \u0022lastVerified\u0022: null,\r\n  \u0022reviewAfter\u0022: \u00222026-11-06T20:00:00.1234567\u002B00:00\u0022\r\n}"
+    },
+    {
+      "type": "ClaimContent",
+      "json": "{\r\n  \u0022text\u0022: \u0022Le caf\u00E9 \\u0022noir\\u0022 \u00E9t\u00E9 \\uD83D\\uDE00\\n\\t\u0022,\r\n  \u0022category\u0022: \u0022decisions\u0022,\r\n  \u0022volatility\u0022: \u0022stable\u0022,\r\n  \u0022lastVerified\u0022: \u00222026-01-02T03:04:05.678\u002B02:00\u0022,\r\n  \u0022reviewAfter\u0022: null\r\n}"
+    },
+    {
+      "type": "ClaimContent",
+      "json": "{\r\n  \u0022text\u0022: \u0022Le caf\u00E9 \\u0022noir\\u0022 \u00E9t\u00E9 \\uD83D\\uDE00\\n\\t\u0022,\r\n  \u0022category\u0022: \u0022decisions\u0022,\r\n  \u0022volatility\u0022: \u0022evolving\u0022,\r\n  \u0022lastVerified\u0022: \u00222026-01-02T03:04:05.678\u002B02:00\u0022,\r\n  \u0022reviewAfter\u0022: null\r\n}"
+    },
+    {
+      "type": "ClaimContent",
+      "json": "{\r\n  \u0022text\u0022: \u0022Le caf\u00E9 \\u0022noir\\u0022 \u00E9t\u00E9 \\uD83D\\uDE00\\n\\t\u0022,\r\n  \u0022category\u0022: \u0022decisions\u0022,\r\n  \u0022volatility\u0022: \u0022volatile\u0022,\r\n  \u0022lastVerified\u0022: \u00222026-01-02T03:04:05.678\u002B02:00\u0022,\r\n  \u0022reviewAfter\u0022: \u00222026-11-06T20:00:00.1234567\u002B00:00\u0022\r\n}"
+    },
+    {
+      "type": "EvidenceContent",
+      "json": "{\r\n  \u0022claimId\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022kind\u0022: \u0022execution\u0022,\r\n  \u0022reference\u0022: \u0022ref\u0022,\r\n  \u0022lineageId\u0022: \u0022lineage\u0022,\r\n  \u0022relation\u0022: \u0022contradicts\u0022,\r\n  \u0022sourceId\u0022: null,\r\n  \u0022sourceHash\u0022: null\r\n}"
+    },
+    {
+      "type": "EvidenceContent",
+      "json": "{\r\n  \u0022claimId\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022kind\u0022: \u0022source_code\u0022,\r\n  \u0022reference\u0022: \u0022ref\u0022,\r\n  \u0022lineageId\u0022: \u0022lineage\u0022,\r\n  \u0022relation\u0022: \u0022supports\u0022,\r\n  \u0022sourceId\u0022: \u00227c9e6679-7425-40de-944b-e07fc1f90ae7\u0022,\r\n  \u0022sourceHash\u0022: \u0022ABCDEF\u0022\r\n}"
+    },
+    {
+      "type": "EvidenceContent",
+      "json": "{\r\n  \u0022claimId\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022kind\u0022: \u0022authoritative_documentation\u0022,\r\n  \u0022reference\u0022: \u0022ref\u0022,\r\n  \u0022lineageId\u0022: \u0022lineage\u0022,\r\n  \u0022relation\u0022: \u0022supports\u0022,\r\n  \u0022sourceId\u0022: null,\r\n  \u0022sourceHash\u0022: null\r\n}"
+    },
+    {
+      "type": "EvidenceContent",
+      "json": "{\r\n  \u0022claimId\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022kind\u0022: \u0022project_decision\u0022,\r\n  \u0022reference\u0022: \u0022ref\u0022,\r\n  \u0022lineageId\u0022: \u0022lineage\u0022,\r\n  \u0022relation\u0022: \u0022supports\u0022,\r\n  \u0022sourceId\u0022: null,\r\n  \u0022sourceHash\u0022: null\r\n}"
+    },
+    {
+      "type": "EvidenceContent",
+      "json": "{\r\n  \u0022claimId\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022kind\u0022: \u0022local_documentation\u0022,\r\n  \u0022reference\u0022: \u0022ref\u0022,\r\n  \u0022lineageId\u0022: \u0022lineage\u0022,\r\n  \u0022relation\u0022: \u0022supports\u0022,\r\n  \u0022sourceId\u0022: null,\r\n  \u0022sourceHash\u0022: null\r\n}"
+    },
+    {
+      "type": "EvidenceContent",
+      "json": "{\r\n  \u0022claimId\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022kind\u0022: \u0022human_observation\u0022,\r\n  \u0022reference\u0022: \u0022ref\u0022,\r\n  \u0022lineageId\u0022: \u0022lineage\u0022,\r\n  \u0022relation\u0022: \u0022supports\u0022,\r\n  \u0022sourceId\u0022: null,\r\n  \u0022sourceHash\u0022: null\r\n}"
+    },
+    {
+      "type": "EvidenceContent",
+      "json": "{\r\n  \u0022claimId\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022kind\u0022: \u0022user_assertion\u0022,\r\n  \u0022reference\u0022: \u0022ref\u0022,\r\n  \u0022lineageId\u0022: \u0022lineage\u0022,\r\n  \u0022relation\u0022: \u0022supports\u0022,\r\n  \u0022sourceId\u0022: null,\r\n  \u0022sourceHash\u0022: null\r\n}"
+    },
+    {
+      "type": "EvidenceContent",
+      "json": "{\r\n  \u0022claimId\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022kind\u0022: \u0022llm_assertion\u0022,\r\n  \u0022reference\u0022: \u0022ref\u0022,\r\n  \u0022lineageId\u0022: \u0022lineage\u0022,\r\n  \u0022relation\u0022: \u0022supports\u0022,\r\n  \u0022sourceId\u0022: null,\r\n  \u0022sourceHash\u0022: null\r\n}"
+    },
+    {
+      "type": "SourceContent",
+      "json": "{\r\n  \u0022relativePath\u0022: \u0022docs/a.md\u0022,\r\n  \u0022status\u0022: \u0022indexed\u0022,\r\n  \u0022hash\u0022: \u002200FF\u0022,\r\n  \u0022size\u0022: 1234567890123,\r\n  \u0022indexedAt\u0022: \u00222026-11-06T20:00:00.1234567\u002B00:00\u0022,\r\n  \u0022passages\u0022: 3,\r\n  \u0022rejection\u0022: null\r\n}"
+    },
+    {
+      "type": "SourceContent",
+      "json": "{\r\n  \u0022relativePath\u0022: \u0022docs/a.md\u0022,\r\n  \u0022status\u0022: \u0022missing\u0022,\r\n  \u0022hash\u0022: \u002200FF\u0022,\r\n  \u0022size\u0022: 1234567890123,\r\n  \u0022indexedAt\u0022: null,\r\n  \u0022passages\u0022: 3,\r\n  \u0022rejection\u0022: null\r\n}"
+    },
+    {
+      "type": "SourceContent",
+      "json": "{\r\n  \u0022relativePath\u0022: \u0022docs/a.md\u0022,\r\n  \u0022status\u0022: \u0022unreadable\u0022,\r\n  \u0022hash\u0022: \u002200FF\u0022,\r\n  \u0022size\u0022: 1234567890123,\r\n  \u0022indexedAt\u0022: null,\r\n  \u0022passages\u0022: 3,\r\n  \u0022rejection\u0022: null\r\n}"
+    },
+    {
+      "type": "SourceContent",
+      "json": "{\r\n  \u0022relativePath\u0022: \u0022docs/a.md\u0022,\r\n  \u0022status\u0022: \u0022rejected\u0022,\r\n  \u0022hash\u0022: \u002200FF\u0022,\r\n  \u0022size\u0022: 1234567890123,\r\n  \u0022indexedAt\u0022: null,\r\n  \u0022passages\u0022: 3,\r\n  \u0022rejection\u0022: \u0022too_large\u0022\r\n}"
+    },
+    {
+      "type": "SourceContent",
+      "json": "{\r\n  \u0022relativePath\u0022: \u0022x\u0022,\r\n  \u0022status\u0022: \u0022rejected\u0022,\r\n  \u0022hash\u0022: \u0022\u0022,\r\n  \u0022size\u0022: 0,\r\n  \u0022indexedAt\u0022: null,\r\n  \u0022passages\u0022: 0,\r\n  \u0022rejection\u0022: \u0022too_large\u0022\r\n}"
+    },
+    {
+      "type": "SourceContent",
+      "json": "{\r\n  \u0022relativePath\u0022: \u0022x\u0022,\r\n  \u0022status\u0022: \u0022rejected\u0022,\r\n  \u0022hash\u0022: \u0022\u0022,\r\n  \u0022size\u0022: 0,\r\n  \u0022indexedAt\u0022: null,\r\n  \u0022passages\u0022: 0,\r\n  \u0022rejection\u0022: \u0022binary\u0022\r\n}"
+    },
+    {
+      "type": "SourceContent",
+      "json": "{\r\n  \u0022relativePath\u0022: \u0022x\u0022,\r\n  \u0022status\u0022: \u0022rejected\u0022,\r\n  \u0022hash\u0022: \u0022\u0022,\r\n  \u0022size\u0022: 0,\r\n  \u0022indexedAt\u0022: null,\r\n  \u0022passages\u0022: 0,\r\n  \u0022rejection\u0022: \u0022empty\u0022\r\n}"
+    },
+    {
+      "type": "SourceContent",
+      "json": "{\r\n  \u0022relativePath\u0022: \u0022x\u0022,\r\n  \u0022status\u0022: \u0022rejected\u0022,\r\n  \u0022hash\u0022: \u0022\u0022,\r\n  \u0022size\u0022: 0,\r\n  \u0022indexedAt\u0022: null,\r\n  \u0022passages\u0022: 0,\r\n  \u0022rejection\u0022: \u0022unsafe_path\u0022\r\n}"
+    },
+    {
+      "type": "RetexContent",
+      "json": "{\r\n  \u0022event\u0022: \u0022e\u0022,\r\n  \u0022impact\u0022: \u0022i\u0022,\r\n  \u0022nextAction\u0022: \u0022n\u0022\r\n}"
+    },
+    {
+      "type": "MemoryRecord",
+      "json": "{\r\n  \u0022id\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022scopeId\u0022: \u0022workspace\u0022,\r\n  \u0022kind\u0022: \u0022claim\u0022,\r\n  \u0022status\u0022: \u0022proposed\u0022,\r\n  \u0022revision\u0022: 7,\r\n  \u0022contentJson\u0022: \u0022{\\u0022a\\u0022:1}\u0022,\r\n  \u0022provenance\u0022: {\r\n    \u0022origin\u0022: \u0022llm\u0022,\r\n    \u0022actor\u0022: \u0022claude\u0022,\r\n    \u0022timestamp\u0022: \u00222026-01-02T03:04:05.678\u002B02:00\u0022\r\n  }\r\n}"
+    },
+    {
+      "type": "MemoryRecord",
+      "json": "{\r\n  \u0022id\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022scopeId\u0022: \u0022workspace\u0022,\r\n  \u0022kind\u0022: \u0022claim\u0022,\r\n  \u0022status\u0022: \u0022active\u0022,\r\n  \u0022revision\u0022: 7,\r\n  \u0022contentJson\u0022: \u0022{\\u0022a\\u0022:1}\u0022,\r\n  \u0022provenance\u0022: {\r\n    \u0022origin\u0022: \u0022llm\u0022,\r\n    \u0022actor\u0022: \u0022claude\u0022,\r\n    \u0022timestamp\u0022: \u00222026-01-02T03:04:05.678\u002B02:00\u0022\r\n  }\r\n}"
+    },
+    {
+      "type": "MemoryRecord",
+      "json": "{\r\n  \u0022id\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022scopeId\u0022: \u0022workspace\u0022,\r\n  \u0022kind\u0022: \u0022claim\u0022,\r\n  \u0022status\u0022: \u0022invalidated\u0022,\r\n  \u0022revision\u0022: 7,\r\n  \u0022contentJson\u0022: \u0022{\\u0022a\\u0022:1}\u0022,\r\n  \u0022provenance\u0022: {\r\n    \u0022origin\u0022: \u0022llm\u0022,\r\n    \u0022actor\u0022: \u0022claude\u0022,\r\n    \u0022timestamp\u0022: \u00222026-01-02T03:04:05.678\u002B02:00\u0022\r\n  }\r\n}"
+    },
+    {
+      "type": "MemoryRecord",
+      "json": "{\r\n  \u0022id\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022scopeId\u0022: \u0022workspace\u0022,\r\n  \u0022kind\u0022: \u0022claim\u0022,\r\n  \u0022status\u0022: \u0022superseded\u0022,\r\n  \u0022revision\u0022: 7,\r\n  \u0022contentJson\u0022: \u0022{\\u0022a\\u0022:1}\u0022,\r\n  \u0022provenance\u0022: {\r\n    \u0022origin\u0022: \u0022llm\u0022,\r\n    \u0022actor\u0022: \u0022claude\u0022,\r\n    \u0022timestamp\u0022: \u00222026-01-02T03:04:05.678\u002B02:00\u0022\r\n  }\r\n}"
+    },
+    {
+      "type": "MemoryRecord",
+      "json": "{\r\n  \u0022id\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022scopeId\u0022: \u0022workspace\u0022,\r\n  \u0022kind\u0022: \u0022claim\u0022,\r\n  \u0022status\u0022: \u0022draft\u0022,\r\n  \u0022revision\u0022: 7,\r\n  \u0022contentJson\u0022: \u0022{\\u0022a\\u0022:1}\u0022,\r\n  \u0022provenance\u0022: {\r\n    \u0022origin\u0022: \u0022llm\u0022,\r\n    \u0022actor\u0022: \u0022claude\u0022,\r\n    \u0022timestamp\u0022: \u00222026-01-02T03:04:05.678\u002B02:00\u0022\r\n  }\r\n}"
+    },
+    {
+      "type": "MemoryRecord",
+      "json": "{\r\n  \u0022id\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022scopeId\u0022: \u0022workspace\u0022,\r\n  \u0022kind\u0022: \u0022evidence\u0022,\r\n  \u0022status\u0022: \u0022proposed\u0022,\r\n  \u0022revision\u0022: 7,\r\n  \u0022contentJson\u0022: \u0022{\\u0022a\\u0022:1}\u0022,\r\n  \u0022provenance\u0022: {\r\n    \u0022origin\u0022: \u0022llm\u0022,\r\n    \u0022actor\u0022: \u0022claude\u0022,\r\n    \u0022timestamp\u0022: \u00222026-01-02T03:04:05.678\u002B02:00\u0022\r\n  }\r\n}"
+    },
+    {
+      "type": "MemoryRecord",
+      "json": "{\r\n  \u0022id\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022scopeId\u0022: \u0022workspace\u0022,\r\n  \u0022kind\u0022: \u0022evidence\u0022,\r\n  \u0022status\u0022: \u0022active\u0022,\r\n  \u0022revision\u0022: 7,\r\n  \u0022contentJson\u0022: \u0022{\\u0022a\\u0022:1}\u0022,\r\n  \u0022provenance\u0022: {\r\n    \u0022origin\u0022: \u0022llm\u0022,\r\n    \u0022actor\u0022: \u0022claude\u0022,\r\n    \u0022timestamp\u0022: \u00222026-01-02T03:04:05.678\u002B02:00\u0022\r\n  }\r\n}"
+    },
+    {
+      "type": "MemoryRecord",
+      "json": "{\r\n  \u0022id\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022scopeId\u0022: \u0022workspace\u0022,\r\n  \u0022kind\u0022: \u0022evidence\u0022,\r\n  \u0022status\u0022: \u0022invalidated\u0022,\r\n  \u0022revision\u0022: 7,\r\n  \u0022contentJson\u0022: \u0022{\\u0022a\\u0022:1}\u0022,\r\n  \u0022provenance\u0022: {\r\n    \u0022origin\u0022: \u0022llm\u0022,\r\n    \u0022actor\u0022: \u0022claude\u0022,\r\n    \u0022timestamp\u0022: \u00222026-01-02T03:04:05.678\u002B02:00\u0022\r\n  }\r\n}"
+    },
+    {
+      "type": "MemoryRecord",
+      "json": "{\r\n  \u0022id\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022scopeId\u0022: \u0022workspace\u0022,\r\n  \u0022kind\u0022: \u0022evidence\u0022,\r\n  \u0022status\u0022: \u0022superseded\u0022,\r\n  \u0022revision\u0022: 7,\r\n  \u0022contentJson\u0022: \u0022{\\u0022a\\u0022:1}\u0022,\r\n  \u0022provenance\u0022: {\r\n    \u0022origin\u0022: \u0022llm\u0022,\r\n    \u0022actor\u0022: \u0022claude\u0022,\r\n    \u0022timestamp\u0022: \u00222026-01-02T03:04:05.678\u002B02:00\u0022\r\n  }\r\n}"
+    },
+    {
+      "type": "MemoryRecord",
+      "json": "{\r\n  \u0022id\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022scopeId\u0022: \u0022workspace\u0022,\r\n  \u0022kind\u0022: \u0022evidence\u0022,\r\n  \u0022status\u0022: \u0022draft\u0022,\r\n  \u0022revision\u0022: 7,\r\n  \u0022contentJson\u0022: \u0022{\\u0022a\\u0022:1}\u0022,\r\n  \u0022provenance\u0022: {\r\n    \u0022origin\u0022: \u0022llm\u0022,\r\n    \u0022actor\u0022: \u0022claude\u0022,\r\n    \u0022timestamp\u0022: \u00222026-01-02T03:04:05.678\u002B02:00\u0022\r\n  }\r\n}"
+    },
+    {
+      "type": "MemoryRecord",
+      "json": "{\r\n  \u0022id\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022scopeId\u0022: \u0022workspace\u0022,\r\n  \u0022kind\u0022: \u0022retex\u0022,\r\n  \u0022status\u0022: \u0022proposed\u0022,\r\n  \u0022revision\u0022: 7,\r\n  \u0022contentJson\u0022: \u0022{\\u0022a\\u0022:1}\u0022,\r\n  \u0022provenance\u0022: {\r\n    \u0022origin\u0022: \u0022llm\u0022,\r\n    \u0022actor\u0022: \u0022claude\u0022,\r\n    \u0022timestamp\u0022: \u00222026-01-02T03:04:05.678\u002B02:00\u0022\r\n  }\r\n}"
+    },
+    {
+      "type": "MemoryRecord",
+      "json": "{\r\n  \u0022id\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022scopeId\u0022: \u0022workspace\u0022,\r\n  \u0022kind\u0022: \u0022retex\u0022,\r\n  \u0022status\u0022: \u0022active\u0022,\r\n  \u0022revision\u0022: 7,\r\n  \u0022contentJson\u0022: \u0022{\\u0022a\\u0022:1}\u0022,\r\n  \u0022provenance\u0022: {\r\n    \u0022origin\u0022: \u0022llm\u0022,\r\n    \u0022actor\u0022: \u0022claude\u0022,\r\n    \u0022timestamp\u0022: \u00222026-01-02T03:04:05.678\u002B02:00\u0022\r\n  }\r\n}"
+    },
+    {
+      "type": "MemoryRecord",
+      "json": "{\r\n  \u0022id\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022scopeId\u0022: \u0022workspace\u0022,\r\n  \u0022kind\u0022: \u0022retex\u0022,\r\n  \u0022status\u0022: \u0022invalidated\u0022,\r\n  \u0022revision\u0022: 7,\r\n  \u0022contentJson\u0022: \u0022{\\u0022a\\u0022:1}\u0022,\r\n  \u0022provenance\u0022: {\r\n    \u0022origin\u0022: \u0022llm\u0022,\r\n    \u0022actor\u0022: \u0022claude\u0022,\r\n    \u0022timestamp\u0022: \u00222026-01-02T03:04:05.678\u002B02:00\u0022\r\n  }\r\n}"
+    },
+    {
+      "type": "MemoryRecord",
+      "json": "{\r\n  \u0022id\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022scopeId\u0022: \u0022workspace\u0022,\r\n  \u0022kind\u0022: \u0022retex\u0022,\r\n  \u0022status\u0022: \u0022superseded\u0022,\r\n  \u0022revision\u0022: 7,\r\n  \u0022contentJson\u0022: \u0022{\\u0022a\\u0022:1}\u0022,\r\n  \u0022provenance\u0022: {\r\n    \u0022origin\u0022: \u0022llm\u0022,\r\n    \u0022actor\u0022: \u0022claude\u0022,\r\n    \u0022timestamp\u0022: \u00222026-01-02T03:04:05.678\u002B02:00\u0022\r\n  }\r\n}"
+    },
+    {
+      "type": "MemoryRecord",
+      "json": "{\r\n  \u0022id\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022scopeId\u0022: \u0022workspace\u0022,\r\n  \u0022kind\u0022: \u0022retex\u0022,\r\n  \u0022status\u0022: \u0022draft\u0022,\r\n  \u0022revision\u0022: 7,\r\n  \u0022contentJson\u0022: \u0022{\\u0022a\\u0022:1}\u0022,\r\n  \u0022provenance\u0022: {\r\n    \u0022origin\u0022: \u0022llm\u0022,\r\n    \u0022actor\u0022: \u0022claude\u0022,\r\n    \u0022timestamp\u0022: \u00222026-01-02T03:04:05.678\u002B02:00\u0022\r\n  }\r\n}"
+    },
+    {
+      "type": "MemoryRecord",
+      "json": "{\r\n  \u0022id\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022scopeId\u0022: \u0022workspace\u0022,\r\n  \u0022kind\u0022: \u0022source\u0022,\r\n  \u0022status\u0022: \u0022proposed\u0022,\r\n  \u0022revision\u0022: 7,\r\n  \u0022contentJson\u0022: \u0022{\\u0022a\\u0022:1}\u0022,\r\n  \u0022provenance\u0022: {\r\n    \u0022origin\u0022: \u0022llm\u0022,\r\n    \u0022actor\u0022: \u0022claude\u0022,\r\n    \u0022timestamp\u0022: \u00222026-01-02T03:04:05.678\u002B02:00\u0022\r\n  }\r\n}"
+    },
+    {
+      "type": "MemoryRecord",
+      "json": "{\r\n  \u0022id\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022scopeId\u0022: \u0022workspace\u0022,\r\n  \u0022kind\u0022: \u0022source\u0022,\r\n  \u0022status\u0022: \u0022active\u0022,\r\n  \u0022revision\u0022: 7,\r\n  \u0022contentJson\u0022: \u0022{\\u0022a\\u0022:1}\u0022,\r\n  \u0022provenance\u0022: {\r\n    \u0022origin\u0022: \u0022llm\u0022,\r\n    \u0022actor\u0022: \u0022claude\u0022,\r\n    \u0022timestamp\u0022: \u00222026-01-02T03:04:05.678\u002B02:00\u0022\r\n  }\r\n}"
+    },
+    {
+      "type": "MemoryRecord",
+      "json": "{\r\n  \u0022id\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022scopeId\u0022: \u0022workspace\u0022,\r\n  \u0022kind\u0022: \u0022source\u0022,\r\n  \u0022status\u0022: \u0022invalidated\u0022,\r\n  \u0022revision\u0022: 7,\r\n  \u0022contentJson\u0022: \u0022{\\u0022a\\u0022:1}\u0022,\r\n  \u0022provenance\u0022: {\r\n    \u0022origin\u0022: \u0022llm\u0022,\r\n    \u0022actor\u0022: \u0022claude\u0022,\r\n    \u0022timestamp\u0022: \u00222026-01-02T03:04:05.678\u002B02:00\u0022\r\n  }\r\n}"
+    },
+    {
+      "type": "MemoryRecord",
+      "json": "{\r\n  \u0022id\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022scopeId\u0022: \u0022workspace\u0022,\r\n  \u0022kind\u0022: \u0022source\u0022,\r\n  \u0022status\u0022: \u0022superseded\u0022,\r\n  \u0022revision\u0022: 7,\r\n  \u0022contentJson\u0022: \u0022{\\u0022a\\u0022:1}\u0022,\r\n  \u0022provenance\u0022: {\r\n    \u0022origin\u0022: \u0022llm\u0022,\r\n    \u0022actor\u0022: \u0022claude\u0022,\r\n    \u0022timestamp\u0022: \u00222026-01-02T03:04:05.678\u002B02:00\u0022\r\n  }\r\n}"
+    },
+    {
+      "type": "MemoryRecord",
+      "json": "{\r\n  \u0022id\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022scopeId\u0022: \u0022workspace\u0022,\r\n  \u0022kind\u0022: \u0022source\u0022,\r\n  \u0022status\u0022: \u0022draft\u0022,\r\n  \u0022revision\u0022: 7,\r\n  \u0022contentJson\u0022: \u0022{\\u0022a\\u0022:1}\u0022,\r\n  \u0022provenance\u0022: {\r\n    \u0022origin\u0022: \u0022llm\u0022,\r\n    \u0022actor\u0022: \u0022claude\u0022,\r\n    \u0022timestamp\u0022: \u00222026-01-02T03:04:05.678\u002B02:00\u0022\r\n  }\r\n}"
+    },
+    {
+      "type": "HistoryEntry",
+      "json": "{\r\n  \u0022sequence\u0022: 42,\r\n  \u0022objectId\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022scopeId\u0022: \u0022workspace\u0022,\r\n  \u0022previousState\u0022: null,\r\n  \u0022newState\u0022: \u0022active\u0022,\r\n  \u0022reason\u0022: \u0022created\u0022,\r\n  \u0022actor\u0022: \u0022john\u0022,\r\n  \u0022timestamp\u0022: \u00222026-01-02T03:04:05.678\u002B02:00\u0022\r\n}"
+    },
+    {
+      "type": "HistoryEntry",
+      "json": "{\r\n  \u0022sequence\u0022: 43,\r\n  \u0022objectId\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022scopeId\u0022: \u0022workspace\u0022,\r\n  \u0022previousState\u0022: \u0022active\u0022,\r\n  \u0022newState\u0022: \u0022invalidated\u0022,\r\n  \u0022reason\u0022: \u0022why\u0022,\r\n  \u0022actor\u0022: \u0022john\u0022,\r\n  \u0022timestamp\u0022: \u00222026-11-06T20:00:00.1234567\u002B00:00\u0022\r\n}"
+    },
+    {
+      "type": "Confidence",
+      "json": "{\r\n  \u0022level\u0022: \u0022low\u0022,\r\n  \u0022reasons\u0022: [\r\n    \u0022a\u0022,\r\n    \u0022b\u0022\r\n  ],\r\n  \u0022independentOrigins\u0022: 2\r\n}"
+    },
+    {
+      "type": "Confidence",
+      "json": "{\r\n  \u0022level\u0022: \u0022medium\u0022,\r\n  \u0022reasons\u0022: [\r\n    \u0022a\u0022,\r\n    \u0022b\u0022\r\n  ],\r\n  \u0022independentOrigins\u0022: 2\r\n}"
+    },
+    {
+      "type": "Confidence",
+      "json": "{\r\n  \u0022level\u0022: \u0022high\u0022,\r\n  \u0022reasons\u0022: [\r\n    \u0022a\u0022,\r\n    \u0022b\u0022\r\n  ],\r\n  \u0022independentOrigins\u0022: 2\r\n}"
+    },
+    {
+      "type": "Confidence",
+      "json": "{\r\n  \u0022level\u0022: \u0022verified\u0022,\r\n  \u0022reasons\u0022: [\r\n    \u0022a\u0022,\r\n    \u0022b\u0022\r\n  ],\r\n  \u0022independentOrigins\u0022: 2\r\n}"
+    }
+  ],
+  "reads": [
+    {
+      "type": "EvidenceContent",
+      "input": "{\u0022claimId\u0022:\u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\u0022kind\u0022:\u0022source_code\u0022,\u0022reference\u0022:\u0022r\u0022,\u0022lineageId\u0022:\u0022l\u0022}",
+      "written": "{\r\n  \u0022claimId\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022kind\u0022: \u0022source_code\u0022,\r\n  \u0022reference\u0022: \u0022r\u0022,\r\n  \u0022lineageId\u0022: \u0022l\u0022,\r\n  \u0022relation\u0022: \u0022supports\u0022,\r\n  \u0022sourceId\u0022: null,\r\n  \u0022sourceHash\u0022: null\r\n}"
+    },
+    {
+      "type": "EvidenceContent",
+      "input": "{\u0022claimId\u0022:\u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\u0022kind\u0022:\u0022source_code\u0022,\u0022reference\u0022:\u0022r\u0022,\u0022lineageId\u0022:\u0022l\u0022,\u0022relation\u0022:\u0022contradicts\u0022,\u0022sourceId\u0022:\u00227c9e6679-7425-40de-944b-e07fc1f90ae7\u0022,\u0022sourceHash\u0022:\u0022AB\u0022}",
+      "written": "{\r\n  \u0022claimId\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022kind\u0022: \u0022source_code\u0022,\r\n  \u0022reference\u0022: \u0022r\u0022,\r\n  \u0022lineageId\u0022: \u0022l\u0022,\r\n  \u0022relation\u0022: \u0022contradicts\u0022,\r\n  \u0022sourceId\u0022: \u00227c9e6679-7425-40de-944b-e07fc1f90ae7\u0022,\r\n  \u0022sourceHash\u0022: \u0022AB\u0022\r\n}"
+    },
+    {
+      "type": "EvidenceContent",
+      "input": "{\u0022claimId\u0022:\u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\u0022kind\u0022:\u0022source_code\u0022,\u0022reference\u0022:\u0022r\u0022,\u0022lineageId\u0022:\u0022l\u0022,\u0022relation\u0022:null}",
+      "exception": "System.Text.Json.JsonException"
+    },
+    {
+      "type": "EvidenceContent",
+      "input": "{\u0022claimId\u0022:\u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\u0022kind\u0022:\u0022source_code\u0022,\u0022reference\u0022:\u0022r\u0022,\u0022lineageId\u0022:\u0022l\u0022,\u0022sourceId\u0022:null,\u0022sourceHash\u0022:null}",
+      "written": "{\r\n  \u0022claimId\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022kind\u0022: \u0022source_code\u0022,\r\n  \u0022reference\u0022: \u0022r\u0022,\r\n  \u0022lineageId\u0022: \u0022l\u0022,\r\n  \u0022relation\u0022: \u0022supports\u0022,\r\n  \u0022sourceId\u0022: null,\r\n  \u0022sourceHash\u0022: null\r\n}"
+    },
+    {
+      "type": "EvidenceContent",
+      "input": "{\u0022kind\u0022:\u0022execution\u0022,\u0022reference\u0022:\u0022r\u0022,\u0022lineageId\u0022:\u0022l\u0022}",
+      "written": "{\r\n  \u0022claimId\u0022: \u002200000000-0000-0000-0000-000000000000\u0022,\r\n  \u0022kind\u0022: \u0022execution\u0022,\r\n  \u0022reference\u0022: \u0022r\u0022,\r\n  \u0022lineageId\u0022: \u0022l\u0022,\r\n  \u0022relation\u0022: \u0022supports\u0022,\r\n  \u0022sourceId\u0022: null,\r\n  \u0022sourceHash\u0022: null\r\n}"
+    },
+    {
+      "type": "EvidenceContent",
+      "input": "{\u0022claimId\u0022:\u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\u0022kind\u0022:\u0022source_code\u0022,\u0022reference\u0022:\u0022r\u0022,\u0022lineageId\u0022:\u0022l\u0022,\u0022relation\u0022:\u0022Contradicts\u0022}",
+      "written": "{\r\n  \u0022claimId\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022kind\u0022: \u0022source_code\u0022,\r\n  \u0022reference\u0022: \u0022r\u0022,\r\n  \u0022lineageId\u0022: \u0022l\u0022,\r\n  \u0022relation\u0022: \u0022contradicts\u0022,\r\n  \u0022sourceId\u0022: null,\r\n  \u0022sourceHash\u0022: null\r\n}"
+    },
+    {
+      "type": "EvidenceContent",
+      "input": "{\u0022claimId\u0022:\u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\u0022kind\u0022:\u0022source_code\u0022,\u0022reference\u0022:\u0022r\u0022,\u0022lineageId\u0022:\u0022l\u0022,\u0022relation\u0022:\u0022CONTRADICTS\u0022}",
+      "written": "{\r\n  \u0022claimId\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022kind\u0022: \u0022source_code\u0022,\r\n  \u0022reference\u0022: \u0022r\u0022,\r\n  \u0022lineageId\u0022: \u0022l\u0022,\r\n  \u0022relation\u0022: \u0022contradicts\u0022,\r\n  \u0022sourceId\u0022: null,\r\n  \u0022sourceHash\u0022: null\r\n}"
+    },
+    {
+      "type": "EvidenceContent",
+      "input": "{\u0022claimId\u0022:\u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\u0022kind\u0022:\u0022source_code\u0022,\u0022reference\u0022:\u0022r\u0022,\u0022lineageId\u0022:\u0022l\u0022,\u0022relation\u0022:1}",
+      "exception": "System.Text.Json.JsonException"
+    },
+    {
+      "type": "EvidenceContent",
+      "input": "{\u0022claimId\u0022:\u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\u0022kind\u0022:\u0022source_code\u0022,\u0022reference\u0022:\u0022r\u0022,\u0022lineageId\u0022:\u0022l\u0022,\u0022relation\u0022:\u00221\u0022}",
+      "exception": "System.Text.Json.JsonException"
+    },
+    {
+      "type": "EvidenceContent",
+      "input": "{\u0022claimId\u0022:\u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\u0022kind\u0022:\u0022source_code\u0022,\u0022reference\u0022:\u0022r\u0022,\u0022lineageId\u0022:\u0022l\u0022,\u0022relation\u0022:\u0022other\u0022}",
+      "exception": "System.Text.Json.JsonException"
+    },
+    {
+      "type": "EvidenceContent",
+      "input": "{\u0022claimId\u0022:\u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\u0022kind\u0022:\u0022source_code\u0022,\u0022reference\u0022:\u0022r\u0022,\u0022lineageId\u0022:\u0022l\u0022,\u0022relation\u0022:\u0022supports, contradicts\u0022}",
+      "written": "{\r\n  \u0022claimId\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022kind\u0022: \u0022source_code\u0022,\r\n  \u0022reference\u0022: \u0022r\u0022,\r\n  \u0022lineageId\u0022: \u0022l\u0022,\r\n  \u0022relation\u0022: \u0022contradicts\u0022,\r\n  \u0022sourceId\u0022: null,\r\n  \u0022sourceHash\u0022: null\r\n}"
+    },
+    {
+      "type": "EvidenceContent",
+      "input": "{\u0022claimId\u0022:\u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\u0022kind\u0022:\u0022source_code\u0022,\u0022reference\u0022:\u0022r\u0022,\u0022lineageId\u0022:\u0022l\u0022,\u0022relation\u0022:\u0022 supports\u0022}",
+      "written": "{\r\n  \u0022claimId\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022kind\u0022: \u0022source_code\u0022,\r\n  \u0022reference\u0022: \u0022r\u0022,\r\n  \u0022lineageId\u0022: \u0022l\u0022,\r\n  \u0022relation\u0022: \u0022supports\u0022,\r\n  \u0022sourceId\u0022: null,\r\n  \u0022sourceHash\u0022: null\r\n}"
+    },
+    {
+      "type": "EvidenceContent",
+      "input": "{\u0022claimId\u0022:\u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\u0022kind\u0022:\u0022SourceCode\u0022,\u0022reference\u0022:\u0022r\u0022,\u0022lineageId\u0022:\u0022l\u0022}",
+      "written": "{\r\n  \u0022claimId\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022kind\u0022: \u0022source_code\u0022,\r\n  \u0022reference\u0022: \u0022r\u0022,\r\n  \u0022lineageId\u0022: \u0022l\u0022,\r\n  \u0022relation\u0022: \u0022supports\u0022,\r\n  \u0022sourceId\u0022: null,\r\n  \u0022sourceHash\u0022: null\r\n}"
+    },
+    {
+      "type": "EvidenceContent",
+      "input": "{\u0022claimId\u0022:\u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\u0022kind\u0022:\u0022sourcecode\u0022,\u0022reference\u0022:\u0022r\u0022,\u0022lineageId\u0022:\u0022l\u0022}",
+      "written": "{\r\n  \u0022claimId\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022kind\u0022: \u0022source_code\u0022,\r\n  \u0022reference\u0022: \u0022r\u0022,\r\n  \u0022lineageId\u0022: \u0022l\u0022,\r\n  \u0022relation\u0022: \u0022supports\u0022,\r\n  \u0022sourceId\u0022: null,\r\n  \u0022sourceHash\u0022: null\r\n}"
+    },
+    {
+      "type": "EvidenceContent",
+      "input": "{\u0022claimId\u0022:\u00220F8FAD5B-D9CB-469F-A165-70867728950E\u0022,\u0022kind\u0022:\u0022execution\u0022,\u0022reference\u0022:\u0022r\u0022,\u0022lineageId\u0022:\u0022l\u0022}",
+      "written": "{\r\n  \u0022claimId\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022kind\u0022: \u0022execution\u0022,\r\n  \u0022reference\u0022: \u0022r\u0022,\r\n  \u0022lineageId\u0022: \u0022l\u0022,\r\n  \u0022relation\u0022: \u0022supports\u0022,\r\n  \u0022sourceId\u0022: null,\r\n  \u0022sourceHash\u0022: null\r\n}"
+    },
+    {
+      "type": "EvidenceContent",
+      "input": "{\u0022claimId\u0022:\u0022{0f8fad5b-d9cb-469f-a165-70867728950e}\u0022,\u0022kind\u0022:\u0022execution\u0022,\u0022reference\u0022:\u0022r\u0022,\u0022lineageId\u0022:\u0022l\u0022}",
+      "exception": "System.Text.Json.JsonException"
+    },
+    {
+      "type": "EvidenceContent",
+      "input": "{\u0022claimId\u0022:\u00220f8fad5bd9cb469fa16570867728950e\u0022,\u0022kind\u0022:\u0022execution\u0022,\u0022reference\u0022:\u0022r\u0022,\u0022lineageId\u0022:\u0022l\u0022}",
+      "exception": "System.Text.Json.JsonException"
+    },
+    {
+      "type": "EvidenceContent",
+      "input": "{\u0022claimId\u0022:\u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\u0022kind\u0022:\u0022source_code\u0022,\u0022reference\u0022:\u0022r\u0022,\u0022lineageId\u0022:\u0022l\u0022,\u0022reference\u0022:\u0022second\u0022}",
+      "written": "{\r\n  \u0022claimId\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022kind\u0022: \u0022source_code\u0022,\r\n  \u0022reference\u0022: \u0022second\u0022,\r\n  \u0022lineageId\u0022: \u0022l\u0022,\r\n  \u0022relation\u0022: \u0022supports\u0022,\r\n  \u0022sourceId\u0022: null,\r\n  \u0022sourceHash\u0022: null\r\n}"
+    },
+    {
+      "type": "EvidenceContent",
+      "input": "{\u0022claimId\u0022:\u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\u0022kind\u0022:\u0022source_code\u0022,\u0022reference\u0022:\u0022r\u0022,\u0022lineageId\u0022:\u0022l\u0022,\u0022Reference\u0022:\u0022case\u0022}",
+      "written": "{\r\n  \u0022claimId\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022kind\u0022: \u0022source_code\u0022,\r\n  \u0022reference\u0022: \u0022r\u0022,\r\n  \u0022lineageId\u0022: \u0022l\u0022,\r\n  \u0022relation\u0022: \u0022supports\u0022,\r\n  \u0022sourceId\u0022: null,\r\n  \u0022sourceHash\u0022: null\r\n}"
+    },
+    {
+      "type": "EvidenceContent",
+      "input": "{\u0022claimId\u0022:\u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\u0022kind\u0022:\u0022source_code\u0022,\u0022reference\u0022:\u0022r\u0022,\u0022lineageId\u0022:\u0022l\u0022,\u0022extra\u0022:{\u0022deep\u0022:[1,2]}}",
+      "written": "{\r\n  \u0022claimId\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022kind\u0022: \u0022source_code\u0022,\r\n  \u0022reference\u0022: \u0022r\u0022,\r\n  \u0022lineageId\u0022: \u0022l\u0022,\r\n  \u0022relation\u0022: \u0022supports\u0022,\r\n  \u0022sourceId\u0022: null,\r\n  \u0022sourceHash\u0022: null\r\n}"
+    },
+    {
+      "type": "ClaimContent",
+      "input": "{\u0022text\u0022:\u0022t\u0022,\u0022category\u0022:\u0022semantic\u0022,\u0022volatility\u0022:\u0022stable\u0022}",
+      "written": "{\r\n  \u0022text\u0022: \u0022t\u0022,\r\n  \u0022category\u0022: \u0022semantic\u0022,\r\n  \u0022volatility\u0022: \u0022stable\u0022,\r\n  \u0022lastVerified\u0022: null,\r\n  \u0022reviewAfter\u0022: null\r\n}"
+    },
+    {
+      "type": "ClaimContent",
+      "input": "{\u0022text\u0022:\u0022t\u0022,\u0022category\u0022:\u0022semantic\u0022,\u0022volatility\u0022:\u0022stable\u0022,\u0022lastVerified\u0022:\u00222026-01-02T03:04:05\u002B02:00\u0022,\u0022reviewAfter\u0022:\u00222026-01-02\u0022}",
+      "written": "{\r\n  \u0022text\u0022: \u0022t\u0022,\r\n  \u0022category\u0022: \u0022semantic\u0022,\r\n  \u0022volatility\u0022: \u0022stable\u0022,\r\n  \u0022lastVerified\u0022: \u00222026-01-02T03:04:05\u002B02:00\u0022,\r\n  \u0022reviewAfter\u0022: \u00222026-01-02T00:00:00\u002B01:00\u0022\r\n}"
+    },
+    {
+      "type": "ClaimContent",
+      "input": "{\u0022text\u0022:\u0022t\u0022,\u0022category\u0022:\u0022semantic\u0022,\u0022volatility\u0022:\u0022stable\u0022,\u0022lastVerified\u0022:\u00222026-01-02T03:04:05Z\u0022}",
+      "written": "{\r\n  \u0022text\u0022: \u0022t\u0022,\r\n  \u0022category\u0022: \u0022semantic\u0022,\r\n  \u0022volatility\u0022: \u0022stable\u0022,\r\n  \u0022lastVerified\u0022: \u00222026-01-02T03:04:05\u002B00:00\u0022,\r\n  \u0022reviewAfter\u0022: null\r\n}"
+    },
+    {
+      "type": "ClaimContent",
+      "input": "{\u0022text\u0022:\u0022t\u0022,\u0022category\u0022:\u0022semantic\u0022,\u0022volatility\u0022:\u0022stable\u0022,\u0022lastVerified\u0022:\u0022not a date\u0022}",
+      "exception": "System.Text.Json.JsonException"
+    },
+    {
+      "type": "ClaimContent",
+      "input": "{\u0022category\u0022:\u0022semantic\u0022,\u0022volatility\u0022:\u0022stable\u0022}",
+      "written": "{\r\n  \u0022text\u0022: null,\r\n  \u0022category\u0022: \u0022semantic\u0022,\r\n  \u0022volatility\u0022: \u0022stable\u0022,\r\n  \u0022lastVerified\u0022: null,\r\n  \u0022reviewAfter\u0022: null\r\n}"
+    },
+    {
+      "type": "ClaimContent",
+      "input": "{\u0022text\u0022:null,\u0022category\u0022:\u0022semantic\u0022,\u0022volatility\u0022:\u0022stable\u0022}",
+      "written": "{\r\n  \u0022text\u0022: null,\r\n  \u0022category\u0022: \u0022semantic\u0022,\r\n  \u0022volatility\u0022: \u0022stable\u0022,\r\n  \u0022lastVerified\u0022: null,\r\n  \u0022reviewAfter\u0022: null\r\n}"
+    },
+    {
+      "type": "ClaimContent",
+      "input": "{\u0022text\u0022:\u0022t\u0022}",
+      "written": "{\r\n  \u0022text\u0022: \u0022t\u0022,\r\n  \u0022category\u0022: \u0022episodic\u0022,\r\n  \u0022volatility\u0022: \u0022stable\u0022,\r\n  \u0022lastVerified\u0022: null,\r\n  \u0022reviewAfter\u0022: null\r\n}"
+    },
+    {
+      "type": "ClaimContent",
+      "input": "{\u0022text\u0022:\u0022t\u0022,\u0022category\u0022:null,\u0022volatility\u0022:\u0022stable\u0022}",
+      "exception": "System.Text.Json.JsonException"
+    },
+    {
+      "type": "ClaimContent",
+      "input": "{\u0022text\u0022:5,\u0022category\u0022:\u0022semantic\u0022,\u0022volatility\u0022:\u0022stable\u0022}",
+      "exception": "System.Text.Json.JsonException"
+    },
+    {
+      "type": "ClaimContent",
+      "input": "{\u0022text\u0022:\u0022\\ud800\u0022,\u0022category\u0022:\u0022semantic\u0022,\u0022volatility\u0022:\u0022stable\u0022}",
+      "exception": "System.Text.Json.JsonException"
+    },
+    {
+      "type": "ClaimContent",
+      "input": "{\u0022text\u0022:\u0022t\u0022,\u0022category\u0022:\u0022semantic\u0022,\u0022volatility\u0022:\u0022stable\u0022,}",
+      "exception": "System.Text.Json.JsonException"
+    },
+    {
+      "type": "ClaimContent",
+      "input": "{\u0022text\u0022:\u0022t\u0022,\u0022category\u0022:\u0022semantic\u0022,\u0022volatility\u0022:\u0022stable\u0022} x",
+      "exception": "System.Text.Json.JsonException"
+    },
+    {
+      "type": "ClaimContent",
+      "input": "[]",
+      "exception": "System.Text.Json.JsonException"
+    },
+    {
+      "type": "ClaimContent",
+      "input": "null",
+      "exception": "Sermofur.Domain.SermofurException",
+      "code": "invalid_record"
+    },
+    {
+      "type": "ClaimContent",
+      "input": "",
+      "exception": "System.Text.Json.JsonException"
+    },
+    {
+      "type": "SourceContent",
+      "input": "{\u0022relativePath\u0022:\u0022a\u0022,\u0022status\u0022:\u0022indexed\u0022,\u0022hash\u0022:\u0022H\u0022,\u0022size\u0022:5,\u0022indexedAt\u0022:null,\u0022passages\u0022:1}",
+      "written": "{\r\n  \u0022relativePath\u0022: \u0022a\u0022,\r\n  \u0022status\u0022: \u0022indexed\u0022,\r\n  \u0022hash\u0022: \u0022H\u0022,\r\n  \u0022size\u0022: 5,\r\n  \u0022indexedAt\u0022: null,\r\n  \u0022passages\u0022: 1,\r\n  \u0022rejection\u0022: null\r\n}"
+    },
+    {
+      "type": "SourceContent",
+      "input": "{\u0022relativePath\u0022:\u0022a\u0022,\u0022status\u0022:\u0022rejected\u0022,\u0022hash\u0022:\u0022H\u0022,\u0022size\u0022:5,\u0022indexedAt\u0022:null,\u0022passages\u0022:1,\u0022rejection\u0022:\u0022too_large\u0022}",
+      "written": "{\r\n  \u0022relativePath\u0022: \u0022a\u0022,\r\n  \u0022status\u0022: \u0022rejected\u0022,\r\n  \u0022hash\u0022: \u0022H\u0022,\r\n  \u0022size\u0022: 5,\r\n  \u0022indexedAt\u0022: null,\r\n  \u0022passages\u0022: 1,\r\n  \u0022rejection\u0022: \u0022too_large\u0022\r\n}"
+    },
+    {
+      "type": "SourceContent",
+      "input": "{\u0022relativePath\u0022:\u0022a\u0022,\u0022status\u0022:\u0022indexed\u0022,\u0022hash\u0022:\u0022H\u0022,\u0022size\u0022:5.0,\u0022passages\u0022:1}",
+      "exception": "System.Text.Json.JsonException"
+    },
+    {
+      "type": "SourceContent",
+      "input": "{\u0022relativePath\u0022:\u0022a\u0022,\u0022status\u0022:\u0022indexed\u0022,\u0022hash\u0022:\u0022H\u0022,\u0022size\u0022:1e3,\u0022passages\u0022:1}",
+      "exception": "System.Text.Json.JsonException"
+    },
+    {
+      "type": "SourceContent",
+      "input": "{\u0022relativePath\u0022:\u0022a\u0022,\u0022status\u0022:\u0022indexed\u0022,\u0022hash\u0022:\u0022H\u0022,\u0022size\u0022:\u00225\u0022,\u0022passages\u0022:1}",
+      "exception": "System.Text.Json.JsonException"
+    },
+    {
+      "type": "SourceContent",
+      "input": "{\u0022relativePath\u0022:\u0022a\u0022,\u0022status\u0022:\u0022indexed\u0022,\u0022hash\u0022:\u0022H\u0022,\u0022size\u0022:9223372036854775808,\u0022passages\u0022:1}",
+      "exception": "System.Text.Json.JsonException"
+    },
+    {
+      "type": "SourceContent",
+      "input": "{\u0022relativePath\u0022:\u0022a\u0022,\u0022status\u0022:\u0022indexed\u0022,\u0022hash\u0022:\u0022H\u0022,\u0022size\u0022:5,\u0022passages\u0022:2147483648}",
+      "exception": "System.Text.Json.JsonException"
+    },
+    {
+      "type": "SourceContent",
+      "input": "{\u0022relativePath\u0022:\u0022a\u0022,\u0022status\u0022:\u0022indexed\u0022,\u0022hash\u0022:\u0022H\u0022,\u0022size\u0022:-5,\u0022passages\u0022:-1}",
+      "written": "{\r\n  \u0022relativePath\u0022: \u0022a\u0022,\r\n  \u0022status\u0022: \u0022indexed\u0022,\r\n  \u0022hash\u0022: \u0022H\u0022,\r\n  \u0022size\u0022: -5,\r\n  \u0022indexedAt\u0022: null,\r\n  \u0022passages\u0022: -1,\r\n  \u0022rejection\u0022: null\r\n}"
+    },
+    {
+      "type": "RetexContent",
+      "input": "{\u0022event\u0022:\u0022e\u0022,\u0022impact\u0022:\u0022i\u0022,\u0022nextAction\u0022:\u0022n\u0022}",
+      "written": "{\r\n  \u0022event\u0022: \u0022e\u0022,\r\n  \u0022impact\u0022: \u0022i\u0022,\r\n  \u0022nextAction\u0022: \u0022n\u0022\r\n}"
+    },
+    {
+      "type": "RetexContent",
+      "input": "{\u0022event\u0022:\u0022e\u0022}",
+      "written": "{\r\n  \u0022event\u0022: \u0022e\u0022,\r\n  \u0022impact\u0022: null,\r\n  \u0022nextAction\u0022: null\r\n}"
+    },
+    {
+      "type": "MemoryRecord",
+      "input": "{\u0022id\u0022:\u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\u0022scopeId\u0022:\u0022workspace\u0022,\u0022kind\u0022:\u0022claim\u0022,\u0022status\u0022:\u0022active\u0022,\u0022revision\u0022:1,\u0022contentJson\u0022:\u0022{}\u0022,\u0022provenance\u0022:{\u0022origin\u0022:\u0022user\u0022,\u0022actor\u0022:\u0022a\u0022,\u0022timestamp\u0022:\u00222026-01-02T03:04:05\u002B00:00\u0022}}",
+      "written": "{\r\n  \u0022id\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022scopeId\u0022: \u0022workspace\u0022,\r\n  \u0022kind\u0022: \u0022claim\u0022,\r\n  \u0022status\u0022: \u0022active\u0022,\r\n  \u0022revision\u0022: 1,\r\n  \u0022contentJson\u0022: \u0022{}\u0022,\r\n  \u0022provenance\u0022: {\r\n    \u0022origin\u0022: \u0022user\u0022,\r\n    \u0022actor\u0022: \u0022a\u0022,\r\n    \u0022timestamp\u0022: \u00222026-01-02T03:04:05\u002B00:00\u0022\r\n  }\r\n}"
+    },
+    {
+      "type": "MemoryRecord",
+      "input": "{\u0022id\u0022:\u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\u0022scopeId\u0022:\u0022workspace\u0022,\u0022kind\u0022:\u0022claim\u0022,\u0022status\u0022:\u0022active\u0022,\u0022revision\u0022:1,\u0022contentJson\u0022:\u0022{}\u0022}",
+      "written": "{\r\n  \u0022id\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022scopeId\u0022: \u0022workspace\u0022,\r\n  \u0022kind\u0022: \u0022claim\u0022,\r\n  \u0022status\u0022: \u0022active\u0022,\r\n  \u0022revision\u0022: 1,\r\n  \u0022contentJson\u0022: \u0022{}\u0022,\r\n  \u0022provenance\u0022: null\r\n}"
+    },
+    {
+      "type": "HistoryEntry",
+      "input": "{\u0022sequence\u0022:1,\u0022objectId\u0022:\u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\u0022scopeId\u0022:\u0022w\u0022,\u0022previousState\u0022:null,\u0022newState\u0022:\u0022active\u0022,\u0022reason\u0022:\u0022r\u0022,\u0022actor\u0022:\u0022a\u0022,\u0022timestamp\u0022:\u00222026-01-02T03:04:05\u002B00:00\u0022}",
+      "written": "{\r\n  \u0022sequence\u0022: 1,\r\n  \u0022objectId\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022scopeId\u0022: \u0022w\u0022,\r\n  \u0022previousState\u0022: null,\r\n  \u0022newState\u0022: \u0022active\u0022,\r\n  \u0022reason\u0022: \u0022r\u0022,\r\n  \u0022actor\u0022: \u0022a\u0022,\r\n  \u0022timestamp\u0022: \u00222026-01-02T03:04:05\u002B00:00\u0022\r\n}"
+    },
+    {
+      "type": "ClaimContent",
+      "input": "{\u0022text\u0022:\u0022t\u0022,\u0022category\u0022:\u0022semantic\u0022,\u0022volatility\u0022:\u0022evolving, volatile\u0022}",
+      "exception": "System.Text.Json.JsonException"
+    },
+    {
+      "type": "ClaimContent",
+      "input": "{\u0022text\u0022:\u0022t\u0022,\u0022category\u0022:\u0022procedural, semantic\u0022,\u0022volatility\u0022:\u0022stable\u0022}",
+      "written": "{\r\n  \u0022text\u0022: \u0022t\u0022,\r\n  \u0022category\u0022: \u0022preferences\u0022,\r\n  \u0022volatility\u0022: \u0022stable\u0022,\r\n  \u0022lastVerified\u0022: null,\r\n  \u0022reviewAfter\u0022: null\r\n}"
+    },
+    {
+      "type": "EvidenceContent",
+      "input": "{\u0022claimId\u0022:\u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\u0022kind\u0022:\u0022source_code\u0022,\u0022reference\u0022:\u0022r\u0022,\u0022lineageId\u0022:\u0022l\u0022,\u0022kind\u0022:\u0022source_code, SourceCode\u0022}",
+      "written": "{\r\n  \u0022claimId\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022kind\u0022: \u0022source_code\u0022,\r\n  \u0022reference\u0022: \u0022r\u0022,\r\n  \u0022lineageId\u0022: \u0022l\u0022,\r\n  \u0022relation\u0022: \u0022supports\u0022,\r\n  \u0022sourceId\u0022: null,\r\n  \u0022sourceHash\u0022: null\r\n}"
+    },
+    {
+      "type": "EvidenceContent",
+      "input": "{\u0022claimId\u0022:\u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\u0022kind\u0022:\u0022source_code\u0022,\u0022reference\u0022:\u0022r\u0022,\u0022lineageId\u0022:\u0022l\u0022,\u0022kind\u0022:\u0022execution, source_code\u0022}",
+      "written": "{\r\n  \u0022claimId\u0022: \u00220f8fad5b-d9cb-469f-a165-70867728950e\u0022,\r\n  \u0022kind\u0022: \u0022source_code\u0022,\r\n  \u0022reference\u0022: \u0022r\u0022,\r\n  \u0022lineageId\u0022: \u0022l\u0022,\r\n  \u0022relation\u0022: \u0022supports\u0022,\r\n  \u0022sourceId\u0022: null,\r\n  \u0022sourceHash\u0022: null\r\n}"
+    },
+    {
+      "type": "RetexContent",
+      "input": "{\u0022event\u0022:\u0022e\u0022,\u0022x\u0022:[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]}",
+      "written": "{\r\n  \u0022event\u0022: \u0022e\u0022,\r\n  \u0022impact\u0022: null,\r\n  \u0022nextAction\u0022: null\r\n}"
+    },
+    {
+      "type": "RetexContent",
+      "input": "{\u0022event\u0022:\u0022e\u0022,\u0022x\u0022:[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]}",
+      "exception": "System.Text.Json.JsonException"
+    },
+    {
+      "type": "RetexContent",
+      "input": "{\u0022event\u0022:\u0022e\u0022,\u0022x\u0022:\u0022\\ud800\u0022}",
+      "written": "{\r\n  \u0022event\u0022: \u0022e\u0022,\r\n  \u0022impact\u0022: null,\r\n  \u0022nextAction\u0022: null\r\n}"
+    }
+  ],
+  "localOffsetMinutes": 60
+}

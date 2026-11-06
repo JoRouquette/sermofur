@@ -1,6 +1,7 @@
 {
   "entries": [],
   "exitCode": 1,
+  "instanceJson": null,
   "stderr": "smf: invalid_arguments: Wrong number of arguments.\n",
   "stdout": ""
 }

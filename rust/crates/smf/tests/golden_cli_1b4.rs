@@ -240,8 +240,8 @@ fn long_form(root: &Path) -> String {
 }
 
 /// Replaces the folder, the instance identity and the creation date by placeholders. The
-/// replaced values are checked first: a GUID in format D and a date in UTC (the `+` of the
-/// offset is written `\u002B` by the .NET encoder).
+/// replaced values are checked first: a GUID in format D and a date in UTC, its `+` written as
+/// it is (the .NET writer of dates does not escape it).
 fn normalize(text: &str, root: &Path) -> String {
     // The tools print the long form of the folder (8.3 names expanded on Windows); a short form
     // left in the output is a defect, so only the long one is replaced.
@@ -261,8 +261,7 @@ fn normalize(text: &str, root: &Path) -> String {
         while let Some(found) = out[from..].find(key) {
             let start = from + found + key.len();
             let end = start + out[start..].find('"').expect("closing quote");
-            let value = out[start..end].replace("\\u002B", "+");
-            let value = value.as_str();
+            let value = &out[start..end];
             if placeholder == "<guid>" {
                 assert!(
                     Uuid::try_parse(value).is_ok() && value.len() == 36,
@@ -293,10 +292,15 @@ fn record(program: &str, scenario: &Scenario) -> Value {
         .map(|a| a.replace("<root>", root_text))
         .collect();
     let out = run(program, &arguments, &root.join(scenario.cwd));
+    // The bytes of the configuration file each tool leaves, line breaks and values normalized.
+    let configuration = fs::read_to_string(root.join(".sermofur").join("instance.json"))
+        .map(|text| normalize(&text.replace("\r\n", "\n"), root))
+        .ok();
     json!({
         "exitCode": out.exit_code,
         "stdout": normalize(&out.stdout, root),
         "stderr": normalize(&out.stderr, root),
+        "instanceJson": configuration,
         "entries": entries(root),
     })
 }

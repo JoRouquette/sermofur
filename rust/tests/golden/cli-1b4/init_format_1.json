@@ -4,6 +4,7 @@
     ".sermofur/instance.json"
   ],
   "exitCode": 3,
+  "instanceJson": "{\"schemaVersion\":1,\"instanceId\":\"0f8fad5b-d9cb-469f-a165-70867728950e\",\"createdAt\":\"2026-01-02T03:04:05+00:00\"}",
   "stderr": "smf: migration_required: Instance in format 1; back it up if you wish, then run smf migrate.\n",
   "stdout": ""
 }

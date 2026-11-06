@@ -6,6 +6,7 @@
     ".sermofur/records/"
   ],
   "exitCode": 1,
+  "instanceJson": "{\n  \"schemaVersion\": 2,\n  \"instanceId\": \"<guid>\",\n  \"createdAt\": \"<date>\"\n}",
   "stderr": "smf: invalid_arguments: Wrong number of arguments.\n",
   "stdout": ""
 }

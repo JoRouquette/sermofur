@@ -13,7 +13,9 @@ pub mod json;
 pub mod limits;
 pub mod local_paths;
 pub mod ownership;
+pub mod records;
 pub mod schema;
+mod stj;
 
 mod dotnet_escape_table;
 #[cfg(windows)]
