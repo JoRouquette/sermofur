@@ -21,6 +21,7 @@ pub mod records;
 pub mod schema;
 pub mod scope_policy;
 pub mod scopes;
+pub mod search;
 mod stj;
 pub mod store;
 

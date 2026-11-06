@@ -6,6 +6,7 @@
 //! the record saved and reports `projection_pending`. A new scope takes the sources of its
 //! ancestors that lie under its mapping (`RescopeSources`).
 
+use std::cell::RefCell;
 use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 
@@ -18,11 +19,12 @@ use crate::init::open_store;
 use crate::instance::invalid_storage;
 use crate::projection::{is_current_safe, project};
 use crate::records::{
-    ClaimContent, DotNetEnum, EvidenceContent, HistoryEntry, KnowledgeStatus, MemoryRecord,
-    RecordKind, RetexContent, Scope, ScopeKind, SourceContent, read, write,
+    DotNetEnum, EvidenceContent, HistoryEntry, KnowledgeStatus, MemoryRecord, RecordKind, Scope,
+    ScopeKind, SourceContent, read, write,
 };
 use crate::schema::{SEARCH_TOKENIZER, storage};
 use crate::scope_policy::{ScopeLike, kind_value, validate_tree, visible_ancestors};
+use crate::search::{self, PassageCache};
 
 /// A row of the `scopes` table. The kind keeps the text stored and the value `Enum.Parse`
 /// gives it, which may be undefined (a number).
@@ -76,10 +78,18 @@ impl ScopeLike for StoredScope {
     }
 }
 
-/// `Enum.Parse<T>(text)`: the .NET names, case-sensitive, spaces around ignored, a list
-/// separated by commas combined by OR, or a number in `int` range. Anything else is the
-/// `ArgumentException` of .NET (`invalid_storage_or_path`).
-fn parse_dotnet_enum<E: DotNetEnum>(text: &str) -> Result<i64> {
+/// `Enum.Parse<T>(text, ignoreCase)`: the .NET names, case-sensitive or as `OrdinalIgnoreCase`,
+/// spaces around ignored, a list separated by commas combined by OR, or a number in `int`
+/// range. Anything else is the `ArgumentException` of .NET (`invalid_storage_or_path`).
+pub(crate) fn parse_dotnet_enum<E: DotNetEnum>(text: &str, ignore_case: bool) -> Result<i64> {
+    let fold = |s: &str| -> Vec<u16> {
+        let units: Vec<u16> = s.encode_utf16().collect();
+        if ignore_case {
+            crate::casing::ordinal_fold(&units)
+        } else {
+            units
+        }
+    };
     let trimmed = text.trim();
     let first = trimmed.chars().next().ok_or_else(invalid_storage)?;
     if first.is_ascii_digit() || first == '-' || first == '+' {
@@ -90,10 +100,10 @@ fn parse_dotnet_enum<E: DotNetEnum>(text: &str) -> Result<i64> {
     }
     let mut value = 0i64;
     for part in trimmed.split(',') {
-        let part = part.trim();
+        let part = fold(part.trim());
         let index = E::NAMES
             .iter()
-            .position(|(name, _, _)| *name == part)
+            .position(|(name, _, _)| fold(name) == part)
             .ok_or_else(invalid_storage)?;
         value |= i64::try_from(index).map_err(|_| invalid_storage())?;
     }
@@ -106,43 +116,6 @@ fn dotnet_name<E: DotNetEnum + PartialEq>(member: E) -> &'static str {
         .iter()
         .find(|(_, _, m)| *m == member)
         .map_or("", |(name, _, _)| name)
-}
-
-/// The kind of a record in the `search` table.
-fn search_kind(kind: RecordKind) -> Result<&'static str> {
-    match kind {
-        RecordKind::Claim => Ok("claim"),
-        RecordKind::Retex => Ok("retex"),
-        RecordKind::Source => Ok("source"),
-        // `ArgumentOutOfRangeException` in .NET: never reached, evidence is not indexed.
-        RecordKind::Evidence => Err(invalid_storage()),
-    }
-}
-
-/// The texts a claim or a RETEX is searched by (`SearchDocuments.For`): one passage each.
-fn search_documents(record: &MemoryRecord) -> Result<Vec<(i64, String)>> {
-    let offset = |_| 0;
-    let json = record.content_json.as_deref().ok_or_else(invalid_storage)?;
-    Ok(match record.kind {
-        RecordKind::Claim => {
-            let content: ClaimContent = read(json, &offset)?;
-            vec![(0, content.text.ok_or_else(invalid_storage)?)]
-        }
-        RecordKind::Retex => {
-            let content: RetexContent = read(json, &offset)?;
-            let part = |p: Option<String>| p.unwrap_or_default();
-            vec![(
-                0,
-                format!(
-                    "{}\n{}\n{}",
-                    part(content.event),
-                    part(content.impact),
-                    part(content.next_action)
-                ),
-            )]
-        }
-        _ => Vec::new(),
-    })
 }
 
 /// The terms of a text, by the exact tokenizer of the `search` table: a temporary FTS5 table
@@ -179,8 +152,11 @@ fn not_found() -> SermofurError {
 
 /// The store of one instance.
 pub struct Store {
-    connection: Connection,
+    pub(crate) connection: Connection,
     root: PathBuf,
+    /// Visible passages of the index, kept while the database and the visibility set stay the
+    /// same (`SqliteStore.visiblePassages`).
+    pub(crate) passages: RefCell<PassageCache>,
 }
 
 impl Store {
@@ -189,6 +165,7 @@ impl Store {
         Ok(Store {
             connection: open_store(root, instance_id, read_only)?,
             root: root.to_path_buf(),
+            passages: RefCell::new(None),
         })
     }
 
@@ -340,22 +317,13 @@ impl Store {
             )
             .map_err(|e| storage(&e))?;
         if matches!(candidate.kind, RecordKind::Claim | RecordKind::Retex) {
-            for (passage, text) in search_documents(candidate)? {
-                let length = tokenize(&transaction, &text)?.len();
-                transaction
-                    .execute(
-                        "INSERT INTO search(object_id,scope_id,kind,passage,length,text) VALUES(?1,?2,?3,?4,?5,?6)",
-                        rusqlite::params![
-                            candidate.id.hyphenated().to_string(),
-                            scope_id,
-                            search_kind(candidate.kind)?,
-                            passage,
-                            i64::try_from(length).unwrap_or(i64::MAX),
-                            text
-                        ],
-                    )
-                    .map_err(|e| storage(&e))?;
-            }
+            search::insert(
+                &transaction,
+                candidate.id,
+                &scope_id,
+                candidate.kind,
+                &search::documents(candidate)?,
+            )?;
         }
         let actor = candidate
             .provenance
@@ -545,7 +513,7 @@ fn read_scopes(connection: &Connection) -> Result<Vec<StoredScope>> {
         .map(|(id, kind, parent_id, relative_path)| {
             Ok(StoredScope {
                 id,
-                kind: parse_dotnet_enum::<ScopeKind>(&kind)?,
+                kind: parse_dotnet_enum::<ScopeKind>(&kind, false)?,
                 parent_id,
                 relative_path,
             })
@@ -688,7 +656,7 @@ fn find_idempotent(
     }
     // `Guid.Parse` reads more formats than the D the store writes; a bad value is its
     // `FormatException`, which the CLI does not catch either: refused as corrupt storage.
-    let id = Uuid::parse_str(&object_id).map_err(|_| invalid_storage())?;
+    let id = crate::guid::try_parse(&object_id).ok_or_else(invalid_storage)?;
     let own = HashSet::from([scope_id.to_owned()]);
     find_record(connection, id, &own)?
         .map(Some)
