@@ -139,3 +139,12 @@ pub(crate) fn process_token() -> io::Result<ProcessToken> {
     unsafe { CloseHandle(token) };
     result
 }
+
+/// Whether `root` (a volume root such as `C:\`) is a mapped network drive, as
+/// `DriveInfo.DriveType == DriveType.Network`.
+pub(crate) fn is_network_drive(root: &Path) -> bool {
+    const DRIVE_REMOTE: u32 = 4;
+    let name = wide(root);
+    // SAFETY: `name` is NUL-terminated and outlives the call, which only reads it.
+    unsafe { windows_sys::Win32::Storage::FileSystem::GetDriveTypeW(name.as_ptr()) == DRIVE_REMOTE }
+}

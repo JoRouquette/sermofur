@@ -33,7 +33,7 @@ pub struct InstanceConfiguration {
 }
 
 /// `unsafe_path`, exit 4: `LocalPaths.LinkNotSupported`.
-fn link_not_supported() -> SermofurError {
+pub(crate) fn link_not_supported() -> SermofurError {
     SermofurError::new(
         "unsafe_path",
         "Links and junctions are not supported in this version.",
@@ -42,7 +42,7 @@ fn link_not_supported() -> SermofurError {
 }
 
 /// `invalid_storage_or_path`, exit 3: `CommandRunner` maps JSON and IO failures to it.
-fn invalid_storage() -> SermofurError {
+pub(crate) fn invalid_storage() -> SermofurError {
     SermofurError::new(
         "invalid_storage_or_path",
         "Invalid path or data; run doctor.",
@@ -87,14 +87,14 @@ pub(crate) fn normalize(path: &Path) -> PathBuf {
 }
 
 #[cfg(windows)]
-fn is_link(metadata: &fs::Metadata) -> bool {
+pub(crate) fn is_link(metadata: &fs::Metadata) -> bool {
     use std::os::windows::fs::MetadataExt;
     const FILE_ATTRIBUTE_REPARSE_POINT: u32 = 0x400;
     metadata.file_attributes() & FILE_ATTRIBUTE_REPARSE_POINT != 0
 }
 
 #[cfg(not(windows))]
-fn is_link(metadata: &fs::Metadata) -> bool {
+pub(crate) fn is_link(metadata: &fs::Metadata) -> bool {
     metadata.file_type().is_symlink()
 }
 
