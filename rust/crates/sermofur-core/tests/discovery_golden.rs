@@ -38,14 +38,15 @@ impl FileOwnership for Fake {
     }
 }
 
-/// The temporary directory; on macOS `/var` is a link, so it is canonicalized everywhere but
+/// The temporary directory, as the oracle sees it; on macOS `/var` is a link, so it is canonicalized everywhere but
 /// on Windows (where `canonicalize` adds the `\\?\` prefix).
 fn temp_base() -> &'static Path {
     static BASE: OnceLock<PathBuf> = OnceLock::new();
     BASE.get_or_init(|| {
         let dir = std::env::temp_dir();
         if cfg!(windows) {
-            dir
+            // `Path.GetTempPath` of the oracle gives the long form: 8.3 names expanded.
+            sermofur_core::discovery::expand_short_names(&dir)
         } else {
             fs::canonicalize(dir).expect("the temporary directory resolves")
         }

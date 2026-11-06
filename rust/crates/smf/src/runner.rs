@@ -1,12 +1,16 @@
 //! Runs one command line, ported from `CommandRunner.Run`.
 //!
 //! Order of the checks, as in the .NET tool: help, then version, then parsing, then the command.
-//! Step 1a stops there: no command is ported yet.
+//! Ported commands: `init` and `root` (lot 1b.4); the others answer `not_ported`.
 
 use std::io::Write;
+use std::path::{Path, PathBuf};
 
 use serde::Serialize;
+use sermofur_core::discovery::{discover, expand_short_names};
 use sermofur_core::error::{Result, SermofurError};
+use sermofur_core::init::{Initialized, initialize};
+use sermofur_core::ownership::SystemOwnership;
 use sermofur_core::{NEW_LINE, VERSION, json};
 
 use crate::args::{
@@ -20,6 +24,71 @@ const NOT_PORTED_EXIT_CODE: i32 = 70;
 #[derive(Serialize)]
 struct VersionBody<'a> {
     version: &'a str,
+}
+
+#[derive(Serialize)]
+struct RootBody {
+    root: String,
+}
+
+/// The answer of `init`, as the anonymous object `{ root, configuration, created }` of .NET.
+#[derive(Serialize)]
+struct InitBody {
+    root: String,
+    configuration: ConfigurationBody,
+    created: bool,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct ConfigurationBody {
+    schema_version: i32,
+    instance_id: String,
+    created_at: String,
+}
+
+impl From<Initialized> for InitBody {
+    fn from(value: Initialized) -> Self {
+        InitBody {
+            root: text(&value.root),
+            configuration: ConfigurationBody {
+                schema_version: value.configuration.schema_version,
+                instance_id: value.configuration.instance_id.hyphenated().to_string(),
+                created_at: value.configuration.created_at.to_json_text(),
+            },
+            created: value.created,
+        }
+    }
+}
+
+/// `Path.GetFullPath(path, basePath)` before normalization: a full path stays; on Windows a
+/// path relative to a drive (`D:sub`) joins the base on the same drive, and takes the root of
+/// its drive otherwise, without the hidden current folder of that drive; anything else joins
+/// the base (`PathBuf::join` already keeps the drive of the base for `\sub`).
+fn combine(path: &str, base: &Path) -> PathBuf {
+    let bytes = path.as_bytes();
+    if cfg!(windows) && bytes.len() >= 2 && bytes[0].is_ascii_alphabetic() && bytes[1] == b':' {
+        let rooted = bytes.get(2).is_some_and(|c| *c == b'\\' || *c == b'/');
+        if !rooted {
+            let same_drive = base
+                .to_str()
+                .and_then(|b| b.as_bytes().first())
+                .is_some_and(|drive| drive.eq_ignore_ascii_case(&bytes[0]))
+                && base
+                    .to_str()
+                    .is_some_and(|b| b.as_bytes().get(1) == Some(&b':'));
+            return if same_drive {
+                base.join(&path[2..])
+            } else {
+                PathBuf::from(format!(r"{}\{}", &path[..2], &path[2..]))
+            };
+        }
+    }
+    base.join(path)
+}
+
+fn text(path: &Path) -> String {
+    path.to_string_lossy().into_owned()
 }
 
 #[derive(Serialize)]
@@ -58,15 +127,53 @@ fn execute(arguments: &[String], json: bool, out: &mut dyn Write) -> Result<i32>
         write_line(out, &text);
         return Ok(0);
     }
-    let parsed = CommandArguments::parse(arguments)?;
+    let mut parsed = CommandArguments::parse(arguments)?;
+    // `Path.GetFullPath(args.Option("path", workingDirectory), workingDirectory)`: a relative
+    // `--path` is taken from the working directory; discovery makes it full.
+    // `Environment.CurrentDirectory` expands the short 8.3 names of the folder on Windows.
+    let working_directory =
+        expand_short_names(&std::env::current_dir().map_err(|_| invalid_storage())?);
+    let path: PathBuf = match parsed.option("path") {
+        Some(value) => combine(value, &working_directory),
+        None => working_directory,
+    };
     if parsed.positionals().is_empty() {
         return Err(SermofurError::invalid_arguments("Command required."));
+    }
+    let command = parsed.positionals()[0].clone();
+    if command == "init" {
+        parsed.require_count(1)?;
+        parsed.validate_used()?;
+        let body = InitBody::from(initialize(&path)?);
+        write_line(out, &to_json(&body)?);
+        return Ok(0);
+    }
+    if command == "root" {
+        let root = discover(&path, &SystemOwnership)?;
+        parsed.require_count(1)?;
+        parsed.validate_used()?;
+        let shown = if json {
+            to_json(&RootBody { root: text(&root) })?
+        } else {
+            text(&root)
+        };
+        write_line(out, &shown);
+        return Ok(0);
     }
     Err(SermofurError::new(
         "not_ported",
         "This command is not ported to Rust yet.",
         NOT_PORTED_EXIT_CODE,
     ))
+}
+
+/// `invalid_storage_or_path`, exit 3: what `CommandRunner.Run` answers to an IO failure.
+fn invalid_storage() -> SermofurError {
+    SermofurError::new(
+        "invalid_storage_or_path",
+        "Invalid path or data; run doctor.",
+        3,
+    )
 }
 
 fn to_json<T: Serialize>(value: &T) -> Result<String> {
@@ -197,6 +304,31 @@ mod tests {
                     prop_assert!(out.contains("\"version\": \"0.0.0-dev\""));
                 }
             }
+        }
+    }
+
+    /// The cases of `Path.GetFullPath(path, basePath)` in the .NET source (Path.Windows.cs).
+    #[cfg(windows)]
+    #[test]
+    fn combine_follows_get_full_path_with_a_base() {
+        use std::path::{Path, PathBuf};
+        let base = Path::new(r"C:\Bar");
+        let cases = [
+            (r"C:Foo", r"C:\Bar\Foo"),
+            (r"c:Foo", r"C:\Bar\Foo"),
+            (r"C:", r"C:\Bar\"),
+            (r"D:Foo", r"D:\Foo"),
+            (r"D:", r"D:\"),
+            (r"\Foo", r"C:\Foo"),
+            (r"Foo", r"C:\Bar\Foo"),
+            (r"D:\Foo", r"D:\Foo"),
+        ];
+        for (path, expected) in cases {
+            assert_eq!(
+                super::combine(path, base),
+                PathBuf::from(expected),
+                "{path}"
+            );
         }
     }
 }

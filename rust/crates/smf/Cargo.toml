@@ -17,3 +17,4 @@ sermofur-core = { path = "../sermofur-core" }
 [dev-dependencies]
 proptest = "1"
 serde_json = "1"
+uuid = "1"

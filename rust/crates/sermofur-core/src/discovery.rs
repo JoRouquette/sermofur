@@ -34,9 +34,111 @@ fn full_path(path: &Path) -> Result<PathBuf> {
     if cfg!(windows) && path.to_string_lossy().starts_with(r"\??\") {
         return Err(invalid_storage());
     }
-    std::path::absolute(path)
+    let full = std::path::absolute(path)
         .map(|full| normalize(&full))
-        .map_err(|_| invalid_storage())
+        .map_err(|_| invalid_storage())?;
+    // An extended path (`\\?\`) is returned as is by `GetFullPath`; any other one has its short
+    // 8.3 names expanded (`PathHelper.Normalize`).
+    if full.to_string_lossy().starts_with(r"\\?\") {
+        return Ok(full);
+    }
+    Ok(expand_short_names(&full))
+}
+
+/// The long form of a full path whose text holds a `~`, as `PathHelper.TryExpandShortFileName`
+/// of .NET on Windows: `GetLongPathNameW` on the longest part of the path that exists, the rest
+/// appended unchanged; the path itself when nothing can be expanded. `Path.GetFullPath` and
+/// `Environment.CurrentDirectory` both apply it. Nothing changes elsewhere than on Windows.
+pub fn expand_short_names(full: &Path) -> PathBuf {
+    #[cfg(windows)]
+    {
+        expand_windows(full).unwrap_or_else(|| full.to_path_buf())
+    }
+    #[cfg(not(windows))]
+    {
+        full.to_path_buf()
+    }
+}
+
+#[cfg(windows)]
+fn expand_windows(full: &Path) -> Option<PathBuf> {
+    use std::ffi::OsString;
+    use std::os::windows::ffi::{OsStrExt, OsStringExt};
+    use std::path::{Component, Prefix};
+
+    const SEPARATOR: u16 = b'\\' as u16;
+    let text: Vec<u16> = full.as_os_str().encode_wide().collect();
+    if !text.contains(&(b'~' as u16)) || text.len() < 3 {
+        return None;
+    }
+    // `PathInternal.GetRootLength`: the prefix, and the separator after a drive or a device.
+    let Some(Component::Prefix(prefix)) = full.components().next() else {
+        return None;
+    };
+    let prefix_length = prefix.as_os_str().encode_wide().count();
+    let unc = matches!(prefix.kind(), Prefix::UNC(..) | Prefix::VerbatimUNC(..));
+    let root_length = if !unc && text.get(prefix_length) == Some(&SEPARATOR) {
+        prefix_length + 1
+    } else {
+        prefix_length
+    };
+    let device = text.starts_with(&[SEPARATOR, SEPARATOR, u16::from(b'?'), SEPARATOR])
+        || text.starts_with(&[SEPARATOR, SEPARATOR, u16::from(b'.'), SEPARATOR]);
+    let dos_unc = !device && text.starts_with(&[SEPARATOR, SEPARATOR]);
+    // The extended prefix allows growth over MAX_PATH; it is removed at the end.
+    let (mut input, root_difference): (Vec<u16>, usize) = if device {
+        let mut input = text.clone();
+        input[2] = u16::from(b'?');
+        (input, 0)
+    } else if dos_unc {
+        let mut input: Vec<u16> = r"\\?\UNC\".encode_utf16().collect();
+        input.extend_from_slice(&text[2..]);
+        (input, 6)
+    } else {
+        let mut input: Vec<u16> = r"\\?\".encode_utf16().collect();
+        input.extend_from_slice(&text);
+        (input, 4)
+    };
+    let root_length = root_length + root_difference;
+    let length = input.len();
+    let mut found = length - 1;
+    let mut cut = false;
+    let mut output = None;
+    loop {
+        let probe = if cut { &input[..found] } else { &input[..] };
+        match crate::windows::long_path_name(probe) {
+            Ok(mut long) => {
+                if cut {
+                    long.extend_from_slice(&input[found..]);
+                }
+                output = Some(long);
+                break;
+            }
+            // ERROR_FILE_NOT_FOUND, ERROR_PATH_NOT_FOUND: look further up the path.
+            Err(2 | 3) => {
+                found = found.checked_sub(1)?;
+                while found > root_length && input[found] != SEPARATOR {
+                    found -= 1;
+                }
+                if found <= root_length {
+                    break;
+                }
+                cut = true;
+            }
+            Err(_) => break,
+        }
+    }
+    let mut result = output.unwrap_or_else(|| std::mem::take(&mut input));
+    if text.get(2) == Some(&u16::from(b'.')) && device {
+        result[2] = u16::from(b'.');
+    }
+    if dos_unc {
+        // `\\?\UNC\` back to `\\`: the character before the server becomes a separator.
+        result[6] = SEPARATOR;
+    }
+    Some(PathBuf::from(OsString::from_wide(
+        result.get(root_difference..)?,
+    )))
 }
 
 /// Refuses a network share or a mapped network drive with the message of the caller

@@ -1,0 +1,9 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json"
+  ],
+  "exitCode": 0,
+  "stderr": "",
+  "stdout": "{\n  \"root\": \"<root>\"\n}\n"
+}

@@ -88,13 +88,30 @@ impl CommandArguments {
 
     /// The value of an option, or `None` when it is absent or is a flag. Reading an option marks
     /// it as used by the command.
-    #[cfg_attr(
-        not(test),
-        expect(dead_code, reason = "called by the commands, from step 1b")
-    )]
     pub fn option(&mut self, name: &str) -> Option<&str> {
         self.used.insert(name.to_string());
         self.options.get(name).and_then(|value| value.as_deref())
+    }
+
+    /// Refuses a command line whose number of positional arguments is not `count`
+    /// (`RequireCount`).
+    pub fn require_count(&self, count: usize) -> Result<()> {
+        if self.positionals.len() != count {
+            return Err(SermofurError::invalid_arguments(
+                "Wrong number of arguments.",
+            ));
+        }
+        Ok(())
+    }
+
+    /// Refuses an option that the command did not read (`ValidateUsed`).
+    pub fn validate_used(&self) -> Result<()> {
+        if self.options.keys().any(|name| !self.used.contains(name)) {
+            return Err(SermofurError::invalid_arguments(
+                "Unknown option for this command.",
+            ));
+        }
+        Ok(())
     }
 
     /// True for an option that takes no value, `--help` and `--version` included.

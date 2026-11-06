@@ -1,0 +1,9 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json"
+  ],
+  "exitCode": 3,
+  "stderr": "smf: migration_required: Instance in format 1; back it up if you wish, then run smf migrate.\n",
+  "stdout": ""
+}

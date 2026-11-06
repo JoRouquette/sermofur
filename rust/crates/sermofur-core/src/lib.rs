@@ -6,6 +6,7 @@ pub mod atomic;
 pub mod discovery;
 pub mod error;
 pub mod format;
+pub mod init;
 pub mod instance;
 pub mod json;
 pub mod limits;

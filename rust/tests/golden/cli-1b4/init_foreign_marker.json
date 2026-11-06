@@ -1,0 +1,8 @@
+{
+  "entries": [
+    ".sermofur"
+  ],
+  "exitCode": 3,
+  "stderr": "smf: invalid_instance: A .sermofur entry that is not a Sermofur instance stops the search for an instance; rename or move it away.\n",
+  "stdout": ""
+}

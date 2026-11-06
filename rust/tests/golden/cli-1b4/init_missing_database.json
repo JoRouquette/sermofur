@@ -1,0 +1,9 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json"
+  ],
+  "exitCode": 3,
+  "stderr": "smf: missing_database: Memory database missing.\n",
+  "stdout": ""
+}

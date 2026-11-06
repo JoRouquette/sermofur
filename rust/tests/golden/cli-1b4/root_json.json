@@ -1,0 +1,11 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/"
+  ],
+  "exitCode": 0,
+  "stderr": "",
+  "stdout": "{\n  \"root\": \"<root>\"\n}\n"
+}

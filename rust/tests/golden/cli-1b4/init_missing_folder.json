@@ -1,0 +1,6 @@
+{
+  "entries": [],
+  "exitCode": 1,
+  "stderr": "smf: invalid_path: The context directory must exist.\n",
+  "stdout": ""
+}

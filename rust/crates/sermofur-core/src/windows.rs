@@ -148,3 +148,32 @@ pub(crate) fn is_network_drive(root: &Path) -> bool {
     // SAFETY: `name` is NUL-terminated and outlives the call, which only reads it.
     unsafe { windows_sys::Win32::Storage::FileSystem::GetDriveTypeW(name.as_ptr()) == DRIVE_REMOTE }
 }
+
+/// `GetLongPathNameW` on a UTF-16 path without terminator: the long form, or the Win32 error.
+pub(crate) fn long_path_name(path: &[u16]) -> Result<Vec<u16>, u32> {
+    let input: Vec<u16> = path.iter().copied().chain([0]).collect();
+    let mut buffer = vec![0u16; 260];
+    loop {
+        let capacity = u32::try_from(buffer.len()).unwrap_or(u32::MAX);
+        // SAFETY: `input` is NUL-terminated and outlives the call; `buffer` is writable for
+        // `capacity` units, which the API never exceeds.
+        let length = unsafe {
+            windows_sys::Win32::Storage::FileSystem::GetLongPathNameW(
+                input.as_ptr(),
+                buffer.as_mut_ptr(),
+                capacity,
+            )
+        };
+        if length == 0 {
+            let error = io::Error::last_os_error().raw_os_error().unwrap_or(0);
+            return Err(u32::try_from(error).unwrap_or(0));
+        }
+        if length as usize > buffer.len() {
+            // Too small: `length` is the size needed, terminator included.
+            buffer.resize(length as usize, 0);
+            continue;
+        }
+        buffer.truncate(length as usize);
+        return Ok(buffer);
+    }
+}
