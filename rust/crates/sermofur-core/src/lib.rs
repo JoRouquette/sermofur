@@ -5,6 +5,7 @@
 pub mod error;
 pub mod json;
 pub mod limits;
+pub mod schema;
 
 mod dotnet_escape_table;
 
