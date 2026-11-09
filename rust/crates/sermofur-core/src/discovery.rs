@@ -43,15 +43,23 @@ fn is_nt_path(path: &Path) -> bool {
     cfg!(windows) && path.to_string_lossy().starts_with(r"\??\")
 }
 
+/// Whether `path` is extended for .NET (`PathInternal.IsExtended`: `\\?\` or `\??\`, backslashes
+/// only; Windows only).
+fn is_extended(path: &Path) -> bool {
+    is_nt_path(path) || (cfg!(windows) && path.to_string_lossy().starts_with(r"\\?\"))
+}
+
 /// `Path.GetFullPath` itself: as [`full_path`], except that an NT path `\??\...`, extended for
-/// .NET, is returned as is, where the discovery refuses it. The command line takes the context
-/// folder (`--path`) and the file of `source add` through it; an NT file is then outside the
-/// instance (`scope_boundary`), as for .NET.
+/// .NET, is returned as is, where the discovery refuses it. An extended path `\\?\...` is returned
+/// as is too, `.` and `..` included, and the discovery then refuses it as a network path
+/// (`unsafe_path`). The command line takes the context folder (`--path`) and the file of
+/// `source add` through it; an NT file is then outside the instance (`scope_boundary`), as for
+/// .NET.
 pub fn get_full_path(path: &Path) -> Result<PathBuf> {
     if path.as_os_str().as_encoded_bytes().contains(&0) {
         return Err(invalid_storage());
     }
-    if is_nt_path(path) {
+    if is_extended(path) {
         return Ok(path.to_path_buf());
     }
     let full = std::path::absolute(path)
@@ -319,4 +327,27 @@ fn invalid_marker(state: MarkerState) -> SermofurError {
         }
     };
     SermofurError::new(code, message, exit)
+}
+
+#[cfg(all(test, windows))]
+mod tests {
+    use std::path::Path;
+
+    /// `Path.GetFullPath` returns an extended path as typed (`PathInternal.IsExtended`, checked
+    /// before any normalization in `Path.Windows.cs`); the discovery refuses both forms.
+    #[test]
+    fn an_extended_path_is_returned_as_typed() {
+        for typed in [r"\\?\C:\a\..\b\.", r"\??\C:\a\..\b\."] {
+            let full = super::get_full_path(Path::new(typed)).expect("full path");
+            assert_eq!(full.as_os_str(), typed);
+        }
+        let full = super::full_path(Path::new(r"\\?\C:\a\..\b")).expect("full path");
+        assert_eq!(full.as_os_str(), r"\\?\C:\a\..\b");
+        assert_eq!(
+            super::full_path(Path::new(r"\??\C:\a"))
+                .expect_err("NT path")
+                .code,
+            "invalid_storage_or_path"
+        );
+    }
 }

@@ -11,7 +11,7 @@ publish.workspace = true
 workspace = true
 
 [dependencies]
-rusqlite = { version = "0.40.2", features = ["bundled"] }
+rusqlite = { version = "0.40.2", features = ["bundled", "backup"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["raw_value"] }
 uuid = { version = "1", features = ["v4"] }

@@ -21,7 +21,7 @@ pub const LEGACY_SCHEMA_VERSION: i64 = 1;
 pub const SEARCH_TOKENIZER: &str = "unicode61 remove_diacritics 2";
 
 /// Busy timeout of a connection, in seconds, as `DefaultTimeout = 5` in .NET.
-const BUSY_TIMEOUT_SECONDS: u64 = 5;
+pub(crate) const BUSY_TIMEOUT_SECONDS: u64 = 5;
 
 const TABLES: &str = "\
 CREATE TABLE metadata(key TEXT PRIMARY KEY, value TEXT NOT NULL);

@@ -3,7 +3,7 @@
 //! Order of the checks, as in the .NET tool: help, then version, then parsing, then the command.
 //! Ported commands: `init` and `root` (lot 1b.4), `status`, `scope`, `export`, `claim`,
 //! `evidence` and `retex` (lot 3.4), `recall` (lot 4.2), `challenge` (lot 4.3), `source`
-//! (lot 5.2), `index` (lot 5.3); the others answer `not_ported`.
+//! (lot 5.2), `index` (lot 5.3), `migrate` (lot 6.1); the others answer `not_ported`.
 
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -14,6 +14,7 @@ use sermofur_core::error::{Result, SermofurError};
 use sermofur_core::init::{Initialized, initialize};
 use sermofur_core::instance::{InstanceConfiguration, read_configuration};
 use sermofur_core::memory::resolve_context;
+use sermofur_core::migration::migrate;
 use sermofur_core::ownership::SystemOwnership;
 use sermofur_core::store::Store;
 use sermofur_core::{NEW_LINE, VERSION, json};
@@ -190,7 +191,10 @@ fn execute(arguments: &[String], json: bool, out: &mut dyn Write) -> Result<i32>
         return Ok(0);
     }
     if command == "migrate" {
-        return Err(not_ported());
+        parsed.require_count(1)?;
+        parsed.validate_used()?;
+        write_line(out, &to_json(&migrate(&root)?)?);
+        return Ok(0);
     }
     let configuration = read_configuration(&root, false, local_offset)?;
     let mut store = Store::open(&root, configuration.instance_id, !writes(&parsed))?;

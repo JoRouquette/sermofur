@@ -1,0 +1,351 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/backups/",
+    ".sermofur/backups/memory-v1-<stamp>-<id>.db",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/",
+    ".sermofur/records/<g1>.md",
+    ".sermofur/records/<g2>.md",
+    ".sermofur/records/<g3>.md",
+    ".sermofur/records/<g4>.md",
+    ".sermofur/records/<g5>.md",
+    ".sermofur/records/<g6>.md",
+    ".sermofur/records/<g8>.md",
+    "client-a/",
+    "client-a/project-x/",
+    "client-b/"
+  ],
+  "projections": {
+    "<g1>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g1>\",\n  \"scopeId\": \"client-a\",\n  \"kind\": \"claim\",\n  \"status\": \"invalidated\",\n  \"revision\": 2,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Claim <g1>\n\n```json\n{\n  \"text\": \"Client A utilise PostgreSQL 16\",\n  \"category\": \"semantic\",\n  \"volatility\": \"evolving\",\n  \"lastVerified\": null,\n  \"reviewAfter\": null\n}\n```\n",
+    "<g2>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Claim <g2>\n\n```json\n{\n  \"text\": \"Le cache est invalidÃ© Ã\\u00A0 chaque dÃ©ploiement\",\n  \"category\": \"semantic\",\n  \"volatility\": \"evolving\",\n  \"lastVerified\": null,\n  \"reviewAfter\": null\n}\n```\n",
+    "<g3>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g3>\",\n  \"scopeId\": \"client-b\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Claim <g3>\n\n```json\n{\n  \"text\": \"Client B dÃ©ploie le vendredi\",\n  \"category\": \"decisions\",\n  \"volatility\": \"evolving\",\n  \"lastVerified\": null,\n  \"reviewAfter\": null\n}\n```\n",
+    "<g4>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g4>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"retex\",\n  \"status\": \"draft\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Retex <g4>\n\n```json\n{\n  \"event\": \"DÃ©ploiement lent\",\n  \"impact\": \"Cache froid\",\n  \"nextAction\": \"PrÃ©chauffer le cache\"\n}\n```\n",
+    "<g5>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g5>\",\n  \"scopeId\": \"project-x\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"llm\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Claim <g5>\n\n```json\n{\n  \"text\": \"Le projet X compile en Release\",\n  \"category\": \"semantic\",\n  \"volatility\": \"evolving\",\n  \"lastVerified\": null,\n  \"reviewAfter\": null\n}\n```\n",
+    "<g6>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g6>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Evidence <g6>\n\n```json\n{\n  \"claimId\": \"<g2>\",\n  \"kind\": \"local_documentation\",\n  \"reference\": \"docs/deploy.md\",\n  \"lineageId\": \"deploy-doc\"\n}\n```\n",
+    "<g8>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g8>\",\n  \"scopeId\": \"client-a\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Claim <g8>\n\n```json\n{\n  \"text\": \"after migration\",\n  \"category\": \"semantic\",\n  \"volatility\": \"evolving\",\n  \"lastVerified\": null,\n  \"reviewAfter\": null\n}\n```\n"
+  },
+  "steps": [
+    {
+      "output": null,
+      "step": {
+        "legacy": true
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/instance.json",
+        "added .sermofur/memory.db",
+        "added .sermofur/records/<g1>.md",
+        "added .sermofur/records/<g2>.md",
+        "added .sermofur/records/<g3>.md",
+        "added .sermofur/records/<g4>.md",
+        "added .sermofur/records/<g5>.md",
+        "added .sermofur/records/<g6>.md"
+      ],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": {
+        "exitCode": 3,
+        "stderr": "{\n  \"code\": \"migration_required\",\n  \"message\": \"Instance in format 1; back it up if you wish, then run smf migrate.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "status"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 3,
+        "stderr": "smf: migration_required: Instance in format 1; back it up if you wish, then run smf migrate.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "status"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 3,
+        "stderr": "{\n  \"code\": \"migration_required\",\n  \"message\": \"Instance in format 1; back it up if you wish, then run smf migrate.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "claim",
+          "add",
+          "x",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 3,
+        "stderr": "smf: migration_required: Instance in format 1; back it up if you wish, then run smf migrate.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "list"
+        ],
+        "cwd": "client-a"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "<root>\n"
+      },
+      "step": {
+        "arguments": [
+          "root"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "root"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"migrated\": true,\n  \"from\": 1,\n  \"to\": 2,\n  \"backup\": \".sermofur/backups/memory-v1-<stamp>-<id>.db\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "migrate"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/backups/memory-v1-<stamp>-<id>.db",
+        "changed .sermofur/instance.json",
+        "changed .sermofur/memory.db"
+      ],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"migrated\": false,\n  \"from\": 2,\n  \"to\": 2,\n  \"backup\": null\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "migrate"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"migrated\": false,\n  \"from\": 2,\n  \"to\": 2,\n  \"backup\": null\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "migrate"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g7>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"scope\": \"workspace\",\n  \"claims\": 1,\n  \"evidence\": 1,\n  \"retex\": 1,\n  \"sources\": 0,\n  \"mode\": \"direct\",\n  \"laya\": \"unavailable\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "status"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "[\n  {\n    \"id\": \"workspace\",\n    \"kind\": \"workspace\",\n    \"parentId\": null,\n    \"relativePath\": null\n  }\n]\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "list"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "[\n  {\n    \"id\": \"<g1>\",\n    \"scopeId\": \"client-a\",\n    \"kind\": \"claim\",\n    \"status\": \"invalidated\",\n    \"revision\": 2,\n    \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022Client A utilise PostgreSQL 16\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  },\n  {\n    \"id\": \"<g2>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"claim\",\n    \"status\": \"proposed\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022Le cache est invalidÃ© Ã\\\\u00A0 chaque dÃ©ploiement\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  }\n]\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "list"
+        ],
+        "cwd": "client-a"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"query\": \"PostgreSQL\",\n  \"results\": [\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g1>\",\n      \"scopeId\": \"client-a\",\n      \"status\": \"invalidated\",\n      \"applicable\": false,\n      \"confidence\": {\n        \"level\": \"low\",\n        \"reasons\": [\n          \"Knowledge not applicable: invalidated or superseded.\"\n        ],\n        \"independentOrigins\": 0\n      },\n      \"excerpt\": \"Client A utilise PostgreSQL 16\",\n      \"matchedTerms\": [\n        \"postgresql\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 1.127604,\n      \"path\": null\n    }\n  ],\n  \"excluded\": 0\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "PostgreSQL"
+        ],
+        "cwd": "client-a"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"query\": \"cache\",\n  \"results\": [\n    {\n      \"kind\": \"retex\",\n      \"id\": \"<g4>\",\n      \"scopeId\": \"workspace\",\n      \"status\": \"draft\",\n      \"applicable\": true,\n      \"confidence\": null,\n      \"excerpt\": \"DÃ©ploiement lent Cache froid PrÃ©chauffer le cache\",\n      \"matchedTerms\": [\n        \"cache\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 0.246612,\n      \"path\": null\n    },\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g2>\",\n      \"scopeId\": \"workspace\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"medium\",\n        \"reasons\": [\n          \"Origin deploy-doc: support Medium; repetitions grouped.\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 1\n      },\n      \"excerpt\": \"Le cache est invalidÃ© Ã\\u00A0 chaque dÃ©ploiement\",\n      \"matchedTerms\": [\n        \"cache\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 0.205499,\n      \"path\": null\n    }\n  ],\n  \"excluded\": 0\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "cache"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "[\n  {\n    \"id\": \"<g4>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"retex\",\n    \"status\": \"draft\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022event\\u0022: \\u0022DÃ©ploiement lent\\u0022,\\n  \\u0022impact\\u0022: \\u0022Cache froid\\u0022,\\n  \\u0022nextAction\\u0022: \\u0022PrÃ©chauffer le cache\\u0022\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  }\n]\n"
+      },
+      "step": {
+        "arguments": [
+          "retex",
+          "list"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "[\n  {\n    \"id\": \"<g6>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"evidence\",\n    \"status\": \"proposed\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022local_documentation\\u0022,\\n  \\u0022reference\\u0022: \\u0022docs/deploy.md\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022deploy-doc\\u0022\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  }\n]\n"
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "list"
+        ],
+        "cwd": "client-a"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g8>\",\n  \"scopeId\": \"client-a\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022after migration\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "add",
+          "after migration",
+          "--origin",
+          "user"
+        ],
+        "cwd": "client-a"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "[\n  {\n    \"id\": \"<g1>\",\n    \"scopeId\": \"client-a\",\n    \"kind\": \"claim\",\n    \"status\": \"invalidated\",\n    \"revision\": 2,\n    \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022Client A utilise PostgreSQL 16\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  },\n  {\n    \"id\": \"<g2>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"claim\",\n    \"status\": \"proposed\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022Le cache est invalidÃ© Ã\\\\u00A0 chaque dÃ©ploiement\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  },\n  {\n    \"id\": \"<g5>\",\n    \"scopeId\": \"project-x\",\n    \"kind\": \"claim\",\n    \"status\": \"proposed\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022Le projet X compile en Release\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"llm\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  },\n  {\n    \"id\": \"<g8>\",\n    \"scopeId\": \"client-a\",\n    \"kind\": \"claim\",\n    \"status\": \"proposed\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022after migration\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  }\n]\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "list"
+        ],
+        "cwd": "client-a/project-x"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"migrated\": false,\n  \"from\": 2,\n  \"to\": 2,\n  \"backup\": null\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "migrate"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/records/<g8>.md",
+        "changed .sermofur/memory.db"
+      ],
+      "step": {
+        "changes": true
+      }
+    }
+  ]
+}

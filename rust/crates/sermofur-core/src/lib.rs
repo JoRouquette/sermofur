@@ -17,6 +17,7 @@ pub mod json;
 pub mod limits;
 pub mod local_paths;
 pub mod memory;
+pub mod migration;
 pub mod ownership;
 pub mod projection;
 pub mod recall;

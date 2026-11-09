@@ -111,6 +111,67 @@ pub enum Act {
     /// The files under `.sermofur` added, changed or removed since the previous `Changes` (or
     /// since the start): what the steps in between wrote.
     Changes,
+    /// Copies the format 1 instance of `MigrationTests` (`tests/Sermofur.Tests/Fixtures/
+    /// instance-v1`, never modified) into the root, with the folders of its scopes, as
+    /// `LegacyInstance` does.
+    Legacy,
+}
+
+/// The format 1 fixture of `MigrationTests`.
+pub fn legacy_fixture() -> PathBuf {
+    PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../../../tests/Sermofur.Tests/Fixtures/instance-v1/marker")
+}
+
+fn copy_folder(source: &Path, target: &Path) {
+    fs::create_dir_all(target).expect("folder");
+    for entry in fs::read_dir(source).expect("listing") {
+        let path = entry.expect("entry").path();
+        let to = target.join(path.file_name().expect("name"));
+        if path.is_dir() {
+            copy_folder(&path, &to);
+        } else {
+            fs::copy(&path, &to).expect("copy");
+        }
+    }
+}
+
+/// Copies the format 1 fixture into `root` (see [`Act::Legacy`]).
+pub fn copy_legacy(root: &Path) {
+    fs::create_dir_all(root.join("client-a").join("project-x")).expect("scopes");
+    fs::create_dir_all(root.join("client-b")).expect("scopes");
+    copy_folder(&legacy_fixture(), &root.join(".sermofur"));
+}
+
+/// `memory-v1-<yyyyMMddTHHmmssZ>-<guid32>.db`, the name of a backup of `migrate`, becomes
+/// `memory-v1-<stamp>-<id>.db` once its shape is checked.
+pub fn backup_names(text: &str) -> String {
+    const PREFIX: &str = "memory-v1-";
+    let mut out = String::new();
+    let mut rest = text;
+    while let Some(at) = rest.find(PREFIX) {
+        let tail = &rest[at + PREFIX.len()..];
+        let shape = tail.as_bytes();
+        let matches = shape.len() >= 52
+            && shape[..8].iter().all(u8::is_ascii_digit)
+            && shape[8] == b'T'
+            && shape[9..15].iter().all(u8::is_ascii_digit)
+            && shape[15] == b'Z'
+            && shape[16] == b'-'
+            && shape[17..49]
+                .iter()
+                .all(|c| c.is_ascii_digit() || (b'a'..=b'f').contains(c))
+            && &shape[49..52] == b".db";
+        out.push_str(&rest[..at + PREFIX.len()]);
+        if matches {
+            out.push_str("<stamp>-<id>.db");
+            rest = &tail[52..];
+        } else {
+            rest = tail;
+        }
+    }
+    out.push_str(rest);
+    out
 }
 
 pub fn r(arguments: &[&'static str]) -> Act {
@@ -363,7 +424,7 @@ pub struct Names {
 impl Names {
     pub fn normalize(&mut self, text: &str, root: &Path) -> String {
         let long = long_form(root);
-        let mut out = collapse_line_breaks(text)
+        let mut out = backup_names(&collapse_line_breaks(text))
             .replace(&long.replace('\\', "\\\\"), "<root>")
             .replace(&long, "<root>");
         out = out
@@ -472,8 +533,9 @@ pub fn directory_link(link: &Path, target: &Path) {
     {
         let out = Command::new("cmd")
             .args(["/C", "mklink", "/J"])
-            .arg(link)
-            .arg(target)
+            // cmd reads a `/` as the start of an option.
+            .arg(link.to_string_lossy().replace('/', "\\"))
+            .arg(target.to_string_lossy().replace('/', "\\"))
             .output()
             .expect("cmd");
         assert!(out.status.success(), "mklink /J failed: {out:?}");
@@ -616,6 +678,10 @@ pub fn record(program: &str, scenario: &Scenario) -> Value {
                     json!({ "history": step }),
                     Value::String(names.normalize(&text.replace("\r\n", "\n"), root)),
                 )
+            }
+            Act::Legacy => {
+                copy_legacy(root);
+                (json!({ "legacy": true }), Value::Null)
             }
             Act::Changes => {
                 let now = files_of(root);
