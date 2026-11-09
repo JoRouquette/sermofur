@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["crates/sermofur-core", "crates/smf"]
+members = ["crates/sermofur-core", "crates/sermofur-daemon", "crates/smf"]
 
 [workspace.package]
 # Same value as the development version of the .NET build (Directory.Build.props), so that the

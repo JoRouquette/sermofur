@@ -29,7 +29,7 @@ pub mod scopes;
 pub mod search;
 pub mod source_service;
 pub mod sources;
-mod stj;
+pub mod stj;
 pub mod store;
 
 mod dotnet_escape_table;

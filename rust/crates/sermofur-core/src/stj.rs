@@ -1,5 +1,6 @@
-//! A JSON reader with the rules of `System.Text.Json` as `RecordJson` reads (the oracle is the
-//! truth, through `rust/tests/golden/instance-config.json` and `records.json`). `serde_json`
+//! A JSON reader with the rules of `System.Text.Json` as `RecordJson` and the daemon frames
+//! (`Framing.Decode`) read (the oracle is the truth, through
+//! `rust/tests/golden/instance-config.json`, `records.json` and `framing.json`). `serde_json`
 //! alone does not reproduce them (lone surrogate escapes, depth, duplicates):
 //! - strict JSON (RFC 8259): no comment, trailing comma, single quote or trailing content;
 //!   whitespace is space, tab, CR, LF; numbers without leading zero; raw control characters
@@ -44,7 +45,7 @@ pub enum Node {
 }
 
 /// Parses a whole document: one value, then only whitespace.
-pub(crate) fn parse(text: &str) -> Result<Node> {
+pub fn parse(text: &str) -> Result<Node> {
     let mut reader = Reader {
         bytes: text.as_bytes(),
         pos: 0,
@@ -62,7 +63,7 @@ pub(crate) fn invalid_record() -> SermofurError {
 
 /// The properties of an object that a record is read from: a name with a lone surrogate
 /// escape is an error there. `null` is `None`; any other value is an error.
-pub(crate) fn object(node: &Node) -> Result<Option<Vec<(&str, &Node)>>> {
+pub fn object(node: &Node) -> Result<Option<Vec<(&str, &Node)>>> {
     match node {
         Node::Object(properties) => properties
             .iter()
@@ -87,7 +88,7 @@ pub(crate) fn document(node: &Node) -> Result<Vec<(&str, &Node)>> {
 }
 
 /// An integer as `Utf8Parser` reads it: optional `-`, digits only, in range of `T`.
-pub(crate) fn integer<T: std::str::FromStr>(node: &Node) -> Result<T> {
+pub fn integer<T: std::str::FromStr>(node: &Node) -> Result<T> {
     let Node::Number(raw) = node else {
         return Err(invalid_storage());
     };
@@ -99,7 +100,7 @@ pub(crate) fn integer<T: std::str::FromStr>(node: &Node) -> Result<T> {
 }
 
 /// A string: `null` is `None`; a lone surrogate escape or another kind of value is an error.
-pub(crate) fn text(node: &Node) -> Result<Option<String>> {
+pub fn text(node: &Node) -> Result<Option<String>> {
     match node {
         Node::Null => Ok(None),
         Node::Text {

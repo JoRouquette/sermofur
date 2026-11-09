@@ -565,6 +565,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "sermofur-daemon"
+version = "0.0.0-dev"
+dependencies = [
+ "proptest",
+ "serde_json",
+ "sermofur-core",
+ "sha2",
+]
+
+[[package]]
 name = "sha2"
 version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
