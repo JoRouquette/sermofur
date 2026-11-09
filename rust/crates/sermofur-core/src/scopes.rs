@@ -175,6 +175,30 @@ fn ensure_registrable(root: &Path, candidate: &Scope, scopes: &[StoredScope]) ->
     Ok(())
 }
 
+/// The number of pairs of scopes whose stored mappings break the registration rules
+/// (`ScopeService.MappingConflicts(...).Count`, the `scope_overlap` check of doctor).
+pub fn mapping_conflicts(root: &Path, scopes: &[StoredScope]) -> Result<usize> {
+    let mut mappings: Vec<(&StoredScope, PathBuf)> = Vec::new();
+    for scope in scopes {
+        if let Some(mapping) = scope.relative_path.as_deref() {
+            mappings.push((scope, stored(root, mapping)?));
+        }
+    }
+    let mut lineages: HashMap<&str, HashSet<String>> = HashMap::new();
+    for scope in scopes {
+        lineages.insert(&scope.id, visible_ancestors(&scope.id, scopes)?);
+    }
+    let mut count = 0;
+    for (index, first) in mappings.iter().enumerate() {
+        for second in &mappings[index + 1..] {
+            if conflict_between(first, second, &lineages).is_some() {
+                count += 1;
+            }
+        }
+    }
+    Ok(count)
+}
+
 fn conflict_between(
     first: &(&StoredScope, PathBuf),
     second: &(&StoredScope, PathBuf),

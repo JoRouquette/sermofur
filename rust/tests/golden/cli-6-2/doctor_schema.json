@@ -1,0 +1,97 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/"
+  ],
+  "projections": {},
+  "steps": [
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"created\": true\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "init"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "sql": "PRAGMA user_version=999"
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/instance.json",
+        "added .sermofur/memory.db"
+      ],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": {
+        "exitCode": 5,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"overall\": \"unhealthy\",\n  \"checks\": [\n    {\n      \"name\": \"instance\",\n      \"status\": \"ok\",\n      \"detail\": \"Compatible configuration and version.\"\n    },\n    {\n      \"name\": \"instance_storage\",\n      \"status\": \"error\",\n      \"detail\": \"unsupported_schema\"\n    },\n    {\n      \"name\": \"daemon\",\n      \"status\": \"warning\",\n      \"detail\": \"absent: commands run directly.\"\n    },\n    {\n      \"name\": \"laya\",\n      \"status\": \"warning\",\n      \"detail\": \"Capability not delivered in this version.\"\n    },\n    {\n      \"name\": \"model\",\n      \"status\": \"warning\",\n      \"detail\": \"Capability not delivered in this version.\"\n    },\n    {\n      \"name\": \"mcp\",\n      \"status\": \"warning\",\n      \"detail\": \"Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "sql": "PRAGMA user_version=1"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 5,
+        "stderr": "",
+        "stdout": "Sermofur Doctor\n  ok: instance — Compatible configuration and version.\n  error: instance_storage — migration_required\n  warning: daemon — absent: commands run directly.\n  warning: laya — Capability not delivered in this version.\n  warning: model — Capability not delivered in this version.\n  warning: mcp — Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\nOverall: unhealthy\n"
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "sql": "PRAGMA user_version=2; DELETE FROM metadata"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 5,
+        "stderr": "",
+        "stdout": "Sermofur Doctor\n  ok: instance — Compatible configuration and version.\n  error: instance_storage — instance_mismatch\n  warning: daemon — absent: commands run directly.\n  warning: laya — Capability not delivered in this version.\n  warning: model — Capability not delivered in this version.\n  warning: mcp — Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\nOverall: unhealthy\n"
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    }
+  ]
+}

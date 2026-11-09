@@ -3,13 +3,17 @@
 //! Order of the checks, as in the .NET tool: help, then version, then parsing, then the command.
 //! Ported commands: `init` and `root` (lot 1b.4), `status`, `scope`, `export`, `claim`,
 //! `evidence` and `retex` (lot 3.4), `recall` (lot 4.2), `challenge` (lot 4.3), `source`
-//! (lot 5.2), `index` (lot 5.3), `migrate` (lot 6.1); the others answer `not_ported`.
+//! (lot 5.2), `index` (lot 5.3), `migrate` (lot 6.1), `doctor` (lot 6.2); the others answer
+//! `not_ported`.
 
 use std::io::Write;
 use std::path::{Path, PathBuf};
 
 use serde::Serialize;
-use sermofur_core::discovery::{discover, expand_short_names, get_full_path};
+use sermofur_core::discovery::{
+    discover, discover_for_diagnosis, expand_short_names, get_full_path,
+};
+use sermofur_core::doctor;
 use sermofur_core::error::{Result, SermofurError};
 use sermofur_core::init::{Initialized, initialize};
 use sermofur_core::instance::{InstanceConfiguration, read_configuration};
@@ -176,7 +180,31 @@ fn execute(arguments: &[String], json: bool, out: &mut dyn Write) -> Result<i32>
         return Ok(0);
     }
     if command == "doctor" {
-        return Err(not_ported());
+        // An invalid `.sermofur` entry is reported instead of failing before the report; a link
+        // is still refused.
+        let root = discover_for_diagnosis(&path, &SystemOwnership)?;
+        parsed.require_count(1)?;
+        parsed.validate_used()?;
+        let variable = |name: &str| std::env::var(name).ok();
+        let report = doctor::inspect(
+            &root,
+            &SystemOwnership,
+            Some(&|| doctor::daemon_check(&variable, &SystemOwnership)),
+            Some(&|root: &Path| doctor::mcp_check(root, &variable)),
+        )?;
+        if json {
+            write_line(out, &to_json(&report)?);
+        } else {
+            write_line(out, "Sermofur Doctor");
+            for check in &report.checks {
+                write_line(
+                    out,
+                    &format!("  {}: {} — {}", check.status, check.name, check.detail),
+                );
+            }
+            write_line(out, &format!("Overall: {}", report.overall));
+        }
+        return Ok(if report.overall == "unhealthy" { 5 } else { 0 });
     }
     let root = discover(&path, &SystemOwnership)?;
     if command == "root" {

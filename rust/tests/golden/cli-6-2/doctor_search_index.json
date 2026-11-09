@@ -1,0 +1,298 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/",
+    ".sermofur/records/<g2>.md",
+    ".sermofur/records/<g3>.md",
+    ".sermofur/records/<g4>.md",
+    "doc.md",
+    "kept.md"
+  ],
+  "projections": {
+    "<g2>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Claim <g2>\n\n```json\n{\n  \"text\": \"conservé\",\n  \"category\": \"semantic\",\n  \"volatility\": \"evolving\",\n  \"lastVerified\": null,\n  \"reviewAfter\": null\n}\n```\n",
+    "<g3>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g3>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 3,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Source <g3>\n\n```json\n{\n  \"relativePath\": \"doc.md\",\n  \"status\": \"indexed\",\n  \"hash\": \"0692366172f3cd59dfaca9fb48c144ff6961ec0a708164fd46cc6f8b14f02f9e\",\n  \"size\": 9,\n  \"indexedAt\": \"<date>\",\n  \"passages\": 1,\n  \"rejection\": null\n}\n```\n",
+    "<g4>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g4>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 2,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Source <g4>\n\n```json\n{\n  \"relativePath\": \"kept.md\",\n  \"status\": \"indexed\",\n  \"hash\": \"bab0bf673996fdc9fbc6e40ada54d2839e4a63432cff0307c917776c6d1c2d32\",\n  \"size\": 14,\n  \"indexedAt\": \"<date>\",\n  \"passages\": 1,\n  \"rejection\": null\n}\n```\n"
+  },
+  "steps": [
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"created\": true\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "init"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022conservé\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "add",
+          "conservé",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "file": "doc.md"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "file": "kept.md"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g3>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022doc.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u0022062fdb3300fcb9efff3bed51524f2a5caa4a6260b938cdb307de819e76399f02\\u0022,\\n  \\u0022size\\u0022: 11,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "doc.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g4>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022kept.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u00224fb6e94f3dd85568ecb1b7e726f09eaef50ef4ff1b347e23f3f9273d326e25f4\\u0022,\\n  \\u0022size\\u0022: 12,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "kept.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "sql": "DELETE FROM search"
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/instance.json",
+        "added .sermofur/memory.db",
+        "added .sermofur/records/<g2>.md",
+        "added .sermofur/records/<g3>.md",
+        "added .sermofur/records/<g4>.md"
+      ],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": {
+        "exitCode": 5,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"overall\": \"unhealthy\",\n  \"checks\": [\n    {\n      \"name\": \"instance\",\n      \"status\": \"ok\",\n      \"detail\": \"Compatible configuration and version.\"\n    },\n    {\n      \"name\": \"schema\",\n      \"status\": \"ok\",\n      \"detail\": \"Consistent SQLite schema and identity.\"\n    },\n    {\n      \"name\": \"storage\",\n      \"status\": \"ok\",\n      \"detail\": \"SQLite integrity check.\"\n    },\n    {\n      \"name\": \"orphan_records\",\n      \"status\": \"ok\",\n      \"detail\": \"0 inconsistent references.\"\n    },\n    {\n      \"name\": \"scopes\",\n      \"status\": \"ok\",\n      \"detail\": \"Valid scope tree.\"\n    },\n    {\n      \"name\": \"scope_mappings\",\n      \"status\": \"ok\",\n      \"detail\": \"0 missing mappings.\"\n    },\n    {\n      \"name\": \"scope_overlap\",\n      \"status\": \"ok\",\n      \"detail\": \"0 conflicting mapping pairs.\"\n    },\n    {\n      \"name\": \"memory_consistency\",\n      \"status\": \"ok\",\n      \"detail\": \"0 inconsistencies detected.\"\n    },\n    {\n      \"name\": \"projections\",\n      \"status\": \"ok\",\n      \"detail\": \"0 missing or diverging projections; run export to rebuild.\"\n    },\n    {\n      \"name\": \"record_columns\",\n      \"status\": \"ok\",\n      \"detail\": \"0 inconsistent metadata rows.\"\n    },\n    {\n      \"name\": \"fts5\",\n      \"status\": \"ok\",\n      \"detail\": \"SQLite full-text search engine.\"\n    },\n    {\n      \"name\": \"search_index\",\n      \"status\": \"error\",\n      \"detail\": \"3 objects missing from the index or misplaced, 0 entries without object; run index rebuild.\"\n    },\n    {\n      \"name\": \"source_scopes\",\n      \"status\": \"ok\",\n      \"detail\": \"0 sources attached to a broader scope than their file.\"\n    },\n    {\n      \"name\": \"sqlite\",\n      \"status\": \"ok\",\n      \"detail\": \"Native version <sqlite>; journal delete.\"\n    },\n    {\n      \"name\": \"daemon\",\n      \"status\": \"warning\",\n      \"detail\": \"absent: commands run directly.\"\n    },\n    {\n      \"name\": \"laya\",\n      \"status\": \"warning\",\n      \"detail\": \"Capability not delivered in this version.\"\n    },\n    {\n      \"name\": \"model\",\n      \"status\": \"warning\",\n      \"detail\": \"Capability not delivered in this version.\"\n    },\n    {\n      \"name\": \"mcp\",\n      \"status\": \"warning\",\n      \"detail\": \"Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"indexed\": 3,\n  \"changedSources\": 0\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "index",
+          "rebuild"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "Sermofur Doctor\n  ok: instance — Compatible configuration and version.\n  ok: schema — Consistent SQLite schema and identity.\n  ok: storage — SQLite integrity check.\n  ok: orphan_records — 0 inconsistent references.\n  ok: scopes — Valid scope tree.\n  ok: scope_mappings — 0 missing mappings.\n  ok: scope_overlap — 0 conflicting mapping pairs.\n  ok: memory_consistency — 0 inconsistencies detected.\n  ok: projections — 0 missing or diverging projections; run export to rebuild.\n  ok: record_columns — 0 inconsistent metadata rows.\n  ok: fts5 — SQLite full-text search engine.\n  ok: search_index — 0 objects missing from the index or misplaced, 0 entries without object; run index rebuild.\n  ok: source_scopes — 0 sources attached to a broader scope than their file.\n  ok: sqlite — Native version <sqlite>; journal delete.\n  warning: daemon — absent: commands run directly.\n  warning: laya — Capability not delivered in this version.\n  warning: model — Capability not delivered in this version.\n  warning: mcp — Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\nOverall: healthy_with_warnings\n"
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "file": "kept.md"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"sources\": [\n    {\n      \"id\": \"<g3>\",\n      \"path\": \"doc.md\",\n      \"outcome\": \"unchanged\",\n      \"previousHash\": \"062fdb3300fcb9efff3bed51524f2a5caa4a6260b938cdb307de819e76399f02\",\n      \"hash\": \"062fdb3300fcb9efff3bed51524f2a5caa4a6260b938cdb307de819e76399f02\"\n    },\n    {\n      \"id\": \"<g4>\",\n      \"path\": \"kept.md\",\n      \"outcome\": \"modified\",\n      \"previousHash\": \"4fb6e94f3dd85568ecb1b7e726f09eaef50ef4ff1b347e23f3f9273d326e25f4\",\n      \"hash\": \"bab0bf673996fdc9fbc6e40ada54d2839e4a63432cff0307c917776c6d1c2d32\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "reindex"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "Sermofur Doctor\n  ok: instance — Compatible configuration and version.\n  ok: schema — Consistent SQLite schema and identity.\n  ok: storage — SQLite integrity check.\n  ok: orphan_records — 0 inconsistent references.\n  ok: scopes — Valid scope tree.\n  ok: scope_mappings — 0 missing mappings.\n  ok: scope_overlap — 0 conflicting mapping pairs.\n  ok: memory_consistency — 0 inconsistencies detected.\n  ok: projections — 0 missing or diverging projections; run export to rebuild.\n  ok: record_columns — 0 inconsistent metadata rows.\n  ok: fts5 — SQLite full-text search engine.\n  ok: search_index — 0 objects missing from the index or misplaced, 0 entries without object; run index rebuild.\n  ok: source_scopes — 0 sources attached to a broader scope than their file.\n  ok: sqlite — Native version <sqlite>; journal delete.\n  warning: daemon — absent: commands run directly.\n  warning: laya — Capability not delivered in this version.\n  warning: model — Capability not delivered in this version.\n  warning: mcp — Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\nOverall: healthy_with_warnings\n"
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "remove": "doc.md"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"indexed\": 2,\n  \"changedSources\": 1\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "index",
+          "rebuild"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "Sermofur Doctor\n  ok: instance — Compatible configuration and version.\n  ok: schema — Consistent SQLite schema and identity.\n  ok: storage — SQLite integrity check.\n  ok: orphan_records — 0 inconsistent references.\n  ok: scopes — Valid scope tree.\n  ok: scope_mappings — 0 missing mappings.\n  ok: scope_overlap — 0 conflicting mapping pairs.\n  ok: memory_consistency — 0 inconsistencies detected.\n  ok: projections — 0 missing or diverging projections; run export to rebuild.\n  ok: record_columns — 0 inconsistent metadata rows.\n  ok: fts5 — SQLite full-text search engine.\n  ok: search_index — 0 objects missing from the index or misplaced, 0 entries without object; run index rebuild.\n  ok: source_scopes — 0 sources attached to a broader scope than their file.\n  ok: sqlite — Native version <sqlite>; journal delete.\n  warning: daemon — absent: commands run directly.\n  warning: laya — Capability not delivered in this version.\n  warning: model — Capability not delivered in this version.\n  warning: mcp — Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\nOverall: healthy_with_warnings\n"
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "file": "doc.md"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"sources\": [\n    {\n      \"id\": \"<g3>\",\n      \"path\": \"doc.md\",\n      \"outcome\": \"restored\",\n      \"previousHash\": \"062fdb3300fcb9efff3bed51524f2a5caa4a6260b938cdb307de819e76399f02\",\n      \"hash\": \"0692366172f3cd59dfaca9fb48c144ff6961ec0a708164fd46cc6f8b14f02f9e\"\n    },\n    {\n      \"id\": \"<g4>\",\n      \"path\": \"kept.md\",\n      \"outcome\": \"unchanged\",\n      \"previousHash\": \"bab0bf673996fdc9fbc6e40ada54d2839e4a63432cff0307c917776c6d1c2d32\",\n      \"hash\": \"bab0bf673996fdc9fbc6e40ada54d2839e4a63432cff0307c917776c6d1c2d32\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "reindex"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "Sermofur Doctor\n  ok: instance — Compatible configuration and version.\n  ok: schema — Consistent SQLite schema and identity.\n  ok: storage — SQLite integrity check.\n  ok: orphan_records — 0 inconsistent references.\n  ok: scopes — Valid scope tree.\n  ok: scope_mappings — 0 missing mappings.\n  ok: scope_overlap — 0 conflicting mapping pairs.\n  ok: memory_consistency — 0 inconsistencies detected.\n  ok: projections — 0 missing or diverging projections; run export to rebuild.\n  ok: record_columns — 0 inconsistent metadata rows.\n  ok: fts5 — SQLite full-text search engine.\n  ok: search_index — 0 objects missing from the index or misplaced, 0 entries without object; run index rebuild.\n  ok: source_scopes — 0 sources attached to a broader scope than their file.\n  ok: sqlite — Native version <sqlite>; journal delete.\n  warning: daemon — absent: commands run directly.\n  warning: laya — Capability not delivered in this version.\n  warning: model — Capability not delivered in this version.\n  warning: mcp — Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\nOverall: healthy_with_warnings\n"
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "sql": "INSERT INTO search(object_id,scope_id,kind,passage,length,text) VALUES('x','workspace','claim',0,1,'x')"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 5,
+        "stderr": "",
+        "stdout": "Sermofur Doctor\n  ok: instance — Compatible configuration and version.\n  ok: schema — Consistent SQLite schema and identity.\n  ok: storage — SQLite integrity check.\n  ok: orphan_records — 0 inconsistent references.\n  ok: scopes — Valid scope tree.\n  ok: scope_mappings — 0 missing mappings.\n  ok: scope_overlap — 0 conflicting mapping pairs.\n  ok: memory_consistency — 0 inconsistencies detected.\n  ok: projections — 0 missing or diverging projections; run export to rebuild.\n  ok: record_columns — 0 inconsistent metadata rows.\n  ok: fts5 — SQLite full-text search engine.\n  error: search_index — 0 objects missing from the index or misplaced, 1 entries without object; run index rebuild.\n  ok: source_scopes — 0 sources attached to a broader scope than their file.\n  ok: sqlite — Native version <sqlite>; journal delete.\n  warning: daemon — absent: commands run directly.\n  warning: laya — Capability not delivered in this version.\n  warning: model — Capability not delivered in this version.\n  warning: mcp — Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\nOverall: unhealthy\n"
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "sql": "UPDATE search SET kind=NULL WHERE object_id='x'"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 5,
+        "stderr": "",
+        "stdout": "Sermofur Doctor\n  ok: instance — Compatible configuration and version.\n  ok: schema — Consistent SQLite schema and identity.\n  ok: storage — SQLite integrity check.\n  ok: orphan_records — 0 inconsistent references.\n  ok: scopes — Valid scope tree.\n  ok: scope_mappings — 0 missing mappings.\n  ok: scope_overlap — 0 conflicting mapping pairs.\n  ok: memory_consistency — 0 inconsistencies detected.\n  ok: projections — 0 missing or diverging projections; run export to rebuild.\n  ok: record_columns — 0 inconsistent metadata rows.\n  ok: fts5 — SQLite full-text search engine.\n  error: search_index — 0 objects missing from the index or misplaced, 1 entries without object; run index rebuild.\n  ok: source_scopes — 0 sources attached to a broader scope than their file.\n  ok: sqlite — Native version <sqlite>; journal delete.\n  warning: daemon — absent: commands run directly.\n  warning: laya — Capability not delivered in this version.\n  warning: model — Capability not delivered in this version.\n  warning: mcp — Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\nOverall: unhealthy\n"
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    }
+  ]
+}

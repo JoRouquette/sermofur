@@ -125,7 +125,7 @@ pub fn documents(record: &MemoryRecord) -> Result<Vec<SearchDocument>> {
 }
 
 /// The kind of an object in the `search` table (`SqliteSearchIndex.KindOf`).
-fn kind_of(kind: RecordKind) -> Result<&'static str> {
+pub(crate) fn kind_of(kind: RecordKind) -> Result<&'static str> {
     match kind {
         RecordKind::Claim => Ok("claim"),
         RecordKind::Retex => Ok("retex"),

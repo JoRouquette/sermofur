@@ -1,0 +1,240 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/memory.db",
+    ".sermofur/records/",
+    "configuration/"
+  ],
+  "projections": {},
+  "steps": [
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"created\": true\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "init"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/instance.json",
+        "added .sermofur/memory.db"
+      ],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "file": ".sermofur/instance.json"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 5,
+        "stderr": "",
+        "stdout": "Sermofur Doctor\n  error: instance — unsupported_schema\n  warning: daemon — absent: commands run directly.\n  warning: laya — Capability not delivered in this version.\n  warning: model — Capability not delivered in this version.\n  warning: mcp — Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\nOverall: unhealthy\n"
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "file": ".sermofur/instance.json"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 5,
+        "stderr": "",
+        "stdout": "Sermofur Doctor\n  error: instance — unsupported_schema\n  warning: daemon — absent: commands run directly.\n  warning: laya — Capability not delivered in this version.\n  warning: model — Capability not delivered in this version.\n  warning: mcp — Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\nOverall: unhealthy\n"
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "file": ".sermofur/instance.json"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 5,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"overall\": \"unhealthy\",\n  \"checks\": [\n    {\n      \"name\": \"instance\",\n      \"status\": \"error\",\n      \"detail\": \"invalid_storage\"\n    },\n    {\n      \"name\": \"daemon\",\n      \"status\": \"warning\",\n      \"detail\": \"absent: commands run directly.\"\n    },\n    {\n      \"name\": \"laya\",\n      \"status\": \"warning\",\n      \"detail\": \"Capability not delivered in this version.\"\n    },\n    {\n      \"name\": \"model\",\n      \"status\": \"warning\",\n      \"detail\": \"Capability not delivered in this version.\"\n    },\n    {\n      \"name\": \"mcp\",\n      \"status\": \"warning\",\n      \"detail\": \"Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "bytes": ".sermofur/instance.json"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 5,
+        "stderr": "",
+        "stdout": "Sermofur Doctor\n  error: instance — invalid_instance\n  warning: daemon — absent: commands run directly.\n  warning: laya — Capability not delivered in this version.\n  warning: model — Capability not delivered in this version.\n  warning: mcp — Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\nOverall: unhealthy\n"
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "remove": ".sermofur/instance.json"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": ".sermofur/instance.json"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 5,
+        "stderr": "",
+        "stdout": "Sermofur Doctor\n  error: instance — invalid_instance\n  warning: daemon — absent: commands run directly.\n  warning: laya — Capability not delivered in this version.\n  warning: model — Capability not delivered in this version.\n  warning: mcp — Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\nOverall: unhealthy\n"
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "rmdir": ".sermofur/instance.json"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "file": ".sermofur/instance.json"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 5,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"overall\": \"unhealthy\",\n  \"checks\": [\n    {\n      \"name\": \"instance\",\n      \"status\": \"ok\",\n      \"detail\": \"Compatible configuration and version.\"\n    },\n    {\n      \"name\": \"instance_storage\",\n      \"status\": \"error\",\n      \"detail\": \"instance_mismatch\"\n    },\n    {\n      \"name\": \"daemon\",\n      \"status\": \"warning\",\n      \"detail\": \"absent: commands run directly.\"\n    },\n    {\n      \"name\": \"laya\",\n      \"status\": \"warning\",\n      \"detail\": \"Capability not delivered in this version.\"\n    },\n    {\n      \"name\": \"model\",\n      \"status\": \"warning\",\n      \"detail\": \"Capability not delivered in this version.\"\n    },\n    {\n      \"name\": \"mcp\",\n      \"status\": \"warning\",\n      \"detail\": \"Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "remove": ".sermofur/memory.db"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 5,
+        "stderr": "",
+        "stdout": "Sermofur Doctor\n  ok: instance — Compatible configuration and version.\n  error: instance_storage — missing_database\n  warning: daemon — absent: commands run directly.\n  warning: laya — Capability not delivered in this version.\n  warning: model — Capability not delivered in this version.\n  warning: mcp — Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\nOverall: unhealthy\n"
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "file": ".sermofur/memory.db"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 5,
+        "stderr": "",
+        "stdout": "Sermofur Doctor\n  ok: instance — Compatible configuration and version.\n  error: instance_storage — invalid_storage\n  warning: daemon — absent: commands run directly.\n  warning: laya — Capability not delivered in this version.\n  warning: model — Capability not delivered in this version.\n  warning: mcp — Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\nOverall: unhealthy\n"
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [
+        "changed .sermofur/instance.json",
+        "changed .sermofur/memory.db"
+      ],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "remove": ".sermofur/instance.json"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": "configuration"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "link": ".sermofur/instance.json",
+        "target": "configuration"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 5,
+        "stderr": "",
+        "stdout": "Sermofur Doctor\n  error: instance — unsafe_path\n  warning: daemon — absent: commands run directly.\n  warning: laya — Capability not delivered in this version.\n  warning: model — Capability not delivered in this version.\n  warning: mcp — Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\nOverall: unhealthy\n"
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    }
+  ]
+}

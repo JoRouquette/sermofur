@@ -29,7 +29,7 @@ fn scenarios() -> Vec<Scenario> {
         acts,
     };
     vec![
-        // OtherCommandsRefuseFormatOneWithoutTouchingIt (the doctor part waits for lot 6.2),
+        // OtherCommandsRefuseFormatOneWithoutTouchingIt (its doctor part is in `golden_cli_6_2.rs`),
         // MigrateCommandReportsTheResult and MigratedInstanceAcceptsNewObjectsAndMigrateIsIdempotent.
         s(
             "migrate_legacy",

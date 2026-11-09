@@ -46,6 +46,14 @@ fn equal(a: &[u16], b: &[u16]) -> bool {
     }
 }
 
+/// `string.Equals(a, b, LocalPaths.Comparison)` on two texts.
+pub(crate) fn same_text(a: &str, b: &str) -> bool {
+    equal(
+        &a.encode_utf16().collect::<Vec<u16>>(),
+        &b.encode_utf16().collect::<Vec<u16>>(),
+    )
+}
+
 /// `PathInternal.IsCaseSensitive` is false on Windows and on macOS: `Path.GetRelativePath`
 /// then ignores case, with `OrdinalIgnoreCase` for the roots and `char.ToUpperInvariant` for
 /// the common part.

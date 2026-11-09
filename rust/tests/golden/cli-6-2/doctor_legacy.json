@@ -1,0 +1,152 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/backups/",
+    ".sermofur/backups/memory-v1-<stamp>-<id>.db",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/",
+    ".sermofur/records/<g1>.md",
+    ".sermofur/records/<g2>.md",
+    ".sermofur/records/<g3>.md",
+    ".sermofur/records/<g4>.md",
+    ".sermofur/records/<g5>.md",
+    ".sermofur/records/<g6>.md",
+    "client-a/",
+    "client-a/project-x/",
+    "client-b/"
+  ],
+  "projections": {
+    "<g1>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g1>\",\n  \"scopeId\": \"client-a\",\n  \"kind\": \"claim\",\n  \"status\": \"invalidated\",\n  \"revision\": 2,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Claim <g1>\n\n```json\n{\n  \"text\": \"Client A utilise PostgreSQL 16\",\n  \"category\": \"semantic\",\n  \"volatility\": \"evolving\",\n  \"lastVerified\": null,\n  \"reviewAfter\": null\n}\n```\n",
+    "<g2>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Claim <g2>\n\n```json\n{\n  \"text\": \"Le cache est invalidÃ© Ã\\u00A0 chaque dÃ©ploiement\",\n  \"category\": \"semantic\",\n  \"volatility\": \"evolving\",\n  \"lastVerified\": null,\n  \"reviewAfter\": null\n}\n```\n",
+    "<g3>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g3>\",\n  \"scopeId\": \"client-b\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Claim <g3>\n\n```json\n{\n  \"text\": \"Client B dÃ©ploie le vendredi\",\n  \"category\": \"decisions\",\n  \"volatility\": \"evolving\",\n  \"lastVerified\": null,\n  \"reviewAfter\": null\n}\n```\n",
+    "<g4>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g4>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"retex\",\n  \"status\": \"draft\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Retex <g4>\n\n```json\n{\n  \"event\": \"DÃ©ploiement lent\",\n  \"impact\": \"Cache froid\",\n  \"nextAction\": \"PrÃ©chauffer le cache\"\n}\n```\n",
+    "<g5>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g5>\",\n  \"scopeId\": \"project-x\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"llm\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Claim <g5>\n\n```json\n{\n  \"text\": \"Le projet X compile en Release\",\n  \"category\": \"semantic\",\n  \"volatility\": \"evolving\",\n  \"lastVerified\": null,\n  \"reviewAfter\": null\n}\n```\n",
+    "<g6>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g6>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Evidence <g6>\n\n```json\n{\n  \"claimId\": \"<g2>\",\n  \"kind\": \"local_documentation\",\n  \"reference\": \"docs/deploy.md\",\n  \"lineageId\": \"deploy-doc\"\n}\n```\n"
+  },
+  "steps": [
+    {
+      "output": null,
+      "step": {
+        "legacy": true
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/instance.json",
+        "added .sermofur/memory.db",
+        "added .sermofur/records/<g1>.md",
+        "added .sermofur/records/<g2>.md",
+        "added .sermofur/records/<g3>.md",
+        "added .sermofur/records/<g4>.md",
+        "added .sermofur/records/<g5>.md",
+        "added .sermofur/records/<g6>.md"
+      ],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": {
+        "exitCode": 5,
+        "stderr": "",
+        "stdout": "Sermofur Doctor\n  error: instance — migration_required\n  warning: daemon — absent: commands run directly.\n  warning: laya — Capability not delivered in this version.\n  warning: model — Capability not delivered in this version.\n  warning: mcp — Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\nOverall: unhealthy\n"
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 5,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"overall\": \"unhealthy\",\n  \"checks\": [\n    {\n      \"name\": \"instance\",\n      \"status\": \"error\",\n      \"detail\": \"migration_required\"\n    },\n    {\n      \"name\": \"daemon\",\n      \"status\": \"warning\",\n      \"detail\": \"absent: commands run directly.\"\n    },\n    {\n      \"name\": \"laya\",\n      \"status\": \"warning\",\n      \"detail\": \"Capability not delivered in this version.\"\n    },\n    {\n      \"name\": \"model\",\n      \"status\": \"warning\",\n      \"detail\": \"Capability not delivered in this version.\"\n    },\n    {\n      \"name\": \"mcp\",\n      \"status\": \"warning\",\n      \"detail\": \"Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 5,
+        "stderr": "",
+        "stdout": "Sermofur Doctor\n  error: instance — migration_required\n  warning: daemon — absent: commands run directly.\n  warning: laya — Capability not delivered in this version.\n  warning: model — Capability not delivered in this version.\n  warning: mcp — Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\nOverall: unhealthy\n"
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": "client-a"
+      }
+    },
+    {
+      "output": [],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"migrated\": true,\n  \"from\": 1,\n  \"to\": 2,\n  \"backup\": \".sermofur/backups/memory-v1-<stamp>-<id>.db\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "migrate"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/backups/memory-v1-<stamp>-<id>.db",
+        "changed .sermofur/instance.json",
+        "changed .sermofur/memory.db"
+      ],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "Sermofur Doctor\n  ok: instance — Compatible configuration and version.\n  ok: schema — Consistent SQLite schema and identity.\n  ok: storage — SQLite integrity check.\n  ok: orphan_records — 0 inconsistent references.\n  ok: scopes — Valid scope tree.\n  ok: scope_mappings — 0 missing mappings.\n  ok: scope_overlap — 0 conflicting mapping pairs.\n  ok: memory_consistency — 0 inconsistencies detected.\n  warning: projections — 6 missing or diverging projections; run export to rebuild.\n  ok: record_columns — 0 inconsistent metadata rows.\n  ok: fts5 — SQLite full-text search engine.\n  ok: search_index — 0 objects missing from the index or misplaced, 0 entries without object; run index rebuild.\n  ok: source_scopes — 0 sources attached to a broader scope than their file.\n  ok: sqlite — Native version <sqlite>; journal delete.\n  warning: daemon — absent: commands run directly.\n  warning: laya — Capability not delivered in this version.\n  warning: model — Capability not delivered in this version.\n  warning: mcp — Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\nOverall: healthy_with_warnings\n"
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"overall\": \"healthy_with_warnings\",\n  \"checks\": [\n    {\n      \"name\": \"instance\",\n      \"status\": \"ok\",\n      \"detail\": \"Compatible configuration and version.\"\n    },\n    {\n      \"name\": \"schema\",\n      \"status\": \"ok\",\n      \"detail\": \"Consistent SQLite schema and identity.\"\n    },\n    {\n      \"name\": \"storage\",\n      \"status\": \"ok\",\n      \"detail\": \"SQLite integrity check.\"\n    },\n    {\n      \"name\": \"orphan_records\",\n      \"status\": \"ok\",\n      \"detail\": \"0 inconsistent references.\"\n    },\n    {\n      \"name\": \"scopes\",\n      \"status\": \"ok\",\n      \"detail\": \"Valid scope tree.\"\n    },\n    {\n      \"name\": \"scope_mappings\",\n      \"status\": \"ok\",\n      \"detail\": \"0 missing mappings.\"\n    },\n    {\n      \"name\": \"scope_overlap\",\n      \"status\": \"ok\",\n      \"detail\": \"0 conflicting mapping pairs.\"\n    },\n    {\n      \"name\": \"memory_consistency\",\n      \"status\": \"ok\",\n      \"detail\": \"0 inconsistencies detected.\"\n    },\n    {\n      \"name\": \"projections\",\n      \"status\": \"warning\",\n      \"detail\": \"6 missing or diverging projections; run export to rebuild.\"\n    },\n    {\n      \"name\": \"record_columns\",\n      \"status\": \"ok\",\n      \"detail\": \"0 inconsistent metadata rows.\"\n    },\n    {\n      \"name\": \"fts5\",\n      \"status\": \"ok\",\n      \"detail\": \"SQLite full-text search engine.\"\n    },\n    {\n      \"name\": \"search_index\",\n      \"status\": \"ok\",\n      \"detail\": \"0 objects missing from the index or misplaced, 0 entries without object; run index rebuild.\"\n    },\n    {\n      \"name\": \"source_scopes\",\n      \"status\": \"ok\",\n      \"detail\": \"0 sources attached to a broader scope than their file.\"\n    },\n    {\n      \"name\": \"sqlite\",\n      \"status\": \"ok\",\n      \"detail\": \"Native version <sqlite>; journal delete.\"\n    },\n    {\n      \"name\": \"daemon\",\n      \"status\": \"warning\",\n      \"detail\": \"absent: commands run directly.\"\n    },\n    {\n      \"name\": \"laya\",\n      \"status\": \"warning\",\n      \"detail\": \"Capability not delivered in this version.\"\n    },\n    {\n      \"name\": \"model\",\n      \"status\": \"warning\",\n      \"detail\": \"Capability not delivered in this version.\"\n    },\n    {\n      \"name\": \"mcp\",\n      \"status\": \"warning\",\n      \"detail\": \"Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "doctor"
+        ],
+        "cwd": "client-a/project-x"
+      }
+    },
+    {
+      "output": [],
+      "step": {
+        "changes": true
+      }
+    }
+  ]
+}

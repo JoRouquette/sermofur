@@ -63,7 +63,7 @@ pub fn render(record: &MemoryRecord) -> Result<String> {
 
 /// Whether the file holds exactly the projection of `record` (`IsCurrent`). A link on the path
 /// is refused (`unsafe_path`); an unreadable file is an error of reading.
-fn is_current(root: &Path, record: &MemoryRecord) -> Result<std::io::Result<bool>> {
+pub(crate) fn is_current(root: &Path, record: &MemoryRecord) -> Result<std::io::Result<bool>> {
     let target = path_for(root, record);
     reject_links(&target)?;
     if !fs::metadata(&target).is_ok_and(|m| m.is_file()) {

@@ -222,6 +222,21 @@ pub fn discover_for_diagnosis(path: &Path, owners: &dyn FileOwnership) -> Result
     locate(path, owners, true)
 }
 
+/// The case of an invalid `.sermofur` entry in `root`, as doctor names it, or `None` for a valid
+/// or absent one (`DescribeInvalidMarker`). A link is still refused.
+pub fn describe_invalid_marker(
+    root: &Path,
+    owners: &dyn FileOwnership,
+) -> Result<Option<&'static str>> {
+    Ok(match inspect_marker(root, owners)? {
+        MarkerState::ForeignOwner => Some("foreign_owner"),
+        MarkerState::Foreign => Some("foreign"),
+        MarkerState::Damaged => Some("damaged"),
+        MarkerState::Unreadable => Some("unreadable"),
+        MarkerState::Absent | MarkerState::Instance => None,
+    })
+}
+
 fn locate(path: &Path, owners: &dyn FileOwnership, for_diagnosis: bool) -> Result<PathBuf> {
     let start = validate_directory(path)?;
     let mut current = Some(start.as_path());

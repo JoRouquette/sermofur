@@ -126,9 +126,68 @@ fn inspect(_path: &Path) -> io::Result<Option<EntryStatus>> {
     ))
 }
 
+/// The SID of the current user in its text form, as `WindowsIdentity.User.Value`.
+#[cfg(windows)]
+pub fn current_user_sid() -> io::Result<String> {
+    sid_text(&crate::windows::process_token()?.user)
+        .ok_or_else(|| io::Error::other("malformed SID"))
+}
+
+/// `S-<revision>-<authority>-<sub-authorities>`: the authority is a 48-bit big-endian number,
+/// written in hexadecimal from 2^32 on; each sub-authority is a 32-bit little-endian number.
+#[cfg_attr(not(windows), allow(dead_code))]
+fn sid_text(sid: &[u8]) -> Option<String> {
+    let count = usize::from(*sid.get(1)?);
+    let authority = sid
+        .get(2..8)?
+        .iter()
+        .fold(0u64, |value, byte| (value << 8) | u64::from(*byte));
+    let mut text = if authority >= 1 << 32 {
+        format!("S-{}-0x{authority:012X}", sid[0])
+    } else {
+        format!("S-{}-{authority}", sid[0])
+    };
+    for index in 0..count {
+        let bytes = sid.get(8 + 4 * index..12 + 4 * index)?;
+        let value = u32::from_le_bytes(bytes.try_into().ok()?);
+        text.push_str(&format!("-{value}"));
+    }
+    Some(text)
+}
+
+/// The effective user of the process, as `UnixNative.EffectiveUserId`.
+#[cfg(unix)]
+pub fn effective_user_id() -> u32 {
+    rustix::process::geteuid().as_raw()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_sid_is_written_as_windows_writes_it() {
+        assert_eq!(sid_text(&ADMINISTRATORS).as_deref(), Some("S-1-5-32-544"));
+        assert_eq!(sid_text(&[1, 1, 0, 0, 0, 0, 0, 5]), None);
+    }
+
+    /// The SID of the account, as `whoami /user` prints it.
+    #[cfg(windows)]
+    #[test]
+    fn the_current_sid_is_the_one_of_whoami() {
+        let out = std::process::Command::new("whoami")
+            .args(["/user", "/fo", "csv", "/nh"])
+            .output()
+            .expect("whoami");
+        let text = String::from_utf8_lossy(&out.stdout);
+        let expected = text
+            .trim()
+            .rsplit(',')
+            .next()
+            .expect("a SID")
+            .trim_matches('"');
+        assert_eq!(current_user_sid().expect("SID"), expected);
+    }
 
     const USER: [u8; 12] = [1, 1, 0, 0, 0, 0, 0, 5, 18, 0, 0, 0];
 

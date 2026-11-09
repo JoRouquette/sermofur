@@ -36,9 +36,14 @@ pub struct Captured {
 }
 
 pub fn run(program: &str, arguments: &[String], cwd: &Path) -> Captured {
+    // A daemon home and a Codex home that never exist: doctor sees no daemon and no user
+    // declaration of the MCP bridge, whatever runs on the machine.
+    let elsewhere = temp_base().join("sermofur-cli-no-daemon");
     let output = Command::new(program)
         .args(arguments)
         .env("SERMOFUR_NO_DAEMON", "1")
+        .env("SERMOFUR_DAEMON_HOME", &elsewhere)
+        .env("CODEX_HOME", &elsewhere)
         .current_dir(cwd)
         .output()
         .expect("the program starts");
@@ -115,6 +120,22 @@ pub enum Act {
     /// instance-v1`, never modified) into the root, with the folders of its scopes, as
     /// `LegacyInstance` does.
     Legacy,
+    /// Runs SQL on the database of the instance, foreign keys off, as the `Tamper` helpers of the
+    /// .NET tests: damage that only a hand or another tool can do.
+    Sql(&'static str),
+}
+
+/// Runs `sql` on `<root>/.sermofur/memory.db` with foreign keys off; the connection is closed
+/// before the next step.
+pub fn tamper(root: &Path, sql: &str) {
+    let connection = sermofur_core::schema::open(
+        &root.join(".sermofur").join("memory.db"),
+        Default::default(),
+    )
+    .expect("database");
+    connection
+        .execute_batch(&format!("PRAGMA foreign_keys=OFF; {sql}"))
+        .expect("SQL");
 }
 
 /// The format 1 fixture of `MigrationTests`.
@@ -169,6 +190,30 @@ pub fn backup_names(text: &str) -> String {
         } else {
             rest = tail;
         }
+    }
+    out.push_str(rest);
+    out
+}
+
+/// `Native version <x.y.z>; ` of the `sqlite` check of doctor becomes `Native version <sqlite>; `
+/// once its shape is checked: the oracle runs SQLite 3.53.4, the port the bundled 3.53.2
+/// (decision A6, `PARITY.md`); `doctor_prints_the_bundled_sqlite_version` checks the port.
+pub fn sqlite_versions(text: &str) -> String {
+    const PREFIX: &str = "Native version ";
+    let mut out = String::new();
+    let mut rest = text;
+    while let Some(at) = rest.find(PREFIX) {
+        let tail = &rest[at + PREFIX.len()..];
+        out.push_str(&rest[..at + PREFIX.len()]);
+        let end = tail.find(';').expect("a version ends with ;");
+        let version = &tail[..end];
+        assert!(
+            version.split('.').count() == 3
+                && version.split('.').all(|part| part.parse::<u32>().is_ok()),
+            "SQLite version {version}"
+        );
+        out.push_str("<sqlite>");
+        rest = &tail[end..];
     }
     out.push_str(rest);
     out
@@ -424,7 +469,7 @@ pub struct Names {
 impl Names {
     pub fn normalize(&mut self, text: &str, root: &Path) -> String {
         let long = long_form(root);
-        let mut out = backup_names(&collapse_line_breaks(text))
+        let mut out = sqlite_versions(&backup_names(&collapse_line_breaks(text)))
             .replace(&long.replace('\\', "\\\\"), "<root>")
             .replace(&long, "<root>");
         out = out
@@ -682,6 +727,10 @@ pub fn record(program: &str, scenario: &Scenario) -> Value {
             Act::Legacy => {
                 copy_legacy(root);
                 (json!({ "legacy": true }), Value::Null)
+            }
+            Act::Sql(sql) => {
+                tamper(root, sql);
+                (json!({ "sql": sql }), Value::Null)
             }
             Act::Changes => {
                 let now = files_of(root);

@@ -8,6 +8,7 @@ pub mod challenge;
 pub mod collation;
 pub mod confidence;
 pub mod discovery;
+pub mod doctor;
 pub mod error;
 pub mod format;
 pub mod guid;

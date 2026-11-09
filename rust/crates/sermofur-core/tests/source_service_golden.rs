@@ -409,7 +409,7 @@ fn reindex_reports_modified_missing_and_restored_sources_with_history() {
         .expect("reindex");
     assert_eq!(entries.len(), 1);
     assert_eq!(entries[0].outcome, ReindexOutcome::Restored);
-    // The `search_index` check of `doctor` comes with lot 6.2.
+    // The `search_index` check of `doctor` is compared in `smf/tests/golden_cli_6_2.rs`.
 }
 
 #[test]
@@ -515,7 +515,7 @@ fn scope_created_on_the_folder_of_an_ancestor_source_takes_the_source() {
     assert_eq!(f.recall("b", "secret"), 0);
     assert_eq!(f.recall("workspace", "secret"), 0);
     assert_eq!(f.recall("a", "secret"), 1);
-    // The `source_scopes` and `search_index` checks of `doctor` come with lot 6.2.
+    // The `source_scopes` and `search_index` checks of `doctor` are compared in `smf/tests/golden_cli_6_2.rs`.
 }
 
 #[test]
@@ -592,7 +592,7 @@ fn scope_mapping_typed_in_another_case_still_holds_its_folder() {
     let registered = register(&mut f, "workspace", client_scope("c", "CLIENT")).expect("scope");
     assert_eq!(registered.relative_path.as_deref(), Some("client"));
     assert_eq!(code(f.add("workspace", &file)), "scope_boundary");
-    // The `scope_mappings` check of `doctor`, before and after a tampered mapping: lot 6.2.
+    // The `scope_mappings` check of `doctor`, before and after a tampered mapping: `smf/tests/golden_cli_6_2.rs`.
 }
 
 #[test]
@@ -778,7 +778,7 @@ fn a_file_declared_by_another_scope_is_refused() {
 }
 
 /// Port of `IndexRebuildRestoresADesynchronizedIndex` (service part; the command line is in
-/// `smf/tests/golden_cli_5_3.rs`, the `search_index` check of `doctor` comes with lot 6.2).
+/// `smf/tests/golden_cli_5_3.rs`, the `search_index` check of `doctor` is compared in `golden_cli_6_2.rs`).
 #[test]
 fn index_rebuild_restores_a_desynchronized_index() {
     let mut f = fixture();
@@ -883,7 +883,7 @@ fn index_rebuild_drops_a_lost_source_and_rolls_back_on_failure() {
         (entry.reason.as_deref(), entry.actor.as_deref()),
         (Some("missing"), Some(SYSTEM_ACTOR))
     );
-    // The `search_index` check of `doctor` comes with lot 6.2.
+    // The `search_index` check of `doctor` is compared in `smf/tests/golden_cli_6_2.rs`.
 }
 
 proptest! {
