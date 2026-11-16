@@ -1,0 +1,1219 @@
+{
+  "stopTimeoutSeconds": 75,
+  "definitions": [
+    {
+      "executable": "/opt/tools/smf",
+      "arguments": [
+        "daemon",
+        "run",
+        "a b",
+        "100%",
+        "q\u0022uote"
+      ],
+      "version": "0.4.0",
+      "environment": [
+        [
+          "PATH",
+          "/usr/bin:/bin"
+        ],
+        [
+          "DOTNET_ROOT",
+          "/opt/dotnet \u0026 co"
+        ]
+      ],
+      "unit": "[Unit]\nDescription=Sermofur daemon 0.4.0\n\n[Service]\nType=simple\nExecStart=\u0022/opt/tools/smf\u0022 \u0022daemon\u0022 \u0022run\u0022 \u0022a b\u0022 \u0022100%%\u0022 \u0022q\\\u0022uote\u0022\nEnvironment=\u0022DOTNET_ROOT=/opt/dotnet \u0026 co\u0022\nEnvironment=\u0022PATH=/usr/bin:/bin\u0022\nRestart=on-failure\nRestartSec=1\nTimeoutStopSec=75\n\n[Install]\nWantedBy=default.target\n",
+      "unitError": null,
+      "plist": "\u003C?xml version=\u00221.0\u0022 encoding=\u0022UTF-8\u0022?\u003E\n\u003C!DOCTYPE plist PUBLIC \u0022-//Apple//DTD PLIST 1.0//EN\u0022 \u0022http://www.apple.com/DTDs/PropertyList-1.0.dtd\u0022\u003E\n\u003Cplist version=\u00221.0\u0022\u003E\n\u003Cdict\u003E\n  \u003Ckey\u003ELabel\u003C/key\u003E\u003Cstring\u003Eio.github.jorouquette.sermofur\u003C/string\u003E\n  \u003Ckey\u003EProgramArguments\u003C/key\u003E\n  \u003Carray\u003E\n    \u003Cstring\u003E/opt/tools/smf\u003C/string\u003E\n    \u003Cstring\u003Edaemon\u003C/string\u003E\n    \u003Cstring\u003Erun\u003C/string\u003E\n    \u003Cstring\u003Ea b\u003C/string\u003E\n    \u003Cstring\u003E100%\u003C/string\u003E\n    \u003Cstring\u003Eq\u0026quot;uote\u003C/string\u003E\n  \u003C/array\u003E\n  \u003Ckey\u003ERunAtLoad\u003C/key\u003E\u003Ctrue/\u003E\n  \u003Ckey\u003EKeepAlive\u003C/key\u003E\u003Cdict\u003E\u003Ckey\u003ESuccessfulExit\u003C/key\u003E\u003Cfalse/\u003E\u003C/dict\u003E\n  \u003Ckey\u003EThrottleInterval\u003C/key\u003E\u003Cinteger\u003E1\u003C/integer\u003E\n  \u003Ckey\u003EExitTimeOut\u003C/key\u003E\u003Cinteger\u003E75\u003C/integer\u003E\n  \u003Ckey\u003EEnvironmentVariables\u003C/key\u003E\n  \u003Cdict\u003E\n    \u003Ckey\u003EDOTNET_ROOT\u003C/key\u003E\u003Cstring\u003E/opt/dotnet \u0026amp; co\u003C/string\u003E\n    \u003Ckey\u003EPATH\u003C/key\u003E\u003Cstring\u003E/usr/bin:/bin\u003C/string\u003E\n  \u003C/dict\u003E\n  \u003Ckey\u003EStandardErrorPath\u003C/key\u003E\u003Cstring\u003E/logs/launchd.err\u003C/string\u003E\n\u003C/dict\u003E\n\u003C/plist\u003E\n",
+      "taskXml": "\u003C?xml version=\u00221.0\u0022 encoding=\u0022UTF-16\u0022?\u003E\n\u003CTask version=\u00221.2\u0022 xmlns=\u0022http://schemas.microsoft.com/windows/2004/02/mit/task\u0022\u003E\n  \u003CRegistrationInfo\u003E\n    \u003CDescription\u003ESermofur daemon 0.4.0\u003C/Description\u003E\n  \u003C/RegistrationInfo\u003E\n  \u003CTriggers\u003E\n    \u003CLogonTrigger\u003E\n      \u003CEnabled\u003Etrue\u003C/Enabled\u003E\n      \u003CUserId\u003EPC\\j\u00E9r\u00F4me\u003C/UserId\u003E\n    \u003C/LogonTrigger\u003E\n  \u003C/Triggers\u003E\n  \u003CPrincipals\u003E\n    \u003CPrincipal id=\u0022Author\u0022\u003E\n      \u003CUserId\u003EPC\\j\u00E9r\u00F4me\u003C/UserId\u003E\n      \u003CLogonType\u003EInteractiveToken\u003C/LogonType\u003E\n      \u003CRunLevel\u003ELeastPrivilege\u003C/RunLevel\u003E\n    \u003C/Principal\u003E\n  \u003C/Principals\u003E\n  \u003CSettings\u003E\n    \u003CMultipleInstancesPolicy\u003EIgnoreNew\u003C/MultipleInstancesPolicy\u003E\n    \u003CDisallowStartIfOnBatteries\u003Efalse\u003C/DisallowStartIfOnBatteries\u003E\n    \u003CStopIfGoingOnBatteries\u003Efalse\u003C/StopIfGoingOnBatteries\u003E\n    \u003CAllowHardTerminate\u003Etrue\u003C/AllowHardTerminate\u003E\n    \u003CStartWhenAvailable\u003Etrue\u003C/StartWhenAvailable\u003E\n    \u003CRunOnlyIfNetworkAvailable\u003Efalse\u003C/RunOnlyIfNetworkAvailable\u003E\n    \u003CIdleSettings\u003E\n      \u003CStopOnIdleEnd\u003Efalse\u003C/StopOnIdleEnd\u003E\n      \u003CRestartOnIdle\u003Efalse\u003C/RestartOnIdle\u003E\n    \u003C/IdleSettings\u003E\n    \u003CAllowStartOnDemand\u003Etrue\u003C/AllowStartOnDemand\u003E\n    \u003CEnabled\u003Etrue\u003C/Enabled\u003E\n    \u003CHidden\u003Etrue\u003C/Hidden\u003E\n    \u003CExecutionTimeLimit\u003EPT0S\u003C/ExecutionTimeLimit\u003E\n    \u003CPriority\u003E7\u003C/Priority\u003E\n    \u003CRestartOnFailure\u003E\n      \u003CInterval\u003EPT1M\u003C/Interval\u003E\n      \u003CCount\u003E999\u003C/Count\u003E\n    \u003C/RestartOnFailure\u003E\n  \u003C/Settings\u003E\n  \u003CActions Context=\u0022Author\u0022\u003E\n    \u003CExec\u003E\n      \u003CCommand\u003E/opt/tools/smf\u003C/Command\u003E\n      \u003CArguments\u003Edaemon run \u0026quot;a b\u0026quot; 100% \u0026quot;q\\\u0026quot;uote\u0026quot;\u003C/Arguments\u003E\n    \u003C/Exec\u003E\n  \u003C/Actions\u003E\n\u003C/Task\u003E",
+      "serviceJson": "ewogICJleGVjdXRhYmxlIjogIi9vcHQvdG9vbHMvc21mIiwKICAiYXJndW1lbnRzIjogWwogICAgImRhZW1vbiIsCiAgICAicnVuIiwKICAgICJhIGIiLAogICAgIjEwMCUiLAogICAgInFcdTAwMjJ1b3RlIgogIF0sCiAgInZlcnNpb24iOiAiMC40LjAiLAogICJlbnZpcm9ubWVudCI6IHsKICAgICJQQVRIIjogIi91c3IvYmluOi9iaW4iLAogICAgIkRPVE5FVF9ST09UIjogIi9vcHQvZG90bmV0IFx1MDAyNiBjbyIKICB9Cn0="
+    },
+    {
+      "executable": "/home/a$b/smf",
+      "arguments": [
+        "daemon",
+        "run"
+      ],
+      "version": "0.4.0",
+      "environment": [
+        [
+          "DOTNET_ROOT",
+          "/opt/$dotnet"
+        ]
+      ],
+      "unit": "[Unit]\nDescription=Sermofur daemon 0.4.0\n\n[Service]\nType=simple\nExecStart=\u0022/home/a$$b/smf\u0022 \u0022daemon\u0022 \u0022run\u0022\nEnvironment=\u0022DOTNET_ROOT=/opt/$dotnet\u0022\nRestart=on-failure\nRestartSec=1\nTimeoutStopSec=75\n\n[Install]\nWantedBy=default.target\n",
+      "unitError": null,
+      "plist": "\u003C?xml version=\u00221.0\u0022 encoding=\u0022UTF-8\u0022?\u003E\n\u003C!DOCTYPE plist PUBLIC \u0022-//Apple//DTD PLIST 1.0//EN\u0022 \u0022http://www.apple.com/DTDs/PropertyList-1.0.dtd\u0022\u003E\n\u003Cplist version=\u00221.0\u0022\u003E\n\u003Cdict\u003E\n  \u003Ckey\u003ELabel\u003C/key\u003E\u003Cstring\u003Eio.github.jorouquette.sermofur\u003C/string\u003E\n  \u003Ckey\u003EProgramArguments\u003C/key\u003E\n  \u003Carray\u003E\n    \u003Cstring\u003E/home/a$b/smf\u003C/string\u003E\n    \u003Cstring\u003Edaemon\u003C/string\u003E\n    \u003Cstring\u003Erun\u003C/string\u003E\n  \u003C/array\u003E\n  \u003Ckey\u003ERunAtLoad\u003C/key\u003E\u003Ctrue/\u003E\n  \u003Ckey\u003EKeepAlive\u003C/key\u003E\u003Cdict\u003E\u003Ckey\u003ESuccessfulExit\u003C/key\u003E\u003Cfalse/\u003E\u003C/dict\u003E\n  \u003Ckey\u003EThrottleInterval\u003C/key\u003E\u003Cinteger\u003E1\u003C/integer\u003E\n  \u003Ckey\u003EExitTimeOut\u003C/key\u003E\u003Cinteger\u003E75\u003C/integer\u003E\n  \u003Ckey\u003EEnvironmentVariables\u003C/key\u003E\n  \u003Cdict\u003E\n    \u003Ckey\u003EDOTNET_ROOT\u003C/key\u003E\u003Cstring\u003E/opt/$dotnet\u003C/string\u003E\n  \u003C/dict\u003E\n  \u003Ckey\u003EStandardErrorPath\u003C/key\u003E\u003Cstring\u003E/logs/launchd.err\u003C/string\u003E\n\u003C/dict\u003E\n\u003C/plist\u003E\n",
+      "taskXml": "\u003C?xml version=\u00221.0\u0022 encoding=\u0022UTF-16\u0022?\u003E\n\u003CTask version=\u00221.2\u0022 xmlns=\u0022http://schemas.microsoft.com/windows/2004/02/mit/task\u0022\u003E\n  \u003CRegistrationInfo\u003E\n    \u003CDescription\u003ESermofur daemon 0.4.0\u003C/Description\u003E\n  \u003C/RegistrationInfo\u003E\n  \u003CTriggers\u003E\n    \u003CLogonTrigger\u003E\n      \u003CEnabled\u003Etrue\u003C/Enabled\u003E\n      \u003CUserId\u003EPC\\a\u0026amp;b\u0026lt;c\u0026gt;\u003C/UserId\u003E\n    \u003C/LogonTrigger\u003E\n  \u003C/Triggers\u003E\n  \u003CPrincipals\u003E\n    \u003CPrincipal id=\u0022Author\u0022\u003E\n      \u003CUserId\u003EPC\\a\u0026amp;b\u0026lt;c\u0026gt;\u003C/UserId\u003E\n      \u003CLogonType\u003EInteractiveToken\u003C/LogonType\u003E\n      \u003CRunLevel\u003ELeastPrivilege\u003C/RunLevel\u003E\n    \u003C/Principal\u003E\n  \u003C/Principals\u003E\n  \u003CSettings\u003E\n    \u003CMultipleInstancesPolicy\u003EIgnoreNew\u003C/MultipleInstancesPolicy\u003E\n    \u003CDisallowStartIfOnBatteries\u003Efalse\u003C/DisallowStartIfOnBatteries\u003E\n    \u003CStopIfGoingOnBatteries\u003Efalse\u003C/StopIfGoingOnBatteries\u003E\n    \u003CAllowHardTerminate\u003Etrue\u003C/AllowHardTerminate\u003E\n    \u003CStartWhenAvailable\u003Etrue\u003C/StartWhenAvailable\u003E\n    \u003CRunOnlyIfNetworkAvailable\u003Efalse\u003C/RunOnlyIfNetworkAvailable\u003E\n    \u003CIdleSettings\u003E\n      \u003CStopOnIdleEnd\u003Efalse\u003C/StopOnIdleEnd\u003E\n      \u003CRestartOnIdle\u003Efalse\u003C/RestartOnIdle\u003E\n    \u003C/IdleSettings\u003E\n    \u003CAllowStartOnDemand\u003Etrue\u003C/AllowStartOnDemand\u003E\n    \u003CEnabled\u003Etrue\u003C/Enabled\u003E\n    \u003CHidden\u003Etrue\u003C/Hidden\u003E\n    \u003CExecutionTimeLimit\u003EPT0S\u003C/ExecutionTimeLimit\u003E\n    \u003CPriority\u003E7\u003C/Priority\u003E\n    \u003CRestartOnFailure\u003E\n      \u003CInterval\u003EPT1M\u003C/Interval\u003E\n      \u003CCount\u003E999\u003C/Count\u003E\n    \u003C/RestartOnFailure\u003E\n  \u003C/Settings\u003E\n  \u003CActions Context=\u0022Author\u0022\u003E\n    \u003CExec\u003E\n      \u003CCommand\u003E/home/a$b/smf\u003C/Command\u003E\n      \u003CArguments\u003Edaemon run\u003C/Arguments\u003E\n    \u003C/Exec\u003E\n  \u003C/Actions\u003E\n\u003C/Task\u003E",
+      "serviceJson": "ewogICJleGVjdXRhYmxlIjogIi9ob21lL2EkYi9zbWYiLAogICJhcmd1bWVudHMiOiBbCiAgICAiZGFlbW9uIiwKICAgICJydW4iCiAgXSwKICAidmVyc2lvbiI6ICIwLjQuMCIsCiAgImVudmlyb25tZW50IjogewogICAgIkRPVE5FVF9ST09UIjogIi9vcHQvJGRvdG5ldCIKICB9Cn0="
+    },
+    {
+      "executable": "/home/a$b/smf",
+      "arguments": [
+        "daemon",
+        "run"
+      ],
+      "version": "0.4.0",
+      "environment": [
+        [
+          "PATH",
+          "/bin\nExecStartPre=/x"
+        ]
+      ],
+      "unit": null,
+      "unitError": "service_install_failed",
+      "plist": "\u003C?xml version=\u00221.0\u0022 encoding=\u0022UTF-8\u0022?\u003E\n\u003C!DOCTYPE plist PUBLIC \u0022-//Apple//DTD PLIST 1.0//EN\u0022 \u0022http://www.apple.com/DTDs/PropertyList-1.0.dtd\u0022\u003E\n\u003Cplist version=\u00221.0\u0022\u003E\n\u003Cdict\u003E\n  \u003Ckey\u003ELabel\u003C/key\u003E\u003Cstring\u003Eio.github.jorouquette.sermofur\u003C/string\u003E\n  \u003Ckey\u003EProgramArguments\u003C/key\u003E\n  \u003Carray\u003E\n    \u003Cstring\u003E/home/a$b/smf\u003C/string\u003E\n    \u003Cstring\u003Edaemon\u003C/string\u003E\n    \u003Cstring\u003Erun\u003C/string\u003E\n  \u003C/array\u003E\n  \u003Ckey\u003ERunAtLoad\u003C/key\u003E\u003Ctrue/\u003E\n  \u003Ckey\u003EKeepAlive\u003C/key\u003E\u003Cdict\u003E\u003Ckey\u003ESuccessfulExit\u003C/key\u003E\u003Cfalse/\u003E\u003C/dict\u003E\n  \u003Ckey\u003EThrottleInterval\u003C/key\u003E\u003Cinteger\u003E1\u003C/integer\u003E\n  \u003Ckey\u003EExitTimeOut\u003C/key\u003E\u003Cinteger\u003E75\u003C/integer\u003E\n  \u003Ckey\u003EEnvironmentVariables\u003C/key\u003E\n  \u003Cdict\u003E\n    \u003Ckey\u003EPATH\u003C/key\u003E\u003Cstring\u003E/bin\nExecStartPre=/x\u003C/string\u003E\n  \u003C/dict\u003E\n  \u003Ckey\u003EStandardErrorPath\u003C/key\u003E\u003Cstring\u003E/logs/launchd.err\u003C/string\u003E\n\u003C/dict\u003E\n\u003C/plist\u003E\n",
+      "taskXml": "\u003C?xml version=\u00221.0\u0022 encoding=\u0022UTF-16\u0022?\u003E\n\u003CTask version=\u00221.2\u0022 xmlns=\u0022http://schemas.microsoft.com/windows/2004/02/mit/task\u0022\u003E\n  \u003CRegistrationInfo\u003E\n    \u003CDescription\u003ESermofur daemon 0.4.0\u003C/Description\u003E\n  \u003C/RegistrationInfo\u003E\n  \u003CTriggers\u003E\n    \u003CLogonTrigger\u003E\n      \u003CEnabled\u003Etrue\u003C/Enabled\u003E\n      \u003CUserId\u003EPC\\j\u00E9r\u00F4me\u003C/UserId\u003E\n    \u003C/LogonTrigger\u003E\n  \u003C/Triggers\u003E\n  \u003CPrincipals\u003E\n    \u003CPrincipal id=\u0022Author\u0022\u003E\n      \u003CUserId\u003EPC\\j\u00E9r\u00F4me\u003C/UserId\u003E\n      \u003CLogonType\u003EInteractiveToken\u003C/LogonType\u003E\n      \u003CRunLevel\u003ELeastPrivilege\u003C/RunLevel\u003E\n    \u003C/Principal\u003E\n  \u003C/Principals\u003E\n  \u003CSettings\u003E\n    \u003CMultipleInstancesPolicy\u003EIgnoreNew\u003C/MultipleInstancesPolicy\u003E\n    \u003CDisallowStartIfOnBatteries\u003Efalse\u003C/DisallowStartIfOnBatteries\u003E\n    \u003CStopIfGoingOnBatteries\u003Efalse\u003C/StopIfGoingOnBatteries\u003E\n    \u003CAllowHardTerminate\u003Etrue\u003C/AllowHardTerminate\u003E\n    \u003CStartWhenAvailable\u003Etrue\u003C/StartWhenAvailable\u003E\n    \u003CRunOnlyIfNetworkAvailable\u003Efalse\u003C/RunOnlyIfNetworkAvailable\u003E\n    \u003CIdleSettings\u003E\n      \u003CStopOnIdleEnd\u003Efalse\u003C/StopOnIdleEnd\u003E\n      \u003CRestartOnIdle\u003Efalse\u003C/RestartOnIdle\u003E\n    \u003C/IdleSettings\u003E\n    \u003CAllowStartOnDemand\u003Etrue\u003C/AllowStartOnDemand\u003E\n    \u003CEnabled\u003Etrue\u003C/Enabled\u003E\n    \u003CHidden\u003Etrue\u003C/Hidden\u003E\n    \u003CExecutionTimeLimit\u003EPT0S\u003C/ExecutionTimeLimit\u003E\n    \u003CPriority\u003E7\u003C/Priority\u003E\n    \u003CRestartOnFailure\u003E\n      \u003CInterval\u003EPT1M\u003C/Interval\u003E\n      \u003CCount\u003E999\u003C/Count\u003E\n    \u003C/RestartOnFailure\u003E\n  \u003C/Settings\u003E\n  \u003CActions Context=\u0022Author\u0022\u003E\n    \u003CExec\u003E\n      \u003CCommand\u003E/home/a$b/smf\u003C/Command\u003E\n      \u003CArguments\u003Edaemon run\u003C/Arguments\u003E\n    \u003C/Exec\u003E\n  \u003C/Actions\u003E\n\u003C/Task\u003E",
+      "serviceJson": "ewogICJleGVjdXRhYmxlIjogIi9ob21lL2EkYi9zbWYiLAogICJhcmd1bWVudHMiOiBbCiAgICAiZGFlbW9uIiwKICAgICJydW4iCiAgXSwKICAidmVyc2lvbiI6ICIwLjQuMCIsCiAgImVudmlyb25tZW50IjogewogICAgIlBBVEgiOiAiL2JpblxuRXhlY1N0YXJ0UHJlPS94IgogIH0KfQ=="
+    },
+    {
+      "executable": "C:\\Users\\J\u00E9r\u00F4me\\.dotnet\\tools\\smf.exe",
+      "arguments": [
+        "daemon",
+        "run",
+        "--supervise"
+      ],
+      "version": "0.4.0",
+      "environment": [],
+      "unit": "[Unit]\nDescription=Sermofur daemon 0.4.0\n\n[Service]\nType=simple\nExecStart=\u0022C:\\\\Users\\\\J\u00E9r\u00F4me\\\\.dotnet\\\\tools\\\\smf.exe\u0022 \u0022daemon\u0022 \u0022run\u0022 \u0022--supervise\u0022\nRestart=on-failure\nRestartSec=1\nTimeoutStopSec=75\n\n[Install]\nWantedBy=default.target\n",
+      "unitError": null,
+      "plist": "\u003C?xml version=\u00221.0\u0022 encoding=\u0022UTF-8\u0022?\u003E\n\u003C!DOCTYPE plist PUBLIC \u0022-//Apple//DTD PLIST 1.0//EN\u0022 \u0022http://www.apple.com/DTDs/PropertyList-1.0.dtd\u0022\u003E\n\u003Cplist version=\u00221.0\u0022\u003E\n\u003Cdict\u003E\n  \u003Ckey\u003ELabel\u003C/key\u003E\u003Cstring\u003Eio.github.jorouquette.sermofur\u003C/string\u003E\n  \u003Ckey\u003EProgramArguments\u003C/key\u003E\n  \u003Carray\u003E\n    \u003Cstring\u003EC:\\Users\\J\u00E9r\u00F4me\\.dotnet\\tools\\smf.exe\u003C/string\u003E\n    \u003Cstring\u003Edaemon\u003C/string\u003E\n    \u003Cstring\u003Erun\u003C/string\u003E\n    \u003Cstring\u003E--supervise\u003C/string\u003E\n  \u003C/array\u003E\n  \u003Ckey\u003ERunAtLoad\u003C/key\u003E\u003Ctrue/\u003E\n  \u003Ckey\u003EKeepAlive\u003C/key\u003E\u003Cdict\u003E\u003Ckey\u003ESuccessfulExit\u003C/key\u003E\u003Cfalse/\u003E\u003C/dict\u003E\n  \u003Ckey\u003EThrottleInterval\u003C/key\u003E\u003Cinteger\u003E1\u003C/integer\u003E\n  \u003Ckey\u003EExitTimeOut\u003C/key\u003E\u003Cinteger\u003E75\u003C/integer\u003E\n  \u003Ckey\u003EEnvironmentVariables\u003C/key\u003E\n  \u003Cdict\u003E\n  \u003C/dict\u003E\n  \u003Ckey\u003EStandardErrorPath\u003C/key\u003E\u003Cstring\u003E/logs/launchd.err\u003C/string\u003E\n\u003C/dict\u003E\n\u003C/plist\u003E\n",
+      "taskXml": "\u003C?xml version=\u00221.0\u0022 encoding=\u0022UTF-16\u0022?\u003E\n\u003CTask version=\u00221.2\u0022 xmlns=\u0022http://schemas.microsoft.com/windows/2004/02/mit/task\u0022\u003E\n  \u003CRegistrationInfo\u003E\n    \u003CDescription\u003ESermofur daemon 0.4.0\u003C/Description\u003E\n  \u003C/RegistrationInfo\u003E\n  \u003CTriggers\u003E\n    \u003CLogonTrigger\u003E\n      \u003CEnabled\u003Etrue\u003C/Enabled\u003E\n      \u003CUserId\u003EPC\\a\u0026amp;b\u0026lt;c\u0026gt;\u003C/UserId\u003E\n    \u003C/LogonTrigger\u003E\n  \u003C/Triggers\u003E\n  \u003CPrincipals\u003E\n    \u003CPrincipal id=\u0022Author\u0022\u003E\n      \u003CUserId\u003EPC\\a\u0026amp;b\u0026lt;c\u0026gt;\u003C/UserId\u003E\n      \u003CLogonType\u003EInteractiveToken\u003C/LogonType\u003E\n      \u003CRunLevel\u003ELeastPrivilege\u003C/RunLevel\u003E\n    \u003C/Principal\u003E\n  \u003C/Principals\u003E\n  \u003CSettings\u003E\n    \u003CMultipleInstancesPolicy\u003EIgnoreNew\u003C/MultipleInstancesPolicy\u003E\n    \u003CDisallowStartIfOnBatteries\u003Efalse\u003C/DisallowStartIfOnBatteries\u003E\n    \u003CStopIfGoingOnBatteries\u003Efalse\u003C/StopIfGoingOnBatteries\u003E\n    \u003CAllowHardTerminate\u003Etrue\u003C/AllowHardTerminate\u003E\n    \u003CStartWhenAvailable\u003Etrue\u003C/StartWhenAvailable\u003E\n    \u003CRunOnlyIfNetworkAvailable\u003Efalse\u003C/RunOnlyIfNetworkAvailable\u003E\n    \u003CIdleSettings\u003E\n      \u003CStopOnIdleEnd\u003Efalse\u003C/StopOnIdleEnd\u003E\n      \u003CRestartOnIdle\u003Efalse\u003C/RestartOnIdle\u003E\n    \u003C/IdleSettings\u003E\n    \u003CAllowStartOnDemand\u003Etrue\u003C/AllowStartOnDemand\u003E\n    \u003CEnabled\u003Etrue\u003C/Enabled\u003E\n    \u003CHidden\u003Etrue\u003C/Hidden\u003E\n    \u003CExecutionTimeLimit\u003EPT0S\u003C/ExecutionTimeLimit\u003E\n    \u003CPriority\u003E7\u003C/Priority\u003E\n    \u003CRestartOnFailure\u003E\n      \u003CInterval\u003EPT1M\u003C/Interval\u003E\n      \u003CCount\u003E999\u003C/Count\u003E\n    \u003C/RestartOnFailure\u003E\n  \u003C/Settings\u003E\n  \u003CActions Context=\u0022Author\u0022\u003E\n    \u003CExec\u003E\n      \u003CCommand\u003EC:\\Users\\J\u00E9r\u00F4me\\.dotnet\\tools\\smf.exe\u003C/Command\u003E\n      \u003CArguments\u003Edaemon run --supervise\u003C/Arguments\u003E\n    \u003C/Exec\u003E\n  \u003C/Actions\u003E\n\u003C/Task\u003E",
+      "serviceJson": "ewogICJleGVjdXRhYmxlIjogIkM6XFxVc2Vyc1xcSlx1MDBFOXJcdTAwRjRtZVxcLmRvdG5ldFxcdG9vbHNcXHNtZi5leGUiLAogICJhcmd1bWVudHMiOiBbCiAgICAiZGFlbW9uIiwKICAgICJydW4iLAogICAgIi0tc3VwZXJ2aXNlIgogIF0sCiAgInZlcnNpb24iOiAiMC40LjAiLAogICJlbnZpcm9ubWVudCI6IHt9Cn0="
+    },
+    {
+      "executable": "C:\\a b\\smf.exe",
+      "arguments": [
+        "daemon",
+        "run",
+        "",
+        "x\\\u0022y",
+        "tab\there",
+        "\u003C\u0026\u003E\u0027",
+        "end\\"
+      ],
+      "version": "1.0.0-rc.1\u002Ba\u003Cb\u003E",
+      "environment": [
+        [
+          "SERMOFUR_DAEMON_HOME",
+          "/h\u0027o\u0022me"
+        ],
+        [
+          "Z",
+          "\u00E9\u0001%"
+        ],
+        [
+          "A",
+          "1"
+        ]
+      ],
+      "unit": "[Unit]\nDescription=Sermofur daemon 1.0.0-rc.1\u002Ba\u003Cb\u003E\n\n[Service]\nType=simple\nExecStart=\u0022C:\\\\a b\\\\smf.exe\u0022 \u0022daemon\u0022 \u0022run\u0022 \u0022\u0022 \u0022x\\\\\\\u0022y\u0022 \u0022tab\there\u0022 \u0022\u003C\u0026\u003E\u0027\u0022 \u0022end\\\\\u0022\nEnvironment=\u0022A=1\u0022\nEnvironment=\u0022SERMOFUR_DAEMON_HOME=/h\u0027o\\\u0022me\u0022\nEnvironment=\u0022Z=\u00E9\u0001%%\u0022\nRestart=on-failure\nRestartSec=1\nTimeoutStopSec=75\n\n[Install]\nWantedBy=default.target\n",
+      "unitError": null,
+      "plist": "\u003C?xml version=\u00221.0\u0022 encoding=\u0022UTF-8\u0022?\u003E\n\u003C!DOCTYPE plist PUBLIC \u0022-//Apple//DTD PLIST 1.0//EN\u0022 \u0022http://www.apple.com/DTDs/PropertyList-1.0.dtd\u0022\u003E\n\u003Cplist version=\u00221.0\u0022\u003E\n\u003Cdict\u003E\n  \u003Ckey\u003ELabel\u003C/key\u003E\u003Cstring\u003Eio.github.jorouquette.sermofur\u003C/string\u003E\n  \u003Ckey\u003EProgramArguments\u003C/key\u003E\n  \u003Carray\u003E\n    \u003Cstring\u003EC:\\a b\\smf.exe\u003C/string\u003E\n    \u003Cstring\u003Edaemon\u003C/string\u003E\n    \u003Cstring\u003Erun\u003C/string\u003E\n    \u003Cstring\u003E\u003C/string\u003E\n    \u003Cstring\u003Ex\\\u0026quot;y\u003C/string\u003E\n    \u003Cstring\u003Etab\there\u003C/string\u003E\n    \u003Cstring\u003E\u0026lt;\u0026amp;\u0026gt;\u0026apos;\u003C/string\u003E\n    \u003Cstring\u003Eend\\\u003C/string\u003E\n  \u003C/array\u003E\n  \u003Ckey\u003ERunAtLoad\u003C/key\u003E\u003Ctrue/\u003E\n  \u003Ckey\u003EKeepAlive\u003C/key\u003E\u003Cdict\u003E\u003Ckey\u003ESuccessfulExit\u003C/key\u003E\u003Cfalse/\u003E\u003C/dict\u003E\n  \u003Ckey\u003EThrottleInterval\u003C/key\u003E\u003Cinteger\u003E1\u003C/integer\u003E\n  \u003Ckey\u003EExitTimeOut\u003C/key\u003E\u003Cinteger\u003E75\u003C/integer\u003E\n  \u003Ckey\u003EEnvironmentVariables\u003C/key\u003E\n  \u003Cdict\u003E\n    \u003Ckey\u003EA\u003C/key\u003E\u003Cstring\u003E1\u003C/string\u003E\n    \u003Ckey\u003ESERMOFUR_DAEMON_HOME\u003C/key\u003E\u003Cstring\u003E/h\u0026apos;o\u0026quot;me\u003C/string\u003E\n    \u003Ckey\u003EZ\u003C/key\u003E\u003Cstring\u003E\u00E9\u0001%\u003C/string\u003E\n  \u003C/dict\u003E\n  \u003Ckey\u003EStandardErrorPath\u003C/key\u003E\u003Cstring\u003E/logs/launchd.err\u003C/string\u003E\n\u003C/dict\u003E\n\u003C/plist\u003E\n",
+      "taskXml": "\u003C?xml version=\u00221.0\u0022 encoding=\u0022UTF-16\u0022?\u003E\n\u003CTask version=\u00221.2\u0022 xmlns=\u0022http://schemas.microsoft.com/windows/2004/02/mit/task\u0022\u003E\n  \u003CRegistrationInfo\u003E\n    \u003CDescription\u003ESermofur daemon 1.0.0-rc.1\u002Ba\u0026lt;b\u0026gt;\u003C/Description\u003E\n  \u003C/RegistrationInfo\u003E\n  \u003CTriggers\u003E\n    \u003CLogonTrigger\u003E\n      \u003CEnabled\u003Etrue\u003C/Enabled\u003E\n      \u003CUserId\u003EPC\\j\u00E9r\u00F4me\u003C/UserId\u003E\n    \u003C/LogonTrigger\u003E\n  \u003C/Triggers\u003E\n  \u003CPrincipals\u003E\n    \u003CPrincipal id=\u0022Author\u0022\u003E\n      \u003CUserId\u003EPC\\j\u00E9r\u00F4me\u003C/UserId\u003E\n      \u003CLogonType\u003EInteractiveToken\u003C/LogonType\u003E\n      \u003CRunLevel\u003ELeastPrivilege\u003C/RunLevel\u003E\n    \u003C/Principal\u003E\n  \u003C/Principals\u003E\n  \u003CSettings\u003E\n    \u003CMultipleInstancesPolicy\u003EIgnoreNew\u003C/MultipleInstancesPolicy\u003E\n    \u003CDisallowStartIfOnBatteries\u003Efalse\u003C/DisallowStartIfOnBatteries\u003E\n    \u003CStopIfGoingOnBatteries\u003Efalse\u003C/StopIfGoingOnBatteries\u003E\n    \u003CAllowHardTerminate\u003Etrue\u003C/AllowHardTerminate\u003E\n    \u003CStartWhenAvailable\u003Etrue\u003C/StartWhenAvailable\u003E\n    \u003CRunOnlyIfNetworkAvailable\u003Efalse\u003C/RunOnlyIfNetworkAvailable\u003E\n    \u003CIdleSettings\u003E\n      \u003CStopOnIdleEnd\u003Efalse\u003C/StopOnIdleEnd\u003E\n      \u003CRestartOnIdle\u003Efalse\u003C/RestartOnIdle\u003E\n    \u003C/IdleSettings\u003E\n    \u003CAllowStartOnDemand\u003Etrue\u003C/AllowStartOnDemand\u003E\n    \u003CEnabled\u003Etrue\u003C/Enabled\u003E\n    \u003CHidden\u003Etrue\u003C/Hidden\u003E\n    \u003CExecutionTimeLimit\u003EPT0S\u003C/ExecutionTimeLimit\u003E\n    \u003CPriority\u003E7\u003C/Priority\u003E\n    \u003CRestartOnFailure\u003E\n      \u003CInterval\u003EPT1M\u003C/Interval\u003E\n      \u003CCount\u003E999\u003C/Count\u003E\n    \u003C/RestartOnFailure\u003E\n  \u003C/Settings\u003E\n  \u003CActions Context=\u0022Author\u0022\u003E\n    \u003CExec\u003E\n      \u003CCommand\u003EC:\\a b\\smf.exe\u003C/Command\u003E\n      \u003CArguments\u003Edaemon run \u0026quot;\u0026quot; \u0026quot;x\\\\\\\u0026quot;y\u0026quot; \u0026quot;tab\there\u0026quot; \u0026lt;\u0026amp;\u0026gt;\u0026apos; end\\\u003C/Arguments\u003E\n    \u003C/Exec\u003E\n  \u003C/Actions\u003E\n\u003C/Task\u003E",
+      "serviceJson": "ewogICJleGVjdXRhYmxlIjogIkM6XFxhIGJcXHNtZi5leGUiLAogICJhcmd1bWVudHMiOiBbCiAgICAiZGFlbW9uIiwKICAgICJydW4iLAogICAgIiIsCiAgICAieFxcXHUwMDIyeSIsCiAgICAidGFiXHRoZXJlIiwKICAgICJcdTAwM0NcdTAwMjZcdTAwM0VcdTAwMjciLAogICAgImVuZFxcIgogIF0sCiAgInZlcnNpb24iOiAiMS4wLjAtcmMuMVx1MDAyQmFcdTAwM0NiXHUwMDNFIiwKICAiZW52aXJvbm1lbnQiOiB7CiAgICAiU0VSTU9GVVJfREFFTU9OX0hPTUUiOiAiL2hcdTAwMjdvXHUwMDIybWUiLAogICAgIloiOiAiXHUwMEU5XHUwMDAxJSIsCiAgICAiQSI6ICIxIgogIH0KfQ=="
+    },
+    {
+      "executable": "/opt/smf",
+      "arguments": [
+        "daemon",
+        "run"
+      ],
+      "version": "0.4.0",
+      "environment": [
+        [
+          "PATH",
+          "/a\u0000b"
+        ]
+      ],
+      "unit": null,
+      "unitError": "service_install_failed",
+      "plist": "\u003C?xml version=\u00221.0\u0022 encoding=\u0022UTF-8\u0022?\u003E\n\u003C!DOCTYPE plist PUBLIC \u0022-//Apple//DTD PLIST 1.0//EN\u0022 \u0022http://www.apple.com/DTDs/PropertyList-1.0.dtd\u0022\u003E\n\u003Cplist version=\u00221.0\u0022\u003E\n\u003Cdict\u003E\n  \u003Ckey\u003ELabel\u003C/key\u003E\u003Cstring\u003Eio.github.jorouquette.sermofur\u003C/string\u003E\n  \u003Ckey\u003EProgramArguments\u003C/key\u003E\n  \u003Carray\u003E\n    \u003Cstring\u003E/opt/smf\u003C/string\u003E\n    \u003Cstring\u003Edaemon\u003C/string\u003E\n    \u003Cstring\u003Erun\u003C/string\u003E\n  \u003C/array\u003E\n  \u003Ckey\u003ERunAtLoad\u003C/key\u003E\u003Ctrue/\u003E\n  \u003Ckey\u003EKeepAlive\u003C/key\u003E\u003Cdict\u003E\u003Ckey\u003ESuccessfulExit\u003C/key\u003E\u003Cfalse/\u003E\u003C/dict\u003E\n  \u003Ckey\u003EThrottleInterval\u003C/key\u003E\u003Cinteger\u003E1\u003C/integer\u003E\n  \u003Ckey\u003EExitTimeOut\u003C/key\u003E\u003Cinteger\u003E75\u003C/integer\u003E\n  \u003Ckey\u003EEnvironmentVariables\u003C/key\u003E\n  \u003Cdict\u003E\n    \u003Ckey\u003EPATH\u003C/key\u003E\u003Cstring\u003E/a\u0000b\u003C/string\u003E\n  \u003C/dict\u003E\n  \u003Ckey\u003EStandardErrorPath\u003C/key\u003E\u003Cstring\u003E/logs/launchd.err\u003C/string\u003E\n\u003C/dict\u003E\n\u003C/plist\u003E\n",
+      "taskXml": "\u003C?xml version=\u00221.0\u0022 encoding=\u0022UTF-16\u0022?\u003E\n\u003CTask version=\u00221.2\u0022 xmlns=\u0022http://schemas.microsoft.com/windows/2004/02/mit/task\u0022\u003E\n  \u003CRegistrationInfo\u003E\n    \u003CDescription\u003ESermofur daemon 0.4.0\u003C/Description\u003E\n  \u003C/RegistrationInfo\u003E\n  \u003CTriggers\u003E\n    \u003CLogonTrigger\u003E\n      \u003CEnabled\u003Etrue\u003C/Enabled\u003E\n      \u003CUserId\u003EPC\\a\u0026amp;b\u0026lt;c\u0026gt;\u003C/UserId\u003E\n    \u003C/LogonTrigger\u003E\n  \u003C/Triggers\u003E\n  \u003CPrincipals\u003E\n    \u003CPrincipal id=\u0022Author\u0022\u003E\n      \u003CUserId\u003EPC\\a\u0026amp;b\u0026lt;c\u0026gt;\u003C/UserId\u003E\n      \u003CLogonType\u003EInteractiveToken\u003C/LogonType\u003E\n      \u003CRunLevel\u003ELeastPrivilege\u003C/RunLevel\u003E\n    \u003C/Principal\u003E\n  \u003C/Principals\u003E\n  \u003CSettings\u003E\n    \u003CMultipleInstancesPolicy\u003EIgnoreNew\u003C/MultipleInstancesPolicy\u003E\n    \u003CDisallowStartIfOnBatteries\u003Efalse\u003C/DisallowStartIfOnBatteries\u003E\n    \u003CStopIfGoingOnBatteries\u003Efalse\u003C/StopIfGoingOnBatteries\u003E\n    \u003CAllowHardTerminate\u003Etrue\u003C/AllowHardTerminate\u003E\n    \u003CStartWhenAvailable\u003Etrue\u003C/StartWhenAvailable\u003E\n    \u003CRunOnlyIfNetworkAvailable\u003Efalse\u003C/RunOnlyIfNetworkAvailable\u003E\n    \u003CIdleSettings\u003E\n      \u003CStopOnIdleEnd\u003Efalse\u003C/StopOnIdleEnd\u003E\n      \u003CRestartOnIdle\u003Efalse\u003C/RestartOnIdle\u003E\n    \u003C/IdleSettings\u003E\n    \u003CAllowStartOnDemand\u003Etrue\u003C/AllowStartOnDemand\u003E\n    \u003CEnabled\u003Etrue\u003C/Enabled\u003E\n    \u003CHidden\u003Etrue\u003C/Hidden\u003E\n    \u003CExecutionTimeLimit\u003EPT0S\u003C/ExecutionTimeLimit\u003E\n    \u003CPriority\u003E7\u003C/Priority\u003E\n    \u003CRestartOnFailure\u003E\n      \u003CInterval\u003EPT1M\u003C/Interval\u003E\n      \u003CCount\u003E999\u003C/Count\u003E\n    \u003C/RestartOnFailure\u003E\n  \u003C/Settings\u003E\n  \u003CActions Context=\u0022Author\u0022\u003E\n    \u003CExec\u003E\n      \u003CCommand\u003E/opt/smf\u003C/Command\u003E\n      \u003CArguments\u003Edaemon run\u003C/Arguments\u003E\n    \u003C/Exec\u003E\n  \u003C/Actions\u003E\n\u003C/Task\u003E",
+      "serviceJson": "ewogICJleGVjdXRhYmxlIjogIi9vcHQvc21mIiwKICAiYXJndW1lbnRzIjogWwogICAgImRhZW1vbiIsCiAgICAicnVuIgogIF0sCiAgInZlcnNpb24iOiAiMC40LjAiLAogICJlbnZpcm9ubWVudCI6IHsKICAgICJQQVRIIjogIi9hXHUwMDAwYiIKICB9Cn0="
+    },
+    {
+      "executable": "/opt/s\rmf",
+      "arguments": [
+        "daemon",
+        "run"
+      ],
+      "version": "0.4.0",
+      "environment": [],
+      "unit": null,
+      "unitError": "service_install_failed",
+      "plist": "\u003C?xml version=\u00221.0\u0022 encoding=\u0022UTF-8\u0022?\u003E\n\u003C!DOCTYPE plist PUBLIC \u0022-//Apple//DTD PLIST 1.0//EN\u0022 \u0022http://www.apple.com/DTDs/PropertyList-1.0.dtd\u0022\u003E\n\u003Cplist version=\u00221.0\u0022\u003E\n\u003Cdict\u003E\n  \u003Ckey\u003ELabel\u003C/key\u003E\u003Cstring\u003Eio.github.jorouquette.sermofur\u003C/string\u003E\n  \u003Ckey\u003EProgramArguments\u003C/key\u003E\n  \u003Carray\u003E\n    \u003Cstring\u003E/opt/s\rmf\u003C/string\u003E\n    \u003Cstring\u003Edaemon\u003C/string\u003E\n    \u003Cstring\u003Erun\u003C/string\u003E\n  \u003C/array\u003E\n  \u003Ckey\u003ERunAtLoad\u003C/key\u003E\u003Ctrue/\u003E\n  \u003Ckey\u003EKeepAlive\u003C/key\u003E\u003Cdict\u003E\u003Ckey\u003ESuccessfulExit\u003C/key\u003E\u003Cfalse/\u003E\u003C/dict\u003E\n  \u003Ckey\u003EThrottleInterval\u003C/key\u003E\u003Cinteger\u003E1\u003C/integer\u003E\n  \u003Ckey\u003EExitTimeOut\u003C/key\u003E\u003Cinteger\u003E75\u003C/integer\u003E\n  \u003Ckey\u003EEnvironmentVariables\u003C/key\u003E\n  \u003Cdict\u003E\n  \u003C/dict\u003E\n  \u003Ckey\u003EStandardErrorPath\u003C/key\u003E\u003Cstring\u003E/logs/launchd.err\u003C/string\u003E\n\u003C/dict\u003E\n\u003C/plist\u003E\n",
+      "taskXml": "\u003C?xml version=\u00221.0\u0022 encoding=\u0022UTF-16\u0022?\u003E\n\u003CTask version=\u00221.2\u0022 xmlns=\u0022http://schemas.microsoft.com/windows/2004/02/mit/task\u0022\u003E\n  \u003CRegistrationInfo\u003E\n    \u003CDescription\u003ESermofur daemon 0.4.0\u003C/Description\u003E\n  \u003C/RegistrationInfo\u003E\n  \u003CTriggers\u003E\n    \u003CLogonTrigger\u003E\n      \u003CEnabled\u003Etrue\u003C/Enabled\u003E\n      \u003CUserId\u003EPC\\j\u00E9r\u00F4me\u003C/UserId\u003E\n    \u003C/LogonTrigger\u003E\n  \u003C/Triggers\u003E\n  \u003CPrincipals\u003E\n    \u003CPrincipal id=\u0022Author\u0022\u003E\n      \u003CUserId\u003EPC\\j\u00E9r\u00F4me\u003C/UserId\u003E\n      \u003CLogonType\u003EInteractiveToken\u003C/LogonType\u003E\n      \u003CRunLevel\u003ELeastPrivilege\u003C/RunLevel\u003E\n    \u003C/Principal\u003E\n  \u003C/Principals\u003E\n  \u003CSettings\u003E\n    \u003CMultipleInstancesPolicy\u003EIgnoreNew\u003C/MultipleInstancesPolicy\u003E\n    \u003CDisallowStartIfOnBatteries\u003Efalse\u003C/DisallowStartIfOnBatteries\u003E\n    \u003CStopIfGoingOnBatteries\u003Efalse\u003C/StopIfGoingOnBatteries\u003E\n    \u003CAllowHardTerminate\u003Etrue\u003C/AllowHardTerminate\u003E\n    \u003CStartWhenAvailable\u003Etrue\u003C/StartWhenAvailable\u003E\n    \u003CRunOnlyIfNetworkAvailable\u003Efalse\u003C/RunOnlyIfNetworkAvailable\u003E\n    \u003CIdleSettings\u003E\n      \u003CStopOnIdleEnd\u003Efalse\u003C/StopOnIdleEnd\u003E\n      \u003CRestartOnIdle\u003Efalse\u003C/RestartOnIdle\u003E\n    \u003C/IdleSettings\u003E\n    \u003CAllowStartOnDemand\u003Etrue\u003C/AllowStartOnDemand\u003E\n    \u003CEnabled\u003Etrue\u003C/Enabled\u003E\n    \u003CHidden\u003Etrue\u003C/Hidden\u003E\n    \u003CExecutionTimeLimit\u003EPT0S\u003C/ExecutionTimeLimit\u003E\n    \u003CPriority\u003E7\u003C/Priority\u003E\n    \u003CRestartOnFailure\u003E\n      \u003CInterval\u003EPT1M\u003C/Interval\u003E\n      \u003CCount\u003E999\u003C/Count\u003E\n    \u003C/RestartOnFailure\u003E\n  \u003C/Settings\u003E\n  \u003CActions Context=\u0022Author\u0022\u003E\n    \u003CExec\u003E\n      \u003CCommand\u003E/opt/s\rmf\u003C/Command\u003E\n      \u003CArguments\u003Edaemon run\u003C/Arguments\u003E\n    \u003C/Exec\u003E\n  \u003C/Actions\u003E\n\u003C/Task\u003E",
+      "serviceJson": "ewogICJleGVjdXRhYmxlIjogIi9vcHQvc1xybWYiLAogICJhcmd1bWVudHMiOiBbCiAgICAiZGFlbW9uIiwKICAgICJydW4iCiAgXSwKICAidmVyc2lvbiI6ICIwLjQuMCIsCiAgImVudmlyb25tZW50Ijoge30KfQ=="
+    },
+    {
+      "executable": "/opt/smf",
+      "arguments": [
+        "daemon",
+        "run"
+      ],
+      "version": "0.4.0",
+      "environment": [],
+      "unit": "[Unit]\nDescription=Sermofur daemon 0.4.0\n\n[Service]\nType=simple\nExecStart=\u0022/opt/smf\u0022 \u0022daemon\u0022 \u0022run\u0022\nRestart=on-failure\nRestartSec=1\nTimeoutStopSec=75\n\n[Install]\nWantedBy=default.target\n",
+      "unitError": null,
+      "plist": "\u003C?xml version=\u00221.0\u0022 encoding=\u0022UTF-8\u0022?\u003E\n\u003C!DOCTYPE plist PUBLIC \u0022-//Apple//DTD PLIST 1.0//EN\u0022 \u0022http://www.apple.com/DTDs/PropertyList-1.0.dtd\u0022\u003E\n\u003Cplist version=\u00221.0\u0022\u003E\n\u003Cdict\u003E\n  \u003Ckey\u003ELabel\u003C/key\u003E\u003Cstring\u003Eio.github.jorouquette.sermofur\u003C/string\u003E\n  \u003Ckey\u003EProgramArguments\u003C/key\u003E\n  \u003Carray\u003E\n    \u003Cstring\u003E/opt/smf\u003C/string\u003E\n    \u003Cstring\u003Edaemon\u003C/string\u003E\n    \u003Cstring\u003Erun\u003C/string\u003E\n  \u003C/array\u003E\n  \u003Ckey\u003ERunAtLoad\u003C/key\u003E\u003Ctrue/\u003E\n  \u003Ckey\u003EKeepAlive\u003C/key\u003E\u003Cdict\u003E\u003Ckey\u003ESuccessfulExit\u003C/key\u003E\u003Cfalse/\u003E\u003C/dict\u003E\n  \u003Ckey\u003EThrottleInterval\u003C/key\u003E\u003Cinteger\u003E1\u003C/integer\u003E\n  \u003Ckey\u003EExitTimeOut\u003C/key\u003E\u003Cinteger\u003E75\u003C/integer\u003E\n  \u003Ckey\u003EEnvironmentVariables\u003C/key\u003E\n  \u003Cdict\u003E\n  \u003C/dict\u003E\n  \u003Ckey\u003EStandardErrorPath\u003C/key\u003E\u003Cstring\u003E/logs/launchd.err\u003C/string\u003E\n\u003C/dict\u003E\n\u003C/plist\u003E\n",
+      "taskXml": "\u003C?xml version=\u00221.0\u0022 encoding=\u0022UTF-16\u0022?\u003E\n\u003CTask version=\u00221.2\u0022 xmlns=\u0022http://schemas.microsoft.com/windows/2004/02/mit/task\u0022\u003E\n  \u003CRegistrationInfo\u003E\n    \u003CDescription\u003ESermofur daemon 0.4.0\u003C/Description\u003E\n  \u003C/RegistrationInfo\u003E\n  \u003CTriggers\u003E\n    \u003CLogonTrigger\u003E\n      \u003CEnabled\u003Etrue\u003C/Enabled\u003E\n      \u003CUserId\u003EPC\\a\u0026amp;b\u0026lt;c\u0026gt;\u003C/UserId\u003E\n    \u003C/LogonTrigger\u003E\n  \u003C/Triggers\u003E\n  \u003CPrincipals\u003E\n    \u003CPrincipal id=\u0022Author\u0022\u003E\n      \u003CUserId\u003EPC\\a\u0026amp;b\u0026lt;c\u0026gt;\u003C/UserId\u003E\n      \u003CLogonType\u003EInteractiveToken\u003C/LogonType\u003E\n      \u003CRunLevel\u003ELeastPrivilege\u003C/RunLevel\u003E\n    \u003C/Principal\u003E\n  \u003C/Principals\u003E\n  \u003CSettings\u003E\n    \u003CMultipleInstancesPolicy\u003EIgnoreNew\u003C/MultipleInstancesPolicy\u003E\n    \u003CDisallowStartIfOnBatteries\u003Efalse\u003C/DisallowStartIfOnBatteries\u003E\n    \u003CStopIfGoingOnBatteries\u003Efalse\u003C/StopIfGoingOnBatteries\u003E\n    \u003CAllowHardTerminate\u003Etrue\u003C/AllowHardTerminate\u003E\n    \u003CStartWhenAvailable\u003Etrue\u003C/StartWhenAvailable\u003E\n    \u003CRunOnlyIfNetworkAvailable\u003Efalse\u003C/RunOnlyIfNetworkAvailable\u003E\n    \u003CIdleSettings\u003E\n      \u003CStopOnIdleEnd\u003Efalse\u003C/StopOnIdleEnd\u003E\n      \u003CRestartOnIdle\u003Efalse\u003C/RestartOnIdle\u003E\n    \u003C/IdleSettings\u003E\n    \u003CAllowStartOnDemand\u003Etrue\u003C/AllowStartOnDemand\u003E\n    \u003CEnabled\u003Etrue\u003C/Enabled\u003E\n    \u003CHidden\u003Etrue\u003C/Hidden\u003E\n    \u003CExecutionTimeLimit\u003EPT0S\u003C/ExecutionTimeLimit\u003E\n    \u003CPriority\u003E7\u003C/Priority\u003E\n    \u003CRestartOnFailure\u003E\n      \u003CInterval\u003EPT1M\u003C/Interval\u003E\n      \u003CCount\u003E999\u003C/Count\u003E\n    \u003C/RestartOnFailure\u003E\n  \u003C/Settings\u003E\n  \u003CActions Context=\u0022Author\u0022\u003E\n    \u003CExec\u003E\n      \u003CCommand\u003E/opt/smf\u003C/Command\u003E\n      \u003CArguments\u003Edaemon run\u003C/Arguments\u003E\n    \u003C/Exec\u003E\n  \u003C/Actions\u003E\n\u003C/Task\u003E",
+      "serviceJson": "ewogICJleGVjdXRhYmxlIjogIi9vcHQvc21mIiwKICAiYXJndW1lbnRzIjogWwogICAgImRhZW1vbiIsCiAgICAicnVuIgogIF0sCiAgInZlcnNpb24iOiAiMC40LjAiLAogICJlbnZpcm9ubWVudCI6IHt9Cn0="
+    }
+  ],
+  "quotes": [
+    [
+      "",
+      "\u0022\u0022"
+    ],
+    [
+      "a",
+      "a"
+    ],
+    [
+      "a b",
+      "\u0022a b\u0022"
+    ],
+    [
+      "C:\\a b\\",
+      "\u0022C:\\a b\\\\\u0022"
+    ],
+    [
+      "q\u0022uote",
+      "\u0022q\\\u0022uote\u0022"
+    ],
+    [
+      "a\\\\\u0022b",
+      "\u0022a\\\\\\\\\\\u0022b\u0022"
+    ],
+    [
+      "\\\\",
+      "\\\\"
+    ],
+    [
+      "tab\there",
+      "\u0022tab\there\u0022"
+    ],
+    [
+      "x\\",
+      "x\\"
+    ],
+    [
+      "\u0022",
+      "\u0022\\\u0022\u0022"
+    ],
+    [
+      "a\\b c",
+      "\u0022a\\b c\u0022"
+    ],
+    [
+      "--supervise",
+      "--supervise"
+    ]
+  ],
+  "same": [
+    {
+      "left": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "PATH",
+            "/a"
+          ],
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ]
+        ]
+      },
+      "right": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "PATH",
+            "/b"
+          ],
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ]
+        ]
+      },
+      "same": true
+    },
+    {
+      "left": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "PATH",
+            "/b"
+          ],
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ]
+        ]
+      },
+      "right": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "PATH",
+            "/a"
+          ],
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ]
+        ]
+      },
+      "same": true
+    },
+    {
+      "left": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "PATH",
+            "/a"
+          ],
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ]
+        ]
+      },
+      "right": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "PATH",
+            "/a"
+          ],
+          [
+            "DOTNET_ROOT",
+            "/e"
+          ]
+        ]
+      },
+      "same": false
+    },
+    {
+      "left": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "PATH",
+            "/a"
+          ],
+          [
+            "DOTNET_ROOT",
+            "/e"
+          ]
+        ]
+      },
+      "right": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "PATH",
+            "/a"
+          ],
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ]
+        ]
+      },
+      "same": false
+    },
+    {
+      "left": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "PATH",
+            "/a"
+          ],
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ]
+        ]
+      },
+      "right": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ]
+        ]
+      },
+      "same": true
+    },
+    {
+      "left": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ]
+        ]
+      },
+      "right": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "PATH",
+            "/a"
+          ],
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ]
+        ]
+      },
+      "same": true
+    },
+    {
+      "left": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "PATH",
+            "/a"
+          ],
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ]
+        ]
+      },
+      "right": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "Path",
+            "/z"
+          ],
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ]
+        ]
+      },
+      "same": true
+    },
+    {
+      "left": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "Path",
+            "/z"
+          ],
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ]
+        ]
+      },
+      "right": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "PATH",
+            "/a"
+          ],
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ]
+        ]
+      },
+      "same": true
+    },
+    {
+      "left": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "PATH",
+            "/a"
+          ],
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ]
+        ]
+      },
+      "right": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ],
+          [
+            "X",
+            "1"
+          ]
+        ]
+      },
+      "same": false
+    },
+    {
+      "left": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ],
+          [
+            "X",
+            "1"
+          ]
+        ]
+      },
+      "right": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "PATH",
+            "/a"
+          ],
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ]
+        ]
+      },
+      "same": false
+    },
+    {
+      "left": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "PATH",
+            "/a"
+          ],
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ]
+        ]
+      },
+      "right": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.1",
+        "environment": [
+          [
+            "PATH",
+            "/a"
+          ],
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ]
+        ]
+      },
+      "same": false
+    },
+    {
+      "left": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.1",
+        "environment": [
+          [
+            "PATH",
+            "/a"
+          ],
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ]
+        ]
+      },
+      "right": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "PATH",
+            "/a"
+          ],
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ]
+        ]
+      },
+      "same": false
+    },
+    {
+      "left": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "PATH",
+            "/a"
+          ],
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ]
+        ]
+      },
+      "right": {
+        "executable": "/opt/smf2",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "PATH",
+            "/a"
+          ],
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ]
+        ]
+      },
+      "same": false
+    },
+    {
+      "left": {
+        "executable": "/opt/smf2",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "PATH",
+            "/a"
+          ],
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ]
+        ]
+      },
+      "right": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "PATH",
+            "/a"
+          ],
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ]
+        ]
+      },
+      "same": false
+    },
+    {
+      "left": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "PATH",
+            "/a"
+          ],
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ]
+        ]
+      },
+      "right": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run",
+          "--supervise"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "PATH",
+            "/a"
+          ],
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ]
+        ]
+      },
+      "same": false
+    },
+    {
+      "left": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run",
+          "--supervise"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "PATH",
+            "/a"
+          ],
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ]
+        ]
+      },
+      "right": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "PATH",
+            "/a"
+          ],
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ]
+        ]
+      },
+      "same": false
+    },
+    {
+      "left": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "PATH",
+            "/a"
+          ],
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ]
+        ]
+      },
+      "right": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "DOTNET_ROOT",
+            "/D"
+          ]
+        ]
+      },
+      "same": false
+    },
+    {
+      "left": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "DOTNET_ROOT",
+            "/D"
+          ]
+        ]
+      },
+      "right": {
+        "executable": "/opt/smf",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "0.4.0",
+        "environment": [
+          [
+            "PATH",
+            "/a"
+          ],
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ]
+        ]
+      },
+      "same": false
+    }
+  ],
+  "carried": [
+    {
+      "environment": [
+        [
+          "PATH",
+          "/usr/bin:rel:/bin"
+        ],
+        [
+          "DOTNET_ROOT",
+          "/d"
+        ]
+      ],
+      "carried": [
+        [
+          "PATH",
+          "/usr/bin:/bin"
+        ],
+        [
+          "DOTNET_ROOT",
+          "/d"
+        ]
+      ],
+      "dropped": [],
+      "narrowed": [
+        "PATH"
+      ]
+    },
+    {
+      "environment": [
+        [
+          "PATH",
+          "C:\\a;rel;D:\\b;;"
+        ],
+        [
+          "DOTNET_ROOT",
+          "C:\\dotnet"
+        ]
+      ],
+      "carried": [],
+      "dropped": [
+        "PATH",
+        "DOTNET_ROOT"
+      ],
+      "narrowed": []
+    },
+    {
+      "environment": [
+        [
+          "PATH",
+          "rel:other"
+        ],
+        [
+          "DOTNET_ROOT",
+          "relative"
+        ],
+        [
+          "SERMOFUR_DAEMON_HOME",
+          "/home"
+        ]
+      ],
+      "carried": [
+        [
+          "SERMOFUR_DAEMON_HOME",
+          "/home"
+        ]
+      ],
+      "dropped": [
+        "PATH",
+        "DOTNET_ROOT"
+      ],
+      "narrowed": []
+    },
+    {
+      "environment": [
+        [
+          "SERMOFUR_DAEMON_HOME",
+          "C:\\home"
+        ],
+        [
+          "path",
+          "/x"
+        ],
+        [
+          "UNKNOWN",
+          "/y"
+        ],
+        [
+          "PATH",
+          ""
+        ]
+      ],
+      "carried": [],
+      "dropped": [
+        "SERMOFUR_DAEMON_HOME",
+        "path",
+        "UNKNOWN",
+        "PATH"
+      ],
+      "narrowed": []
+    },
+    {
+      "environment": [
+        [
+          "PATH",
+          "::"
+        ],
+        [
+          "DOTNET_ROOT",
+          ""
+        ],
+        [
+          "HOME",
+          "/root"
+        ]
+      ],
+      "carried": [],
+      "dropped": [
+        "PATH",
+        "DOTNET_ROOT",
+        "HOME"
+      ],
+      "narrowed": []
+    },
+    {
+      "environment": [
+        [
+          "PATH",
+          "\\\\server\\share;C:rel;\\rooted"
+        ]
+      ],
+      "carried": [],
+      "dropped": [
+        "PATH"
+      ],
+      "narrowed": []
+    }
+  ],
+  "reads": [
+    {
+      "content": "eyJleGVjdXRhYmxlIjoiQzpcXHNtZi5leGUiLCJhcmd1bWVudHMiOlsiZGFlbW9uIiwicnVuIl0sInZlcnNpb24iOiIxIn0=",
+      "read": {
+        "executable": "C:\\smf.exe",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "1",
+        "environment": []
+      }
+    },
+    {
+      "content": "eyJleGVjdXRhYmxlIjoiYSIsImV4ZWN1dGFibGUiOiJDOlxcc21mLmV4ZSIsImFyZ3VtZW50cyI6WyJkYWVtb24iLCJydW4iXSwidmVyc2lvbiI6IjEifQ==",
+      "read": {
+        "executable": "C:\\smf.exe",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "1",
+        "environment": []
+      }
+    },
+    {
+      "content": "eyJleGVjdXRhYmxlIjo1LCJleGVjdXRhYmxlIjoiQzpcXHNtZi5leGUiLCJhcmd1bWVudHMiOlsiZGFlbW9uIiwicnVuIl0sInZlcnNpb24iOiIxIn0=",
+      "read": null
+    },
+    {
+      "content": "eyJleGVjdXRhYmxlIjoiXHVkODAweCIsImFyZ3VtZW50cyI6WyJkYWVtb24iLCJydW4iXSwidmVyc2lvbiI6IjEifQ==",
+      "read": null
+    },
+    {
+      "content": "77u/eyJleGVjdXRhYmxlIjoiQzpcXHNtZi5leGUiLCJhcmd1bWVudHMiOlsiZGFlbW9uIiwicnVuIl0sInZlcnNpb24iOiIxIn0=",
+      "read": null
+    },
+    {
+      "content": "eyJleGVjdXRhYmxlIjoiQzpcXHNtZi5leGUiLCJhcmd1bWVudHMiOlsiZGFlbW9uIixudWxsLCJydW4iXSwidmVyc2lvbiI6IjEifQ==",
+      "read": null
+    },
+    {
+      "content": "eyJleGVjdXRhYmxlIjoiQzpcXHNtZi5leGUiLCJhcmd1bWVudHMiOltudWxsLCJkYWVtb24iLCJydW4iXSwidmVyc2lvbiI6IjEiLCJlbnZpcm9ubWVudCI6bnVsbH0=",
+      "read": {
+        "executable": "C:\\smf.exe",
+        "arguments": [
+          null,
+          "daemon",
+          "run"
+        ],
+        "version": "1",
+        "environment": []
+      }
+    },
+    {
+      "content": "eyJleGVjdXRhYmxlIjoiQzpcXHNtZi5leGUiLCJhcmd1bWVudHMiOlsiZGFlbW9uIiwicnVuIl0sInZlcnNpb24iOiIxIiwiZW52aXJvbm1lbnQiOnsiQSI6bnVsbCwiQSI6IngifX0=",
+      "read": {
+        "executable": "C:\\smf.exe",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "1",
+        "environment": [
+          [
+            "A",
+            "x"
+          ]
+        ]
+      }
+    },
+    {
+      "content": "eyJleGVjdXRhYmxlIjoiQzpcXHNtZi5leGUiLCJhcmd1bWVudHMiOlsiZGFlbW9uIiwicnVuIl0sInZlcnNpb24iOiIxIiwiZW52aXJvbm1lbnQiOltdfQ==",
+      "read": null
+    },
+    {
+      "content": "eyJleGVjdXRhYmxlIjoiQzpcXHNtZi5leGUiLCJhcmd1bWVudHMiOlsiZGFlbW9uIiwicnVuIl0sInZlcnNpb24iOiIxIiwiZW52aXJvbm1lbnQiOnsiQSI6MX19",
+      "read": null
+    },
+    {
+      "content": "eyJFeGVjdXRhYmxlIjoiQzpcXHNtZi5leGUiLCJhcmd1bWVudHMiOlsiZGFlbW9uIiwicnVuIl0sInZlcnNpb24iOiIxIn0=",
+      "read": null
+    },
+    {
+      "content": "eyJleGVjdXRhYmxlIjoicmVsLmV4ZSIsImFyZ3VtZW50cyI6WyJkYWVtb24iLCJydW4iXSwidmVyc2lvbiI6IsKgIn0=",
+      "read": null
+    },
+    {
+      "content": "eyJleGVjdXRhYmxlIjoicmVsIiwiYXJndW1lbnRzIjpbIi0teCIsImRhZW1vbiIsInJ1biIsIi0tc3VwZXJ2aXNlIl0sInZlcnNpb24iOiJ2In0=",
+      "read": {
+        "executable": "rel",
+        "arguments": [
+          "--x",
+          "daemon",
+          "run",
+          "--supervise"
+        ],
+        "version": "v",
+        "environment": []
+      }
+    },
+    {
+      "content": "eyJleGVjdXRhYmxlIjoiQzpcXHNtZi5leGUiLCJhcmd1bWVudHMiOlsiZGFlbW9uIiwicnVuIl0sInZlcnNpb24iOiIxIix9",
+      "read": null
+    },
+    {
+      "content": "eyJleGVjdXRhYmxlIjoiQzpcXHNtZi5leGUiLCJhcmd1bWVudHMiOlsiZGFlbW9uIiwicnVuIl0sInZlcnNpb24iOiIxIn0g",
+      "read": {
+        "executable": "C:\\smf.exe",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "1",
+        "environment": []
+      }
+    },
+    {
+      "content": "W10=",
+      "read": null
+    },
+    {
+      "content": "bnVsbA==",
+      "read": null
+    },
+    {
+      "content": "",
+      "read": null
+    },
+    {
+      "content": "eyJleGVjdXRhYmxlIjoiQzpcXHNtZi5leGUiLCJhcmd1bWVudHMiOiJkYWVtb24gcnVuIiwidmVyc2lvbiI6IjEifQ==",
+      "read": null
+    },
+    {
+      "content": "eyJleGVjdXRhYmxlIjoiQzpcXHNtZi5leGUiLCJhcmd1bWVudHMiOlsiZGFlbW9uIiwicnVuIl0sInZlcnNpb24iOjF9",
+      "read": null
+    },
+    {
+      "content": "eyJleGVjdXRhYmxlIjoiQzpcXHNtZi5leGUiLCJhcmd1bWVudHMiOlsiZGFlbW9uIiwicnVuIl0sInZlcnNpb24iOiIxIiwiZW52aXJvbm1lbnQiOnsiUEFUSCI6Ii9hIiwiQiI6bnVsbCwiRE9UTkVUX1JPT1QiOiIvZCIsIlBBVEgiOiIvYiJ9fQ==",
+      "read": {
+        "executable": "C:\\smf.exe",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "1",
+        "environment": [
+          [
+            "PATH",
+            "/b"
+          ],
+          [
+            "B",
+            null
+          ],
+          [
+            "DOTNET_ROOT",
+            "/d"
+          ]
+        ]
+      }
+    },
+    {
+      "content": "eyJleGVjdXRhYmxlIjoieP8iLCJhcmd1bWVudHMiOlsiZGFlbW9uIiwicnVuIl0sInZlcnNpb24iOiIxIn0=",
+      "read": null
+    },
+    {
+      "content": "eyJleGVjdXRhYmxlIjoieCIsImFyZ3VtZW50cyI6WyJkYWVtb24iLCJydW4iXSwidmVyc2lvbiI6IjEiLCJ6Ijoi/yJ9",
+      "read": {
+        "executable": "x",
+        "arguments": [
+          "daemon",
+          "run"
+        ],
+        "version": "1",
+        "environment": []
+      }
+    }
+  ]
+}

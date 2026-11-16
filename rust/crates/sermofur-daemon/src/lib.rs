@@ -17,5 +17,6 @@ pub mod log;
 pub mod registry;
 pub mod server;
 pub mod services;
+pub mod supervisor;
 
 mod relaxed_escape_table;

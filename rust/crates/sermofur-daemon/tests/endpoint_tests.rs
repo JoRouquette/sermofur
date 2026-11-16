@@ -111,12 +111,12 @@ fn no_daemon_means_no_client() {
     assert!(elapsed < Duration::from_millis(100), "{elapsed:?}");
 }
 
-/// Lot 7.6, minor 4 of the review of lot 7.5: with no daemon, `inspect` lists the pipe file
-/// system three times under Windows. Measured on 50 calls, against one listing alone; the
-/// bound is the one of `no_daemon_means_no_client`.
+/// Lot 7.6, minor 4 of the review of lot 7.5: with no daemon, `inspect` (which lists the pipe
+/// file system three times under Windows) answers `Absent` within 100 ms a call, the bound of
+/// `no_daemon_means_no_client`. Measured on 50 calls; one listing alone is printed beside it.
 #[cfg(windows)]
 #[test]
-fn inspect_without_a_daemon_lists_the_pipes_three_times() {
+fn inspect_without_a_daemon_answers_absent_within_100_ms() {
     let home = Home::new("listings");
     let paths = home.paths();
     let calls: u32 = 50;

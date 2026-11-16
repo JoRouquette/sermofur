@@ -1085,3 +1085,270 @@ fn the_installed_definition_is_read_as_the_oracle_reads_it() {
         cases.len()
     );
 }
+
+/// The pid of the daemon that answers on `paths`, once it differs from `other`.
+fn wait_for_pid(paths: &DaemonPaths, other: Option<i32>) -> i32 {
+    let started = Instant::now();
+    while started.elapsed() < Duration::from_secs(20) {
+        let pid = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .expect("a runtime")
+            .block_on(async {
+                let mut client = DaemonClient::connect(
+                    paths,
+                    &SystemOwnership,
+                    VERSION,
+                    &std::env::temp_dir().to_string_lossy(),
+                    Duration::from_millis(500),
+                )
+                .await
+                .ok()
+                .flatten()?;
+                client.status().await.ok()?.pid
+            });
+        if let Some(pid) = pid.filter(|pid| Some(*pid) != other) {
+            return pid;
+        }
+        thread::sleep(Duration::from_millis(100));
+    }
+    panic!("The supervised daemon did not answer.");
+}
+
+/// Ends a process by its pid, as `Process.GetProcessById(pid).Kill()`.
+fn kill(pid: i32) {
+    let pid = pid.to_string();
+    let status = if cfg!(windows) {
+        Command::new("taskkill").args(["/F", "/PID", &pid]).output()
+    } else {
+        Command::new("kill").args(["-9", &pid]).output()
+    };
+    assert!(status.expect("the kill runs").status.success());
+}
+
+/// Port of `ServiceTests.SupervisorRestartsAKilledDaemonAndStopsCleanly`: the supervisor runs
+/// a real `smf daemon run`, restarts it after a kill, and stops it on request.
+#[test]
+fn the_supervisor_restarts_a_killed_daemon_and_stops_cleanly() {
+    use sermofur_daemon::supervisor::{ChildStart, Supervisor};
+    let home = Home::new("supervisor");
+    let paths = home.paths();
+    let child = ChildStart {
+        program: SMF.to_owned(),
+        arguments: vec!["daemon".to_owned(), "run".to_owned()],
+        environment: vec![(
+            HOME_VARIABLE.to_owned(),
+            home.home().to_string_lossy().into_owned(),
+        )],
+    };
+    let log = DaemonLog::new(&home.0.join("supervisor.log"));
+    let stopper = paths.clone();
+    let supervisor = Supervisor::new(
+        child,
+        log,
+        Box::new(move || {
+            let _ = tokio::runtime::Builder::new_current_thread()
+                .enable_all()
+                .build()
+                .expect("a runtime")
+                .block_on(async {
+                    let mut stream =
+                        endpoint::connect(&stopper, &SystemOwnership, Duration::from_millis(500))
+                            .await
+                            .ok()??;
+                    let frame =
+                        framing::encode(&IpcMessage::new(kind::SHUTDOWN), MAX_BODY_BYTES).ok()?;
+                    stream.write_all(&frame).await.ok()?;
+                    read_message(&mut stream, MAX_BODY_BYTES).await.ok()?
+                });
+        }),
+    );
+    let stop = Arc::new(AtomicBool::new(false));
+    let (done, finished) = mpsc::channel();
+    let asked = Arc::clone(&stop);
+    let supervising = thread::spawn(move || {
+        let _ = done.send(supervisor.run(&asked));
+    });
+    let first = wait_for_pid(&paths, None);
+    kill(first);
+    let back = Instant::now();
+    let second = wait_for_pid(&paths, Some(first));
+    assert!(
+        back.elapsed() < Duration::from_secs(10),
+        "back after {:?}",
+        back.elapsed()
+    );
+    assert_ne!(first, second);
+    stop.store(true, Ordering::SeqCst);
+    assert_eq!(finished.recv_timeout(Duration::from_secs(20)), Ok(0));
+    supervising.join().expect("the supervisor");
+    let gone = tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .expect("a runtime")
+        .block_on(endpoint::connect(
+            &paths,
+            &SystemOwnership,
+            Duration::from_millis(500),
+        ));
+    assert!(matches!(gone, Ok(None)), "a daemon still answers");
+}
+
+/// `ServiceFactAttribute`: a test that installs a real service in the session of the current
+/// user runs in CI (`GITHUB_ACTIONS=true`) or when `SERMOFUR_SERVICE_TESTS=1`, never by surprise
+/// on a developer machine.
+fn real_services_allowed() -> bool {
+    std::env::var("GITHUB_ACTIONS").as_deref() == Ok("true")
+        || std::env::var("SERMOFUR_SERVICE_TESTS").as_deref() == Ok("1")
+}
+
+/// `RealServiceTests.SmfIn`: the real smf, without the daemon home nor the bypass of tests.
+fn real_smf(folder: &Path, arguments: &[&str]) -> (i32, Value, String) {
+    let output = Command::new(SMF)
+        .args(arguments)
+        .current_dir(folder)
+        .env_remove(HOME_VARIABLE)
+        .env_remove("SERMOFUR_NO_DAEMON")
+        .output()
+        .expect("smf runs");
+    let json = serde_json::from_slice(&output.stdout).unwrap_or(Value::Null);
+    (
+        output.status.code().unwrap_or(-1),
+        json,
+        String::from_utf8_lossy(&output.stderr).into_owned(),
+    )
+}
+
+fn real_status(folder: &Path, arguments: &[&str]) -> Value {
+    let (code, json, error) = real_smf(folder, arguments);
+    assert_eq!(code, 0, "{arguments:?}: {error}");
+    json
+}
+
+/// Every file under `root` with its bytes (`TestInstance.Snapshot`).
+fn instance_files(root: &Path) -> BTreeMap<PathBuf, Vec<u8>> {
+    let mut files = BTreeMap::new();
+    let mut folders = vec![root.to_path_buf()];
+    while let Some(folder) = folders.pop() {
+        for entry in fs::read_dir(&folder).expect("a folder").flatten() {
+            let path = entry.path();
+            if path.is_dir() {
+                folders.push(path);
+            } else {
+                files.insert(path.clone(), fs::read(&path).unwrap_or_default());
+            }
+        }
+    }
+    files
+}
+
+/// Port of `RealServiceTests.InstallRestartAfterAKillPilotAndUninstall`, behind the guard of
+/// `ServiceFactAttribute`. Under Windows the task runs `daemon run --supervise`, which waits for
+/// the job object of the supervisor: the test is ignored there until then.
+#[test]
+#[cfg_attr(
+    windows,
+    ignore = "the Windows supervisor waits for its job object (decision on win32job)"
+)]
+fn a_real_service_installs_restarts_after_a_kill_and_uninstalls() {
+    if !real_services_allowed() {
+        eprintln!("Installs a real service: runs in CI, or set SERMOFUR_SERVICE_TESTS=1.");
+        return;
+    }
+    let home = Home::new("real-service");
+    let root = home.0.join("instance");
+    fs::create_dir_all(&root).expect("the root");
+    sermofur_core::init::initialize(&root).expect("an instance");
+    let temporary = std::env::temp_dir();
+    real_smf(&temporary, &["daemon", "uninstall"]);
+    let root_text = root.to_string_lossy().into_owned();
+    let tested = std::panic::catch_unwind(|| {
+        let install = Instant::now();
+        let installed = real_status(&temporary, &["daemon", "install", "--json"]);
+        eprintln!("install: {:?}, {installed}", install.elapsed());
+        assert_eq!(installed["state"], "running");
+        assert!(install.elapsed() < Duration::from_secs(60));
+        assert_eq!(installed["version"], VERSION);
+        assert_eq!(
+            real_smf(&temporary, &["daemon", "register", "--path", &root_text]).0,
+            0
+        );
+        let data = instance_files(&root);
+        assert_eq!(real_status(&root, &["status", "--json"])["mode"], "daemon");
+        let first = installed["pid"].as_i64().expect("a pid");
+        kill(i32::try_from(first).expect("a pid"));
+        let back = Instant::now();
+        let second = loop {
+            assert!(
+                back.elapsed() < Duration::from_secs(30),
+                "the daemon is not back"
+            );
+            let status = real_status(&temporary, &["daemon", "status", "--json"]);
+            if let Some(pid) = status["pid"].as_i64().filter(|pid| *pid != first) {
+                break pid;
+            }
+            thread::sleep(Duration::from_millis(200));
+        };
+        eprintln!("back after a kill: {:?}", back.elapsed());
+        assert!(back.elapsed() < Duration::from_secs(10));
+        assert_ne!(first, second);
+        for (arguments, state) in [
+            (["daemon", "stop", "--json"], "installed_stopped"),
+            (["daemon", "start", "--json"], "running"),
+            (["daemon", "install", "--json"], "running"),
+        ] {
+            assert_eq!(real_status(&temporary, &arguments)["state"], state);
+        }
+        let uninstall = Instant::now();
+        assert_eq!(
+            real_status(&temporary, &["daemon", "uninstall", "--json"])["state"],
+            "absent"
+        );
+        assert!(uninstall.elapsed() < Duration::from_secs(60));
+        assert_eq!(instance_files(&root), data);
+        let instances = real_smf(&temporary, &["daemon", "instances", "--json"]).1;
+        let name = root
+            .file_name()
+            .expect("a name")
+            .to_string_lossy()
+            .into_owned();
+        assert!(instances.to_string().contains(&name));
+    });
+    real_smf(&temporary, &["daemon", "uninstall"]);
+    real_smf(&temporary, &["daemon", "unregister", "--path", &root_text]);
+    if let Err(panic) = tested {
+        std::panic::resume_unwind(panic);
+    }
+}
+
+/// Review of lot 7.7 (Fort): under Windows, while the supervisor waits for the win32job
+/// question, `install`, `start` and `restart` answer `not_ported` before a running daemon is
+/// stopped or anything is written; `status` still runs.
+#[cfg(windows)]
+#[test]
+fn install_start_and_restart_are_refused_under_windows_before_any_effect() {
+    let _alone = alone();
+    let home = Home::new("no-supervisor");
+    let _daemon = home.daemon(SMF);
+    for subcommand in ["install", "start", "restart"] {
+        let output = std::process::Command::new(SMF)
+            .args(["daemon", subcommand, "--json"])
+            .env(HOME_VARIABLE, home.home())
+            .output()
+            .expect("smf runs");
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        assert_ne!(output.status.code(), Some(0), "{subcommand}: {stderr}");
+        assert!(stderr.contains("not_ported"), "{subcommand}: {stderr}");
+        assert!(
+            !home.paths().state_directory.join("service.json").exists(),
+            "{subcommand}"
+        );
+    }
+    let status = std::process::Command::new(SMF)
+        .args(["daemon", "status", "--json"])
+        .env(HOME_VARIABLE, home.home())
+        .output()
+        .expect("smf runs");
+    let status: serde_json::Value = serde_json::from_slice(&status.stdout).expect("JSON");
+    assert_eq!(status["state"], "running", "{status}");
+}

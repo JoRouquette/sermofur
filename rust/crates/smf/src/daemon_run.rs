@@ -4,6 +4,7 @@
 use std::io::Write;
 use std::path::Path;
 use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 use sermofur_core::daemon_paths::DaemonPaths;
 use sermofur_core::discovery::{expand_short_names, get_full_path};
@@ -42,7 +43,7 @@ pub(crate) fn local_only(argv: &[String]) -> bool {
 }
 
 /// `CliCommandExecutor`: the commands of a client, run in this process with its `cwd`.
-struct CliCommandExecutor;
+pub(crate) struct CliCommandExecutor;
 
 impl CommandExecutor for CliCommandExecutor {
     fn plan(&self, argv: &[String], cwd: &str) -> Result<CommandPlan> {
@@ -109,8 +110,11 @@ pub fn run(
     args.require_count(2)?;
     args.validate_used()?;
     if supervise {
-        // The supervisor comes with the services (lot 7.7).
-        return Err(not_ported());
+        // The job object of the Windows supervisor waits for the decision on its crate.
+        if cfg!(windows) {
+            return Err(not_ported());
+        }
+        return supervise_daemon(paths);
     }
     let _lock = file_turn::acquire(&paths)?;
     let log = DaemonLog::new(&paths.log_file());
@@ -139,17 +143,24 @@ pub fn run(
         // `SignalStop`: the first signal drains the started commands; a second one ends the
         // process at once, with the code of the default action of that signal.
         let stop_on_signals = async {
-            signals.next().await;
-            drain_log.write("draining", None, None, None);
-            // With `--json`, stderr holds only the JSON error: no progress line (`CommandRunner`).
-            if !json {
-                write_line(
-                    err,
-                    "smf: finishing the running commands; a second Ctrl+C or SIGTERM stops at once.",
-                );
+            let stopping = AtomicBool::new(false);
+            loop {
+                let code = signals.next().await;
+                let first = handle(&stopping, || {
+                    drain_log.write("draining", None, None, None);
+                    // With `--json`, stderr holds only the JSON error: no progress line.
+                    if !json {
+                        write_line(
+                            err,
+                            "smf: finishing the running commands; a second Ctrl+C or SIGTERM stops at once.",
+                        );
+                    }
+                    server.stop();
+                });
+                if !first {
+                    std::process::exit(code);
+                }
             }
-            server.stop();
-            std::process::exit(signals.next().await);
         };
         let serving = server.run(&SystemOwnership, || {
             // One line, even in JSON: a supervisor or a test reads it as the signal of readiness.
@@ -218,5 +229,84 @@ impl Signals {
         } else {
             143
         }
+    }
+}
+
+/// `DaemonCommands.Supervise`: the daemon as a child, started again when it fails. The first
+/// signal stops the daemon and the supervisor; a second one ends the supervisor at once.
+fn supervise_daemon(paths: DaemonPaths) -> Result<i32> {
+    use sermofur_daemon::services::{self, ServiceDefinition};
+    use sermofur_daemon::supervisor::{ChildStart, Supervisor};
+    let child = ServiceDefinition::for_current_process(VERSION, false, &mut |_| {}, &mut |_| {})?;
+    let log = DaemonLog::new(&paths.log_file());
+    let installed = services::read_installed(&paths)?;
+    if installed.is_none() && services::installed_definition_file(&paths).is_file() {
+        // The file is there but its shape does not hold: the daemon starts with no recorded
+        // environment at all.
+        log.write("installed_definition_unsound", None, None, None);
+    }
+    // The name of the variable, never its value: the journal is read by eye.
+    let start = ChildStart::new(
+        &child,
+        installed.as_ref(),
+        &mut |name| log.write("supervised_variable_dropped", Some(name), None, None),
+        &mut |name| log.write("supervised_path_entries_dropped", Some(name), None, None),
+    );
+    let stop = Arc::new(AtomicBool::new(false));
+    let flag = Arc::clone(&stop);
+    std::thread::spawn(move || {
+        let Ok(runtime) = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+        else {
+            return;
+        };
+        runtime.block_on(async {
+            let Ok(mut signals) = Signals::register() else {
+                return;
+            };
+            loop {
+                let code = signals.next().await;
+                if !handle(&flag, || {}) {
+                    std::process::exit(code);
+                }
+            }
+        });
+    });
+    let stopper = paths.clone();
+    let supervisor = Supervisor::new(
+        start,
+        log,
+        Box::new(move || {
+            crate::daemon_commands::shutdown(&stopper, &mut |_| {});
+        }),
+    );
+    Ok(supervisor.run(&stop))
+}
+
+/// `SignalStop.Handle`: the first signal runs `on_first` and asks the stop, then lets the
+/// process live; a later one finds the stop asked and returns `false`: the process ends at once.
+pub(crate) fn handle(stop: &AtomicBool, on_first: impl FnOnce()) -> bool {
+    if stop.load(Ordering::SeqCst) {
+        return false;
+    }
+    on_first();
+    stop.store(true, Ordering::SeqCst);
+    true
+}
+
+#[cfg(test)]
+mod signal_tests {
+    use super::*;
+
+    /// Port of `ServiceTests.SecondSignalEndsTheProcess` (reported from lot 7.6).
+    #[test]
+    fn a_second_signal_ends_the_process() {
+        let stop = AtomicBool::new(false);
+        let mut first = 0;
+        assert!(handle(&stop, || first += 1));
+        assert!(stop.load(Ordering::SeqCst));
+        assert!(!handle(&stop, || first += 1));
+        assert_eq!(first, 1);
     }
 }

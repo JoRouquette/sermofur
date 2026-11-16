@@ -399,3 +399,49 @@ fn a_refused_folder_keeps_the_trailing_separator_in_the_message() {
         "<root>/folder/ was left untouched: it is a folder."
     );
 }
+
+fn hardening_folder() -> PathBuf {
+    let folder = std::env::temp_dir().join(format!("smf-hard-{}", Uuid::new_v4().simple()));
+    fs::create_dir_all(&folder).expect("a folder");
+    folder
+}
+
+/// Port of `ServiceHardeningTests.AtomicWriteKeepsThePermissionsOfTheFile` (lot 7.7).
+#[cfg(unix)]
+#[test]
+fn an_atomic_write_keeps_the_permissions_of_the_file() {
+    use std::os::unix::fs::PermissionsExt;
+    let folder = hardening_folder();
+    let mode = |file: &Path| fs::metadata(file).expect("a file").permissions().mode() & 0o777;
+    let file = folder.join("config.toml");
+    fs::write(&file, "a = 1\n").expect("written");
+    fs::set_permissions(&file, fs::Permissions::from_mode(0o600)).expect("narrowed");
+    write(&file, b"a = 2\n", &WriteOptions::default()).expect("replaced");
+    assert_eq!(mode(&file), 0o600);
+    let fresh = folder.join("new.toml");
+    let secret = WriteOptions {
+        new_file_mode: Some(0o600),
+        ..WriteOptions::default()
+    };
+    write(&fresh, b"b = 1\n", &secret).expect("created");
+    assert_eq!(mode(&fresh), 0o600);
+    let mut names: Vec<_> = fs::read_dir(&folder)
+        .expect("the folder")
+        .map(|entry| entry.expect("an entry").file_name())
+        .collect();
+    names.sort();
+    assert_eq!(names, ["config.toml", "new.toml"]);
+    let _ = fs::remove_dir_all(&folder);
+}
+
+/// Port of `ServiceHardeningTests.AtomicWriteReplacesTheContentAndLeavesNoTemporaryFile`.
+#[test]
+fn an_atomic_write_replaces_the_content_and_leaves_no_temporary_file() {
+    let folder = hardening_folder();
+    let file = folder.join(".mcp.json");
+    write(&file, b"{}", &WriteOptions::default()).expect("written");
+    write(&file, b"{\"a\":1}", &WriteOptions::default()).expect("replaced");
+    assert_eq!(fs::read_to_string(&file).expect("read"), "{\"a\":1}");
+    assert_eq!(fs::read_dir(&folder).expect("the folder").count(), 1);
+    let _ = fs::remove_dir_all(&folder);
+}
