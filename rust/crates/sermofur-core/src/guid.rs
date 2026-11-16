@@ -215,6 +215,20 @@ mod tests {
                 prop_assert_eq!(try_parse(&form), Some(id), "{}", form);
             }
         }
+
+        // The format D, in either case and with blanks around, reads back the value it was
+        // written from; the other formats are refused.
+        #[test]
+        fn the_exact_d_form_round_trips(value in any::<u128>()) {
+            let id = Uuid::from_u128(value);
+            let d = id.hyphenated().to_string();
+            for form in [d.clone(), d.to_uppercase(), format!(" {d}\t")] {
+                prop_assert_eq!(try_parse_exact_d(&form), Some(id), "{}", form);
+            }
+            for form in [id.simple().to_string(), id.braced().to_string(), x_form(id)] {
+                prop_assert_eq!(try_parse_exact_d(&form), None, "{}", form);
+            }
+        }
     }
 
     #[test]

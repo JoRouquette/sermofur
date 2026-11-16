@@ -109,6 +109,34 @@ mod properties {
     }
 
     /// Text built from the pieces of the TOML grammar that the editor cuts on.
+    /// True when a `command` or `args` line of a `[mcp_servers.sermofur]` table holds `"""` or
+    /// `'''` after its `=`: the only lines `with_launch_lines` replaces, keys read as it reads
+    /// them (`key_of` on the trimmed line, quoted keys left aside). A header is a line that
+    /// starts with `[` and ends with `]` before any comment.
+    fn launch_value_opens_a_multiline_string(content: &str) -> bool {
+        let mut in_table = false;
+        content.split('\n').any(|line| {
+            let trimmed = line.trim();
+            let code = trimmed.split('#').next().unwrap_or("").trim_end();
+            if code.starts_with('[') && code.ends_with(']') {
+                let name: String = code
+                    .trim_matches(|c| c == '[' || c == ']')
+                    .chars()
+                    .filter(|c| !c.is_whitespace() && *c != '"' && *c != '\'')
+                    .collect();
+                in_table = name == "mcp_servers.sermofur";
+                return false;
+            }
+            in_table
+                && !trimmed.starts_with('#')
+                && trimmed.split_once('=').is_some_and(|(key, value)| {
+                    !key.is_empty()
+                        && ["command", "args"].contains(&key.trim())
+                        && (value.contains("\"\"\"") || value.contains("'''"))
+                })
+        })
+    }
+
     fn toml_like() -> impl Strategy<Value = String> {
         let pieces = vec![
             "[",
@@ -201,7 +229,7 @@ mod properties {
                 // `declares` refuses: `with_launch_lines` replaces its first line and leaves the
                 // rest, as `CodexConfigFile.WithLaunchLines` of the oracle does (golden cases
                 // `multiline_*`; a defect of the oracle, named in PARITY.md).
-                let multiline = content.contains("\"\"\"") || content.contains("'''");
+                let multiline = launch_value_opens_a_multiline_string(&content);
                 match declares(&out) {
                     Ok(true) => {}
                     Err(_) if multiline => {}

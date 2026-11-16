@@ -197,6 +197,12 @@ impl<'a> Scan<'a> {
 
     /// A string token, unescaped; a lone surrogate (which `GetString` refuses) is `None`.
     fn string(&mut self) -> Option<String> {
+        String::from_utf16(&self.units()?).ok()
+    }
+
+    /// The UTF-16 units of a string token, lone surrogates included: a skipped value is never
+    /// converted (measured: `{"a":"\udc00","id":116}` is answered with its id).
+    fn units(&mut self) -> Option<Vec<u16>> {
         self.eat(b'"')?;
         let mut units: Vec<u16> = Vec::new();
         loop {
@@ -204,7 +210,7 @@ impl<'a> Scan<'a> {
             match byte {
                 b'"' => {
                     self.at += 1;
-                    return String::from_utf16(&units).ok();
+                    return Some(units);
                 }
                 b'\\' => {
                     self.at += 1;
@@ -283,7 +289,7 @@ impl<'a> Scan<'a> {
     /// Skips one value; `depth` counts the containers around it (64 at most).
     fn skip(&mut self, depth: usize) -> Option<()> {
         match self.peek()? {
-            b'"' => self.string().map(drop),
+            b'"' => self.units().map(drop),
             b'{' | b'[' if depth >= 64 => None,
             open @ (b'{' | b'[') => {
                 let close = if open == b'{' { b'}' } else { b']' };
@@ -294,7 +300,7 @@ impl<'a> Scan<'a> {
                 }
                 loop {
                     if open == b'{' {
-                        self.string()?;
+                        self.units()?;
                         self.blank();
                         self.eat(b':')?;
                         self.blank();
@@ -450,11 +456,11 @@ pub(crate) fn params_fit(params: Option<&Node>, properties: &'static [Property])
     match params {
         None | Some(Node::Null) => true,
         Some(Node::Object(entries)) => {
-            let distinct = entries.iter().enumerate().all(|(index, (name, _))| {
-                entries[..index]
-                    .iter()
-                    .all(|(other, _)| !same_name(&other.text, &name.text))
-            });
+            // `same_name` is ASCII case folding: the lowered names are distinct.
+            let mut seen = std::collections::HashSet::with_capacity(entries.len());
+            let distinct = entries
+                .iter()
+                .all(|(name, _)| seen.insert(name.text.to_ascii_lowercase()));
             distinct && fits(params.unwrap_or(&Node::Null), Shape::Object(properties))
         }
         Some(_) => false,
@@ -636,6 +642,15 @@ mod tests {
             Some(RequestId::Text("s".to_owned()))
         );
         assert_eq!(invalid(r#"{"id":"a\ud800"}"#), None);
+        // A lone surrogate in a value skipped before the id (measured, golden `mcp-serve.json`).
+        assert_eq!(
+            invalid(r#"{"jsonrpc":"2.0","method":"ping\ud800","id":115}"#),
+            Some(RequestId::Number(115))
+        );
+        assert_eq!(
+            invalid(r#"{"a":"\udc00","id":116}"#),
+            Some(RequestId::Number(116))
+        );
         assert_eq!(invalid("[]"), None);
     }
 
@@ -680,6 +695,19 @@ mod tests {
         let started = std::time::Instant::now();
         assert_eq!(invalid(&line), Some(RequestId::Number(7)));
         assert!(started.elapsed() < std::time::Duration::from_secs(10));
+    }
+
+    /// `params` with 200 000 distinct names are checked in linear time (review of lot 8.4); a
+    /// name repeated without case is still refused.
+    #[test]
+    fn many_params_names_are_checked_in_linear_time() {
+        let entries: Vec<String> = (0..200_000).map(|i| format!(r#""k{i}":1"#)).collect();
+        let params = stj::parse(&format!("{{{}}}", entries.join(","))).expect("JSON");
+        let started = std::time::Instant::now();
+        assert!(params_fit(Some(&params), LIST_TOOLS));
+        assert!(started.elapsed() < std::time::Duration::from_secs(10));
+        let twice = stj::parse(r#"{"cursor":"a","k":1,"CURSOR":"b"}"#).expect("JSON");
+        assert!(!params_fit(Some(&twice), LIST_TOOLS));
     }
 
     #[test]

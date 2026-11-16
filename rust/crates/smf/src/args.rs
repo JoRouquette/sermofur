@@ -164,7 +164,7 @@ impl CommandArguments {
     /// True when the argument at `index` is an option whose value is the next argument, with the
     /// rule of the parser: an option that is not a flag, followed by an argument that does not
     /// start with `--`.
-    fn takes_value(arguments: &[String], index: usize) -> bool {
+    pub(crate) fn takes_value(arguments: &[String], index: usize) -> bool {
         let argument = arguments[index].as_str();
         argument.starts_with("--")
             && argument != END_OF_OPTIONS

@@ -154,6 +154,9 @@ List<string> protocol =
     """{"jsonrpc":"2.0","id":115 , "method":"ping"} x""",
     """{"jsonrpc":"2.0","id":5x}""",
     """{"params":{"id":116},"jsonrpc":"1.0","method":"x"}""",
+    // A lone surrogate after the method, then in a value skipped before the id (review of lot 8.4).
+    """{"jsonrpc":"2.0","method":"ping\ud800","id":115}""",
+    """{"a":"\udc00","id":116}""",
     """{"jsonrpc":"2.0","id":117,"result":{}}""",
     """{"jsonrpc":"2.0","id":118,"result":5}""",
     """{"jsonrpc":"2.0","id":119,"result":null}""",
@@ -297,6 +300,11 @@ List<string> tools =
     Request(28, "initialize"),
     Call(29, "sermofur_claim", """{"text":"written by an unnamed host"}"""),
     Call(30, "sermofur_status", """{"zz":1}"""),
+    // Actor of a host named with U+0130 and the Kelvin sign (review of lot 8.4).
+    Init("\u0130\u212A"),
+    Call(31, "sermofur_claim", """{"text":"written by a dotted host"}"""),
+    Init("a\u0130b"),
+    Call(32, "sermofur_claim", """{"text":"written by a dotted host"}"""),
 ];
 
 List<string> sibling =

@@ -3,6 +3,7 @@
 //! launch folder; writes carry `--origin llm` and the actor of the session, never values of the
 //! call.
 
+use std::collections::HashMap;
 use std::future::Future;
 use std::path::Path;
 
@@ -474,14 +475,18 @@ fn validate(
 ) -> std::result::Result<Vec<(&'static str, String)>, Failure> {
     // `Dictionary<string, JsonElement>`: a repeated key keeps its first place and its last value.
     let mut given: Vec<(&str, &Node)> = Vec::new();
+    let mut place: HashMap<&str, usize> = HashMap::new();
     if let Some(Node::Object(entries)) = arguments {
         for (name, value) in entries {
             if name.lone_surrogate {
                 return Err(Failure::Internal);
             }
-            match given.iter_mut().find(|(key, _)| *key == name.text) {
-                Some(slot) => slot.1 = value,
-                None => given.push((&name.text, value)),
+            match place.get(name.text.as_str()) {
+                Some(&index) => given[index].1 = value,
+                None => {
+                    place.insert(&name.text, given.len());
+                    given.push((&name.text, value));
+                }
             }
         }
     }
@@ -493,7 +498,7 @@ fn validate(
     }
     let mut values = Vec::new();
     for field in fields {
-        match given.iter().find(|(name, _)| *name == field.name) {
+        match place.get(field.name).map(|&index| given[index]) {
             None | Some((_, Node::Null)) => {
                 if field.required {
                     return Err(invalid(format!("Field '{}' is required.", field.name)).into());
@@ -768,12 +773,11 @@ pub fn actor(client_name: Option<&str>) -> String {
     };
     let mut actor = String::new();
     let mut dash = false;
-    // `ToLowerInvariant` per UTF-16 unit: only `İ` (to `i`) and the Kelvin sign (to `k`) reach
-    // ASCII from outside it; any other unit outside `[a-z0-9]` is a separator, as one unit or as
-    // the two of a surrogate pair.
+    // `ToLowerInvariant` per UTF-16 unit: only the Kelvin sign (to `k`) reaches ASCII from
+    // outside it; `İ` stays itself (measured, golden `mcp-serve.json`). Any other unit
+    // outside `[a-z0-9]` is a separator, as one unit or as the two of a surrogate pair.
     for character in name.trim().chars() {
         let lower = match character {
-            'İ' => 'i',
             '\u{212A}' => 'k',
             other => other.to_ascii_lowercase(),
         };
@@ -823,7 +827,8 @@ mod tests {
         assert_eq!(actor(None), "mcp-client");
         assert_eq!(actor(Some(&"a".repeat(100))).len(), 64);
         assert_eq!(actor(Some("Claude Code É")), "claude-code");
-        assert_eq!(actor(Some("İ\u{212A}")), "ik");
+        assert_eq!(actor(Some("İ\u{212A}")), "k");
+        assert_eq!(actor(Some("aİb")), "a-b");
         let temporary = std::env::temp_dir();
         let project = temporary.to_string_lossy().into_owned();
         let expected = trim_ending_separator(
@@ -878,5 +883,37 @@ mod tests {
         ] {
             assert_eq!(read(unreadable).0, "storage_error", "{unreadable}");
         }
+    }
+
+    proptest::proptest! {
+        /// Whatever the host name: a non-empty actor of at most 64 characters of `[a-z0-9-]`,
+        /// without a dash at either end or two in a row.
+        #[test]
+        fn an_actor_is_always_a_safe_name(
+            name in proptest::option::of(r"\PC{0,100}|[a-zA-Z0-9 _.\u{130}\u{212A}\u{e9}-]{0,100}")
+        ) {
+            let actor = actor(name.as_deref());
+            proptest::prop_assert!(!actor.is_empty() && actor.len() <= MAX_ACTOR_LENGTH, "{}", actor);
+            proptest::prop_assert!(
+                actor.bytes().all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-'),
+                "{}",
+                actor
+            );
+            proptest::prop_assert!(
+                !actor.starts_with('-') && !actor.ends_with('-') && !actor.contains("--"),
+                "{}",
+                actor
+            );
+        }
+    }
+
+    /// Arguments with 200 000 distinct names are refused in linear time (review of lot 8.4).
+    #[test]
+    fn many_argument_names_are_checked_in_linear_time() {
+        let entries: Vec<String> = (0..200_000).map(|i| format!(r#""k{i}":1"#)).collect();
+        let arguments = stj::parse(&format!("{{{}}}", entries.join(","))).expect("JSON");
+        let started = std::time::Instant::now();
+        assert!(validate(TOOLS[0].fields, Some(&arguments)).is_err());
+        assert!(started.elapsed() < std::time::Duration::from_secs(10));
     }
 }

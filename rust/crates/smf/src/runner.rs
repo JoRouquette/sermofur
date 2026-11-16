@@ -161,7 +161,7 @@ fn execute(
     err: &mut dyn Write,
 ) -> Result<i32> {
     if arguments.is_empty() || CommandArguments::asks(arguments, HELP, HELP_SHORTCUT) {
-        write_line(out, &help::usage());
+        write_line(out, &help::find(arguments).unwrap_or_else(help::usage));
         return Ok(0);
     }
     if CommandArguments::asks(arguments, VERSION_OPTION, VERSION_SHORTCUT) {

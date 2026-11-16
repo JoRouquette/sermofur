@@ -722,6 +722,18 @@
           "answers": []
         },
         {
+          "send": "{\"jsonrpc\":\"2.0\",\"method\":\"ping\\ud800\",\"id\":115}",
+          "answers": [
+            "{\"error\":{\"code\":-32700,\"message\":\"Failed to parse the JSON-RPC request.\"},\"id\":115,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"a\":\"\\udc00\",\"id\":116}",
+          "answers": [
+            "{\"error\":{\"code\":-32700,\"message\":\"Failed to parse the JSON-RPC request.\"},\"id\":116,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
           "send": "{\"jsonrpc\":\"2.0\",\"id\":117,\"result\":{}}",
           "answers": []
         },
@@ -1298,8 +1310,8 @@
         {
           "send": "{\"jsonrpc\":\"2.0\",\"id\":6,\"method\":\"ping\"}\r\n{\"jsonrpc\":\"2.0\",\"id\":7,\"method\":\"ping\"}",
           "answers": [
-            "{\"result\":{},\"id\":7,\"jsonrpc\":\"2.0\"}",
-            "{\"result\":{},\"id\":6,\"jsonrpc\":\"2.0\"}"
+            "{\"result\":{},\"id\":6,\"jsonrpc\":\"2.0\"}",
+            "{\"result\":{},\"id\":7,\"jsonrpc\":\"2.0\"}"
           ]
         }
       ],
@@ -1642,6 +1654,30 @@
           "answers": [
             "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Unknown field \\u0027zz\\u0027.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Unknown field \\u0027zz\\u0027.\"},\"isError\":true},\"id\":30,\"jsonrpc\":\"2.0\"}"
           ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":\"init\",\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{},\"clientInfo\":{\"name\":\"\\u0130\\u212A\",\"version\":\"1.0\"}}}",
+          "answers": [
+            "{\"result\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"logging\":{},\"tools\":{}},\"serverInfo\":{\"name\":\"sermofur\",\"version\":\"0.0.0-dev\"},\"instructions\":\"Sermofur keeps a contestable memory of this project: recall before deciding, challenge a claim before relying on it, and record what you learn as claims, evidence or RETEX. What you write is recorded as coming from an LLM.\"},\"id\":\"init\",\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":31,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_claim\",\"arguments\":{\"text\":\"written by a dotted host\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\u0022id\\u0022:\\u0022<g16>\\u0022,\\u0022scopeId\\u0022:\\u0022workspace\\u0022,\\u0022kind\\u0022:\\u0022claim\\u0022,\\u0022status\\u0022:\\u0022proposed\\u0022,\\u0022revision\\u0022:1,\\u0022contentJson\\u0022:\\u0022{\\\\n  \\\\u0022text\\\\u0022: \\\\u0022written by a dotted host\\\\u0022,\\\\n  \\\\u0022category\\\\u0022: \\\\u0022semantic\\\\u0022,\\\\n  \\\\u0022volatility\\\\u0022: \\\\u0022evolving\\\\u0022,\\\\n  \\\\u0022lastVerified\\\\u0022: null,\\\\n  \\\\u0022reviewAfter\\\\u0022: null\\\\n}\\u0022,\\u0022provenance\\u0022:{\\u0022origin\\u0022:\\u0022llm\\u0022,\\u0022actor\\u0022:\\u0022k\\u0022,\\u0022timestamp\\u0022:\\u0022<date>\\\\u002B00:00\\u0022}}\"}],\"structuredContent\":{\"id\":\"<g16>\",\"scopeId\":\"workspace\",\"kind\":\"claim\",\"status\":\"proposed\",\"revision\":1,\"contentJson\":\"{\\n  \\u0022text\\u0022: \\u0022written by a dotted host\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\"provenance\":{\"origin\":\"llm\",\"actor\":\"k\",\"timestamp\":\"<date>\\u002B00:00\"}}},\"id\":31,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":\"init\",\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{},\"clientInfo\":{\"name\":\"a\\u0130b\",\"version\":\"1.0\"}}}",
+          "answers": [
+            "{\"result\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"logging\":{},\"tools\":{}},\"serverInfo\":{\"name\":\"sermofur\",\"version\":\"0.0.0-dev\"},\"instructions\":\"Sermofur keeps a contestable memory of this project: recall before deciding, challenge a claim before relying on it, and record what you learn as claims, evidence or RETEX. What you write is recorded as coming from an LLM.\"},\"id\":\"init\",\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":32,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_claim\",\"arguments\":{\"text\":\"written by a dotted host\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\u0022id\\u0022:\\u0022<g17>\\u0022,\\u0022scopeId\\u0022:\\u0022workspace\\u0022,\\u0022kind\\u0022:\\u0022claim\\u0022,\\u0022status\\u0022:\\u0022proposed\\u0022,\\u0022revision\\u0022:1,\\u0022contentJson\\u0022:\\u0022{\\\\n  \\\\u0022text\\\\u0022: \\\\u0022written by a dotted host\\\\u0022,\\\\n  \\\\u0022category\\\\u0022: \\\\u0022semantic\\\\u0022,\\\\n  \\\\u0022volatility\\\\u0022: \\\\u0022evolving\\\\u0022,\\\\n  \\\\u0022lastVerified\\\\u0022: null,\\\\n  \\\\u0022reviewAfter\\\\u0022: null\\\\n}\\u0022,\\u0022provenance\\u0022:{\\u0022origin\\u0022:\\u0022llm\\u0022,\\u0022actor\\u0022:\\u0022a-b\\u0022,\\u0022timestamp\\u0022:\\u0022<date>\\\\u002B00:00\\u0022}}\"}],\"structuredContent\":{\"id\":\"<g17>\",\"scopeId\":\"workspace\",\"kind\":\"claim\",\"status\":\"proposed\",\"revision\":1,\"contentJson\":\"{\\n  \\u0022text\\u0022: \\u0022written by a dotted host\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\"provenance\":{\"origin\":\"llm\",\"actor\":\"a-b\",\"timestamp\":\"<date>\\u002B00:00\"}}},\"id\":32,\"jsonrpc\":\"2.0\"}"
+          ]
         }
       ],
       "exit": 0,
@@ -1677,6 +1713,8 @@
         "mcp_call",
         "mcp_call",
         "mcp_call invalid_input",
+        "mcp_call",
+        "mcp_call",
         "mcp_stopped"
       ]
     },

@@ -406,6 +406,15 @@ fn a_cancelled_call_gets_no_answer_and_the_next_one_gets_its_own() {
         &mut host,
         r#"{"jsonrpc":"2.0","method":"notifications/cancelled","params":{"requestId":1}}"#,
     );
+    // Lines are read in order: once the ping is answered, the cancellation has been read.
+    send(
+        &mut host,
+        r#"{"jsonrpc":"2.0","id":"sync","method":"ping"}"#,
+    );
+    assert_eq!(
+        answers.recv_timeout(Duration::from_secs(10)).expect("pong"),
+        r#"{"result":{},"id":"sync","jsonrpc":"2.0"}"#
+    );
     gated.release();
     send(&mut host, &STATUS.replace("ID", "2"));
     let answer = answers
