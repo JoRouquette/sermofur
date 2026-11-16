@@ -7,6 +7,7 @@ mod casing;
 pub mod challenge;
 pub mod collation;
 pub mod confidence;
+pub mod daemon_paths;
 pub mod discovery;
 pub mod doctor;
 pub mod error;

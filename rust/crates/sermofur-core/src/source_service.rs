@@ -96,7 +96,7 @@ pub struct SourceView {
 /// `SourceService.Content`.
 pub fn content(source: &MemoryRecord) -> Result<SourceContent> {
     let json = source.content_json.as_deref().ok_or_else(invalid_storage)?;
-    read(json, &|_| 0)
+    read(json, &crate::format::local_offset_of_clock)
 }
 
 fn not_found() -> SermofurError {

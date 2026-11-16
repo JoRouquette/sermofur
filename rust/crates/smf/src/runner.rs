@@ -185,7 +185,7 @@ fn execute(arguments: &[String], json: bool, out: &mut dyn Write) -> Result<i32>
         let root = discover_for_diagnosis(&path, &SystemOwnership)?;
         parsed.require_count(1)?;
         parsed.validate_used()?;
-        let variable = |name: &str| std::env::var(name).ok();
+        let variable = sermofur_core::daemon_paths::environment_text;
         let report = doctor::inspect(
             &root,
             &SystemOwnership,
@@ -224,19 +224,14 @@ fn execute(arguments: &[String], json: bool, out: &mut dyn Write) -> Result<i32>
         write_line(out, &to_json(&migrate(&root)?)?);
         return Ok(0);
     }
-    let configuration = read_configuration(&root, false, local_offset)?;
+    let configuration =
+        read_configuration(&root, false, sermofur_core::format::local_offset_of_clock)?;
     let mut store = Store::open(&root, configuration.instance_id, !writes(&parsed))?;
     let scopes = store.read_scopes()?;
     let context = resolve_context(&path, &root, &scopes)?;
     let body = dispatch(&mut parsed, &mut store, &context, &configuration, &path)?;
     write_line(out, &body);
     Ok(0)
-}
-
-/// The offset of local time, which reads a `createdAt` written without offset.
-// ponytail: UTC until lot 7.2 ports the local offset (DateTimeOffset.Now).
-fn local_offset(_utc_ticks: i64) -> i16 {
-    0
 }
 
 /// A command of the .NET tool that the port does not run yet.

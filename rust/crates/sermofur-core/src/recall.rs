@@ -257,7 +257,7 @@ fn select(
     let mut evidence: HashMap<Uuid, Vec<MemoryRecord>> = HashMap::new();
     for record in store.read_records(visible, Some(RecordKind::Evidence))? {
         let json = record.content_json.as_deref().ok_or_else(invalid_storage)?;
-        let claim = read::<EvidenceContent>(json, &|_| 0)?.claim_id;
+        let claim = read::<EvidenceContent>(json, &crate::format::local_offset_of_clock)?.claim_id;
         evidence.entry(claim).or_default().push(record);
     }
     let no_evidence = Vec::new();
@@ -274,7 +274,15 @@ fn select(
             1.0
         } else {
             let claim = find(store, candidate.record.id, visible)?;
-            weight(evaluate_confidence(&claim, evidence_of(&claim.id), now, &|_| 0)?.level)
+            weight(
+                evaluate_confidence(
+                    &claim,
+                    evidence_of(&claim.id),
+                    now,
+                    &crate::format::local_offset_of_clock,
+                )?
+                .level,
+            )
         };
         let entry = (candidate, candidate.relevance * weight);
         // Bounded insertion: the list never holds more than `limit` entries, in final order.
@@ -397,8 +405,9 @@ fn describe(
     };
     match record.kind {
         RecordKind::Claim => {
-            let claim: ClaimContent = read(json, &|_| 0)?;
-            let confidence = evaluate_confidence(record, evidence, now, &|_| 0)?;
+            let claim: ClaimContent = read(json, &crate::format::local_offset_of_clock)?;
+            let confidence =
+                evaluate_confidence(record, evidence, now, &crate::format::local_offset_of_clock)?;
             result.kind = "claim";
             result.applicable = !matches!(
                 record.status,
@@ -410,7 +419,7 @@ fn describe(
             result.freshness.review_after = claim.review_after;
         }
         RecordKind::Source => {
-            let source: SourceContent = read(json, &|_| 0)?;
+            let source: SourceContent = read(json, &crate::format::local_offset_of_clock)?;
             result.kind = "source";
             result.freshness.indexed_at = source.indexed_at;
             result.freshness.hash = source.hash;

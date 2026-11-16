@@ -23,13 +23,6 @@ use crate::records::{
 use crate::scope_policy::{WORKSPACE_SCOPE_ID, validate_tree, visible_ancestors};
 use crate::store::{Store, StoredScope};
 
-/// The offset of local time, which reads a stored date written without offset.
-// ponytail: UTC until lot 7.2 ports the local offset (DateTimeOffset.Now); only a date stored
-// without offset is read differently.
-fn local_offset(_utc_ticks: i64) -> i16 {
-    0
-}
-
 /// The instance root, the scope of the working folder and the scopes it sees
 /// (`MemoryContext`).
 #[derive(Clone, Debug)]
@@ -107,7 +100,7 @@ fn content<T: crate::records::Record>(record: &MemoryRecord) -> Result<T> {
         .content_json
         .as_deref()
         .ok_or_else(crate::instance::invalid_storage)?;
-    read(json, &local_offset)
+    read(json, &crate::format::local_offset_of_clock)
 }
 
 /// A claim with its confidence, its evidence and its history (`ClaimExplanation`).
@@ -256,8 +249,12 @@ impl<'a> MemoryService<'a> {
                 evidence.push(record);
             }
         }
-        let confidence =
-            evaluate_confidence(&claim, &evidence, DateTimeOffset::now_utc(), &local_offset)?;
+        let confidence = evaluate_confidence(
+            &claim,
+            &evidence,
+            DateTimeOffset::now_utc(),
+            &crate::format::local_offset_of_clock,
+        )?;
         let history = self.store.read_history(id, &self.context.visible)?;
         Ok(ClaimExplanation {
             claim,

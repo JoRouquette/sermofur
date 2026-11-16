@@ -69,8 +69,8 @@ pub fn migrate_with(
     root: &Path,
     hook: &mut dyn FnMut(&str) -> Result<()>,
 ) -> Result<MigrationResult> {
-    // ponytail: a createdAt without offset is read in UTC until lot 7.2 ports the local offset.
-    let configuration = read_configuration(root, true, |_| 0)?;
+    // A `createdAt` without offset is read in the local zone and written back with its offset.
+    let configuration = read_configuration(root, true, crate::format::local_offset_of_clock)?;
     let database = database_path(root);
     reject_links(&database)?;
     // `File.Exists`: false for a folder.

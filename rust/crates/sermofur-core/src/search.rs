@@ -91,7 +91,8 @@ pub fn is_indexed(record: &MemoryRecord) -> Result<bool> {
         RecordKind::Claim | RecordKind::Retex => true,
         RecordKind::Source => {
             let json = record.content_json.as_deref().ok_or_else(invalid_storage)?;
-            read::<SourceContent>(json, &|_| 0)?.status == SourceStatus::Indexed
+            read::<SourceContent>(json, &crate::format::local_offset_of_clock)?.status
+                == SourceStatus::Indexed
         }
         RecordKind::Evidence => false,
     })
@@ -100,7 +101,7 @@ pub fn is_indexed(record: &MemoryRecord) -> Result<bool> {
 /// The documents of a claim or a RETEX (`SearchDocuments.For`); sources are indexed from their
 /// file, and evidence is not indexed.
 pub fn documents(record: &MemoryRecord) -> Result<Vec<SearchDocument>> {
-    let offset = |_| 0;
+    let offset = crate::format::local_offset_of_clock;
     let json = || record.content_json.as_deref().ok_or_else(invalid_storage);
     Ok(match record.kind {
         RecordKind::Claim => {
@@ -193,7 +194,7 @@ pub fn index_records(connection: &Connection) -> Result<usize> {
     // One record in memory at a time, as the .NET reader streams the registry.
     while let Some(row) = rows.next().map_err(|e| storage(&e))? {
         let payload: String = row.get(0).map_err(|e| storage(&e))?;
-        let record: MemoryRecord = read(&payload, &|_| 0)?;
+        let record: MemoryRecord = read(&payload, &crate::format::local_offset_of_clock)?;
         let scope_id = record.scope_id.as_deref().ok_or_else(invalid_storage)?;
         insert(
             connection,
@@ -371,7 +372,8 @@ impl Store {
                     id: crate::guid::try_parse(&id).ok_or_else(invalid_storage)?,
                     kind: member(parse_dotnet_enum::<RecordKind>(&kind, false)?)?,
                     status: member(parse_dotnet_enum::<KnowledgeStatus>(&status, true)?)?,
-                    created_at: parse_json_text(&created_at, |_| 0).ok_or_else(invalid_storage)?,
+                    created_at: parse_json_text(&created_at, crate::format::local_offset_of_clock)
+                        .ok_or_else(invalid_storage)?,
                 })
             })
             .collect()

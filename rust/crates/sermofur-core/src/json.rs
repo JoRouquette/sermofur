@@ -34,6 +34,35 @@ pub fn to_string<T: Serialize + ?Sized>(value: &T) -> serde_json::Result<String>
     Ok(text.replace('\n', NEW_LINE))
 }
 
+/// A JSON string, quotes included, escaped as the default .NET encoder does.
+pub fn quoted(text: &str) -> String {
+    let mut out = String::with_capacity(text.len() + 2);
+    out.push('"');
+    for c in text.chars() {
+        push_escaped(&mut out, c);
+    }
+    out.push('"');
+    out
+}
+
+/// A JSON string, quotes included, as `JavaScriptEncoder.Default` writes it: Basic Latin
+/// only, every other scalar escaped (`System.Text.Json` without an encoder of its own).
+pub fn quoted_basic_latin(text: &str) -> String {
+    let mut out = String::with_capacity(text.len() + 2);
+    out.push('"');
+    for c in text.chars() {
+        if u32::from(c) > 0x7E {
+            for unit in c.encode_utf16(&mut [0u16; 2]) {
+                let _ = write!(out, "\\u{unit:04X}");
+            }
+        } else {
+            push_escaped(&mut out, c);
+        }
+    }
+    out.push('"');
+    out
+}
+
 /// Appends a scalar value to `out`, escaped as the .NET encoder does.
 pub(crate) fn push_escaped(out: &mut String, c: char) {
     let scalar = u32::from(c);

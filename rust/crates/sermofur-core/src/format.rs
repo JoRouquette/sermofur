@@ -155,6 +155,13 @@ impl DateTimeOffset {
         })
     }
 
+    /// `DateTimeOffset.Now`: the current instant with the offset of the local zone
+    /// ([`local_offset_at`]).
+    pub fn now_local() -> Self {
+        let now = Self::now_utc();
+        Self::new(now.utc_ticks, local_offset_at(now.utc_ticks)).unwrap_or(now)
+    }
+
     /// `UtcTicks`.
     pub fn utc_ticks(&self) -> i64 {
         self.utc_ticks
@@ -231,6 +238,118 @@ impl DateTimeOffset {
         let minutes = self.offset_minutes.unsigned_abs();
         format!("{sign}{:02}:{:02}", minutes / 60, minutes % 60)
     }
+}
+
+/// Decision A5 (chrono, decision of John of 2026-11-10), boundary of the local time zone: the
+/// offset of the zone of the machine at an instant, in minutes, as
+/// `TimeZoneInfo.Local.GetUtcOffset` (`DateTimeOffset.Now`, the lines of the daemon journal,
+/// `registeredAt`). `rust/tests/golden/local-offset*.json` is the truth.
+pub fn local_offset_at(utc_ticks: i64) -> i16 {
+    guarded(|| minutes(offset_at(naive(utc_ticks)?)))
+}
+
+/// Decision A5, boundary of the local time zone: the offset .NET gives a clock reading of the
+/// zone of the machine read without offset (`createdAt` of `instance.json`, stored dates read
+/// by `System.Text.Json` or `DateTimeOffset.Parse`), from its local ticks. The rule, measured
+/// on the oracle (`local-offset*.json`, Europe/Dublin, Africa/Casablanca and Asia/Kathmandu
+/// included):
+/// - a reading that one offset only gives back (the offset of the day before or of the day
+///   after, whose instant has that offset) takes that offset;
+/// - a reading of a repeated or a skipped hour belongs to a change. When the new offset was in
+///   force within the 400 days before the change, or the old one comes back within the 400
+///   days after it (a seasonal change: daylight saving time, Ramadan, the first summer of a
+///   new daylight saving time as Australia/Lord_Howe in 1985), it takes the smaller of the two
+///   offsets. Otherwise (a change of standard time:
+///   Asia/Kathmandu in 1986, Africa/Casablanca at the end of 1985) the change splits the clock
+///   where the old offset reaches it: before, the old offset; from there, the new one.
+///
+/// Named deviation (decision of John of 2026-11-16): the skipped hour of Europe/Moscow on
+/// 2011-03-27 reads 180 here, 240 in .NET, which tells it by the daylight flag of its zone data.
+pub fn local_offset_of_clock(local_ticks: i64) -> i16 {
+    use chrono::{Days, TimeDelta};
+    guarded(|| {
+        let clock = naive(local_ticks)?;
+        let old = offset_at(clock - Days::new(1))?;
+        let new = offset_at(clock + Days::new(1))?;
+        let instant = |offset: chrono::FixedOffset| {
+            clock - TimeDelta::seconds(i64::from(offset.local_minus_utc()))
+        };
+        let valid = |offset| offset_at(instant(offset)) == Some(offset);
+        if old == new || valid(old) != valid(new) {
+            return minutes(Some(if valid(new) && (old == new || !valid(old)) {
+                new
+            } else {
+                old
+            }));
+        }
+        // The instant of the change: the first whole second with the new offset.
+        let (mut low, mut high) = (clock - Days::new(1), clock + Days::new(1));
+        while high - low > TimeDelta::seconds(1) {
+            let middle = low + TimeDelta::seconds((high - low).num_seconds() / 2);
+            if offset_at(middle) == Some(old) {
+                low = middle;
+            } else {
+                high = middle;
+            }
+        }
+        // ponytail: seasonal or not is told by daily samples over 400 days on each side, on
+        // this rare path only; .NET tells it by the daylight flags of its zone data.
+        let seasonal = (1..=400).any(|day| {
+            offset_at(high - Days::new(day)) == Some(new)
+                || offset_at(high + Days::new(day)) == Some(old)
+        });
+        let (old_minutes, new_minutes) = (minutes(Some(old))?, minutes(Some(new))?);
+        Some(if seasonal {
+            old_minutes.min(new_minutes)
+        } else if clock < high + TimeDelta::seconds(i64::from(old.local_minus_utc())) {
+            old_minutes
+        } else {
+            new_minutes
+        })
+    })
+}
+
+/// The `NaiveDateTime` of ticks (whole seconds).
+fn naive(ticks: i64) -> Option<chrono::NaiveDateTime> {
+    let seconds = (ticks - DAYS_TO_UNIX_EPOCH * TICKS_PER_DAY).div_euclid(TICKS_PER_SECOND);
+    chrono::DateTime::from_timestamp(seconds, 0).map(|d| d.naive_utc())
+}
+
+/// The offset of the local zone at a UTC reading.
+fn offset_at(utc: chrono::NaiveDateTime) -> Option<chrono::FixedOffset> {
+    use chrono::{Local, TimeZone};
+    Some(Local.offset_from_utc_datetime(&utc))
+}
+
+/// Set once chrono has panicked on the zone of the machine: chrono is not called again.
+static BROKEN_ZONE: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+
+/// A zone read through chrono never stops the process: chrono panics on a zone it cannot use
+/// (an unreadable or broken zone file), where .NET falls back to UTC; so does the port, and
+/// the zone is not read again, so that the panic message is printed once.
+fn guarded(read: impl FnOnce() -> Option<i16>) -> i16 {
+    guarded_with(&BROKEN_ZONE, read)
+}
+
+fn guarded_with(broken: &std::sync::atomic::AtomicBool, read: impl FnOnce() -> Option<i16>) -> i16 {
+    use std::sync::atomic::Ordering;
+    if broken.load(Ordering::Relaxed) {
+        return 0;
+    }
+    match std::panic::catch_unwind(std::panic::AssertUnwindSafe(read)) {
+        Ok(offset) => offset.unwrap_or(0),
+        Err(_) => {
+            broken.store(true, Ordering::Relaxed);
+            0
+        }
+    }
+}
+
+/// Whole minutes of an offset.
+// ponytail: an offset with seconds (local mean time before 1912 on Unix) is cut to its
+// minutes; .NET rounds those differently (PARITY.md, Écarts assumés).
+fn minutes(offset: Option<chrono::FixedOffset>) -> Option<i16> {
+    i16::try_from(offset?.local_minus_utc() / 60).ok()
 }
 
 /// Civil date (year, month, day) from days since 1970-01-01 (proleptic Gregorian calendar).
@@ -376,4 +495,22 @@ pub fn parse_json_text(
         local_ticks - i64::from(offset_minutes) * TICKS_PER_MINUTE,
         offset_minutes,
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// A zone chrono cannot use makes it panic; the boundary answers UTC instead. A broken zone
+    /// of the machine cannot be forged from a test (Windows reads the registry, Unix the zone
+    /// file named by `TZ`, which chrono reads once per process), so the guard itself is tested.
+    #[test]
+    fn a_panicking_zone_reads_as_utc() {
+        let broken = std::sync::atomic::AtomicBool::new(false);
+        assert_eq!(guarded_with(&broken, || None), 0);
+        assert_eq!(guarded_with(&broken, || Some(90)), 90);
+        assert_eq!(guarded_with(&broken, || panic!("broken zone")), 0);
+        // Once broken, the zone is not read again.
+        assert_eq!(guarded_with(&broken, || Some(90)), 0);
+    }
 }

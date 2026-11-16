@@ -226,7 +226,7 @@ impl Store {
         }
         visible_payloads(&self.connection, visible, suffix, &extra)?
             .iter()
-            .map(|payload| read(payload, &|_| 0))
+            .map(|payload| read(payload, &crate::format::local_offset_of_clock))
             .collect()
     }
 
@@ -252,7 +252,8 @@ impl Store {
             .map_err(|e| storage(&e))?;
         rows.into_iter()
             .map(|(sequence, payload)| {
-                let mut entry: HistoryEntry = read(&payload, &|_| 0)?;
+                let mut entry: HistoryEntry =
+                    read(&payload, &crate::format::local_offset_of_clock)?;
                 entry.sequence = sequence;
                 Ok(entry)
             })
@@ -289,7 +290,7 @@ impl Store {
                 .content_json
                 .as_deref()
                 .ok_or_else(invalid_storage)?;
-            let content: EvidenceContent = read(json, &|_| 0)?;
+            let content: EvidenceContent = read(json, &crate::format::local_offset_of_clock)?;
             let own = HashSet::from([scope_id.clone()]);
             let claim = find_record(&transaction, content.claim_id, &own)?;
             if claim.map(|c| c.kind) != Some(RecordKind::Claim) {
@@ -448,7 +449,7 @@ impl Store {
                 rusqlite::Error::QueryReturnedNoRows => Ok(None),
                 other => Err(storage(&other)),
             })?
-            .map(|payload| read::<MemoryRecord>(&payload, &|_| 0))
+            .map(|payload| read::<MemoryRecord>(&payload, &crate::format::local_offset_of_clock))
             .transpose()?;
         let scopes = read_scopes(&transaction)?;
         let Some(change) = decide(previous.as_ref(), &scopes)? else {
@@ -478,7 +479,9 @@ impl Store {
         }
         search::remove(&transaction, next.id)?;
         let json = next.content_json.as_deref().ok_or_else(invalid_storage)?;
-        if read::<SourceContent>(json, &|_| 0)?.status == crate::records::SourceStatus::Indexed {
+        if read::<SourceContent>(json, &crate::format::local_offset_of_clock)?.status
+            == crate::records::SourceStatus::Indexed
+        {
             search::insert(
                 &transaction,
                 next.id,
@@ -533,7 +536,7 @@ impl Store {
                     row.get(0)
                 })
                 .map_err(|e| storage(&e))?;
-            let source: MemoryRecord = read(&payload, &|_| 0)?;
+            let source: MemoryRecord = read(&payload, &crate::format::local_offset_of_clock)?;
             let (change, passages) = decide(&source)?;
             let current = match change {
                 Some(change) => {
@@ -572,7 +575,8 @@ impl Store {
                 .content_json
                 .as_deref()
                 .ok_or_else(invalid_storage)?;
-            if read::<SourceContent>(json, &|_| 0)?.status == crate::records::SourceStatus::Indexed
+            if read::<SourceContent>(json, &crate::format::local_offset_of_clock)?.status
+                == crate::records::SourceStatus::Indexed
             {
                 let scope_id = current.scope_id.as_deref().ok_or_else(invalid_storage)?;
                 search::insert(
@@ -634,7 +638,7 @@ fn rescope_sources(
     };
     let mut moved = Vec::new();
     for payload in payloads {
-        let source: MemoryRecord = read(&payload, &|_| 0)?;
+        let source: MemoryRecord = read(&payload, &crate::format::local_offset_of_clock)?;
         let Some(owner) = source.scope_id.as_deref() else {
             continue;
         };
@@ -642,7 +646,7 @@ fn rescope_sources(
             continue;
         }
         let json = source.content_json.as_deref().ok_or_else(invalid_storage)?;
-        let content: SourceContent = read(json, &|_| 0)?;
+        let content: SourceContent = read(json, &crate::format::local_offset_of_clock)?;
         // A missing path is the `NullReferenceException` of .NET, unless the mapping is the root.
         let held = match content.relative_path.as_deref() {
             Some(path) => holds(mapping, path),
@@ -736,7 +740,9 @@ fn find_record(
     let payload = visible_payloads(connection, visible, "AND id=$id", &[("$id", &id_text)])?
         .into_iter()
         .next();
-    payload.map(|p| read(&p, &|_| 0)).transpose()
+    payload
+        .map(|p| read(&p, &crate::format::local_offset_of_clock))
+        .transpose()
 }
 
 /// Appends a history entry stamped with the present instant (`AppendHistory`).

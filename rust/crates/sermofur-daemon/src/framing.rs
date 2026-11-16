@@ -290,7 +290,7 @@ fn body(m: &IpcMessage) -> String {
 }
 
 /// Writes `"name":` after a comma unless it is the first field.
-fn name(out: &mut String, name: &str) {
+pub(crate) fn name(out: &mut String, name: &str) {
     if out.len() > 1 {
         out.push(',');
     }
@@ -299,14 +299,14 @@ fn name(out: &mut String, name: &str) {
     out.push_str("\":");
 }
 
-fn string_field(out: &mut String, field: &str, value: Option<&str>) {
+pub(crate) fn string_field(out: &mut String, field: &str, value: Option<&str>) {
     if let Some(value) = value {
         name(out, field);
         push_string(out, value);
     }
 }
 
-fn int_field(out: &mut String, field: &str, value: Option<i64>) {
+pub(crate) fn int_field(out: &mut String, field: &str, value: Option<i64>) {
     if let Some(value) = value {
         name(out, field);
         let _ = write!(out, "{value}");

@@ -60,7 +60,7 @@ pub struct ChallengeAnswer {
 fn content<T: Record>(record: &MemoryRecord) -> Result<T> {
     read(
         record.content_json.as_deref().ok_or_else(invalid_storage)?,
-        &|_| 0,
+        &crate::format::local_offset_of_clock,
     )
 }
 

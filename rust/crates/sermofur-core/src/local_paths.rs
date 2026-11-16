@@ -92,6 +92,40 @@ fn trim_ending(path: &[u16]) -> &[u16] {
     }
 }
 
+/// `Path.IsPathFullyQualified`.
+pub fn is_path_fully_qualified(path: &str) -> bool {
+    let units: Vec<u16> = path.encode_utf16().collect();
+    if !cfg!(windows) {
+        return units.first() == Some(&u16::from(b'/'));
+    }
+    let separator = |unit: u16| unit == u16::from(b'\\') || unit == u16::from(b'/');
+    match units.as_slice() {
+        [first, second, ..] if separator(*first) => {
+            *second == u16::from(b'?') || separator(*second)
+        }
+        [drive, colon, third, ..] => {
+            u8::try_from(*drive).is_ok_and(|d| d.is_ascii_alphabetic())
+                && *colon == u16::from(b':')
+                && separator(*third)
+        }
+        _ => false,
+    }
+}
+
+/// `Path.TrimEndingDirectorySeparator` on a text.
+pub fn trim_ending_separator(path: &str) -> String {
+    let units: Vec<u16> = path.encode_utf16().collect();
+    String::from_utf16_lossy(trim_ending(&units))
+}
+
+/// Same root, with the case rule of the operating system, final separators trimmed
+/// (`InstanceRegistry.Same`).
+pub fn same_root(a: &str, b: &str) -> bool {
+    let a: Vec<u16> = a.encode_utf16().collect();
+    let b: Vec<u16> = b.encode_utf16().collect();
+    equal(trim_ending(&a), trim_ending(&b))
+}
+
 /// Whether `child` is `parent` or lies under it, lexically (`LocalPaths.Contains`).
 pub fn contains(parent: &Path, child: &Path) -> bool {
     let parent_units = units(parent);

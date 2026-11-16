@@ -80,16 +80,9 @@ pub fn configuration_json(configuration: &InstanceConfiguration) -> Result<Strin
     .map_err(|_| invalid_storage())
 }
 
-/// The offset of local time, which reads a `createdAt` written without offset.
-// ponytail: UTC until lot 7.2 ports the local offset (DateTimeOffset.Now); only a hand-written
-// instance.json without offset is read differently.
-fn local_offset(_utc_ticks: i64) -> i16 {
-    0
-}
-
 /// Reads the configuration and checks the database of an existing instance.
 fn existing(root: &Path) -> Result<Initialized> {
-    let configuration = read_configuration(root, false, local_offset)?;
+    let configuration = read_configuration(root, false, crate::format::local_offset_of_clock)?;
     open_store(root, configuration.instance_id, false)?;
     Ok(Initialized {
         root: root.to_path_buf(),

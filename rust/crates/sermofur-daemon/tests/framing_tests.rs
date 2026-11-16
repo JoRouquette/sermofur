@@ -289,10 +289,19 @@ proptest! {
     }
 
     /// The same through `read`, behind a header that may be off by up to two bytes and before
-    /// arbitrary trailing bytes: a message consumes exactly its header and its body.
+    /// arbitrary trailing bytes: a message consumes exactly its header and its body. Half of the
+    /// bodies are a valid message (`framing::encode` of an arbitrary kind), so that the
+    /// consumption check runs on a known share of cases (every exact header among them).
     #[test]
     fn framed_arbitrary_bodies_are_a_message_or_a_refusal(
-        body in prop::collection::vec(any::<u8>(), 1..256),
+        body in prop_oneof![
+            prop::collection::vec(any::<u8>(), 1..256),
+            ".{1,32}".prop_map(|kind| {
+                framing::encode(&IpcMessage::new(&kind), MAX_BODY_BYTES).expect("a valid message")
+                    [4..]
+                    .to_vec()
+            }),
+        ],
         delta in -2i64..=2,
         tail in prop::collection::vec(any::<u8>(), 0..8),
     ) {

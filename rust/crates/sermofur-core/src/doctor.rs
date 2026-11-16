@@ -10,7 +10,8 @@ use rusqlite::Connection;
 use rusqlite::types::ValueRef;
 use serde::Serialize;
 
-use crate::discovery::{describe_invalid_marker, get_full_path, validate_directory};
+use crate::daemon_paths::{DaemonPaths, system_folder};
+use crate::discovery::{describe_invalid_marker, validate_directory};
 use crate::error::{Result, SermofurError};
 use crate::instance::{invalid_storage, read_configuration};
 use crate::local_paths::{canonical_case, normalize_mapping, relativize_mapping, same_text};
@@ -87,8 +88,9 @@ pub fn inspect(
         ));
         return report(root, checks, daemon, mcp);
     }
-    // `createdAt` without offset: UTC until lot 7.2, as everywhere in the port.
-    let configuration = match read_configuration(root, false, |_| 0) {
+    // `createdAt` without offset: read in the local zone (decision A5).
+    let configuration = match read_configuration(root, false, crate::format::local_offset_of_clock)
+    {
         Ok(configuration) => configuration,
         Err(error) => {
             checks.push(DiagnosticCheck::new(
@@ -285,16 +287,17 @@ fn inspect_memory(
         let json = || record.content_json.as_deref().ok_or_else(invalid_storage);
         match record.kind {
             RecordKind::Claim => {
-                read::<ClaimContent>(json()?, &|_| 0)?;
+                read::<ClaimContent>(json()?, &crate::format::local_offset_of_clock)?;
             }
             RecordKind::Retex => {
-                read::<RetexContent>(json()?, &|_| 0)?;
+                read::<RetexContent>(json()?, &crate::format::local_offset_of_clock)?;
             }
             RecordKind::Source => {
-                read::<SourceContent>(json()?, &|_| 0)?;
+                read::<SourceContent>(json()?, &crate::format::local_offset_of_clock)?;
             }
             RecordKind::Evidence => {
-                let evidence: EvidenceContent = read(json()?, &|_| 0)?;
+                let evidence: EvidenceContent =
+                    read(json()?, &crate::format::local_offset_of_clock)?;
                 // `SingleOrDefault`: two records with the same identifier are an
                 // `InvalidOperationException`.
                 let mut cited = records.iter().filter(|r| r.id == evidence.claim_id);
@@ -314,7 +317,10 @@ fn inspect_memory(
             None => false,
             Some(last) => {
                 let state = last.new_state.as_deref().ok_or_else(invalid_storage)?;
-                same_record(&read::<MemoryRecord>(state, &|_| 0)?, record)
+                same_record(
+                    &read::<MemoryRecord>(state, &crate::format::local_offset_of_clock)?,
+                    record,
+                )
             }
         };
         if !current {
@@ -394,7 +400,7 @@ fn inspect_search_index(
         "SELECT payload FROM records WHERE kind IN ('Claim','Retex','Source')",
     )?
     .iter()
-    .map(|payload| read(payload, &|_| 0))
+    .map(|payload| read(payload, &crate::format::local_offset_of_clock))
     .collect::<Result<_>>()?;
     let indexed: HashSet<String> = query_strings(
         connection,
@@ -425,7 +431,7 @@ fn inspect_search_index(
     let mut misplaced = 0;
     for source in records.iter().filter(|r| r.kind == RecordKind::Source) {
         let json = source.content_json.as_deref().ok_or_else(invalid_storage)?;
-        let content: SourceContent = read(json, &|_| 0)?;
+        let content: SourceContent = read(json, &crate::format::local_offset_of_clock)?;
         // A source without path or scope: a `NullReferenceException` in .NET (PARITY.md).
         let path = content.relative_path.ok_or_else(invalid_storage)?;
         let owner = source.scope_id.as_deref().ok_or_else(invalid_storage)?;
@@ -490,8 +496,9 @@ pub fn daemon_check(
     variable: &dyn Fn(&str) -> Option<String>,
     owners: &dyn FileOwnership,
 ) -> Result<DiagnosticCheck> {
-    let endpoint = match daemon_endpoint(variable) {
-        Ok(endpoint) => endpoint,
+    // The endpoint only: an unusable profile folder does not stop the report, as in .NET.
+    let endpoint = match DaemonPaths::locate(variable, &system_folder) {
+        Ok((paths, _)) => paths.endpoint,
         Err(error) if error.code != "invalid_storage_or_path" => {
             return Ok(DiagnosticCheck::new(
                 "daemon",
@@ -520,80 +527,6 @@ enum EndpointState {
     Absent,
     Present,
     Foreign,
-}
-
-/// `string.IsNullOrWhiteSpace` read as absent (`DaemonPaths.NonEmpty`).
-fn non_empty(value: Option<String>) -> Option<String> {
-    value.filter(|text| !text.chars().all(char::is_whitespace))
-}
-
-/// The first 16 hexadecimal digits, in lower case, of the SHA-256 of a text (`DaemonPaths.Hash`).
-fn short_hash(text: &str) -> String {
-    crate::store::sha256_upper(text.as_bytes())[..16].to_lowercase()
-}
-
-/// The endpoint of `DaemonPaths.ForCurrentUser`: a pipe name on Windows, a socket path
-/// elsewhere, checked for its length.
-fn daemon_endpoint(variable: &dyn Fn(&str) -> Option<String>) -> Result<PathBuf> {
-    let home = non_empty(variable("SERMOFUR_DAEMON_HOME"));
-    if cfg!(windows) {
-        let suffix = match home {
-            Some(home) => format!(
-                "home-{}",
-                short_hash(&get_full_path(Path::new(&home))?.to_string_lossy())
-            ),
-            None => short_hash(&current_sid()?),
-        };
-        return Ok(PathBuf::from(format!("sermofur-{suffix}")));
-    }
-    let endpoint = match home {
-        Some(home) => get_full_path(Path::new(&home))?
-            .join("run")
-            .join("daemon.sock"),
-        None => {
-            let temporary = non_empty(variable("TMPDIR")).unwrap_or_else(|| "/tmp".to_owned());
-            let private = Path::new(&temporary).join(format!("sermofur-{}", user_id()));
-            let folder = if cfg!(target_os = "macos") {
-                private
-            } else {
-                non_empty(variable("XDG_RUNTIME_DIR"))
-                    .map_or(private, |runtime| Path::new(&runtime).join("sermofur"))
-            };
-            folder.join("daemon.sock")
-        }
-    };
-    const MAX_SOCKET_PATH_BYTES: usize = 103;
-    if endpoint.to_string_lossy().len() > MAX_SOCKET_PATH_BYTES {
-        return Err(SermofurError::new(
-            "invalid_path",
-            format!(
-                "The daemon socket path is longer than {MAX_SOCKET_PATH_BYTES} bytes: {}. Set SERMOFUR_DAEMON_HOME or TMPDIR to a shorter folder.",
-                endpoint.to_string_lossy()
-            ),
-            3,
-        ));
-    }
-    Ok(endpoint)
-}
-
-#[cfg(windows)]
-fn current_sid() -> Result<String> {
-    crate::ownership::current_user_sid().map_err(|_| invalid_storage())
-}
-
-#[cfg(not(windows))]
-fn current_sid() -> Result<String> {
-    Err(invalid_storage())
-}
-
-#[cfg(unix)]
-fn user_id() -> u32 {
-    crate::ownership::effective_user_id()
-}
-
-#[cfg(not(unix))]
-fn user_id() -> u32 {
-    0
 }
 
 /// `IpcEndpoint.Inspect`: on Windows a listing of the pipe file system (opening the pipe would
