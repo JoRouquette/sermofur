@@ -140,7 +140,7 @@ pub fn run(
         .enable_all()
         .build()
         .map_err(|error| SermofurError::new("internal_error", error.to_string(), 70))?;
-    runtime.block_on(server.run(&SystemOwnership, || {
+    let served = runtime.block_on(server.run(&SystemOwnership, || {
         // One line, even in JSON: a supervisor or a test reads it as the signal of readiness.
         let line = if json {
             json::to_string(&ListeningBody {
@@ -152,6 +152,10 @@ pub fn run(
             format!("Sermofur daemon {VERSION} listening on {endpoint}")
         };
         write_line(out, &line);
-    }))?;
+    }));
+    // After `drain_timeout`, a command may still run on a blocking thread: the process leaves
+    // without waiting for it, as the background threads of the oracle (review of lot 7.4).
+    runtime.shutdown_background();
+    served?;
     Ok(0)
 }

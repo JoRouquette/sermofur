@@ -316,8 +316,9 @@ impl DaemonServer {
                     sessions.retain(|session| !session.is_finished());
                     sessions.push(tokio::spawn(serve(Arc::clone(shared), stream)));
                 }
-                // An I/O failure of one connection never stops the daemon.
-                Ok(Err(_)) => {}
+                // An I/O failure of one connection never stops the daemon; a short pause keeps a
+                // persistent failure from spinning the only thread of the runtime.
+                Ok(Err(_)) => tokio::time::sleep(std::time::Duration::from_millis(10)).await,
                 Err(()) => break,
             }
         }
@@ -326,7 +327,9 @@ impl DaemonServer {
         #[cfg(windows)]
         let refuser = tokio::spawn(async move {
             loop {
-                let _ = listener.accept().await;
+                if listener.accept().await.is_err() {
+                    tokio::time::sleep(std::time::Duration::from_millis(10)).await;
+                }
             }
         });
         #[cfg(not(windows))]
