@@ -77,7 +77,7 @@ pub fn run(
 
 /// The `mcp` check of `doctor`, with the hosts that declare the bridge for the root.
 pub fn doctor_check(root: &Path) -> Result<DiagnosticCheck> {
-    let declared = declarations(root);
+    let declared = declarations(root)?;
     Ok(if declared.is_empty() {
         DiagnosticCheck::new(
             "mcp",
@@ -90,21 +90,27 @@ pub fn doctor_check(root: &Path) -> Result<DiagnosticCheck> {
 }
 
 /// Hosts that declare the bridge for an instance root, with where (`Declarations`).
-pub fn declarations(root: &Path) -> Vec<String> {
+///
+/// As `IsDeclared` and `CodexDeclares`, a refusal of the content counts as not declared, but a
+/// file that cannot be read stops `doctor` as the `IOException` of the oracle does
+/// (`invalid_storage_or_path`, exit 3; review of lot 8.3).
+pub fn declarations(root: &Path) -> Result<Vec<String>> {
     let mut found = Vec::new();
     let file = root.join(mcp_config::FILE_NAME);
-    if is_file(&file)
-        && std::fs::read(&file).is_ok_and(|bytes| mcp_config::has_entry(&bytes).unwrap_or(false))
-    {
+    if is_file(&file) && mcp_config::has_entry(&read_for_doctor(&file)?).unwrap_or(false) {
         found.push(format!("{CLAUDE_CODE} ({})", mcp_config::FILE_NAME));
     }
-    if codex_declares(&codex_config::project_path(root)) {
+    if codex_declares(&codex_config::project_path(root))? {
         found.push(format!("{CODEX} (.codex/config.toml)"));
     }
-    if codex_declares(&codex_config::user_path(environment_text)) {
+    if codex_declares(&codex_config::user_path(environment_text))? {
         found.push(format!("{CODEX} (user configuration)"));
     }
-    found
+    Ok(found)
+}
+
+fn read_for_doctor(file: &Path) -> Result<Vec<u8>> {
+    std::fs::read(file).map_err(|_| sermofur_core::instance::invalid_storage())
 }
 
 fn install(folder: &Path, host: &str, scope: &str) -> Result<DeclarationReport> {
@@ -230,11 +236,15 @@ fn codex_file(folder: &Path, scope: &str) -> PathBuf {
     }
 }
 
-fn codex_declares(file: &Path) -> bool {
-    is_file(file)
-        && read_text(file).is_ok_and(|(content, _)| {
-            content.is_some_and(|text| codex_config::declares(&text).unwrap_or(false))
-        })
+fn codex_declares(file: &Path) -> Result<bool> {
+    if !is_file(file) {
+        return Ok(false);
+    }
+    let bytes = read_for_doctor(file)?;
+    let body = bytes
+        .strip_prefix(&[0xEF, 0xBB, 0xBF][..])
+        .unwrap_or(&bytes);
+    Ok(std::str::from_utf8(body).is_ok_and(|text| codex_config::declares(text).unwrap_or(false)))
 }
 
 /// `File.Exists`: a file, links followed.
