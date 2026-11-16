@@ -318,7 +318,7 @@ impl DaemonServer {
                 }
                 // An I/O failure of one connection never stops the daemon; a short pause keeps a
                 // persistent failure from spinning the only thread of the runtime.
-                Ok(Err(_)) => tokio::time::sleep(std::time::Duration::from_millis(10)).await,
+                Ok(Err(_)) => sleep(Duration::from_millis(10)).await,
                 Err(()) => break,
             }
         }
@@ -328,7 +328,7 @@ impl DaemonServer {
         let refuser = tokio::spawn(async move {
             loop {
                 if listener.accept().await.is_err() {
-                    tokio::time::sleep(std::time::Duration::from_millis(10)).await;
+                    sleep(Duration::from_millis(10)).await;
                 }
             }
         });
@@ -874,7 +874,7 @@ async fn fired(flag: &mut watch::Receiver<bool>) {
 
 /// The first of two futures to finish (`Ok` for the left one, preferred when both are ready);
 /// the other is dropped.
-async fn first<L: Future, R: Future>(
+pub async fn first<L: Future, R: Future>(
     left: L,
     right: R,
 ) -> std::result::Result<L::Output, R::Output> {

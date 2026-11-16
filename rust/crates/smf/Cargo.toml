@@ -15,7 +15,7 @@ serde = { version = "1", features = ["derive"] }
 sermofur-core = { path = "../sermofur-core" }
 sermofur-daemon = { path = "../sermofur-daemon" }
 # Decision A2 of John: tokio for the daemon only (`smf daemon run`).
-tokio = { version = "1.54.1", default-features = false, features = ["rt"] }
+tokio = { version = "1.54.1", default-features = false, features = ["rt", "signal"] }
 
 [dev-dependencies]
 proptest = "1"

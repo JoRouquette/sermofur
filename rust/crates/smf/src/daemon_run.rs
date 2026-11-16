@@ -5,7 +5,6 @@ use std::io::Write;
 use std::path::Path;
 use std::sync::Arc;
 
-use serde::Serialize;
 use sermofur_core::daemon_paths::DaemonPaths;
 use sermofur_core::discovery::{expand_short_names, get_full_path};
 use sermofur_core::error::{Result, SermofurError};
@@ -15,7 +14,7 @@ use sermofur_daemon::file_turn;
 use sermofur_daemon::log::DaemonLog;
 use sermofur_daemon::registry::InstanceRegistry;
 use sermofur_daemon::server::{
-    CommandExecutor, CommandOutcome, CommandPlan, DaemonLimits, DaemonServer, ServingGate,
+    CommandExecutor, CommandOutcome, CommandPlan, DaemonLimits, DaemonServer, ServingGate, first,
 };
 
 use crate::args::{
@@ -98,18 +97,12 @@ impl CommandExecutor for CliCommandExecutor {
     }
 }
 
-#[derive(Serialize)]
-struct ListeningBody<'a> {
-    listening: &'a str,
-    version: &'a str,
-}
-
-/// `daemon run`: serves in the foreground until a `shutdown` request.
+/// `daemon run`: serves in the foreground until a `shutdown` request, Ctrl+C or SIGTERM.
 pub fn run(
     args: &mut CommandArguments,
     json: bool,
     out: &mut dyn Write,
-    _err: &mut dyn Write,
+    err: &mut dyn Write,
 ) -> Result<i32> {
     let supervise = args.flag("supervise");
     args.require_count(2)?;
@@ -126,6 +119,7 @@ pub fn run(
         move |code| refusals.write("not_served", Some(code), None, None),
     ));
     let endpoint = paths.endpoint.to_string_lossy().into_owned();
+    let drain_log = log.clone();
     let server = DaemonServer::new(
         paths,
         VERSION,
@@ -134,28 +128,95 @@ pub fn run(
         log,
         DaemonLimits::default(),
     );
-    // ponytail: no handler of Ctrl+C or SIGTERM yet (the `signal` feature of tokio brings a new
-    // crate); a signal ends the process at once, the commands are not drained.
     let runtime = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
         .map_err(|error| SermofurError::new("internal_error", error.to_string(), 70))?;
-    let served = runtime.block_on(server.run(&SystemOwnership, || {
-        // One line, even in JSON: a supervisor or a test reads it as the signal of readiness.
-        let line = if json {
-            json::to_string(&ListeningBody {
-                listening: &endpoint,
-                version: VERSION,
-            })
-            .unwrap_or_default()
-        } else {
-            format!("Sermofur daemon {VERSION} listening on {endpoint}")
+    let served = runtime.block_on(async {
+        // Registered before the endpoint opens, as `SignalStop.Register` before `RunAsync`.
+        let mut signals = Signals::register()
+            .map_err(|error| SermofurError::new("internal_error", error.to_string(), 70))?;
+        // `SignalStop`: the first signal drains the started commands; a second one ends the
+        // process at once, with the code of the default action of that signal.
+        let stop_on_signals = async {
+            signals.next().await;
+            drain_log.write("draining", None, None, None);
+            // With `--json`, stderr holds only the JSON error: no progress line (`CommandRunner`).
+            if !json {
+                write_line(
+                    err,
+                    "smf: finishing the running commands; a second Ctrl+C or SIGTERM stops at once.",
+                );
+            }
+            server.stop();
+            std::process::exit(signals.next().await);
         };
-        write_line(out, &line);
-    }));
+        let serving = server.run(&SystemOwnership, || {
+            // One line, even in JSON: a supervisor or a test reads it as the signal of readiness.
+            // `JsonSerializer.Serialize` without options: compact, default encoder.
+            let line = if json {
+                format!(
+                    "{{\"listening\":{},\"version\":{}}}",
+                    json::quoted_basic_latin(&endpoint),
+                    json::quoted_basic_latin(VERSION)
+                )
+            } else {
+                format!("Sermofur daemon {VERSION} listening on {endpoint}")
+            };
+            write_line(out, &line);
+        });
+        match first(serving, stop_on_signals).await {
+            Ok(served) => served,
+            // The signal future never finishes: it exits the process.
+            Err(()) => Ok(()),
+        }
+    });
     // After `drain_timeout`, a command may still run on a blocking thread: the process leaves
     // without waiting for it, as the background threads of the oracle (review of lot 7.4).
     runtime.shutdown_background();
     served?;
     Ok(0)
+}
+
+/// The signals of `SignalStop`: SIGINT and SIGTERM on Unix; on Windows, as .NET maps them,
+/// `CTRL_C_EVENT` and `CTRL_SHUTDOWN_EVENT`.
+#[cfg(unix)]
+struct Signals(tokio::signal::unix::Signal, tokio::signal::unix::Signal);
+
+#[cfg(windows)]
+struct Signals(
+    tokio::signal::windows::CtrlC,
+    tokio::signal::windows::CtrlShutdown,
+);
+
+impl Signals {
+    #[cfg(unix)]
+    fn register() -> std::io::Result<Self> {
+        use tokio::signal::unix::{SignalKind, signal};
+        Ok(Self(
+            signal(SignalKind::interrupt())?,
+            signal(SignalKind::terminate())?,
+        ))
+    }
+
+    #[cfg(windows)]
+    fn register() -> std::io::Result<Self> {
+        use tokio::signal::windows::{ctrl_c, ctrl_shutdown};
+        Ok(Self(ctrl_c()?, ctrl_shutdown()?))
+    }
+
+    /// Waits for the next signal; returns the exit code of its default action: 128 plus the
+    /// number of the signal on Unix (the oracle dies by the signal itself, which a shell
+    /// reports with the same number), `STATUS_CONTROL_C_EXIT` on Windows.
+    async fn next(&mut self) -> i32 {
+        let interrupt = first(self.0.recv(), self.1.recv()).await.is_ok();
+        if cfg!(windows) {
+            // STATUS_CONTROL_C_EXIT, 0xC000013A, as an `i32` exit code.
+            -1_073_741_510
+        } else if interrupt {
+            130
+        } else {
+            143
+        }
+    }
 }

@@ -13,7 +13,7 @@ use std::process::{Child, Command, Stdio};
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::mpsc;
 use std::thread;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use sermofur_core::format::DateTimeOffset;
 use sermofur_core::ownership::SystemOwnership;
@@ -76,12 +76,19 @@ impl Home {
 
     /// `daemon run` of `program` under this home, once it says it listens.
     fn daemon(&self, program: &str) -> Daemon {
+        let (daemon, line) = self.started(program, &["daemon", "run"]);
+        assert!(line.contains("listening on"), "{line}");
+        daemon
+    }
+
+    /// `program` started with `args` under this home, and its first line.
+    fn started(&self, program: &str, args: &[&str]) -> (Daemon, String) {
         let mut child = Command::new(program)
-            .args(["daemon", "run"])
+            .args(args)
             .env(HOME_VARIABLE, self.home())
             .stdin(Stdio::null())
             .stdout(Stdio::piped())
-            .stderr(Stdio::null())
+            .stderr(Stdio::piped())
             .spawn()
             .expect("the daemon starts");
         let stdout = child.stdout.take().expect("stdout");
@@ -95,8 +102,7 @@ impl Home {
         let line = lines
             .recv_timeout(LIMIT)
             .expect("the daemon listens in time");
-        assert!(line.contains("listening on"), "{line}");
-        daemon
+        (daemon, line)
     }
 }
 
@@ -151,7 +157,16 @@ enum Item {
 /// One connection: each item is sent, then one answer is read (`None`: closed). The session
 /// ends after the last item.
 fn exchange(paths: &DaemonPaths, items: &[Item]) -> Vec<Option<IpcMessage>> {
+    timed_exchange(paths, items)
+        .into_iter()
+        .map(|(answer, _)| answer)
+        .collect()
+}
+
+/// [`exchange`], with the time from the connection to each answer.
+fn timed_exchange(paths: &DaemonPaths, items: &[Item]) -> Vec<(Option<IpcMessage>, Duration)> {
     block_on(async {
+        let started = Instant::now();
         let mut stream = connect(paths, &SystemOwnership, Duration::from_secs(5))
             .await
             .expect("no refusal")
@@ -163,16 +178,15 @@ fn exchange(paths: &DaemonPaths, items: &[Item]) -> Vec<Option<IpcMessage>> {
                 Item::Bytes(bytes) => bytes.clone(),
             };
             if stream.write_all(&bytes).await.is_err() {
-                answers.push(None);
+                answers.push((None, started.elapsed()));
                 break;
             }
             let _ = stream.flush().await;
-            answers.push(
-                read_message(&mut stream, MAX_RESPONSE_BYTES)
-                    .await
-                    .ok()
-                    .flatten(),
-            );
+            let answer = read_message(&mut stream, MAX_RESPONSE_BYTES)
+                .await
+                .ok()
+                .flatten();
+            answers.push((answer, started.elapsed()));
         }
         answers
     })
@@ -383,6 +397,141 @@ fn simultaneous_clients_are_all_served() {
     }
 }
 
+/// `DaemonTests.RelativePathIsResolvedFromTheClientFolder`: `--path ..` is read from the
+/// folder of the client, not from the one of the daemon.
+#[test]
+fn a_relative_path_is_resolved_from_the_client_folder() {
+    let home = Home::new("relative");
+    let root = home.instance("instance", true);
+    let sub = root.join("sub");
+    fs::create_dir_all(&sub).expect("sub");
+    let _daemon = home.daemon(SMF);
+    let answers = exchange(
+        &home.paths(),
+        &[
+            hello(VERSION, &sub),
+            run(1, &sub, &["root", "--path", "..", "--json"]),
+        ],
+    );
+    let served = answers[1].as_ref().expect("an answer");
+    let stdout = served.stdout.as_deref().expect("an output");
+    let body: serde_json::Value = serde_json::from_str(stdout).expect("JSON");
+    assert_eq!(
+        body["root"].as_str(),
+        Some(root.to_string_lossy().as_ref()),
+        "{stdout}"
+    );
+}
+
+/// `DaemonSessionTests.OtherVersionIsReportedBeforeAnyProtocolCheck`: a hello of another
+/// version and another protocol is refused for its version, with the version of the daemon.
+#[test]
+fn another_version_is_reported_before_any_protocol_check() {
+    let home = Home::new("other-version");
+    let _daemon = home.daemon(SMF);
+    let mut hello = IpcMessage::new(kind::HELLO);
+    hello.protocol = Some(2);
+    hello.tool_version = Some("9.0.0".to_owned());
+    hello.cwd = Some(home.0.to_string_lossy().into_owned());
+    let answers = exchange(&home.paths(), &[Item::Message(Box::new(hello))]);
+    let refusal = answers[0].as_ref().expect("a refusal");
+    assert_eq!(
+        (
+            refusal.kind.as_str(),
+            refusal.code.as_deref(),
+            refusal.tool_version.as_deref()
+        ),
+        ("error", Some("daemon_version_mismatch"), Some(VERSION))
+    );
+}
+
+/// `DaemonLoadTests.TwentyFourRecallsAndAWriteAllAnswerAndHellosStayInTime`: 24 recalls at
+/// once and a write, on a real instance; every command answers and every hello comes within
+/// the 5 s bound of the test client. The slowest hello is reported. A read refused with
+/// `daemon_busy` is accepted (wait for a place of 5 s instead of the request timeout of the
+/// .NET test); the write must run.
+#[test]
+fn twenty_four_recalls_and_a_write_all_answer_and_hellos_stay_in_time() {
+    const HELLO_BOUND: Duration = Duration::from_secs(5);
+    let home = Home::new("recalls");
+    let root = home.instance("instance", true);
+    let _daemon = home.daemon(SMF);
+    let paths = home.paths();
+    let texts: Vec<String> = (0..40)
+        .map(|n| format!("billing paginates by cursor, case {n}"))
+        .collect();
+    let mut seed = vec![hello(VERSION, &root)];
+    for (id, text) in (1..).zip(&texts) {
+        seed.push(run(
+            id,
+            &root,
+            &["claim", "add", text.as_str(), "--origin", "user"],
+        ));
+    }
+    for added in &exchange(&paths, &seed)[1..] {
+        assert_eq!(
+            added.as_ref().and_then(|a| a.exit_code),
+            Some(0),
+            "{added:?}"
+        );
+    }
+    let started = Instant::now();
+    let commands: Vec<_> = (0..25)
+        .map(|n| {
+            let paths = paths.clone();
+            let root = root.clone();
+            thread::spawn(move || {
+                let argv: &[&str] = if n < 24 {
+                    &["recall", "how does billing paginate", "--json"]
+                } else {
+                    &["claim", "add", "written under load", "--origin", "user"]
+                };
+                timed_exchange(&paths, &[hello(VERSION, &root), run(n, &root, argv)])
+            })
+        })
+        .collect();
+    let mut slowest_probe = Duration::ZERO;
+    for _ in 0..5 {
+        let (welcome, took) = timed_exchange(&paths, &[hello(VERSION, &root)]).remove(0);
+        assert_eq!(welcome.map(|w| w.kind), Some(kind::WELCOME.to_owned()));
+        assert!(took < HELLO_BOUND, "{took:?}");
+        slowest_probe = slowest_probe.max(took);
+        thread::sleep(Duration::from_millis(20));
+    }
+    let mut slowest_hello = Duration::ZERO;
+    for (n, command) in commands.into_iter().enumerate() {
+        let answers = command.join().expect("a client");
+        let (welcome, hello_took) = &answers[0];
+        assert_eq!(
+            welcome.as_ref().map(|w| w.kind.as_str()),
+            Some(kind::WELCOME)
+        );
+        assert!(*hello_took < HELLO_BOUND, "{hello_took:?}");
+        slowest_hello = slowest_hello.max(*hello_took);
+        let result = answers[1].0.as_ref().expect("an answer");
+        // The oracle raises the wait for a place to the request timeout; the real `smf` keeps
+        // 5 s, so on a runner with two places a read may be refused: only the write must run.
+        let busy = n < 24 && result.code.as_deref() == Some("daemon_busy");
+        assert!(
+            busy || (result.kind.as_str(), result.exit_code) == ("result", Some(0)),
+            "{result:?}"
+        );
+    }
+    eprintln!(
+        "25 commands in {:?}; slowest hello of a command {slowest_hello:?}, of a probe {slowest_probe:?}",
+        started.elapsed()
+    );
+    let listed = Command::new(SMF)
+        .args(["claim", "list", "--json"])
+        .current_dir(&root)
+        .env(HOME_VARIABLE, home.home())
+        .env("SERMOFUR_NO_DAEMON", "1")
+        .output()
+        .expect("smf runs");
+    let claims: serde_json::Value = serde_json::from_slice(&listed.stdout).expect("JSON");
+    assert_eq!(claims.as_array().map(Vec::len), Some(41));
+}
+
 /// A shutdown request: `stopping`, then the process ends with 0 and the journal says so.
 #[test]
 fn a_shutdown_request_stops_the_daemon() {
@@ -424,4 +573,88 @@ fn a_second_daemon_is_refused() {
         .expect("smf runs");
     assert_eq!(output.status.code(), Some(3));
     assert!(String::from_utf8_lossy(&output.stderr).contains("daemon_already_running"));
+}
+
+/// `RealProcessServesAndStopsOnSignal` with the signal itself (the .NET test kills the process):
+/// `daemon run --json` says `{"listening":<endpoint>,"version":<version>}`; a first SIGINT or
+/// SIGTERM drains and the daemon leaves with 0 after `stopped`; the line of the first signal
+/// goes to stderr without `--json` only. For the port and, with `SMF_ORACLE`, for the oracle
+/// (its own version). Unix only: Windows sends Ctrl+C to a console only through an `unsafe`
+/// Win32 call.
+#[cfg(unix)]
+#[test]
+fn a_signal_drains_and_stops_the_daemon() {
+    use std::io::Read;
+    let programs = std::iter::once(SMF.to_owned()).chain(oracle());
+    for program in programs {
+        for (signal, json) in [("-INT", false), ("-TERM", false), ("-TERM", true)] {
+            let home = Home::new("signal");
+            let args: &[&str] = if json {
+                &["daemon", "run", "--json"]
+            } else {
+                &["daemon", "run"]
+            };
+            let (mut daemon, line) = home.started(&program, args);
+            let endpoint = home.paths().endpoint.to_string_lossy().into_owned();
+            if json {
+                let started: serde_json::Value = serde_json::from_str(&line).expect("JSON");
+                assert_eq!(started["listening"], endpoint.as_str(), "{program}: {line}");
+                assert!(started["version"].is_string(), "{program}: {line}");
+                if program == SMF {
+                    assert_eq!(started["version"], VERSION, "{line}");
+                }
+            } else {
+                assert!(line.contains("listening on"), "{program}: {line}");
+            }
+            let pid = daemon.0.id().to_string();
+            let sent = Command::new("kill")
+                .args([signal, &pid])
+                .status()
+                .expect("kill runs");
+            assert!(sent.success());
+            assert_eq!(daemon.exit(), Some(0), "{program} {signal} {json}");
+            let mut stderr = String::new();
+            daemon
+                .0
+                .stderr
+                .take()
+                .expect("stderr")
+                .read_to_string(&mut stderr)
+                .expect("stderr is read");
+            let expected = if json {
+                ""
+            } else {
+                "smf: finishing the running commands; a second Ctrl+C or SIGTERM stops at once.
+"
+            };
+            assert_eq!(stderr, expected, "{program} {signal} {json}");
+            let journal = fs::read_to_string(home.paths().log_file()).expect("a journal");
+            for event in ["started", "draining", "stopped"] {
+                assert!(
+                    journal.contains(&format!("\"event\":\"{event}\"")),
+                    "{program} {signal}: {journal}"
+                );
+            }
+            assert!(!home.paths().endpoint.exists(), "{program} {signal}");
+        }
+    }
+}
+
+/// The `--json` line of `RealProcessServesAndStopsOnSignal` on every system: one compact line,
+/// `{"listening":<endpoint>,"version":<version>}`, endpoint escaped as the default encoder of
+/// .NET does (a Windows pipe name keeps its backslashes once read back).
+#[test]
+fn daemon_run_json_says_where_it_listens() {
+    let programs = std::iter::once(SMF.to_owned()).chain(oracle());
+    for program in programs {
+        let home = Home::new("json");
+        let (_daemon, line) = home.started(&program, &["daemon", "run", "--json"]);
+        let started: serde_json::Value = serde_json::from_str(&line).expect("one JSON line");
+        let endpoint = home.paths().endpoint.to_string_lossy().into_owned();
+        assert_eq!(started["listening"], endpoint.as_str(), "{program}: {line}");
+        assert!(line.starts_with("{\"listening\":\""), "{program}: {line}");
+        if program == SMF {
+            assert_eq!(started["version"], VERSION, "{line}");
+        }
+    }
 }
