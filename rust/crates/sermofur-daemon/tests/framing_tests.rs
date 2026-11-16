@@ -540,6 +540,39 @@ proptest! {
     }
 }
 
+/// Lot 7.6, minor 2 of the review of lot 7.5: a message with each of the sixteen fields the
+/// protocol reads decodes the same through both decoders, and as it was encoded (`argv` kept
+/// empty by the answer decoder).
+#[test]
+fn both_decoders_agree_on_a_complete_message() {
+    let message = IpcMessage {
+        kind: "status".to_owned(),
+        protocol: Some(1),
+        tool_version: Some("0.4.3".to_owned()),
+        cwd: Some("C:\\\u{e9}\u{1F600}".to_owned()),
+        pid: Some(-42),
+        id: Some(i64::MAX),
+        argv: Some(vec![Some("a".to_owned()), None]),
+        exit_code: Some(3),
+        stdout: Some("out\r\n".to_owned()),
+        stderr: Some("<err>".to_owned()),
+        code: Some("code".to_owned()),
+        message: Some("m\u{0}".to_owned()),
+        started_at: Some("2026-11-16T18:00:00.0000000+01:00".to_owned()),
+        instances_open: Some(2),
+        clients: Some(i32::MIN),
+        registry: Some("/r/instances.json".to_owned()),
+    };
+    let frame = framing::encode(&message, MAX_RESPONSE_BYTES).unwrap();
+    let body = &frame[4..];
+    let expected = IpcMessage {
+        argv: Some(Vec::new()),
+        ..message
+    };
+    assert_eq!(decoded(body), Ok(expected.clone()));
+    assert_eq!(decoded_answer(body), Ok(expected));
+}
+
 /// A JSON string token: ordinary characters, and lone high or low surrogate escapes.
 fn string_token() -> impl Strategy<Value = String> {
     let piece = prop_oneof![
@@ -557,7 +590,22 @@ fn string_token() -> impl Strategy<Value = String> {
 fn name_token() -> impl Strategy<Value = String> {
     prop_oneof![
         prop::sample::select(vec![
-            "kind", "id", "argv", "exitCode", "stdout", "stderr", "code", "message", "protocol",
+            "kind",
+            "protocol",
+            "toolVersion",
+            "cwd",
+            "pid",
+            "id",
+            "argv",
+            "exitCode",
+            "stdout",
+            "stderr",
+            "code",
+            "message",
+            "startedAt",
+            "instancesOpen",
+            "clients",
+            "registry",
         ])
         .prop_map(|name| format!("\"{name}\"")),
         string_token(),

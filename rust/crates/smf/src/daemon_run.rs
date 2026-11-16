@@ -100,6 +100,7 @@ impl CommandExecutor for CliCommandExecutor {
 /// `daemon run`: serves in the foreground until a `shutdown` request, Ctrl+C or SIGTERM.
 pub fn run(
     args: &mut CommandArguments,
+    paths: DaemonPaths,
     json: bool,
     out: &mut dyn Write,
     err: &mut dyn Write,
@@ -111,7 +112,6 @@ pub fn run(
         // The supervisor comes with the services (lot 7.7).
         return Err(not_ported());
     }
-    let paths = DaemonPaths::for_current_user()?;
     let _lock = file_turn::acquire(&paths)?;
     let log = DaemonLog::new(&paths.log_file());
     let refusals = log.clone();

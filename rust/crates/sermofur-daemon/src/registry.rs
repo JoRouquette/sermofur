@@ -318,21 +318,7 @@ type Instances = Option<Vec<Option<RegisteredInstance>>>;
 /// unknown properties skipped. `None` where .NET throws a `JsonException`; a `null` document
 /// reads as no instance list.
 fn parse(content: &[u8]) -> Option<(i32, Instances)> {
-    // .NET checks UTF-8 only where it reads a string: an invalid sequence becomes a lone
-    // surrogate escape, refused where a string is read, skipped elsewhere as STJ skips it. Right
-    // after a backslash it is a broken escape, refused even in a skipped value.
-    let mut text = String::with_capacity(content.len());
-    for chunk in content.utf8_chunks() {
-        text.push_str(chunk.valid());
-        if !chunk.invalid().is_empty() {
-            let backslashes = text.bytes().rev().take_while(|b| *b == b'\\').count();
-            if backslashes % 2 == 1 {
-                return None;
-            }
-            text.push_str("\\uDFFF");
-        }
-    }
-    let node = stj::parse(&text).ok()?;
+    let node = stj::parse(&lenient_text(content)?).ok()?;
     let Some(properties) = stj::object(&node).ok()? else {
         return Some((0, None));
     };
@@ -346,6 +332,25 @@ fn parse(content: &[u8]) -> Option<(i32, Instances)> {
         }
     }
     Some((version, instances))
+}
+
+/// The text of a JSON document as `JsonSerializer.Deserialize` reads its bytes: .NET checks
+/// UTF-8 only where it reads a string, so an invalid sequence becomes a lone surrogate escape,
+/// refused where a string is read, skipped elsewhere as STJ skips it. Right after a backslash it
+/// is a broken escape: `None`, refused even in a skipped value.
+pub(crate) fn lenient_text(content: &[u8]) -> Option<String> {
+    let mut text = String::with_capacity(content.len());
+    for chunk in content.utf8_chunks() {
+        text.push_str(chunk.valid());
+        if !chunk.invalid().is_empty() {
+            let backslashes = text.bytes().rev().take_while(|b| *b == b'\\').count();
+            if backslashes % 2 == 1 {
+                return None;
+            }
+            text.push_str("\\uDFFF");
+        }
+    }
+    Some(text)
 }
 
 fn list(node: &Node) -> Option<Instances> {

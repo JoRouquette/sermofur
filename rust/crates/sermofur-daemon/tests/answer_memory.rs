@@ -89,6 +89,13 @@ fn flat(size: usize) -> String {
     body
 }
 
+/// Lot 7.6, minor 6 of the review of lot 7.5: an answer of `size` bytes whose bulk is one
+/// unknown scalar, `{"kind":"result","zz":"zzz…"}`: checked, never kept.
+fn scalar(size: usize) -> String {
+    let head = r#"{"kind":"result","zz":""#;
+    format!("{head}{}\"}}", "z".repeat(size - head.len() - 2))
+}
+
 /// Bound: `decode_answer` builds only the kept scalars (here the 4 MiB `stdout`, a few bytes
 /// otherwise) and one property name at a time, so it never needs more than the body itself;
 /// a decoder that builds the tree needs dozens of bytes per property. One body size, plus 1 MiB
@@ -99,6 +106,8 @@ fn flat(size: usize) -> String {
 fn a_huge_answer_is_decoded_within_the_size_of_its_body() {
     let slack = 1024 * 1024;
     for (name, body) in [
+        // First: measured before any page freed by another case can be reused.
+        ("scalar", scalar(MAX_RESPONSE_BYTES)),
         ("nested", nested(MAX_RESPONSE_BYTES)),
         ("flat", flat(MAX_RESPONSE_BYTES)),
     ] {

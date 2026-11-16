@@ -1,6 +1,7 @@
 //! `smf`, the Sermofur command line (Rust port, work in progress).
 
 mod args;
+mod daemon_commands;
 mod daemon_run;
 mod help;
 mod memory_commands;

@@ -9,9 +9,9 @@ use std::time::Duration;
 use sermofur_core::VERSION;
 use sermofur_core::daemon_paths::{DaemonPaths, EndpointState};
 use sermofur_core::error::{Result, SermofurError};
-use sermofur_core::ownership::SystemOwnership;
+use sermofur_core::ownership::{FileOwnership, SystemOwnership};
 use sermofur_daemon::client::{DaemonClient, INTERRUPTED_CODE};
-use sermofur_daemon::endpoint::inspect;
+use sermofur_daemon::endpoint::{self, inspect};
 use sermofur_daemon::framing::{IpcMessage, kind};
 use sermofur_daemon::server::DaemonLimits;
 
@@ -118,7 +118,8 @@ impl Router<'_> {
         folder: &Path,
     ) -> std::result::Result<Option<IpcMessage>, Failure> {
         let paths = (self.paths)().map_err(|_| Failure::Unreached)?;
-        // Metadata only: with no daemon, the cost is one stat or one pipe lookup.
+        // Metadata only: with no daemon, the cost is one stat on Unix; on Windows, three
+        // listings of the pipe file system (`endpoint_state`): 5.2 ms for 676 pipes (lot 7.6).
         if inspect(&paths, &SystemOwnership).map_err(|_| Failure::Unreached)?
             != EndpointState::Present
         {
@@ -126,16 +127,8 @@ impl Router<'_> {
         }
         let folder = folder.to_string_lossy().into_owned();
         block_on(async {
-            let client =
-                DaemonClient::connect(&paths, &SystemOwnership, VERSION, &folder, CONNECT_TIMEOUT)
-                    .await;
-            let mut client = match client {
-                Ok(Some(client)) => client,
-                Ok(None) => return Ok(None),
-                // A foreign endpoint is not our daemon: the command line still works.
-                Err(error) if error.code == "foreign_endpoint" => return Err(Failure::Unreached),
-                // Our daemon answered the hello with a refusal.
-                Err(error) => return Err(Failure::Daemon(error)),
+            let Some(mut client) = session(&paths, &SystemOwnership, &folder).await? else {
+                return Ok(None);
             };
             // A daemon alive but stuck must not hold the command line: past its own request
             // timeout and the time to answer, it counts as gone mid-command.
@@ -161,6 +154,25 @@ impl Router<'_> {
     }
 }
 
+/// `DaemonClient.ConnectAsync` as `CliRouter.Send` meets it: an error of the endpoint itself
+/// (not ours, or a listing that fails: the `IOException` of the oracle) is no daemon of ours,
+/// and the command line still works; any error of the hello comes from our daemon.
+async fn session(
+    paths: &DaemonPaths,
+    owners: &dyn FileOwnership,
+    folder: &str,
+) -> std::result::Result<Option<DaemonClient>, Failure> {
+    let Some(stream) = endpoint::connect(paths, owners, CONNECT_TIMEOUT)
+        .await
+        .map_err(|_| Failure::Unreached)?
+    else {
+        return Ok(None);
+    };
+    DaemonClient::hello(stream, VERSION, folder, CONNECT_TIMEOUT)
+        .await
+        .map_err(Failure::Daemon)
+}
+
 /// `CliRouter.Routable` without the variable: help, version, no command, `init`, `doctor`,
 /// `daemon …` and `mcp …` always run here, and so does a line the runner will refuse.
 pub(crate) fn routable(arguments: &[String]) -> bool {
@@ -170,11 +182,7 @@ pub(crate) fn routable(arguments: &[String]) -> bool {
 /// `DaemonProbe.Connect` for `doctor`: a hello of one second from the temporary folder; the
 /// version of the daemon, or `None` when nothing answers.
 pub(crate) fn probe(paths: &DaemonPaths) -> Result<Option<String>> {
-    // `Path.GetTempPath()` ends with a separator; `temp_dir` may not.
-    let mut folder = std::env::temp_dir().to_string_lossy().into_owned();
-    if !folder.ends_with(std::path::MAIN_SEPARATOR) {
-        folder.push(std::path::MAIN_SEPARATOR);
-    }
+    let folder = temporary_folder();
     block_on(async {
         let client = DaemonClient::connect(
             paths,
@@ -188,9 +196,19 @@ pub(crate) fn probe(paths: &DaemonPaths) -> Result<Option<String>> {
     })?
 }
 
+/// `Path.GetTempPath()`: the folder a probe or a status says hello from. It ends with a
+/// separator; `temp_dir` may not.
+pub(crate) fn temporary_folder() -> String {
+    let mut folder = std::env::temp_dir().to_string_lossy().into_owned();
+    if !folder.ends_with(std::path::MAIN_SEPARATOR) {
+        folder.push(std::path::MAIN_SEPARATOR);
+    }
+    folder
+}
+
 /// Runs a future on a runtime of the current thread (decision A2: tokio for the daemon and its
 /// client only); a runtime that cannot start is `internal_error`.
-fn block_on<F: Future>(future: F) -> Result<F::Output> {
+pub(crate) fn block_on<F: Future>(future: F) -> Result<F::Output> {
     tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
@@ -268,10 +286,12 @@ mod tests {
     #[test]
     fn an_interrupted_read_runs_directly() {
         let scratch = Scratch::new("interrupted-read");
-        let _stub = StubDaemon::start(&scratch.paths, Behavior::Close, false);
+        let stub = StubDaemon::start(&scratch.paths, Behavior::Close, false);
         let (code, out, err) = routed(&scratch, ANSWER, &["claim", "list", "--json"]);
         assert_eq!(code, 0, "{err}");
         assert_eq!(out.trim(), "[]");
+        // Sent to the daemon first, then run directly.
+        assert_eq!(stub.runs(), 1);
     }
 
     /// Port of `DaemonSessionTests.RefusedHelloIsNeverFollowedByADirectRun`.
@@ -312,9 +332,10 @@ mod tests {
     #[test]
     fn an_oversized_read_runs_directly_but_an_oversized_write_is_not_replayed() {
         let scratch = Scratch::new("too-large");
-        let _stub = StubDaemon::start(&scratch.paths, Behavior::TooLarge, false);
+        let stub = StubDaemon::start(&scratch.paths, Behavior::TooLarge, false);
         let (code, out, err) = routed(&scratch, ANSWER, &["claim", "list", "--json"]);
         assert_eq!((code, out.trim()), (0, "[]"), "{err}");
+        assert_eq!(stub.runs(), 1, "the read went through the daemon first");
         let (code, _, err) = routed(
             &scratch,
             ANSWER,
@@ -322,6 +343,7 @@ mod tests {
         );
         assert_eq!(code, 1, "{err}");
         assert!(err.contains("response_too_large"), "{err}");
+        assert_eq!(stub.runs(), 2, "the write is sent once");
         assert_eq!(stored(&scratch), "[]");
     }
 
@@ -330,11 +352,12 @@ mod tests {
     #[test]
     fn a_silent_daemon_makes_the_cli_replay_a_read_and_report_a_write() {
         let scratch = Scratch::new("silent");
-        let _stub = StubDaemon::start(&scratch.paths, Behavior::Silent, false);
+        let stub = StubDaemon::start(&scratch.paths, Behavior::Silent, false);
         let watch = std::time::Instant::now();
         let second = Duration::from_secs(1);
         let (code, out, err) = routed(&scratch, second, &["claim", "list", "--json"]);
         assert_eq!((code, out.trim()), (0, "[]"), "{err}");
+        assert_eq!(stub.runs(), 1, "the read went through the daemon first");
         let (code, _, err) = routed(
             &scratch,
             second,
@@ -342,6 +365,7 @@ mod tests {
         );
         assert_eq!(code, 3, "{err}");
         assert!(err.contains(INTERRUPTED_CODE), "{err}");
+        assert_eq!(stub.runs(), 2, "the write is sent once");
         assert!(
             watch.elapsed() < Duration::from_secs(8),
             "{:?}",
@@ -369,5 +393,39 @@ mod tests {
             assert_eq!(stub.runs(), 2, "{refusal}");
             assert_eq!(stored(&scratch), "[]");
         }
+    }
+
+    /// Lot 7.6, minor 1 of the review of lot 7.5: an error of the endpoint met by the second
+    /// inspection, inside `ConnectAsync`, is no daemon of ours (`foreign_endpoint`, or the
+    /// `IOException` of a listing that fails): the command runs directly, as in .NET, never
+    /// reported as an answer of the daemon.
+    #[cfg(unix)]
+    #[test]
+    fn an_error_of_the_endpoint_is_no_daemon_of_ours() {
+        use sermofur_core::ownership::EntryStatus;
+
+        struct Unreadable;
+        impl FileOwnership for Unreadable {
+            fn inspect(&self, _: &Path) -> std::io::Result<Option<EntryStatus>> {
+                Err(std::io::Error::other("unreadable"))
+            }
+        }
+        struct Foreign;
+        impl FileOwnership for Foreign {
+            fn inspect(&self, _: &Path) -> std::io::Result<Option<EntryStatus>> {
+                Ok(Some(EntryStatus {
+                    is_regular_file: false,
+                    is_directory: true,
+                    is_owned_by_current_user: false,
+                }))
+            }
+        }
+        let scratch = Scratch::new("endpoint-error");
+        let stub = StubDaemon::start(&scratch.paths, Behavior::Close, false);
+        for owners in [&Unreadable as &dyn FileOwnership, &Foreign] {
+            let reached = block_on(session(&scratch.paths, owners, "/")).expect("a runtime");
+            assert!(matches!(reached, Err(Failure::Unreached)));
+        }
+        assert_eq!(stub.runs(), 0);
     }
 }

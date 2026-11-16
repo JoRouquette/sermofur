@@ -1,7 +1,8 @@
-//! Lot 7.5: the command line of the port through a daemon (`router` and `DaemonClient`), in real
+//! Lots 7.5 and 7.6: the command line of the port through a daemon (`router` and `DaemonClient`), in real
 //! processes. Ports of `RouterTests`; with `SMF_ORACLE` (the `smf` of .NET 0.4.3), the `smf` of
 //! the port is also routed by the daemon of the oracle and the `smf` of the oracle by the daemon
-//! of the port, and their outputs are compared. Every home is fresh, under the temporary
+//! of the port, and their outputs are compared. Lot 7.6 adds `daemon register`, `unregister`,
+//! `instances` and `status`, compared with those of the oracle on fresh homes. Every home is fresh, under the temporary
 //! directory; every daemon is stopped at the end of its test, even on failure. The tests of this
 //! file run one at a time, as the `Daemon timing` collection of .NET: their timeouts and their
 //! measures must not compete for the machine.
@@ -778,36 +779,309 @@ fn a_lone_surrogate_in_the_current_folder_is_sent_as_the_oracle_sends_it() {
     home.register(&root);
     let folder = root.join(OsString::from_wide(&[u16::from(b'i'), 0xDC00]));
     fs::create_dir_all(&folder).expect("a folder with a lone surrogate");
-    let _daemon = home.daemon(SMF);
-    let programs = std::iter::once(SMF.to_owned()).chain(oracle());
-    for program in programs {
-        let routed = home.cli(&program, &folder, false, &["status", "--json"]);
-        assert_eq!(routed.exit_code, Some(0), "{program}: {routed}");
-        assert_eq!(routed.mode(), "direct", "{program}: {routed}");
+    let programs: Vec<String> = std::iter::once(SMF.to_owned()).chain(oracle()).collect();
+    // Lot 7.6, minor 5 of the review of lot 7.5: the same, with SMF_ORACLE, on the daemon of
+    // the oracle.
+    for server in &programs {
+        let daemon = home.daemon(server);
+        for program in &programs {
+            let routed = home.cli(program, &folder, false, &["status", "--json"]);
+            assert_eq!(routed.exit_code, Some(0), "{server}, {program}: {routed}");
+            assert_eq!(routed.mode(), "direct", "{server}, {program}: {routed}");
+        }
+        assert_eq!(
+            home.cli(SMF, &root, false, &["status", "--json"]).mode(),
+            "daemon",
+            "{server}: the instance itself is served"
+        );
+        // The daemon is reached from that folder and answers `not_serving`: the cwd the port
+        // sends (U+FFFD for the surrogate) names no registered folder.
+        let cwd = folder.to_string_lossy().into_owned();
+        assert!(cwd.contains('\u{FFFD}'), "{cwd}");
+        let paths = home.paths();
+        let answer = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .expect("a runtime")
+            .block_on(async {
+                let mut client =
+                    DaemonClient::connect(&paths, &SystemOwnership, VERSION, &cwd, LIMIT)
+                        .await
+                        .expect("no refusal")
+                        .expect("a daemon answers");
+                client
+                    .run(&["status".to_owned(), "--json".to_owned()])
+                    .await
+                    .expect("an answer")
+            });
+        assert_eq!(answer.kind, kind::NOT_SERVING, "{server}: {answer:?}");
+        eprintln!("surrogate cwd on the daemon of {server}: {}", answer.kind);
+        daemon.shutdown(&paths);
     }
-    assert_eq!(
-        home.cli(SMF, &root, false, &["status", "--json"]).mode(),
-        "daemon",
-        "the instance itself is served"
+}
+
+/// `program` with the daemon home `home`, from `cwd`: exit code, output and error, with `home`
+/// written `<home>` (as typed and JSON-escaped) and each `registeredAt` value `<date>`.
+fn shown(program: &str, home: &Path, cwd: &Path, args: &[&str]) -> String {
+    let run = cli(program, home, cwd, true, args.iter().map(OsStr::new));
+    let folder = home.to_string_lossy();
+    let text = run
+        .to_string()
+        .replace(&folder.replace('\\', "\\\\"), "<home>")
+        .replace(&*folder, "<home>");
+    let key = "\"registeredAt\": \"";
+    let (mut out, mut rest) = (String::new(), text.as_str());
+    while let Some(at) = rest.find(key) {
+        out.push_str(&rest[..at + key.len()]);
+        rest = &rest[at + key.len()..];
+        out.push_str("<date>");
+        rest = &rest[rest.find('"').unwrap_or(rest.len())..];
+    }
+    out.push_str(rest);
+    out
+}
+
+/// Port of `DaemonTests.RegistryCommandsWorkInARealProcess`, for the port and, with
+/// `SMF_ORACLE`, for the oracle.
+#[test]
+fn registry_commands_work_in_a_real_process() {
+    let _alone = alone();
+    for program in std::iter::once(SMF.to_owned()).chain(oracle()) {
+        let home = Home::new("registry");
+        let root = home.instance("instance");
+        let text = root.to_str().expect("a Unicode path");
+        let run = |args: &[&str]| home.cli(&program, &home.0, true, args);
+        let registered = run(&["daemon", "register", "--path", text, "--json"]);
+        assert_eq!(registered.exit_code, Some(0), "{program}: {registered}");
+        assert_eq!(registered.json()["root"], Value::from(text), "{program}");
+        let listed = run(&["daemon", "instances", "--json"]);
+        assert_eq!(listed.json().as_array().map(Vec::len), Some(1), "{listed}");
+        let removed = run(&["daemon", "unregister", "--path", text]);
+        assert_eq!(removed.exit_code, Some(0), "{program}: {removed}");
+        let again = run(&["daemon", "unregister", "--path", text, "--json"]);
+        assert_eq!(again.exit_code, Some(1), "{program}: {again}");
+        let error: Value = serde_json::from_slice(&again.stderr).expect("a JSON error");
+        assert_eq!(error["code"], "not_registered", "{program}");
+        assert_eq!(run(&["daemon", "nope"]).exit_code, Some(1), "{program}");
+    }
+}
+
+/// Lot 7.6, with `SMF_ORACLE`: `register`, `unregister`, `instances` and `status` of the port
+/// print what the oracle prints, each on a fresh home, `registeredAt` apart; then a registry
+/// written by one tool is read and changed by the other.
+#[test]
+fn registry_commands_print_what_the_oracle_prints() {
+    let Some(oracle) = oracle() else {
+        eprintln!("SMF_ORACLE not set: no cross reading");
+        return;
+    };
+    let _alone = alone();
+    let home = Home::new("registry-cross");
+    let root = home.instance("instance");
+    fs::create_dir_all(root.join("sub")).expect("a subfolder");
+    home.instance("moved");
+    let cwd = &home.0;
+    let steps: &[&[&str]] = &[
+        &["daemon", "instances"],
+        &["daemon", "register", "--path", "instance"],
+        &["daemon", "register", "--path", "instance/sub", "--json"],
+        &["daemon", "register", "--path", "moved", "--json"],
+        &["daemon", "register"],
+        &["daemon", "register", "--path", "missing"],
+        &["daemon", "instances", "--json"],
+        &["daemon", "status", "--json"],
+        &["daemon", "status"],
+        &["daemon", "unregister", "--path", "instance/sub"],
+        &["daemon", "unregister", "--path", "instance", "--json"],
+        &["daemon", "unregister", "--path", "elsewhere"],
+        &["daemon", "instances"],
+        &["daemon"],
+        &["daemon", "--json"],
+        &["daemon", "nope"],
+        &["daemon", "status", "extra"],
+        &["daemon", "instances", "--path"],
+        &["daemon", "instances", "--bogus", "x"],
+    ];
+    let (port_home, oracle_home) = (cwd.join("home-port"), cwd.join("home-oracle"));
+    let compare = |step: &[&str], context: &str| {
+        assert_eq!(
+            shown(SMF, &port_home, cwd, step),
+            shown(&oracle, &oracle_home, cwd, step),
+            "{context}{}",
+            step.join(" ")
+        );
+    };
+    for step in steps {
+        compare(step, "");
+    }
+    // A moved instance is listed as missing and removed by its registered path.
+    fs::rename(cwd.join("moved"), cwd.join("gone")).expect("moved");
+    compare(&["daemon", "instances", "--json"], "moved: ");
+    compare(
+        &["daemon", "unregister", "--path", "moved", "--json"],
+        "moved: ",
     );
-    // The daemon is reached from that folder and answers `not_serving`: the cwd the port sends
-    // (U+FFFD for the surrogate) names no registered folder.
-    let cwd = folder.to_string_lossy().into_owned();
-    assert!(cwd.contains('\u{FFFD}'), "{cwd}");
-    let paths = home.paths();
-    let answer = tokio::runtime::Builder::new_current_thread()
-        .enable_all()
-        .build()
-        .expect("a runtime")
-        .block_on(async {
-            let mut client = DaemonClient::connect(&paths, &SystemOwnership, VERSION, &cwd, LIMIT)
-                .await
-                .expect("no refusal")
-                .expect("a daemon answers");
-            client
-                .run(&["status".to_owned(), "--json".to_owned()])
-                .await
-                .expect("an answer")
-        });
-    assert_eq!(answer.kind, kind::NOT_SERVING, "{answer:?}");
+    // Written by one, read and changed by the other.
+    let same_home = |writer: &str, reader: &str, home: &Path| {
+        let add = ["daemon", "register", "--path", "instance"];
+        let registered = shown(writer, home, cwd, &add);
+        assert!(registered.starts_with("exit Some(0)"), "{registered}");
+        let listed = |program: &str| shown(program, home, cwd, &["daemon", "instances", "--json"]);
+        assert_eq!(listed(reader), listed(writer));
+        let remove = ["daemon", "unregister", "--path", "instance"];
+        assert_eq!(shown(reader, home, cwd, &remove), registered);
+        assert_eq!(listed(writer), listed(reader));
+    };
+    same_home(&oracle, SMF, &oracle_home);
+    same_home(SMF, &oracle, &port_home);
+    // A registry that cannot be used is reported the same way, and left untouched.
+    for content in ["not json", "{\"version\":2,\"instances\":[]}"] {
+        for folder in [&port_home, &oracle_home] {
+            fs::write(folder.join("config").join("instances.json"), content).expect("written");
+        }
+        compare(&["daemon", "instances"], content);
+        compare(
+            &["daemon", "register", "--path", "instance", "--json"],
+            content,
+        );
+        let kept = fs::read_to_string(port_home.join("config").join("instances.json"));
+        assert_eq!(kept.expect("kept"), content);
+    }
+    eprintln!("registry cross-read ok");
+}
+
+/// `daemon status --json` of `program` under `home`, with `clients` checked then left out: each
+/// status is a client of its own, and the count of the previous one may not have dropped yet.
+fn status_of(program: &str, home: &Home) -> Value {
+    let run = home.cli(program, &home.0, true, &["daemon", "status", "--json"]);
+    assert_eq!(run.exit_code, Some(0), "{program}: {run}");
+    let mut status = run.json();
+    if status["answering"] == Value::Bool(true) {
+        assert!(
+            status["clients"].as_i64().is_some_and(|n| n >= 1),
+            "{status}"
+        );
+    }
+    status["clients"] = Value::Null;
+    status
+}
+
+/// Lot 7.6: `daemon status` reports the daemon of the home: absent, running and answering,
+/// of another version, or silent before its hello. With `SMF_ORACLE`, the oracle prints the
+/// same object, `clients` apart, for the daemon of the port and for its own.
+#[test]
+fn status_reports_the_daemon_as_the_oracle_does() {
+    let _alone = alone();
+    let home = Home::new("status");
+    let programs: Vec<String> = std::iter::once(SMF.to_owned()).chain(oracle()).collect();
+    let states = |expected: &[&str]| {
+        let port = status_of(SMF, &home);
+        assert!(
+            port["state"]
+                .as_str()
+                .is_some_and(|s| expected.contains(&s)),
+            "{port}"
+        );
+        for program in &programs[1..] {
+            assert_eq!(status_of(program, &home), port, "{program}");
+        }
+        port
+    };
+    // Without a daemon: `absent`, or `service_manager_unavailable` (WSL without systemd).
+    states(&["absent", "service_manager_unavailable"]);
+    let daemon = home.daemon(SMF);
+    let running = states(&["running"]);
+    assert_eq!(
+        (&running["answering"], &running["version"]),
+        (&Value::Bool(true), &Value::from(VERSION))
+    );
+    assert_eq!(running["pid"], Value::from(daemon.0.id()), "{running}");
+    daemon.shutdown(&home.paths());
+    if let Some(oracle) = oracle() {
+        let dotnet = home.daemon(&oracle);
+        states(&["running"]);
+        dotnet.shutdown(&home.paths());
+    }
+    let other = daemon_of_version(&home, "0.0.0-other");
+    states(&["version_mismatch"]);
+    drop(other);
+    // Silent before its hello: no daemon answered within the second of the connection.
+    let silent = silent_daemon(&home);
+    states(&["absent", "service_manager_unavailable"]);
+    drop(silent);
+}
+
+/// Lot 7.6, with `SMF_ORACLE`: `service.json` is read as the oracle reads it: `status` shows the
+/// executable of a sound definition only, whatever the shape of the file.
+#[test]
+fn the_installed_definition_is_read_as_the_oracle_reads_it() {
+    let Some(oracle) = oracle() else {
+        eprintln!("SMF_ORACLE not set: no cross reading");
+        return;
+    };
+    let _alone = alone();
+    let home = Home::new("service-json");
+    let state = home.paths().state_directory;
+    fs::create_dir_all(&state).expect("the state folder");
+    let exe = if cfg!(windows) {
+        r"C:\\smf.exe"
+    } else {
+        "/smf"
+    };
+    let run = r#""arguments":["daemon","run"]"#;
+    let sound = format!(r#"{{"executable":"{exe}",{run},"version":"1"}}"#);
+    let texts = [
+        sound.clone(),
+        format!(r#"{{"executable":"a","executable":"{exe}",{run},"version":"1"}}"#),
+        format!(r#"{{"executable":5,"executable":"{exe}",{run},"version":"1"}}"#),
+        format!(r#"{{"executable":"\ud800x",{run},"version":"1"}}"#),
+        format!("\u{FEFF}{sound}"),
+        format!(r#"{{"executable":"{exe}","arguments":["daemon",null,"run"],"version":"1"}}"#),
+        format!(
+            r#"{{"executable":"{exe}","arguments":[null,"daemon","run"],"version":"1","environment":null}}"#
+        ),
+        format!(
+            r#"{{"executable":"{exe}",{run},"version":"1","environment":{{"A":null,"A":"x"}}}}"#
+        ),
+        format!(r#"{{"executable":"{exe}",{run},"version":"1","environment":[]}}"#),
+        format!(r#"{{"executable":"{exe}",{run},"version":"1","environment":{{"A":1}}}}"#),
+        format!(r#"{{"Executable":"{exe}",{run},"version":"1"}}"#),
+        format!(r#"{{"executable":"rel.exe",{run},"version":"\u00a0"}}"#),
+        r#"{"executable":"rel","arguments":["--x","daemon","run","--supervise"],"version":"v"}"#
+            .to_owned(),
+        format!(r#"{{"executable":"{exe}",{run},"version":"1",}}"#),
+        format!("{sound} "),
+        "[]".to_owned(),
+        "null".to_owned(),
+        String::new(),
+        format!(r#"{{"executable":"{exe}","arguments":"daemon run","version":"1"}}"#),
+        format!(r#"{{"executable":"{exe}",{run},"version":1}}"#),
+    ];
+    let cases: Vec<Vec<u8>> = texts
+        .into_iter()
+        .map(String::into_bytes)
+        .chain([
+            // Invalid UTF-8 in a value read, then in a value skipped.
+            b"{\"executable\":\"x\xff\",\"arguments\":[\"daemon\",\"run\"],\"version\":\"1\"}"
+                .to_vec(),
+            b"{\"executable\":\"x\",\"arguments\":[\"daemon\",\"run\"],\"version\":\"1\",\"z\":\"\xff\"}"
+                .to_vec(),
+        ])
+        .collect();
+    let mut sound_cases = 0;
+    for (index, content) in cases.iter().enumerate() {
+        fs::write(state.join("service.json"), content).expect("written");
+        let port = status_of(SMF, &home);
+        assert_eq!(status_of(&oracle, &home), port, "case {index}");
+        sound_cases += usize::from(port["executable"].is_string());
+    }
+    // A folder in place of the file reads as nothing installed.
+    fs::remove_file(state.join("service.json")).expect("removed");
+    fs::create_dir(state.join("service.json")).expect("a folder");
+    assert_eq!(status_of(&oracle, &home), status_of(SMF, &home));
+    assert!(sound_cases > 0, "no sound definition among the cases");
+    eprintln!(
+        "service.json cross-read ok: {} cases, {sound_cases} sound",
+        cases.len()
+    );
 }

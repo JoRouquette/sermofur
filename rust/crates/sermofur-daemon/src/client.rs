@@ -46,9 +46,20 @@ impl DaemonClient {
         working_directory: &str,
         timeout: Duration,
     ) -> Result<Option<Self>> {
-        let Some(mut stream) = endpoint::connect(paths, owners, timeout).await? else {
+        let Some(stream) = endpoint::connect(paths, owners, timeout).await? else {
             return Ok(None);
         };
+        Self::hello(stream, tool_version, working_directory, timeout).await
+    }
+
+    /// The hello of [`DaemonClient::connect`] on an open `stream`: every error comes from the
+    /// answer of the daemon (or from a hello too large to send), none from the endpoint.
+    pub async fn hello(
+        mut stream: Stream,
+        tool_version: &str,
+        working_directory: &str,
+        timeout: Duration,
+    ) -> Result<Option<Self>> {
         let mut hello = IpcMessage::new(kind::HELLO);
         hello.protocol = Some(CURRENT_PROTOCOL);
         hello.tool_version = Some(tool_version.to_owned());
@@ -136,6 +147,27 @@ impl DaemonClient {
             ));
         }
         Ok(answer)
+    }
+
+    /// `StatusAsync`: the `status` message of the daemon. A session closed before the answer
+    /// is an I/O failure (`invalid_storage_or_path`), as the `IOException` of the oracle; a
+    /// frame the protocol refuses keeps its code. Bounded by the caller, as `run`.
+    pub async fn status(&mut self) -> Result<IpcMessage> {
+        let frame = framing::encode(&IpcMessage::new(kind::STATUS), MAX_BODY_BYTES)?;
+        send(&mut self.stream, &frame)
+            .await
+            .map_err(endpoint::io_failure)?;
+        let bytes = gather(&mut self.stream, MAX_RESPONSE_BYTES)
+            .await
+            .map_err(endpoint::io_failure)?;
+        match framing::read_answer(&mut bytes.as_slice(), MAX_RESPONSE_BYTES) {
+            Ok(Some(answer)) => Ok(answer),
+            Ok(None) => Err(endpoint::io_failure(
+                std::io::ErrorKind::UnexpectedEof.into(),
+            )),
+            Err(FrameError::Io(error)) => Err(endpoint::io_failure(error)),
+            Err(FrameError::Refused(refusal)) => Err(refusal),
+        }
     }
 }
 

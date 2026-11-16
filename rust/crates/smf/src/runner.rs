@@ -3,8 +3,9 @@
 //! Order of the checks, as in the .NET tool: help, then version, then parsing, then the command.
 //! Ported commands: `init` and `root` (lot 1b.4), `status`, `scope`, `export`, `claim`,
 //! `evidence` and `retex` (lot 3.4), `recall` (lot 4.2), `challenge` (lot 4.3), `source`
-//! (lot 5.2), `index` (lot 5.3), `migrate` (lot 6.1), `doctor` (lot 6.2); the others answer
-//! `not_ported`.
+//! (lot 5.2), `index` (lot 5.3), `migrate` (lot 6.1), `doctor` (lot 6.2), `daemon run`
+//! (lot 7.4), `daemon register`, `unregister`, `instances` and `status` (lot 7.6); the others
+//! answer `not_ported`.
 
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -176,12 +177,8 @@ fn execute(
     if parsed
         .positionals()
         .first()
-        .is_some_and(|command| command == "daemon" || command == "mcp")
+        .is_some_and(|command| command == "mcp")
     {
-        // Lot 7.4: `daemon run` only; the other subcommands come with lots 7.6 and 7.7.
-        if mode == "direct" && parsed.positionals().get(1).is_some_and(|sub| sub == "run") {
-            return crate::daemon_run::run(&mut parsed, json, out, err);
-        }
         return Err(not_ported());
     }
     // `Path.GetFullPath(args.Option("path", workingDirectory), workingDirectory)`: a relative
@@ -192,6 +189,14 @@ fn execute(
         Some(folder) => folder.to_path_buf(),
         None => expand_short_names(&std::env::current_dir().map_err(|_| invalid_storage())?),
     };
+    if parsed
+        .positionals()
+        .first()
+        .is_some_and(|command| command == "daemon")
+    {
+        // Lots 7.4 and 7.6; the services come with lot 7.7.
+        return crate::daemon_commands::run(&mut parsed, json, &working_directory, out, err);
+    }
     let path: PathBuf = match parsed.option("path") {
         Some(value) => get_full_path(&combine(value, &working_directory))?,
         None => working_directory,
@@ -287,7 +292,7 @@ fn invalid_storage() -> SermofurError {
     )
 }
 
-fn to_json<T: Serialize>(value: &T) -> Result<String> {
+pub(crate) fn to_json<T: Serialize>(value: &T) -> Result<String> {
     json::to_string(value).map_err(|error| {
         SermofurError::new("internal_error", error.to_string(), NOT_PORTED_EXIT_CODE)
     })

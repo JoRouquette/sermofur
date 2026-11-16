@@ -111,6 +111,34 @@ fn no_daemon_means_no_client() {
     assert!(elapsed < Duration::from_millis(100), "{elapsed:?}");
 }
 
+/// Lot 7.6, minor 4 of the review of lot 7.5: with no daemon, `inspect` lists the pipe file
+/// system three times under Windows. Measured on 50 calls, against one listing alone; the
+/// bound is the one of `no_daemon_means_no_client`.
+#[cfg(windows)]
+#[test]
+fn inspect_without_a_daemon_lists_the_pipes_three_times() {
+    let home = Home::new("listings");
+    let paths = home.paths();
+    let calls: u32 = 50;
+    let started = Instant::now();
+    let mut pipes = 0;
+    for _ in 0..calls {
+        pipes = fs::read_dir(r"\\.\pipe\").expect("the pipes").count();
+    }
+    let listing = started.elapsed() / calls;
+    let started = Instant::now();
+    for _ in 0..calls {
+        assert_eq!(state(&paths), EndpointState::Absent);
+    }
+    let inspected = started.elapsed() / calls;
+    eprintln!(
+        "inspect without a daemon: {:.3} ms per call; one listing of {pipes} pipes: {:.3} ms",
+        inspected.as_secs_f64() * 1000.0,
+        listing.as_secs_f64() * 1000.0
+    );
+    assert!(inspected < Duration::from_millis(100), "{inspected:?}");
+}
+
 #[test]
 fn second_daemon_on_the_same_endpoint_is_refused() {
     let home = Home::new("second");
