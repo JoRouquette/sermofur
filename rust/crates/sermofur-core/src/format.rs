@@ -326,7 +326,9 @@ static BROKEN_ZONE: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBoo
 
 /// A zone read through chrono never stops the process: chrono panics on a zone it cannot use
 /// (an unreadable or broken zone file), where .NET falls back to UTC; so does the port, and
-/// the zone is not read again, so that the panic message is printed once.
+/// the zone is not read again. The panic hook of the process still writes the panic on stderr
+/// once (`thread '…' panicked at …` and the message of chrono): no hook is replaced here, as
+/// the hook is global (PARITY.md, Écarts assumés, lot 7.2).
 fn guarded(read: impl FnOnce() -> Option<i16>) -> i16 {
     guarded_with(&BROKEN_ZONE, read)
 }

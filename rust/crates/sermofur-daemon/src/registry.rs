@@ -116,7 +116,7 @@ impl InstanceRegistry {
 
     /// The bytes of the registry, `None` when absent.
     fn read_content(&self) -> Result<Option<Vec<u8>>> {
-        let mut file = match File::open(&self.file) {
+        let file = match File::open(&self.file) {
             Ok(file) => file,
             Err(error)
                 if matches!(
@@ -132,8 +132,14 @@ impl InstanceRegistry {
         if length > MAX_BYTES {
             return Err(self.invalid(&format!("larger than {MAX_BYTES} bytes")));
         }
+        // Bounded even if the file grows after the check; the oracle reads it whole.
         let mut content = Vec::new();
-        file.read_to_end(&mut content).map_err(FileError::from)?;
+        file.take(MAX_BYTES + 1)
+            .read_to_end(&mut content)
+            .map_err(FileError::from)?;
+        if content.len() as u64 > MAX_BYTES {
+            return Err(self.invalid(&format!("larger than {MAX_BYTES} bytes")));
+        }
         Ok(Some(content))
     }
 

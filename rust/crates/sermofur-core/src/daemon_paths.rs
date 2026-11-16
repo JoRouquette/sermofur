@@ -13,6 +13,7 @@ use crate::discovery::get_full_path;
 use crate::error::{Result, SermofurError};
 use crate::instance::invalid_storage;
 use crate::local_paths::is_path_fully_qualified;
+use crate::ownership::FileOwnership;
 
 /// Environment variable that replaces every location.
 pub const HOME_VARIABLE: &str = "SERMOFUR_DAEMON_HOME";
@@ -265,6 +266,74 @@ fn user_id() -> u32 {
 #[cfg(not(unix))]
 fn user_id() -> u32 {
     0
+}
+
+/// What a client finds at the endpoint of the daemon, before any exchange (`EndpointState`).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum EndpointState {
+    /// No endpoint: no daemon runs for this user.
+    Absent,
+    /// An endpoint of the current user exists; a daemon may answer.
+    Present,
+    /// The endpoint or its folder belongs to another account or is not private (FR-008).
+    Foreign,
+}
+
+/// `IpcEndpoint.Inspect`: on Windows a listing of the pipe file system (opening the pipe would
+/// take a server instance); elsewhere the private folder of the socket, then the socket, both
+/// of the current user. It never connects.
+pub fn endpoint_state(endpoint: &Path, owners: &dyn FileOwnership) -> Result<EndpointState> {
+    if cfg!(windows) {
+        let name = endpoint.to_string_lossy();
+        let listing = std::fs::read_dir(r"\\.\pipe\").map_err(|_| invalid_storage())?;
+        for entry in listing {
+            let entry = entry.map_err(|_| invalid_storage())?;
+            if entry
+                .file_name()
+                .to_string_lossy()
+                .eq_ignore_ascii_case(&name)
+            {
+                return Ok(EndpointState::Present);
+            }
+        }
+        return Ok(EndpointState::Absent);
+    }
+    let folder = endpoint.parent().unwrap_or(endpoint);
+    let Some(status) = owners.inspect(folder).map_err(|_| invalid_storage())? else {
+        return Ok(EndpointState::Absent);
+    };
+    if !status.is_directory || !status.is_owned_by_current_user || !is_private(folder)? {
+        return Ok(EndpointState::Foreign);
+    }
+    Ok(
+        match owners.inspect(endpoint).map_err(|_| invalid_storage())? {
+            None => EndpointState::Absent,
+            Some(socket)
+                if socket.is_owned_by_current_user
+                    && !socket.is_directory
+                    && !socket.is_regular_file =>
+            {
+                EndpointState::Present
+            }
+            Some(_) => EndpointState::Foreign,
+        },
+    )
+}
+
+/// No permission for the group nor the others (`IsPrivate`).
+#[cfg(unix)]
+fn is_private(folder: &Path) -> Result<bool> {
+    use std::os::unix::fs::PermissionsExt;
+    let mode = std::fs::metadata(folder)
+        .map_err(|_| invalid_storage())?
+        .permissions()
+        .mode();
+    Ok(mode & 0o077 == 0)
+}
+
+#[cfg(not(unix))]
+fn is_private(_folder: &Path) -> Result<bool> {
+    Ok(true)
 }
 
 #[cfg(test)]

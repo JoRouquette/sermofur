@@ -136,11 +136,7 @@ fn local_offsets_are_those_of_dotnet() {
             .iter()
             .any(|(tz, prefix)| zone["tz"] == *tz && text.starts_with(prefix))
         {
-            if offset != 180 {
-                mismatches.push(format!(
-                    "clock {text}: {offset}, the named deviation is 180"
-                ));
-            }
+            assert_eq!(offset, 180, "clock {text}: the named deviation is 180");
             named += 1;
             continue;
         }
