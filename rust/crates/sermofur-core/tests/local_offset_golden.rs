@@ -136,6 +136,11 @@ fn local_offsets_are_those_of_dotnet() {
             .iter()
             .any(|(tz, prefix)| zone["tz"] == *tz && text.starts_with(prefix))
         {
+            if offset != 180 {
+                mismatches.push(format!(
+                    "clock {text}: {offset}, the named deviation is 180"
+                ));
+            }
             named += 1;
             continue;
         }
@@ -148,6 +153,9 @@ fn local_offsets_are_those_of_dotnet() {
                 probe["text"], probe["kind"]
             ));
         }
+    }
+    if zone["tz"] == "Europe/Moscow" {
+        assert_eq!(named, 5, "the skipped hour of Moscow 2011 has 5 probes");
     }
     assert!(
         mismatches.is_empty(),

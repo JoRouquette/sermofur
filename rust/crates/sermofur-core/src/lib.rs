@@ -18,6 +18,7 @@ pub mod instance;
 pub mod json;
 pub mod limits;
 pub mod local_paths;
+pub mod mcp_config;
 pub mod memory;
 pub mod migration;
 pub mod ownership;
