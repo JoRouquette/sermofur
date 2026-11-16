@@ -40,7 +40,7 @@ pub fn foreign_endpoint(paths: &DaemonPaths) -> SermofurError {
 }
 
 /// An I/O failure, as the .NET command runner maps an `IOException`: `invalid_storage_or_path`.
-fn io_failure(error: io::Error) -> SermofurError {
+pub(crate) fn io_failure(error: io::Error) -> SermofurError {
     crate::file_turn::FileError::from(error).into()
 }
 

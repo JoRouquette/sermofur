@@ -15,7 +15,8 @@
 //! `invalid_storage_or_path`.
 //!
 //! The reader keeps the whole document as a tree: the caller bounds the size of the text it
-//! reads (64 KiB for `instance.json`).
+//! reads (64 KiB for `instance.json`). [`parse_flat`] builds only the kept scalar values of a
+//! top-level object, one at a time, for the 16 MiB answers of the daemon.
 
 use uuid::Uuid;
 
@@ -54,6 +55,87 @@ pub fn parse(text: &str) -> Result<Node> {
     let node = reader.value(0)?;
     reader.end()?;
     Ok(node)
+}
+
+/// A property value of [`parse_flat`]: a scalar is built, a container is only checked.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Flat {
+    Scalar(Node),
+    /// `texts`: every item is `null` or a string without a lone surrogate escape.
+    Array {
+        texts: bool,
+    },
+    Object,
+}
+
+/// Parses a document that must be an object or `null` (`false`) with the rules of [`parse`],
+/// and hands each property whose name `keep` accepts to `visit`, in order, one at a time: a
+/// scalar is built, an array or an object is checked (syntax, depth, strings) and skipped. The
+/// value of any other name is checked without being built. A name with a lone surrogate escape
+/// is refused, as [`object`] refuses it. The memory used stays near the size of the largest
+/// kept scalar, whatever the shape and the number of properties.
+pub fn parse_flat(
+    text: &str,
+    keep: &dyn Fn(&str) -> bool,
+    visit: &mut dyn FnMut(&str, Flat) -> Result<()>,
+) -> Result<bool> {
+    let mut reader = Reader {
+        bytes: text.as_bytes(),
+        pos: 0,
+        lone_surrogate: false,
+    };
+    reader.skip_space();
+    if reader.peek() == Some(b'n') {
+        reader.literal(b"null")?;
+        reader.end()?;
+        return Ok(false);
+    }
+    reader.expect(b'{')?;
+    reader.skip_space();
+    if reader.peek() == Some(b'}') {
+        reader.pos += 1;
+    } else {
+        loop {
+            reader.skip_space();
+            if reader.peek() != Some(b'"') {
+                return Err(invalid_storage());
+            }
+            let name = reader.string()?;
+            if reader.lone_surrogate {
+                // Every outcome of `parse` then `object` is this same error.
+                return Err(invalid_storage());
+            }
+            reader.skip_space();
+            reader.expect(b':')?;
+            reader.skip_space();
+            let kept = keep(&name);
+            let value = match reader.peek() {
+                Some(b'[') => Some(Flat::Array {
+                    texts: reader.skip_container(1, b']', false)?,
+                }),
+                Some(b'{') => {
+                    reader.skip_container(1, b'}', true)?;
+                    Some(Flat::Object)
+                }
+                _ if kept => Some(Flat::Scalar(reader.value(1)?)),
+                _ => {
+                    reader.skip_scalar()?;
+                    None
+                }
+            };
+            if let Some(value) = value.filter(|_| kept) {
+                visit(&name, value)?;
+            }
+            reader.skip_space();
+            match reader.next() {
+                Some(b',') => {}
+                Some(b'}') => break,
+                _ => return Err(invalid_storage()),
+            }
+        }
+    }
+    reader.end()?;
+    Ok(true)
 }
 
 /// `RecordJson.Read` of a top-level `null`.
@@ -274,6 +356,66 @@ impl Reader<'_> {
         })
     }
 
+    /// Checks a string, a number or a literal at `pos`, as [`Reader::value`] reads it, without
+    /// building it.
+    fn skip_scalar(&mut self) -> Result<()> {
+        match self.peek().ok_or_else(invalid_storage)? {
+            b'"' => self.scan_string(None),
+            b'n' => self.literal(b"null"),
+            b't' => self.literal(b"true"),
+            b'f' => self.literal(b"false"),
+            b'-' | b'0'..=b'9' => self.skip_number(),
+            _ => Err(invalid_storage()),
+        }
+    }
+
+    /// Checks an array or an object whose opening bracket is at `pos`, as [`Reader::container`]
+    /// reads it, without building anything; true when every item is `null` or a string
+    /// without a lone surrogate escape.
+    fn skip_container(&mut self, depth: usize, close: u8, object: bool) -> Result<bool> {
+        if depth + 1 > MAX_DEPTH {
+            return Err(invalid_storage());
+        }
+        self.pos += 1;
+        let mut texts = true;
+        self.skip_space();
+        if self.peek() == Some(close) {
+            self.pos += 1;
+            return Ok(texts);
+        }
+        loop {
+            if object {
+                self.skip_space();
+                if self.peek() != Some(b'"') {
+                    return Err(invalid_storage());
+                }
+                self.scan_string(None)?;
+                self.skip_space();
+                self.expect(b':')?;
+            }
+            self.skip_space();
+            texts &= match self.peek().ok_or_else(invalid_storage)? {
+                b'"' => {
+                    self.scan_string(None)?;
+                    !self.lone_surrogate
+                }
+                b'n' => self.literal(b"null").map(|()| true)?,
+                b't' => self.literal(b"true").map(|()| false)?,
+                b'f' => self.literal(b"false").map(|()| false)?,
+                b'-' | b'0'..=b'9' => self.skip_number().map(|()| false)?,
+                b'[' => self.skip_container(depth + 1, b']', false).map(|_| false)?,
+                b'{' => self.skip_container(depth + 1, b'}', true).map(|_| false)?,
+                _ => return Err(invalid_storage()),
+            };
+            self.skip_space();
+            match self.next() {
+                Some(b',') => {}
+                Some(b) if b == close => return Ok(texts),
+                _ => return Err(invalid_storage()),
+            }
+        }
+    }
+
     fn digits(&mut self) -> usize {
         let from = self.pos;
         while matches!(self.peek(), Some(b'0'..=b'9')) {
@@ -284,6 +426,11 @@ impl Reader<'_> {
 
     fn number(&mut self) -> Result<String> {
         let start = self.pos;
+        self.skip_number()?;
+        Ok(String::from_utf8_lossy(&self.bytes[start..self.pos]).into_owned())
+    }
+
+    fn skip_number(&mut self) -> Result<()> {
         if self.peek() == Some(b'-') {
             self.pos += 1;
         }
@@ -310,7 +457,7 @@ impl Reader<'_> {
             }
         }
         // A digit after a leading zero ("02") is caught by the caller as an unexpected token.
-        Ok(String::from_utf8_lossy(&self.bytes[start..self.pos]).into_owned())
+        Ok(())
     }
 
     fn hex4(&mut self) -> Result<u32> {
@@ -329,13 +476,19 @@ impl Reader<'_> {
 
     /// Reads a string whose opening quote is at `pos`.
     fn string(&mut self) -> Result<String> {
+        let mut out: Vec<u8> = Vec::new();
+        self.scan_string(Some(&mut out))?;
+        Ok(String::from_utf8_lossy(&out).into_owned())
+    }
+
+    /// Checks a string whose opening quote is at `pos`, and decodes it into `out` if given.
+    fn scan_string(&mut self, mut out: Option<&mut Vec<u8>>) -> Result<()> {
         self.pos += 1;
         self.lone_surrogate = false;
-        let mut out: Vec<u8> = Vec::new();
         loop {
             let b = self.next().ok_or_else(invalid_storage)?;
             match b {
-                b'"' => return Ok(String::from_utf8_lossy(&out).into_owned()),
+                b'"' => return Ok(()),
                 0..=0x1F => return Err(invalid_storage()),
                 b'\\' => {
                     let c = match self.next().ok_or_else(invalid_storage)? {
@@ -369,10 +522,16 @@ impl Reader<'_> {
                         }
                         _ => return Err(invalid_storage()),
                     };
-                    let mut buffer = [0u8; 4];
-                    out.extend_from_slice(c.encode_utf8(&mut buffer).as_bytes());
+                    if let Some(out) = out.as_deref_mut() {
+                        let mut buffer = [0u8; 4];
+                        out.extend_from_slice(c.encode_utf8(&mut buffer).as_bytes());
+                    }
                 }
-                _ => out.push(b),
+                _ => {
+                    if let Some(out) = out.as_deref_mut() {
+                        out.push(b);
+                    }
+                }
             }
         }
     }

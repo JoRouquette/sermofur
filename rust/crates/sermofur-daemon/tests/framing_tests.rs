@@ -317,3 +317,286 @@ proptest! {
         }
     }
 }
+
+/// What [`framing::decode`] gives, as [`framing::decode_answer`] gives it: `argv` checked but
+/// kept empty.
+fn decoded(body: &[u8]) -> Result<IpcMessage, (String, i32, String)> {
+    framing::decode(body)
+        .map(|mut message| {
+            message.argv = message.argv.map(|_| Vec::new());
+            message
+        })
+        .map_err(|e| (e.code, e.exit_code, e.message))
+}
+
+fn decoded_answer(body: &[u8]) -> Result<IpcMessage, (String, i32, String)> {
+    framing::decode_answer(body).map_err(|e| (e.code, e.exit_code, e.message))
+}
+
+/// Lot 7.5: an answer of almost 16 MiB whose unknown properties are an array and an object,
+/// huge and nested to the limit of 64, is decoded by `decode_answer` (and `read_answer`) with
+/// the fields `decode` gives, without building the containers.
+#[test]
+fn a_huge_answer_is_decoded_without_its_unknown_containers() {
+    let item = r#"{"a":[1,-2.5e3,"xé😀",null,true,false,{}],"b":[]},"#;
+    let mut body = String::with_capacity(MAX_RESPONSE_BYTES);
+    body.push_str(r#"{"kind":"result","id":7,"exitCode":0,"stdout":""#);
+    body.push_str(&"o".repeat(4 * 1024 * 1024));
+    body.push_str(r#"","stderr":"warn\n","deep":"#);
+    // The top-level object is depth 1; with 60 arrays, the `{}` of each item is at 64, the
+    // limit.
+    body.push_str(&"[".repeat(60));
+    let room = MAX_RESPONSE_BYTES - body.len() - 4 * 1024 * 1024 - 1024;
+    for _ in 0..room / item.len() {
+        body.push_str(item);
+    }
+    body.push('0');
+    body.push_str(&"]".repeat(60));
+    body.push_str(r#","other":{"#);
+    let mut object = 0;
+    while body.len() < MAX_RESPONSE_BYTES - 1024 {
+        body.push_str(&format!(r#""k{object}":{item}"#));
+        object += 1;
+    }
+    body.push_str(r#""last":[[[["x"]]]]},"code":null}"#);
+    assert!(body.len() <= MAX_RESPONSE_BYTES, "{}", body.len());
+    assert!(body.len() > MAX_RESPONSE_BYTES - 2048);
+    let answer = decoded_answer(body.as_bytes()).expect("an answer");
+    assert_eq!(answer, decoded(body.as_bytes()).expect("a message"));
+    assert_eq!(
+        (answer.kind.as_str(), answer.id, answer.exit_code),
+        ("result", Some(7), Some(0))
+    );
+    assert_eq!(
+        answer.stdout.as_ref().map(String::len),
+        Some(4 * 1024 * 1024)
+    );
+    assert_eq!(answer.stderr.as_deref(), Some("warn\n"));
+    let length = u32::try_from(body.len()).unwrap().to_le_bytes();
+    let frame = [&length[..], body.as_bytes()].concat();
+    let read = framing::read_answer(&mut Cursor::new(frame), MAX_RESPONSE_BYTES)
+        .expect("read")
+        .expect("a message");
+    assert_eq!(read, answer);
+}
+
+/// Lot 7.5: `decode_answer` refuses what `decode` refuses, with the same error, and accepts
+/// what it accepts with the same fields.
+#[test]
+fn the_answer_decoder_refuses_what_the_decoder_refuses() {
+    let deep = |levels: usize| {
+        format!(
+            r#"{{"kind":"result","x":{}1{}}}"#,
+            "[".repeat(levels),
+            "]".repeat(levels)
+        )
+    };
+    let deep_objects = |levels: usize| {
+        format!(
+            r#"{{"kind":"result","x":{}1{}}}"#,
+            r#"{"a":"#.repeat(levels),
+            "}".repeat(levels)
+        )
+    };
+    let refused = [
+        deep(64),
+        deep_objects(64),
+        r#"{"kind":"result","x":[1,2,]}"#.to_owned(),
+        r#"{"kind":"result","x":[1 2]}"#.to_owned(),
+        r#"{"kind":"result","x":{"a" 1}}"#.to_owned(),
+        r#"{"kind":"result","x":{"a":1,}}"#.to_owned(),
+        r#"{"kind":"result","x":{1:1}}"#.to_owned(),
+        r#"{"kind":"result","x":[01]}"#.to_owned(),
+        r#"{"kind":"result","x":[1.]}"#.to_owned(),
+        r#"{"kind":"result","x":[tru]}"#.to_owned(),
+        r#"{"kind":"result","x":["\x"]}"#.to_owned(),
+        "{\"kind\":\"result\",\"x\":[\"a\u{1}\"]}".to_owned(),
+        r#"{"kind":"result","x":["\u12"]}"#.to_owned(),
+        r#"{"kind":"result","x":[1]"#.to_owned(),
+        r#"{"kind":"result","x":[1]}}"#.to_owned(),
+        r#"{"kind":"result","\ud800":1}"#.to_owned(),
+        r#"{"kind":"result","\udc00x":[1]}"#.to_owned(),
+        r#"{"kind":"run","argv":["\ud800"]}"#.to_owned(),
+        r#"{"kind":"run","argv":[1]}"#.to_owned(),
+        r#"{"kind":"run","argv":[["a"]]}"#.to_owned(),
+        r#"{"kind":"result","stdout":["a"]}"#.to_owned(),
+        r#"{"kind":"result","stdout":{}}"#.to_owned(),
+        r#"{"kind":"result","id":[1]}"#.to_owned(),
+        r#"{"kind":"result","exitCode":{}}"#.to_owned(),
+        r#"{"kind":["result"]}"#.to_owned(),
+        "null".to_owned(),
+        " null ".to_owned(),
+        r#"{"id":1,"x":[[]]}"#.to_owned(),
+        r#"{"kind":null,"x":{}}"#.to_owned(),
+        r#"{"kind":"","x":{}}"#.to_owned(),
+        "[]".to_owned(),
+        "{}".to_owned(),
+    ];
+    for body in &refused {
+        let expected = decoded(body.as_bytes());
+        assert!(expected.is_err(), "{body}");
+        assert_eq!(decoded_answer(body.as_bytes()), expected, "{body}");
+    }
+    let accepted = [
+        deep(63),
+        deep_objects(63),
+        r#"{"kind":"result","x":{"\ud800":[1]}}"#.to_owned(),
+        r#"{"kind":"result","x":["\ud800",{"\udc00":"\ud800"}]}"#.to_owned(),
+        r#"{"kind":"run","argv":["a",null,"é"]}"#.to_owned(),
+        r#"{"kind":"run","argv":[]}"#.to_owned(),
+        r#"{"kind":"run","argv":null}"#.to_owned(),
+        r#"{"kind":"a","kind":"result","stdout":"x","stdout":null}"#.to_owned(),
+        r#" { "kind" : "result" , "x" : [ ] , "y" : { } } "#.to_owned(),
+    ];
+    for body in &accepted {
+        let expected = decoded(body.as_bytes());
+        assert!(expected.is_ok(), "{body}: {expected:?}");
+        assert_eq!(decoded_answer(body.as_bytes()), expected, "{body}");
+    }
+}
+
+/// Any JSON value, nested a few levels.
+fn json_value() -> impl Strategy<Value = serde_json::Value> {
+    let leaf = prop_oneof![
+        Just(serde_json::Value::Null),
+        any::<bool>().prop_map(serde_json::Value::from),
+        any::<i64>().prop_map(serde_json::Value::from),
+        any::<f64>()
+            .prop_filter("finite", |f| f.is_finite())
+            .prop_map(serde_json::Value::from),
+        any::<String>().prop_map(serde_json::Value::from),
+    ];
+    leaf.prop_recursive(4, 32, 6, |inner| {
+        prop_oneof![
+            prop::collection::vec(inner.clone(), 0..6).prop_map(serde_json::Value::from),
+            prop::collection::btree_map(".{0,6}", inner, 0..6)
+                .prop_map(|map| serde_json::Value::Object(map.into_iter().collect())),
+        ]
+    })
+}
+
+proptest! {
+    #![proptest_config(ProptestConfig::with_cases(300))]
+
+    /// Lot 7.5: an encoded message, with an unknown property of any JSON value placed first,
+    /// decodes the same through both decoders.
+    #[test]
+    fn both_decoders_agree_on_encoded_messages(
+        kind in ".{0,12}",
+        text in proptest::option::of(any::<String>()),
+        number in proptest::option::of(any::<i32>()),
+        argv in proptest::option::of(prop::collection::vec(proptest::option::of(".{0,8}"), 0..4)),
+        unknown in proptest::option::of(json_value()),
+    ) {
+        let message = IpcMessage {
+            id: number.map(i64::from),
+            argv,
+            exit_code: number,
+            stdout: text.clone(),
+            stderr: text.clone(),
+            code: text.clone(),
+            message: text,
+            ..IpcMessage::new(&kind)
+        };
+        let frame = framing::encode(&message, MAX_RESPONSE_BYTES).unwrap();
+        let mut body = frame[4..].to_vec();
+        if let Some(unknown) = unknown {
+            let property = format!("\"zz\":{},", serde_json::to_string(&unknown).unwrap());
+            body.splice(1..1, property.into_bytes());
+        }
+        prop_assert_eq!(decoded_answer(&body), decoded(&body));
+    }
+
+    /// Lot 7.5: bodies made of JSON punctuation agree too, refusals included.
+    #[test]
+    fn both_decoders_agree_on_arbitrary_bodies(
+        body in r#"\{"kind":"r",[{}\[\]":, a-z0-9\\.-]{0,48}"#,
+    ) {
+        prop_assert_eq!(decoded_answer(body.as_bytes()), decoded(body.as_bytes()));
+    }
+
+    /// Lot 7.5: bodies built token by token, with lone `\uD8xx` and `\uDCxx` escapes in names,
+    /// strings and `argv`, containers nested 58 to 66 deep, known names in any order and
+    /// repeated, and an unknown property inserted at a random position.
+    #[test]
+    fn both_decoders_agree_on_built_bodies(
+        properties in prop::collection::vec((name_token(), property_value()), 0..6),
+        unknown in (string_token(), property_value()),
+        at in any::<prop::sample::Index>(),
+        with_kind in any::<bool>(),
+    ) {
+        let mut properties: Vec<String> = properties
+            .into_iter()
+            .map(|(name, value)| format!("{name}:{value}"))
+            .collect();
+        if with_kind {
+            // A share of bodies that both decoders accept.
+            properties.insert(0, r#""kind":"result""#.to_owned());
+        }
+        let position = at.index(properties.len() + 1);
+        properties.insert(position, format!("{}:{}", unknown.0, unknown.1));
+        let body = format!("{{{}}}", properties.join(","));
+        prop_assert_eq!(decoded_answer(body.as_bytes()), decoded(body.as_bytes()), "{}", body);
+    }
+}
+
+/// A JSON string token: ordinary characters, and lone high or low surrogate escapes.
+fn string_token() -> impl Strategy<Value = String> {
+    let piece = prop_oneof![
+        4 => any::<char>().prop_map(|c| {
+            let quoted = serde_json::to_string(&c.to_string()).unwrap();
+            quoted[1..quoted.len() - 1].to_owned()
+        }),
+        1 => "[89abAB][0-9a-fA-F]{2}".prop_map(|tail| format!(r"\uD{tail}")),
+        1 => "[c-fC-F][0-9a-fA-F]{2}".prop_map(|tail| format!(r"\uD{tail}")),
+    ];
+    prop::collection::vec(piece, 0..5).prop_map(|pieces| format!("\"{}\"", pieces.concat()))
+}
+
+/// A property name: a name the message reads, or any string token.
+fn name_token() -> impl Strategy<Value = String> {
+    prop_oneof![
+        prop::sample::select(vec![
+            "kind", "id", "argv", "exitCode", "stdout", "stderr", "code", "message", "protocol",
+        ])
+        .prop_map(|name| format!("\"{name}\"")),
+        string_token(),
+    ]
+}
+
+/// A JSON value token, nested a few levels, with string tokens everywhere.
+fn value_token() -> impl Strategy<Value = String> {
+    let leaf = prop_oneof![
+        Just("null".to_owned()),
+        Just("true".to_owned()),
+        Just("\"result\"".to_owned()),
+        any::<i64>().prop_map(|n| n.to_string()),
+        string_token(),
+    ];
+    leaf.prop_recursive(3, 24, 4, |inner| {
+        prop_oneof![
+            prop::collection::vec(inner.clone(), 0..4)
+                .prop_map(|items| format!("[{}]", items.join(","))),
+            prop::collection::vec((string_token(), inner), 0..4).prop_map(|pairs| {
+                let pairs: Vec<String> =
+                    pairs.into_iter().map(|(k, v)| format!("{k}:{v}")).collect();
+                format!("{{{}}}", pairs.join(","))
+            }),
+        ]
+    })
+}
+
+/// The value of a property: any token, an `argv`-like array of strings, or a container nested
+/// 57 to 65 levels under the top-level object (58 to 66 in all).
+fn property_value() -> impl Strategy<Value = String> {
+    prop_oneof![
+        3 => value_token(),
+        1 => prop::collection::vec(prop_oneof![string_token(), Just("null".to_owned())], 0..4)
+            .prop_map(|items| format!("[{}]", items.join(","))),
+        1 => (57usize..=65, any::<bool>()).prop_map(|(levels, objects)| if objects {
+            format!("{}1{}", r#"{"a":"#.repeat(levels), "}".repeat(levels))
+        } else {
+            format!("{}1{}", "[".repeat(levels), "]".repeat(levels))
+        }),
+    ]
+}

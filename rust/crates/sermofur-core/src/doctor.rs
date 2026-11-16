@@ -489,16 +489,19 @@ fn rows(connection: &Connection, sql: &str) -> Result<Vec<Vec<String>>> {
     Ok(out)
 }
 
-/// `DaemonProbe.Check` up to the connection: the endpoint of the daemon of the current user is
-/// absent, foreign, or present. Talking to a present daemon comes with its client (lot 7.5);
-/// until then a present endpoint is reported as the oracle reports a daemon it does not probe.
+/// `DaemonProbe.Check`: the endpoint of the daemon of the current user is absent, foreign, or
+/// present; a present one is asked by `hello` (the client lives above the core, in
+/// `sermofur-daemon`): `hello` gives the version of the daemon (`running`), `None` when nothing
+/// answers (`not_answering`), or the refusal of the daemon (`error`, as the oracle reports any
+/// `SermofurException`).
 pub fn daemon_check(
     variable: &dyn Fn(&str) -> Option<String>,
     owners: &dyn FileOwnership,
+    hello: &dyn Fn(&DaemonPaths) -> Result<Option<String>>,
 ) -> Result<DiagnosticCheck> {
     // The endpoint only: an unusable profile folder does not stop the report, as in .NET.
-    let endpoint = match DaemonPaths::locate(variable, &system_folder) {
-        Ok((paths, _)) => paths.endpoint,
+    let paths = match DaemonPaths::locate(variable, &system_folder) {
+        Ok((paths, _)) => paths,
         Err(error) if error.code != "invalid_storage_or_path" => {
             return Ok(DiagnosticCheck::new(
                 "daemon",
@@ -508,7 +511,7 @@ pub fn daemon_check(
         }
         Err(error) => return Err(error),
     };
-    Ok(match endpoint_state(&endpoint, owners)? {
+    Ok(match endpoint_state(&paths.endpoint, owners)? {
         EndpointState::Foreign => DiagnosticCheck::new(
             "daemon",
             "error",
@@ -517,8 +520,19 @@ pub fn daemon_check(
         EndpointState::Absent => {
             DiagnosticCheck::new("daemon", "warning", "absent: commands run directly.")
         }
-        // ponytail: no client before lot 7.5.
-        EndpointState::Present => DiagnosticCheck::new("daemon", "warning", NOT_DELIVERED),
+        EndpointState::Present => match hello(&paths) {
+            Ok(Some(version)) => {
+                DiagnosticCheck::new("daemon", "ok", format!("running: version {version}."))
+            }
+            Ok(None) => {
+                DiagnosticCheck::new("daemon", "warning", "not_answering: commands run directly.")
+            }
+            Err(error) => DiagnosticCheck::new(
+                "daemon",
+                "error",
+                format!("{}: {}", error.code, error.message),
+            ),
+        },
     })
 }
 

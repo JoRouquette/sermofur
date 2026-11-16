@@ -285,15 +285,22 @@ pub enum EndpointState {
 pub fn endpoint_state(endpoint: &Path, owners: &dyn FileOwnership) -> Result<EndpointState> {
     if cfg!(windows) {
         let name = endpoint.to_string_lossy();
-        let listing = std::fs::read_dir(r"\\.\pipe\").map_err(|_| invalid_storage())?;
-        for entry in listing {
-            let entry = entry.map_err(|_| invalid_storage())?;
-            if entry
-                .file_name()
-                .to_string_lossy()
-                .eq_ignore_ascii_case(&name)
-            {
-                return Ok(EndpointState::Present);
+        // ponytail: a full listing of the pipe file system skips names when other pipes close
+        // during it (lot 7.5: a running daemon seen absent, 2 times in 96 runs of
+        // `daemon_server` beside 7 others). .NET asks for the one name
+        // (`EnumerateFiles(folder, name)`), which needs a Win32 call here (`unsafe`). A name not
+        // seen is looked for again, three listings in all, before it counts as absent.
+        for _ in 0..3 {
+            let listing = std::fs::read_dir(r"\\.\pipe\").map_err(|_| invalid_storage())?;
+            for entry in listing {
+                let entry = entry.map_err(|_| invalid_storage())?;
+                if entry
+                    .file_name()
+                    .to_string_lossy()
+                    .eq_ignore_ascii_case(&name)
+                {
+                    return Ok(EndpointState::Present);
+                }
             }
         }
         return Ok(EndpointState::Absent);

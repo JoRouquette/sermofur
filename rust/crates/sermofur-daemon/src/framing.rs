@@ -109,6 +109,19 @@ fn protocol_error(message: &str) -> SermofurError {
 /// Reads one message of at most `limit` bytes, or `None` when the stream ends cleanly between
 /// two frames. A frame over the limit is refused from its header, before its body is read.
 pub fn read(stream: &mut impl Read, limit: usize) -> Result<Option<IpcMessage>, FrameError> {
+    read_with(stream, limit, decode)
+}
+
+/// [`read`] of an answer of the daemon, decoded by [`decode_answer`].
+pub fn read_answer(stream: &mut impl Read, limit: usize) -> Result<Option<IpcMessage>, FrameError> {
+    read_with(stream, limit, decode_answer)
+}
+
+fn read_with(
+    stream: &mut impl Read,
+    limit: usize,
+    decode: fn(&[u8]) -> Result<IpcMessage, SermofurError>,
+) -> Result<Option<IpcMessage>, FrameError> {
     let mut header = [0u8; 4];
     let got = fill(stream, &mut header)?;
     if got == 0 {
@@ -180,13 +193,81 @@ pub fn decode(body: &[u8]) -> Result<IpcMessage, SermofurError> {
         // A `null` document: the .NET serializer returns no message.
         return Err(protocol_error("Message without kind."));
     };
-    let mut message = IpcMessage::default();
-    // `Kind` is a `required` property: a missing one is a JSON error, a null one is not.
-    let mut kind: Option<Option<String>> = None;
-    // Properties in order, the last one wins; an unknown one is skipped.
+    message_of(properties)
+}
+
+/// [`decode`] for an answer of up to 16 MiB, as the client reads it: the same message and the
+/// same refusals, but property by property ([`stj::parse_flat`]): an array or an object is
+/// checked without being built, and so is the value of a name the message does not read, so
+/// the memory used stays near the size of the body. `argv`, never read in an answer, is
+/// checked but kept empty.
+pub fn decode_answer(body: &[u8]) -> Result<IpcMessage, SermofurError> {
+    let json = std::str::from_utf8(body).map_err(|_| malformed())?;
+    // A container stands as an empty one of the same validity for the conversion.
+    let (texts, others, object) = (
+        Node::Array(Vec::new()),
+        Node::Array(vec![Node::Bool(false)]),
+        Node::Object(Vec::new()),
+    );
+    let mut reading = Reading::default();
+    let found = stj::parse_flat(json, &|name| NAMES.contains(&name), &mut |name, value| {
+        let node = match &value {
+            stj::Flat::Scalar(node) => node,
+            stj::Flat::Array { texts: true } => &texts,
+            stj::Flat::Array { texts: false } => &others,
+            stj::Flat::Object => &object,
+        };
+        reading.property(name, node)
+    })
+    .map_err(|_| malformed())?;
+    if !found {
+        return Err(protocol_error("Message without kind."));
+    }
+    reading.finish()
+}
+
+/// The properties a message reads; any other is skipped.
+const NAMES: [&str; 16] = [
+    "kind",
+    "protocol",
+    "toolVersion",
+    "cwd",
+    "pid",
+    "id",
+    "argv",
+    "exitCode",
+    "stdout",
+    "stderr",
+    "code",
+    "message",
+    "startedAt",
+    "instancesOpen",
+    "clients",
+    "registry",
+];
+
+/// The message of the properties of a body, in order.
+fn message_of(properties: Vec<(&str, &Node)>) -> Result<IpcMessage, SermofurError> {
+    let mut reading = Reading::default();
     for (name, value) in properties {
+        reading.property(name, value)?;
+    }
+    reading.finish()
+}
+
+/// A message read property by property: in order, the last one wins, a bad one fails at once.
+#[derive(Default)]
+struct Reading {
+    message: IpcMessage,
+    /// `Kind` is a `required` property: a missing one is a JSON error, a null one is not.
+    kind: Option<Option<String>>,
+}
+
+impl Reading {
+    fn property(&mut self, name: &str, value: &Node) -> Result<(), SermofurError> {
+        let message = &mut self.message;
         let converted = match name {
-            "kind" => text(value).map(|v| kind = Some(v)),
+            "kind" => text(value).map(|v| self.kind = Some(v)),
             "protocol" => int(value).map(|v| message.protocol = v),
             "toolVersion" => text(value).map(|v| message.tool_version = v),
             "cwd" => text(value).map(|v| message.cwd = v),
@@ -202,17 +283,22 @@ pub fn decode(body: &[u8]) -> Result<IpcMessage, SermofurError> {
             "instancesOpen" => int(value).map(|v| message.instances_open = v),
             "clients" => int(value).map(|v| message.clients = v),
             "registry" => text(value).map(|v| message.registry = v),
+            // An unknown property is skipped.
             _ => Some(()),
         };
-        converted.ok_or_else(malformed)?;
+        converted.ok_or_else(malformed)
     }
-    match kind {
-        None => Err(malformed()),
-        Some(None) => Err(protocol_error("Message without kind.")),
-        Some(Some(k)) if k.is_empty() => Err(protocol_error("Message without kind.")),
-        Some(Some(k)) => {
-            message.kind = k;
-            Ok(message)
+
+    fn finish(self) -> Result<IpcMessage, SermofurError> {
+        let mut message = self.message;
+        match self.kind {
+            None => Err(malformed()),
+            Some(None) => Err(protocol_error("Message without kind.")),
+            Some(Some(k)) if k.is_empty() => Err(protocol_error("Message without kind.")),
+            Some(Some(k)) => {
+                message.kind = k;
+                Ok(message)
+            }
         }
     }
 }

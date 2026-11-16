@@ -520,8 +520,8 @@ impl Drop for Daemon {
 
 /// The endpoint of a daemon of the oracle, started under its own `SERMOFUR_DAEMON_HOME`, is
 /// found by the port under the same name (hash of the folder, listing of the pipes or the
-/// socket): the oracle connects and reports it running, the port reports it not probed until
-/// its client (lot 7.5); once the daemon stops, both report it absent.
+/// socket): both tools connect and report it running with the same line (lot 7.5); once the
+/// daemon is killed, both report it absent (Windows) or not answering (a socket left behind).
 #[test]
 fn the_endpoint_of_a_running_daemon_is_found() {
     let Ok(oracle) = std::env::var("SMF_ORACLE") else {
@@ -553,7 +553,7 @@ fn the_endpoint_of_a_running_daemon_is_found() {
     }
     assert_eq!(
         daemon_line(rust, &root, &home),
-        "  warning: daemon — Capability not delivered in this version."
+        daemon_line(&oracle, &root, &home)
     );
     let _ = daemon.0.kill();
     let _ = daemon.0.wait();
@@ -566,12 +566,11 @@ fn the_endpoint_of_a_running_daemon_is_found() {
         );
         assert!(daemon_line(rust, &root, &home).contains("absent"));
     } else {
-        // A killed daemon leaves its socket: the oracle connects and reports it not answering,
-        // the port reports it not probed until its client (lot 7.5).
+        // A killed daemon leaves its socket: both tools try it and report it not answering.
         assert!(daemon_line(&oracle, &root, &home).contains("not_answering"));
         assert_eq!(
             daemon_line(rust, &root, &home),
-            "  warning: daemon — Capability not delivered in this version."
+            daemon_line(&oracle, &root, &home)
         );
     }
 }

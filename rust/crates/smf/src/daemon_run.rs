@@ -25,7 +25,7 @@ use crate::runner::{combine, not_ported, run_in, write_line};
 
 /// `CliRouter.LocalOnly`: help, version, no command, and the commands that run only in the
 /// process of the user.
-fn local_only(argv: &[String]) -> bool {
+pub(crate) fn local_only(argv: &[String]) -> bool {
     if argv.is_empty()
         || CommandArguments::asks(argv, HELP, HELP_SHORTCUT)
         || CommandArguments::asks(argv, VERSION_OPTION, VERSION_SHORTCUT)

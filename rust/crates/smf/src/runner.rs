@@ -124,6 +124,8 @@ struct ErrorBody<'a> {
 ///
 /// Results go to `out`, errors to `err`: with `--json`, an error is a JSON object on `err` and
 /// `out` stays empty.
+/// The process itself goes through the router (`router::route`).
+#[cfg(test)]
 pub fn run(arguments: &[String], out: &mut dyn Write, err: &mut dyn Write) -> i32 {
     run_in(arguments, None, "direct", out, err)
 }
@@ -215,7 +217,7 @@ fn execute(
         let report = doctor::inspect(
             &root,
             &SystemOwnership,
-            Some(&|| doctor::daemon_check(&variable, &SystemOwnership)),
+            Some(&|| doctor::daemon_check(&variable, &SystemOwnership, &crate::router::probe)),
             Some(&|root: &Path| doctor::mcp_check(root, &variable)),
         )?;
         if json {
@@ -291,7 +293,7 @@ fn to_json<T: Serialize>(value: &T) -> Result<String> {
     })
 }
 
-fn write_error(err: &mut dyn Write, error: &SermofurError, json: bool) {
+pub(crate) fn write_error(err: &mut dyn Write, error: &SermofurError, json: bool) {
     let text = if json {
         to_json(&ErrorBody {
             code: &error.code,

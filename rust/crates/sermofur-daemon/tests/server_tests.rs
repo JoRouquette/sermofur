@@ -13,6 +13,7 @@ use std::time::{Duration, Instant};
 use sermofur_core::error::Result;
 use sermofur_core::format::DateTimeOffset;
 use sermofur_core::ownership::SystemOwnership;
+use sermofur_daemon::client::DaemonClient;
 use sermofur_daemon::daemon_paths::{DaemonPaths, HOME_VARIABLE};
 use sermofur_daemon::endpoint::{Stream, connect};
 use sermofur_daemon::framing::{self, IpcMessage, MAX_RESPONSE_BYTES, kind};
@@ -405,12 +406,22 @@ impl CommandExecutor for Gated {
                 .wait_timeout_while(state, Duration::from_secs(30), |s| !s.released)
                 .unwrap_or_else(PoisonError::into_inner);
         }
+        let stdout = match argv[0].as_str() {
+            "big" => big(),
+            "huge" => "x".repeat(MAX_RESPONSE_BYTES + 1),
+            _ => argv[0].clone(),
+        };
         CommandOutcome {
             exit_code: 0,
-            stdout: argv[0].clone(),
+            stdout,
             stderr: String::new(),
         }
     }
+}
+
+/// `GatedExecutor.Big`: 300 000 characters, 600 000 UTF-8 bytes beyond ASCII.
+fn big() -> String {
+    "é€ ".repeat(100_000)
 }
 
 /// Releases the [`Gated`] executor on drop, so that a failed test never leaves a command blocked.
@@ -652,4 +663,33 @@ fn a_client_that_leaves_abandons_its_queued_write() {
         assert_eq!(code(answer(&mut after).await).2, Some(0));
     });
     assert!(!gated.ran("queued"));
+}
+
+/// Port of `DaemonSessionTests.LargeNonAsciiOutputIsAnsweredOnce`, through the client of the
+/// port: a large non-ASCII output comes back whole, one over 16 MiB is `response_too_large`
+/// (exit 1), the session stays usable, and each command runs exactly once.
+#[test]
+fn a_large_non_ascii_output_is_answered_once() {
+    let (fixture, gated) = Fixture::gated("non-ascii", DaemonLimits::default());
+    block_on(async {
+        let mut client = DaemonClient::connect(
+            &fixture.paths,
+            &SystemOwnership,
+            "test",
+            &fixture.root,
+            Duration::from_secs(5),
+        )
+        .await
+        .expect("no refusal")
+        .expect("a daemon answers");
+        let run = |argv: &str| vec![argv.to_owned()];
+        let answer = client.run(&run("big")).await.expect("an answer");
+        assert_eq!(answer.kind, kind::RESULT);
+        assert!(answer.stdout == Some(big()), "the output differs");
+        let huge = client.run(&run("huge")).await.expect("an answer");
+        assert_eq!(code(Some(huge)), error("response_too_large", 1));
+        let quick = client.run(&run("quick")).await.expect("an answer");
+        assert_eq!(quick.stdout.as_deref(), Some("quick"));
+    });
+    assert_eq!(gated.state().ran, ["big", "huge", "quick"]);
 }

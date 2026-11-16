@@ -840,6 +840,15 @@ async fn send(writer: &mut (impl AsyncWrite + Unpin), frame: &[u8]) -> std::io::
 /// `Framing.ReadAsync`: the bytes of one frame are gathered, then read by [`framing::read`],
 /// so that every refusal and every count of bytes consumed is the one of the synchronous reader.
 pub async fn read_message(stream: &mut (impl AsyncRead + Unpin), limit: usize) -> Read {
+    framing::read(&mut gather(stream, limit).await?.as_slice(), limit)
+}
+
+/// The bytes of one frame: its header, then its body when the header announces a size within
+/// `limit`; fewer when the stream ends first.
+pub(crate) async fn gather(
+    stream: &mut (impl AsyncRead + Unpin),
+    limit: usize,
+) -> std::io::Result<Vec<u8>> {
     let mut bytes = vec![0u8; 4];
     let got = fill(stream, &mut bytes).await?;
     bytes.truncate(got);
@@ -851,7 +860,7 @@ pub async fn read_message(stream: &mut (impl AsyncRead + Unpin), limit: usize) -
             bytes.truncate(4 + got);
         }
     }
-    framing::read(&mut bytes.as_slice(), limit)
+    Ok(bytes)
 }
 
 async fn fill(stream: &mut (impl AsyncRead + Unpin), buffer: &mut [u8]) -> std::io::Result<usize> {

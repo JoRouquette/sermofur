@@ -4,6 +4,7 @@ mod args;
 mod daemon_run;
 mod help;
 mod memory_commands;
+mod router;
 mod runner;
 #[cfg(test)]
 mod test_support;
@@ -18,7 +19,7 @@ fn main() -> ExitCode {
         .skip(1)
         .map(|argument| argument.to_string_lossy().into_owned())
         .collect();
-    let code = runner::run(
+    let code = router::route(
         &arguments,
         &mut io::stdout().lock(),
         &mut io::stderr().lock(),

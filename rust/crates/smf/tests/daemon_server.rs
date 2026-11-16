@@ -449,7 +449,7 @@ fn another_version_is_reported_before_any_protocol_check() {
 /// once and a write, on a real instance; every command answers and every hello comes within
 /// the 5 s bound of the test client. The slowest hello is reported. A read refused with
 /// `daemon_busy` is accepted (wait for a place of 5 s instead of the request timeout of the
-/// .NET test); the write must run.
+/// .NET test); the write and at least one read must run.
 #[test]
 fn twenty_four_recalls_and_a_write_all_answer_and_hellos_stay_in_time() {
     const HELLO_BOUND: Duration = Duration::from_secs(5);
@@ -499,6 +499,7 @@ fn twenty_four_recalls_and_a_write_all_answer_and_hellos_stay_in_time() {
         thread::sleep(Duration::from_millis(20));
     }
     let mut slowest_hello = Duration::ZERO;
+    let mut reads = 0;
     for (n, command) in commands.into_iter().enumerate() {
         let answers = command.join().expect("a client");
         let (welcome, hello_took) = &answers[0];
@@ -512,11 +513,12 @@ fn twenty_four_recalls_and_a_write_all_answer_and_hellos_stay_in_time() {
         // The oracle raises the wait for a place to the request timeout; the real `smf` keeps
         // 5 s, so on a runner with two places a read may be refused: only the write must run.
         let busy = n < 24 && result.code.as_deref() == Some("daemon_busy");
-        assert!(
-            busy || (result.kind.as_str(), result.exit_code) == ("result", Some(0)),
-            "{result:?}"
-        );
+        let served = (result.kind.as_str(), result.exit_code) == ("result", Some(0));
+        assert!(busy || served, "{result:?}");
+        reads += usize::from(n < 24 && served);
     }
+    // At least one recall must really run: a daemon that refuses every read is not served.
+    assert!(reads >= 1, "no recall was served");
     eprintln!(
         "25 commands in {:?}; slowest hello of a command {slowest_hello:?}, of a probe {slowest_probe:?}",
         started.elapsed()
