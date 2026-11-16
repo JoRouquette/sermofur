@@ -254,17 +254,29 @@ fn supervise_daemon(paths: DaemonPaths) -> Result<i32> {
     );
     let stop = Arc::new(AtomicBool::new(false));
     let flag = Arc::clone(&stop);
+    // Registered before the daemon starts, as `SignalStop.Register`: the thread answers once
+    // the handlers are in place, or with the reason they are not.
+    let (registered, acknowledged) = std::sync::mpsc::channel::<std::io::Result<()>>();
     std::thread::spawn(move || {
-        let Ok(runtime) = tokio::runtime::Builder::new_current_thread()
+        let signals = tokio::runtime::Builder::new_current_thread()
             .enable_all()
             .build()
-        else {
-            return;
+            .and_then(|runtime| {
+                // Tokio registers signals inside a runtime.
+                let signals = runtime.block_on(async { Signals::register() })?;
+                Ok((runtime, signals))
+            });
+        let (runtime, mut signals) = match signals {
+            Ok(ready) => {
+                let _ = registered.send(Ok(()));
+                ready
+            }
+            Err(error) => {
+                let _ = registered.send(Err(error));
+                return;
+            }
         };
         runtime.block_on(async {
-            let Ok(mut signals) = Signals::register() else {
-                return;
-            };
             loop {
                 let code = signals.next().await;
                 if !handle(&flag, || {}) {
@@ -273,6 +285,10 @@ fn supervise_daemon(paths: DaemonPaths) -> Result<i32> {
             }
         });
     });
+    acknowledged
+        .recv()
+        .unwrap_or_else(|_| Err(std::io::Error::other("the signal thread ended")))
+        .map_err(|error| SermofurError::new("internal_error", error.to_string(), 70))?;
     let stopper = paths.clone();
     let supervisor = Supervisor::new(
         start,

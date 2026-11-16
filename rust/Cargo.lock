@@ -698,6 +698,7 @@ dependencies = [
  "serde_json",
  "sermofur-core",
  "sermofur-daemon",
+ "sermofur-mcp",
  "tokio",
  "uuid",
 ]

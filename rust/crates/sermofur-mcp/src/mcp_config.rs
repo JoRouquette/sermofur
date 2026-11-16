@@ -7,12 +7,10 @@
 //! an early token ("not a JSON object", "\"mcpServers\" is not an object") wins over a syntax
 //! error further on: strict JSON, depth 64, no comment, strings checked for control characters
 //! and escapes but not for UTF-8.
-//!
-//! Lives in `sermofur-core` until the `sermofur-mcp` crate is declared in the workspace.
 
-use crate::error::{Result, SermofurError};
-use crate::instance::invalid_storage;
-use crate::json::quoted_basic_latin;
+use sermofur_core::error::{Result, SermofurError};
+use sermofur_core::instance::invalid_storage;
+use sermofur_core::json::quoted_basic_latin;
 
 pub const FILE_NAME: &str = ".mcp.json";
 pub const SERVERS_PROPERTY: &str = "mcpServers";

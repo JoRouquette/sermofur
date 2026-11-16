@@ -14,6 +14,7 @@ workspace = true
 serde = { version = "1", features = ["derive"] }
 sermofur-core = { path = "../sermofur-core" }
 sermofur-daemon = { path = "../sermofur-daemon" }
+sermofur-mcp = { path = "../sermofur-mcp" }
 # Decision A2 of John: tokio for the daemon and its client only (`smf daemon run`, the router).
 tokio = { version = "1.54.1", default-features = false, features = ["io-util", "rt", "signal", "time"] }
 

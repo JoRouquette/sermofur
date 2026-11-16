@@ -102,7 +102,13 @@ impl Supervisor {
                 match daemon.try_wait() {
                     Ok(Some(status)) => break status,
                     Ok(None) => thread::sleep(POLL),
-                    Err(_) => return 1,
+                    Err(_) => {
+                        // The state of the daemon is unknown: stop it rather than leave it alone.
+                        self.stop_daemon(&mut daemon);
+                        self.log
+                            .write("supervised_give_up", Some("wait_failed"), pid, None);
+                        return 1;
+                    }
                 }
             };
             let code = exit_code(status);
@@ -154,7 +160,8 @@ impl Supervisor {
         (self.request_stop)();
         let waited = Instant::now();
         while waited.elapsed() < Duration::from_secs(5) {
-            if !matches!(daemon.try_wait(), Ok(None)) {
+            // A failed wait proves nothing: wait on, then kill.
+            if matches!(daemon.try_wait(), Ok(Some(_))) {
                 return;
             }
             thread::sleep(POLL);

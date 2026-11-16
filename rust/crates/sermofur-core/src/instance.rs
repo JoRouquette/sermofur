@@ -43,7 +43,7 @@ pub(crate) fn link_not_supported() -> SermofurError {
 }
 
 /// `invalid_storage_or_path`, exit 3: `CommandRunner` maps JSON and IO failures to it.
-pub(crate) fn invalid_storage() -> SermofurError {
+pub fn invalid_storage() -> SermofurError {
     SermofurError::new(
         "invalid_storage_or_path",
         "Invalid path or data; run doctor.",
