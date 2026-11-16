@@ -13,7 +13,7 @@ workspace = true
 [dependencies]
 sermofur-core = { path = "../sermofur-core" }
 # Decision A2 of John: tokio for the daemon and its client only, the core stays synchronous.
-tokio = { version = "1.54.1", default-features = false, features = ["net", "time"] }
+tokio = { version = "1.54.1", default-features = false, features = ["io-util", "net", "rt", "sync", "time"] }
 
 [dev-dependencies]
 proptest = "1"

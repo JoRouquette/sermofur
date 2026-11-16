@@ -181,6 +181,9 @@ mod platform {
                 None => create(&self.name, false).map_err(io_failure)?,
             };
             pipe.connect().await.map_err(io_failure)?;
+            // One instance ahead, as `PipeListener`: a client arriving before the next accept
+            // finds a listening instance instead of a busy pipe.
+            self.next = create(&self.name, false).ok();
             Ok(Stream(Box::new(pipe)))
         }
     }

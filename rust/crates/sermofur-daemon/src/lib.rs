@@ -12,5 +12,6 @@ pub mod file_turn;
 pub mod framing;
 pub mod log;
 pub mod registry;
+pub mod server;
 
 mod relaxed_escape_table;

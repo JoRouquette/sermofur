@@ -125,9 +125,22 @@ struct ErrorBody<'a> {
 /// Results go to `out`, errors to `err`: with `--json`, an error is a JSON object on `err` and
 /// `out` stays empty.
 pub fn run(arguments: &[String], out: &mut dyn Write, err: &mut dyn Write) -> i32 {
+    run_in(arguments, None, "direct", out, err)
+}
+
+/// `new CommandRunner(output, error, mode).Run(arguments, workingDirectory)`: `None` takes the
+/// current directory of the process; the daemon gives the `cwd` of its client and the mode
+/// `daemon`, which `status` reports.
+pub fn run_in(
+    arguments: &[String],
+    working_directory: Option<&Path>,
+    mode: &'static str,
+    out: &mut dyn Write,
+    err: &mut dyn Write,
+) -> i32 {
     // Read ahead: a parsing error must already honour the requested format.
     let json = CommandArguments::has_flag(arguments, "json");
-    match execute(arguments, json, out) {
+    match execute(arguments, json, working_directory, mode, out, err) {
         Ok(code) => code,
         Err(error) => {
             write_error(err, &error, json);
@@ -136,7 +149,14 @@ pub fn run(arguments: &[String], out: &mut dyn Write, err: &mut dyn Write) -> i3
     }
 }
 
-fn execute(arguments: &[String], json: bool, out: &mut dyn Write) -> Result<i32> {
+fn execute(
+    arguments: &[String],
+    json: bool,
+    working_directory: Option<&Path>,
+    mode: &'static str,
+    out: &mut dyn Write,
+    err: &mut dyn Write,
+) -> Result<i32> {
     if arguments.is_empty() || CommandArguments::asks(arguments, HELP, HELP_SHORTCUT) {
         write_line(out, &help::usage());
         return Ok(0);
@@ -156,14 +176,20 @@ fn execute(arguments: &[String], json: bool, out: &mut dyn Write) -> Result<i32>
         .first()
         .is_some_and(|command| command == "daemon" || command == "mcp")
     {
+        // Lot 7.4: `daemon run` only; the other subcommands come with lots 7.6 and 7.7.
+        if mode == "direct" && parsed.positionals().get(1).is_some_and(|sub| sub == "run") {
+            return crate::daemon_run::run(&mut parsed, json, out, err);
+        }
         return Err(not_ported());
     }
     // `Path.GetFullPath(args.Option("path", workingDirectory), workingDirectory)`: a relative
     // `--path` is taken from the working directory, then normalized as `GetFullPath` does
     // (`sub ` is `sub`), before any command; its `ArgumentException` is `invalid_storage_or_path`.
     // `Environment.CurrentDirectory` expands the short 8.3 names of the folder on Windows.
-    let working_directory =
-        expand_short_names(&std::env::current_dir().map_err(|_| invalid_storage())?);
+    let working_directory = match working_directory {
+        Some(folder) => folder.to_path_buf(),
+        None => expand_short_names(&std::env::current_dir().map_err(|_| invalid_storage())?),
+    };
     let path: PathBuf = match parsed.option("path") {
         Some(value) => get_full_path(&combine(value, &working_directory))?,
         None => working_directory,
@@ -229,13 +255,20 @@ fn execute(arguments: &[String], json: bool, out: &mut dyn Write) -> Result<i32>
     let mut store = Store::open(&root, configuration.instance_id, !writes(&parsed))?;
     let scopes = store.read_scopes()?;
     let context = resolve_context(&path, &root, &scopes)?;
-    let body = dispatch(&mut parsed, &mut store, &context, &configuration, &path)?;
+    let body = dispatch(
+        &mut parsed,
+        &mut store,
+        &context,
+        &configuration,
+        &path,
+        mode,
+    )?;
     write_line(out, &body);
     Ok(0)
 }
 
 /// A command of the .NET tool that the port does not run yet.
-fn not_ported() -> SermofurError {
+pub(crate) fn not_ported() -> SermofurError {
     SermofurError::new(
         "not_ported",
         "This command is not ported to Rust yet.",
@@ -273,7 +306,7 @@ fn write_error(err: &mut dyn Write, error: &SermofurError, json: bool) {
 
 /// Writes a line. A write that fails (output closed by the reader, for example) cannot be
 /// reported anywhere more useful, so it is ignored, as a closed pipe ends any command-line tool.
-fn write_line(writer: &mut dyn Write, text: &str) {
+pub(crate) fn write_line(writer: &mut dyn Write, text: &str) {
     let _ = writer.write_all(text.as_bytes());
     let _ = writer.write_all(NEW_LINE.as_bytes());
     let _ = writer.flush();

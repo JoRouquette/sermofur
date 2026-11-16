@@ -97,6 +97,7 @@ pub fn dispatch(
     context: &MemoryContext,
     configuration: &InstanceConfiguration,
     path: &Path,
+    mode: &str,
 ) -> Result<String> {
     let command = args.positionals()[0].clone();
     match command.as_str() {
@@ -113,8 +114,8 @@ pub fn dispatch(
                 evidence: count(RecordKind::Evidence),
                 retex: count(RecordKind::Retex),
                 sources: count(RecordKind::Source),
-                // ponytail: always direct until the daemon (lot 7.4) runs commands for clients.
-                mode: "direct",
+                // `direct`, or `daemon` when the daemon runs it for a client.
+                mode,
                 laya: "unavailable",
             })
         }
