@@ -195,7 +195,7 @@ fn execute(
         .first()
         .is_some_and(|command| command == "mcp")
     {
-        // Lot 8.3; `mcp serve` comes with lot 8.4.
+        // Lots 8.3 and 8.4.
         return crate::mcp_commands::run(&mut parsed, &working_directory, out);
     }
     let path: PathBuf = match parsed.option("path") {

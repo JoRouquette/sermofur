@@ -148,11 +148,29 @@ pub fn try_parse(text: &str) -> Option<Uuid> {
     }
 }
 
+/// `Guid.TryParseExact(text, "D")`: blanks around trimmed, then the format D only, with the
+/// leniencies of the .NET parser in its first four groups (identifiers of the MCP tools).
+pub fn try_parse_exact_d(text: &str) -> Option<Uuid> {
+    let text: Vec<char> = text.trim().chars().collect();
+    exact_d(&text)
+}
+
 #[cfg(test)]
 mod tests {
     use proptest::prelude::*;
 
-    use super::{Uuid, try_parse};
+    use super::{Uuid, try_parse, try_parse_exact_d};
+
+    #[test]
+    fn the_exact_d_form_is_the_only_one_accepted() {
+        let id = "0f8fad5b-d9cb-469f-a165-70867728950e";
+        assert!(try_parse_exact_d(id).is_some());
+        assert!(try_parse_exact_d(&format!(" {id}\t")).is_some());
+        assert!(try_parse_exact_d(&id.to_uppercase()).is_some());
+        assert!(try_parse_exact_d(&id.replace('-', "")).is_none());
+        assert!(try_parse_exact_d(&format!("{{{id}}}")).is_none());
+        assert!(try_parse_exact_d("").is_none());
+    }
 
     /// `Guid.ToString("X")`: `{0xaaaaaaaa,0xbbbb,0xcccc,{0xdd,…}}`.
     fn x_form(id: Uuid) -> String {

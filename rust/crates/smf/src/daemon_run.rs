@@ -192,17 +192,17 @@ pub fn run(
 /// The signals of `SignalStop`: SIGINT and SIGTERM on Unix; on Windows, as .NET maps them,
 /// `CTRL_C_EVENT` and `CTRL_SHUTDOWN_EVENT`.
 #[cfg(unix)]
-struct Signals(tokio::signal::unix::Signal, tokio::signal::unix::Signal);
+pub(crate) struct Signals(tokio::signal::unix::Signal, tokio::signal::unix::Signal);
 
 #[cfg(windows)]
-struct Signals(
+pub(crate) struct Signals(
     tokio::signal::windows::CtrlC,
     tokio::signal::windows::CtrlShutdown,
 );
 
 impl Signals {
     #[cfg(unix)]
-    fn register() -> std::io::Result<Self> {
+    pub(crate) fn register() -> std::io::Result<Self> {
         use tokio::signal::unix::{SignalKind, signal};
         Ok(Self(
             signal(SignalKind::interrupt())?,
@@ -211,7 +211,7 @@ impl Signals {
     }
 
     #[cfg(windows)]
-    fn register() -> std::io::Result<Self> {
+    pub(crate) fn register() -> std::io::Result<Self> {
         use tokio::signal::windows::{ctrl_c, ctrl_shutdown};
         Ok(Self(ctrl_c()?, ctrl_shutdown()?))
     }
@@ -219,7 +219,7 @@ impl Signals {
     /// Waits for the next signal; returns the exit code of its default action: 128 plus the
     /// number of the signal on Unix (the oracle dies by the signal itself, which a shell
     /// reports with the same number), `STATUS_CONTROL_C_EXIT` on Windows.
-    async fn next(&mut self) -> i32 {
+    pub(crate) async fn next(&mut self) -> i32 {
         let interrupt = first(self.0.recv(), self.1.recv()).await.is_ok();
         if cfg!(windows) {
             // STATUS_CONTROL_C_EXIT, 0xC000013A, as an `i32` exit code.
@@ -314,6 +314,26 @@ pub(crate) fn handle(stop: &AtomicBool, on_first: impl FnOnce()) -> bool {
 #[cfg(test)]
 mod signal_tests {
     use super::*;
+
+    /// Port of `DaemonSessionTests.CommandsOfTheCliAloneAreRefusedByTheDaemon` at the executor:
+    /// the daemon answers `cli_only`, exit 3 (the session staying usable is checked by the
+    /// `cli_only` exchange of `daemon_server.rs`).
+    #[test]
+    fn commands_of_the_cli_alone_are_refused_by_the_daemon() {
+        for argv in [
+            &["daemon", "stop"][..],
+            &["mcp", "serve"],
+            &["init"],
+            &["doctor"],
+            &["status", "--help"],
+        ] {
+            let argv: Vec<String> = argv.iter().map(|word| (*word).to_owned()).collect();
+            let refused = CliCommandExecutor
+                .plan(&argv, &std::env::temp_dir().to_string_lossy())
+                .expect_err("refused");
+            assert_eq!((refused.code.as_str(), refused.exit_code), ("cli_only", 3));
+        }
+    }
 
     /// Port of `ServiceTests.SecondSignalEndsTheProcess` (reported from lot 7.6).
     #[test]

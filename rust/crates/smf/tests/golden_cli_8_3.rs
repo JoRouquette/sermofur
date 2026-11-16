@@ -285,3 +285,43 @@ fn the_oracle_and_the_port_declare_alike() {
     }
     assert_eq!(expected.len(), actual.len());
 }
+
+/// Minor of lot 8.3, closed at lot 8.4: a declaration file present but unreadable (mode 000)
+/// stops `doctor` with `invalid_storage_or_path`, exit 3, as the oracle; `mcp install` answers
+/// `invalid_mcp_config`, exit 3 (named deviation of lot 8.3). Skipped for root, who reads it.
+#[cfg(unix)]
+#[test]
+fn an_unreadable_declaration_stops_doctor_as_the_oracle() {
+    use std::os::unix::fs::PermissionsExt;
+
+    let mut programs = vec![SMF.to_owned()];
+    programs.extend(std::env::var("SMF_ORACLE").ok().filter(|v| !v.is_empty()));
+    for program in programs {
+        let scratch = instance(&program);
+        let root = &scratch.0;
+        let file = root.join("instance").join(".mcp.json");
+        fs::write(&file, "{}").expect("written");
+        fs::set_permissions(&file, fs::Permissions::from_mode(0o000)).expect("mode");
+        if fs::read(&file).is_ok() {
+            eprintln!("this account reads a file of mode 000 (root): skipped");
+            return;
+        }
+        let doctor = smf(&program, root, &["doctor", "--json"]);
+        assert_eq!(doctor.code, 3, "{program}: {}", doctor.stderr);
+        assert!(
+            doctor.stderr.contains("invalid_storage_or_path"),
+            "{}",
+            doctor.stderr
+        );
+        if program == SMF {
+            let install = smf(SMF, root, &["mcp", "install", "--json"]);
+            assert_eq!(install.code, 3, "{}", install.stderr);
+            assert!(
+                install.stderr.contains("invalid_mcp_config"),
+                "{}",
+                install.stderr
+            );
+        }
+        fs::set_permissions(&file, fs::Permissions::from_mode(0o600)).expect("mode");
+    }
+}

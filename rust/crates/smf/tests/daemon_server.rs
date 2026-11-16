@@ -660,3 +660,51 @@ fn daemon_run_json_says_where_it_listens() {
         }
     }
 }
+
+/// Port of `DaemonRobustnessTests.ReplayedKeyGivesTheFirstObject` (reported to lot 8): the same
+/// write with the same key, from two sessions, gives the first object and stores one claim.
+#[test]
+fn a_replayed_key_gives_the_first_object() {
+    use sermofur_daemon::client::DaemonClient;
+
+    let home = Home::new("replayed-key");
+    let root = home.instance("instance", true);
+    let _daemon = home.daemon(SMF);
+    let add: Vec<String> = [
+        "claim", "add", "once", "--origin", "user", "--key", "replay-1", "--json",
+    ]
+    .map(str::to_owned)
+    .to_vec();
+    let folder = root.to_string_lossy().into_owned();
+    let paths = home.paths();
+    let ids: Vec<String> = block_on(async {
+        let mut ids = Vec::new();
+        for _ in 0..2 {
+            let mut client = DaemonClient::connect(
+                &paths,
+                &SystemOwnership,
+                VERSION,
+                &folder,
+                Duration::from_secs(5),
+            )
+            .await
+            .expect("no refusal")
+            .expect("a daemon answers");
+            let answer = client.run(&add).await.expect("an answer");
+            let printed: serde_json::Value =
+                serde_json::from_str(answer.stdout.as_deref().expect("stdout")).expect("JSON");
+            ids.push(printed["id"].as_str().expect("an id").to_owned());
+        }
+        ids
+    });
+    assert_eq!(ids[0], ids[1]);
+    let listed = Command::new(SMF)
+        .args(["claim", "list", "--json"])
+        .current_dir(&root)
+        .env("SERMOFUR_NO_DAEMON", "1")
+        .env(HOME_VARIABLE, home.home())
+        .output()
+        .expect("listed");
+    let claims: serde_json::Value = serde_json::from_slice(&listed.stdout).expect("JSON");
+    assert_eq!(claims.as_array().expect("claims").len(), 1);
+}

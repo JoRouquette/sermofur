@@ -12,3 +12,10 @@ workspace = true
 
 [dependencies]
 sermofur-core = { path = "../sermofur-core" }
+sermofur-daemon = { path = "../sermofur-daemon" }
+# Decision A2 of John: tokio for the daemon and its clients; the bridge is one of them.
+tokio = { version = "1.54.1", default-features = false, features = ["rt", "sync", "time"] }
+
+[dev-dependencies]
+proptest = "1"
+tokio = { version = "1.54.1", default-features = false, features = ["io-util", "rt"] }

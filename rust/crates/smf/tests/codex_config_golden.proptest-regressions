@@ -5,3 +5,4 @@
 # It is recommended to check this file in to source control so that
 # everyone who runs the test benefits from these saved cases.
 cc c7abaac4c865c1ec9ff195d96658ecca47b568ad7670385522c006c2000988f2 # shrinks to content = "\r", wrapped = false
+cc 2815043f44730959aae9b06d83f287a9ee503aa2660f79214f2bd86fb92a4be5 # shrinks to content = "command=\"\"\"\n\"\"\"", wrapped = true

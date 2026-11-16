@@ -152,6 +152,26 @@ Case("unclosed_literal", "s = '''\n[mcp_servers.sermofur]\n");
 Case("unicode_text", "été = '😀'\n[mcp_servers.sermofur]\ncommand = 'é\\\\'\n");
 Case("escaped_backslash_unicode", "s = \"\\é\"\"\"\nx\n\"\"\"\n");
 Case("table_then_ours_no_blank", "[a]\nx = 1\n[mcp_servers.sermofur]\ncommand = 'smf'\nargs = ['mcp', 'serve']\n");
+// A launch value in a multi-line string (lot 8.4): WithLaunchLines replaces its first line and
+// leaves the rest; each output is recorded again as a case, so Declares on it is measured too.
+foreach ((string name, string content) in new[]
+{
+    ("multiline_command", "[mcp_servers.sermofur]\ncommand=\"\"\"\n\"\"\""),
+    ("multiline_command_literal", "[mcp_servers.sermofur]\ncommand = '''\nsmf\n'''\nargs = ['mcp', 'serve']\n"),
+    ("multiline_args", "[mcp_servers.sermofur]\ncommand = 'smf'\nargs = [\"\"\"\nmcp\"\"\", 'serve']\n"),
+    ("multiline_args_string", "[mcp_servers.sermofur]\ncommand = 'smf'\nargs = '''\nmcp serve\n'''\n"),
+})
+{
+    Case(name, content);
+    try
+    {
+        Case(name + "_installed", CodexConfigFile.WithBlock(content, entries[0].Command, entries[0].Arguments) ?? "");
+    }
+    catch (SermofurException)
+    {
+        // Refused: the case above records it.
+    }
+}
 // Shapes of the FsCheck properties.
 string Tables(IEnumerable<string> names, string nl, bool comments) =>
     string.Concat(names.Select(name =>

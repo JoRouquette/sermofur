@@ -1352,3 +1352,48 @@ fn install_start_and_restart_are_refused_under_windows_before_any_effect() {
     let status: serde_json::Value = serde_json::from_slice(&status.stdout).expect("JSON");
     assert_eq!(status["state"], "running", "{status}");
 }
+
+/// Minor of lot 7.7, closed at lot 8.4: `daemon run --supervise` started by hand under Unix
+/// starts the daemon as its child, and SIGTERM to the supervisor stops both, exit 0.
+#[cfg(unix)]
+#[test]
+fn the_supervisor_runs_the_daemon_and_stops_with_it_on_sigterm() {
+    let home = Home::new("supervise");
+    let mut supervisor = Command::new(SMF)
+        .args(["daemon", "run", "--supervise"])
+        .env(HOME_VARIABLE, home.home())
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+        .expect("the supervisor starts");
+    let daemon = wait_for_pid(&home.paths(), None);
+    assert_ne!(
+        u32::try_from(daemon).ok(),
+        Some(supervisor.id()),
+        "the daemon is a child"
+    );
+    let signalled = Command::new("kill")
+        .args(["-TERM", &supervisor.id().to_string()])
+        .status()
+        .expect("kill runs");
+    assert!(signalled.success());
+    let started = Instant::now();
+    let code = loop {
+        if let Some(status) = supervisor.try_wait().expect("the status") {
+            break status.code();
+        }
+        if started.elapsed() > LIMIT {
+            let _ = supervisor.kill();
+            panic!("the supervisor did not stop on SIGTERM");
+        }
+        thread::sleep(Duration::from_millis(100));
+    };
+    assert_eq!(code, Some(0));
+    let alive = Command::new("kill")
+        .args(["-0", &daemon.to_string()])
+        .stderr(Stdio::null())
+        .status()
+        .expect("kill runs");
+    assert!(!alive.success(), "the daemon stopped with its supervisor");
+}

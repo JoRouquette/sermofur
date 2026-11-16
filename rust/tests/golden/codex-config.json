@@ -2442,6 +2442,276 @@
       }
     },
     {
+      "name": "multiline_command",
+      "content": "[mcp_servers.sermofur]\ncommand=\u0022\u0022\u0022\n\u0022\u0022\u0022",
+      "withBlock": [
+        {
+          "text": "[mcp_servers.sermofur]\ncommand = \u0027smf\u0027\nargs = [\u0027mcp\u0027, \u0027serve\u0027]\n\u0022\u0022\u0022"
+        },
+        {
+          "text": "[mcp_servers.sermofur]\ncommand = \u0027/opt/smf\u0027\nargs = [\u0027mcp\u0027, \u0027serve\u0027]\n\u0022\u0022\u0022"
+        },
+        {
+          "text": "[mcp_servers.sermofur]\ncommand = \u0022C:\\\\it\u0027s\\\\smf.exe\u0022\nargs = [\u0027mcp\u0027, \u0027serve\u0027]\n\u0022\u0022\u0022"
+        },
+        {
+          "text": "[mcp_servers.sermofur]\ncommand = \u0027C:\\Users\\me\\.dotnet\\tools\\smf.exe\u0027\nargs = [\u0027mcp\u0027, \u0027serve\u0027]\n\u0022\u0022\u0022"
+        },
+        {
+          "text": "[mcp_servers.sermofur]\ncommand = \u0022a\\nb\\\u0022c\\\\ \u00E9t\u00E9 \uD83D\uDE00\u0022\nargs = [\u0022x\u0027y\u0022, \u0027\u0027, \u0027\u2028\u0027]\n\u0022\u0022\u0022"
+        },
+        {
+          "text": "[mcp_servers.sermofur]\ncommand = \u0027smf\u0027\nargs = []\n\u0022\u0022\u0022"
+        }
+      ],
+      "withoutBlock": {
+        "text": ""
+      },
+      "declares": {
+        "declares": true
+      }
+    },
+    {
+      "name": "multiline_command_installed",
+      "content": "[mcp_servers.sermofur]\ncommand = \u0027smf\u0027\nargs = [\u0027mcp\u0027, \u0027serve\u0027]\n\u0022\u0022\u0022",
+      "withBlock": [
+        {
+          "code": "invalid_mcp_config",
+          "message": "The Codex configuration cannot be changed safely (a multi-line string is not closed); it is left untouched.",
+          "exit": 3
+        },
+        {
+          "code": "invalid_mcp_config",
+          "message": "The Codex configuration cannot be changed safely (a multi-line string is not closed); it is left untouched.",
+          "exit": 3
+        },
+        {
+          "code": "invalid_mcp_config",
+          "message": "The Codex configuration cannot be changed safely (a multi-line string is not closed); it is left untouched.",
+          "exit": 3
+        },
+        {
+          "code": "invalid_mcp_config",
+          "message": "The Codex configuration cannot be changed safely (a multi-line string is not closed); it is left untouched.",
+          "exit": 3
+        },
+        {
+          "code": "invalid_mcp_config",
+          "message": "The Codex configuration cannot be changed safely (a multi-line string is not closed); it is left untouched.",
+          "exit": 3
+        },
+        {
+          "code": "invalid_mcp_config",
+          "message": "The Codex configuration cannot be changed safely (a multi-line string is not closed); it is left untouched.",
+          "exit": 3
+        }
+      ],
+      "withoutBlock": {
+        "code": "invalid_mcp_config",
+        "message": "The Codex configuration cannot be changed safely (a multi-line string is not closed); it is left untouched.",
+        "exit": 3
+      },
+      "declares": {
+        "code": "invalid_mcp_config",
+        "message": "The Codex configuration cannot be changed safely (a multi-line string is not closed); it is left untouched.",
+        "exit": 3
+      }
+    },
+    {
+      "name": "multiline_command_literal",
+      "content": "[mcp_servers.sermofur]\ncommand = \u0027\u0027\u0027\nsmf\n\u0027\u0027\u0027\nargs = [\u0027mcp\u0027, \u0027serve\u0027]\n",
+      "withBlock": [
+        {
+          "text": "[mcp_servers.sermofur]\ncommand = \u0027smf\u0027\nsmf\n\u0027\u0027\u0027\nargs = [\u0027mcp\u0027, \u0027serve\u0027]\n"
+        },
+        {
+          "text": "[mcp_servers.sermofur]\ncommand = \u0027/opt/smf\u0027\nsmf\n\u0027\u0027\u0027\nargs = [\u0027mcp\u0027, \u0027serve\u0027]\n"
+        },
+        {
+          "text": "[mcp_servers.sermofur]\ncommand = \u0022C:\\\\it\u0027s\\\\smf.exe\u0022\nsmf\n\u0027\u0027\u0027\nargs = [\u0027mcp\u0027, \u0027serve\u0027]\n"
+        },
+        {
+          "text": "[mcp_servers.sermofur]\ncommand = \u0027C:\\Users\\me\\.dotnet\\tools\\smf.exe\u0027\nsmf\n\u0027\u0027\u0027\nargs = [\u0027mcp\u0027, \u0027serve\u0027]\n"
+        },
+        {
+          "text": "[mcp_servers.sermofur]\ncommand = \u0022a\\nb\\\u0022c\\\\ \u00E9t\u00E9 \uD83D\uDE00\u0022\nsmf\n\u0027\u0027\u0027\nargs = [\u0022x\u0027y\u0022, \u0027\u0027, \u0027\u2028\u0027]\n"
+        },
+        {
+          "text": "[mcp_servers.sermofur]\ncommand = \u0027smf\u0027\nsmf\n\u0027\u0027\u0027\nargs = []\n"
+        }
+      ],
+      "withoutBlock": {
+        "text": ""
+      },
+      "declares": {
+        "declares": true
+      }
+    },
+    {
+      "name": "multiline_command_literal_installed",
+      "content": "[mcp_servers.sermofur]\ncommand = \u0027smf\u0027\nsmf\n\u0027\u0027\u0027\nargs = [\u0027mcp\u0027, \u0027serve\u0027]\n",
+      "withBlock": [
+        {
+          "code": "invalid_mcp_config",
+          "message": "The Codex configuration cannot be changed safely (a multi-line string is not closed); it is left untouched.",
+          "exit": 3
+        },
+        {
+          "code": "invalid_mcp_config",
+          "message": "The Codex configuration cannot be changed safely (a multi-line string is not closed); it is left untouched.",
+          "exit": 3
+        },
+        {
+          "code": "invalid_mcp_config",
+          "message": "The Codex configuration cannot be changed safely (a multi-line string is not closed); it is left untouched.",
+          "exit": 3
+        },
+        {
+          "code": "invalid_mcp_config",
+          "message": "The Codex configuration cannot be changed safely (a multi-line string is not closed); it is left untouched.",
+          "exit": 3
+        },
+        {
+          "code": "invalid_mcp_config",
+          "message": "The Codex configuration cannot be changed safely (a multi-line string is not closed); it is left untouched.",
+          "exit": 3
+        },
+        {
+          "code": "invalid_mcp_config",
+          "message": "The Codex configuration cannot be changed safely (a multi-line string is not closed); it is left untouched.",
+          "exit": 3
+        }
+      ],
+      "withoutBlock": {
+        "code": "invalid_mcp_config",
+        "message": "The Codex configuration cannot be changed safely (a multi-line string is not closed); it is left untouched.",
+        "exit": 3
+      },
+      "declares": {
+        "code": "invalid_mcp_config",
+        "message": "The Codex configuration cannot be changed safely (a multi-line string is not closed); it is left untouched.",
+        "exit": 3
+      }
+    },
+    {
+      "name": "multiline_args",
+      "content": "[mcp_servers.sermofur]\ncommand = \u0027smf\u0027\nargs = [\u0022\u0022\u0022\nmcp\u0022\u0022\u0022, \u0027serve\u0027]\n",
+      "withBlock": [
+        {
+          "code": "invalid_mcp_config",
+          "message": "The Codex configuration cannot be changed safely (args of [mcp_servers.sermofur] spans several lines); it is left untouched.",
+          "exit": 3
+        },
+        {
+          "code": "invalid_mcp_config",
+          "message": "The Codex configuration cannot be changed safely (args of [mcp_servers.sermofur] spans several lines); it is left untouched.",
+          "exit": 3
+        },
+        {
+          "code": "invalid_mcp_config",
+          "message": "The Codex configuration cannot be changed safely (args of [mcp_servers.sermofur] spans several lines); it is left untouched.",
+          "exit": 3
+        },
+        {
+          "code": "invalid_mcp_config",
+          "message": "The Codex configuration cannot be changed safely (args of [mcp_servers.sermofur] spans several lines); it is left untouched.",
+          "exit": 3
+        },
+        {
+          "code": "invalid_mcp_config",
+          "message": "The Codex configuration cannot be changed safely (args of [mcp_servers.sermofur] spans several lines); it is left untouched.",
+          "exit": 3
+        },
+        {
+          "code": "invalid_mcp_config",
+          "message": "The Codex configuration cannot be changed safely (args of [mcp_servers.sermofur] spans several lines); it is left untouched.",
+          "exit": 3
+        }
+      ],
+      "withoutBlock": {
+        "text": ""
+      },
+      "declares": {
+        "declares": true
+      }
+    },
+    {
+      "name": "multiline_args_string",
+      "content": "[mcp_servers.sermofur]\ncommand = \u0027smf\u0027\nargs = \u0027\u0027\u0027\nmcp serve\n\u0027\u0027\u0027\n",
+      "withBlock": [
+        {
+          "text": "[mcp_servers.sermofur]\ncommand = \u0027smf\u0027\nargs = [\u0027mcp\u0027, \u0027serve\u0027]\nmcp serve\n\u0027\u0027\u0027\n"
+        },
+        {
+          "text": "[mcp_servers.sermofur]\ncommand = \u0027/opt/smf\u0027\nargs = [\u0027mcp\u0027, \u0027serve\u0027]\nmcp serve\n\u0027\u0027\u0027\n"
+        },
+        {
+          "text": "[mcp_servers.sermofur]\ncommand = \u0022C:\\\\it\u0027s\\\\smf.exe\u0022\nargs = [\u0027mcp\u0027, \u0027serve\u0027]\nmcp serve\n\u0027\u0027\u0027\n"
+        },
+        {
+          "text": "[mcp_servers.sermofur]\ncommand = \u0027C:\\Users\\me\\.dotnet\\tools\\smf.exe\u0027\nargs = [\u0027mcp\u0027, \u0027serve\u0027]\nmcp serve\n\u0027\u0027\u0027\n"
+        },
+        {
+          "text": "[mcp_servers.sermofur]\ncommand = \u0022a\\nb\\\u0022c\\\\ \u00E9t\u00E9 \uD83D\uDE00\u0022\nargs = [\u0022x\u0027y\u0022, \u0027\u0027, \u0027\u2028\u0027]\nmcp serve\n\u0027\u0027\u0027\n"
+        },
+        {
+          "text": "[mcp_servers.sermofur]\ncommand = \u0027smf\u0027\nargs = []\nmcp serve\n\u0027\u0027\u0027\n"
+        }
+      ],
+      "withoutBlock": {
+        "text": ""
+      },
+      "declares": {
+        "declares": true
+      }
+    },
+    {
+      "name": "multiline_args_string_installed",
+      "content": "[mcp_servers.sermofur]\ncommand = \u0027smf\u0027\nargs = [\u0027mcp\u0027, \u0027serve\u0027]\nmcp serve\n\u0027\u0027\u0027\n",
+      "withBlock": [
+        {
+          "code": "invalid_mcp_config",
+          "message": "The Codex configuration cannot be changed safely (a multi-line string is not closed); it is left untouched.",
+          "exit": 3
+        },
+        {
+          "code": "invalid_mcp_config",
+          "message": "The Codex configuration cannot be changed safely (a multi-line string is not closed); it is left untouched.",
+          "exit": 3
+        },
+        {
+          "code": "invalid_mcp_config",
+          "message": "The Codex configuration cannot be changed safely (a multi-line string is not closed); it is left untouched.",
+          "exit": 3
+        },
+        {
+          "code": "invalid_mcp_config",
+          "message": "The Codex configuration cannot be changed safely (a multi-line string is not closed); it is left untouched.",
+          "exit": 3
+        },
+        {
+          "code": "invalid_mcp_config",
+          "message": "The Codex configuration cannot be changed safely (a multi-line string is not closed); it is left untouched.",
+          "exit": 3
+        },
+        {
+          "code": "invalid_mcp_config",
+          "message": "The Codex configuration cannot be changed safely (a multi-line string is not closed); it is left untouched.",
+          "exit": 3
+        }
+      ],
+      "withoutBlock": {
+        "code": "invalid_mcp_config",
+        "message": "The Codex configuration cannot be changed safely (a multi-line string is not closed); it is left untouched.",
+        "exit": 3
+      },
+      "declares": {
+        "code": "invalid_mcp_config",
+        "message": "The Codex configuration cannot be changed safely (a multi-line string is not closed); it is left untouched.",
+        "exit": 3
+      }
+    },
+    {
       "name": "generated_0",
       "content": "# server YYb\r\n[mcp_servers.YYb]\r\ncommand = \u0027YYb\u0027\r\n[mcp_servers.YYb.env]\r\nK = \u0027YYb\u0027  # kept\r\n\r\n# server Zc\r\n[mcp_servers.Zc]\r\ncommand = \u0027Zc\u0027\r\n[mcp_servers.Zc.env]\r\nK = \u0027Zc\u0027  # kept\r\n\r\n",
       "withBlock": [

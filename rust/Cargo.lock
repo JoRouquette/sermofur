@@ -647,7 +647,10 @@ dependencies = [
 name = "sermofur-mcp"
 version = "0.0.0-dev"
 dependencies = [
+ "proptest",
  "sermofur-core",
+ "sermofur-daemon",
+ "tokio",
 ]
 
 [[package]]

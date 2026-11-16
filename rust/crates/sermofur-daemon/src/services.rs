@@ -923,6 +923,10 @@ impl ProcessRunner for SystemProcessRunner {
                 format!("{program} was not found in the system folders."),
             );
         };
+        // Named deviation (PARITY.md, lot 7.7): stdin is the null device, where `ProcessStartInfo`
+        // of the oracle leaves it inherited. None of the tools run here reads stdin; a tool that
+        // asked for input would get the end of input instead of the console or the pipe of the
+        // caller (under `smf mcp serve`, the requests of the host).
         let mut child = match Command::new(path)
             .args(arguments)
             .stdin(Stdio::null())

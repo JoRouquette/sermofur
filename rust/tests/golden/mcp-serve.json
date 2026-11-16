@@ -1,0 +1,1891 @@
+{
+  "tool": "rust/tools/mcp-serve-oracle",
+  "sessions": [
+    {
+      "name": "protocol",
+      "folder": "root",
+      "daemon": false,
+      "registered": false,
+      "projectDirectory": null,
+      "setup": [],
+      "cases": [
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":\"init\",\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{},\"clientInfo\":{\"name\":\"Claude Code Test\",\"version\":\"1.0\"}}}",
+          "answers": [
+            "{\"result\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"logging\":{},\"tools\":{}},\"serverInfo\":{\"name\":\"sermofur\",\"version\":\"0.0.0-dev\"},\"instructions\":\"Sermofur keeps a contestable memory of this project: recall before deciding, challenge a claim before relying on it, and record what you learn as claims, evidence or RETEX. What you write is recorded as coming from an LLM.\"},\"id\":\"init\",\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"method\":\"notifications/initialized\"}",
+          "answers": []
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"1999-01-01\", \"capabilities\":{},\"clientInfo\":{\"name\":\"A\",\"version\":\"1\"}}}",
+          "answers": [
+            "{\"result\":{\"protocolVersion\":\"2025-11-25\",\"capabilities\":{\"logging\":{},\"tools\":{}},\"serverInfo\":{\"name\":\"sermofur\",\"version\":\"0.0.0-dev\"},\"instructions\":\"Sermofur keeps a contestable memory of this project: recall before deciding, challenge a claim before relying on it, and record what you learn as claims, evidence or RETEX. What you write is recorded as coming from an LLM.\"},\"id\":1,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2024-11-05\", \"capabilities\":{},\"clientInfo\":{\"name\":\"A\",\"version\":\"1\"}}}",
+          "answers": [
+            "{\"result\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{\"logging\":{},\"tools\":{}},\"serverInfo\":{\"name\":\"sermofur\",\"version\":\"0.0.0-dev\"},\"instructions\":\"Sermofur keeps a contestable memory of this project: recall before deciding, challenge a claim before relying on it, and record what you learn as claims, evidence or RETEX. What you write is recorded as coming from an LLM.\"},\"id\":2,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":3,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-03-26\", \"capabilities\":{},\"clientInfo\":{\"name\":\"A\",\"version\":\"1\"}}}",
+          "answers": [
+            "{\"result\":{\"protocolVersion\":\"2025-03-26\",\"capabilities\":{\"logging\":{},\"tools\":{}},\"serverInfo\":{\"name\":\"sermofur\",\"version\":\"0.0.0-dev\"},\"instructions\":\"Sermofur keeps a contestable memory of this project: recall before deciding, challenge a claim before relying on it, and record what you learn as claims, evidence or RETEX. What you write is recorded as coming from an LLM.\"},\"id\":3,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":4,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-11-25\", \"capabilities\":{},\"clientInfo\":{\"name\":\"A\",\"version\":\"1\"}}}",
+          "answers": [
+            "{\"result\":{\"protocolVersion\":\"2025-11-25\",\"capabilities\":{\"logging\":{},\"tools\":{}},\"serverInfo\":{\"name\":\"sermofur\",\"version\":\"0.0.0-dev\"},\"instructions\":\"Sermofur keeps a contestable memory of this project: recall before deciding, challenge a claim before relying on it, and record what you learn as claims, evidence or RETEX. What you write is recorded as coming from an LLM.\"},\"id\":4,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":5,\"method\":\"initialize\",\"params\":{\"protocolVersion\":null, \"capabilities\":{},\"clientInfo\":{\"name\":\"A\",\"version\":\"1\"}}}",
+          "answers": [
+            "{\"result\":{\"protocolVersion\":\"2025-11-25\",\"capabilities\":{\"logging\":{},\"tools\":{}},\"serverInfo\":{\"name\":\"sermofur\",\"version\":\"0.0.0-dev\"},\"instructions\":\"Sermofur keeps a contestable memory of this project: recall before deciding, challenge a claim before relying on it, and record what you learn as claims, evidence or RETEX. What you write is recorded as coming from an LLM.\"},\"id\":5,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":6,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"\", \"capabilities\":{},\"clientInfo\":{\"name\":\"A\",\"version\":\"1\"}}}",
+          "answers": [
+            "{\"result\":{\"protocolVersion\":\"2025-11-25\",\"capabilities\":{\"logging\":{},\"tools\":{}},\"serverInfo\":{\"name\":\"sermofur\",\"version\":\"0.0.0-dev\"},\"instructions\":\"Sermofur keeps a contestable memory of this project: recall before deciding, challenge a claim before relying on it, and record what you learn as claims, evidence or RETEX. What you write is recorded as coming from an LLM.\"},\"id\":6,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":7,\"method\":\"initialize\"}",
+          "answers": [
+            "{\"result\":{\"protocolVersion\":\"2025-11-25\",\"capabilities\":{\"logging\":{},\"tools\":{}},\"serverInfo\":{\"name\":\"sermofur\",\"version\":\"0.0.0-dev\"},\"instructions\":\"Sermofur keeps a contestable memory of this project: recall before deciding, challenge a claim before relying on it, and record what you learn as claims, evidence or RETEX. What you write is recorded as coming from an LLM.\"},\"id\":7,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":8,\"method\":\"initialize\",\"params\":null}",
+          "answers": [
+            "{\"result\":{\"protocolVersion\":\"2025-11-25\",\"capabilities\":{\"logging\":{},\"tools\":{}},\"serverInfo\":{\"name\":\"sermofur\",\"version\":\"0.0.0-dev\"},\"instructions\":\"Sermofur keeps a contestable memory of this project: recall before deciding, challenge a claim before relying on it, and record what you learn as claims, evidence or RETEX. What you write is recorded as coming from an LLM.\"},\"id\":8,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":9,\"method\":\"initialize\",\"params\":{}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":9,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":10,\"method\":\"initialize\",\"params\":[]}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":10,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":11,\"method\":\"initialize\",\"params\":\"x\"}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":11,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":12,\"method\":\"initialize\",\"params\":{ \"capabilities\":{},\"clientInfo\":{\"name\":\"A\",\"version\":\"1\"}}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":12,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":13,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"clientInfo\":{\"name\":\"A\",\"version\":\"1\"}}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":13,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":14,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{}}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":14,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":15,\"method\":\"initialize\",\"params\":{\"protocolVersion\":5,\"capabilities\":{},\"clientInfo\":{\"name\":\"A\",\"version\":\"1\"}}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":15,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":16,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":null,\"clientInfo\":null}}",
+          "answers": [
+            "{\"result\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"logging\":{},\"tools\":{}},\"serverInfo\":{\"name\":\"sermofur\",\"version\":\"0.0.0-dev\"},\"instructions\":\"Sermofur keeps a contestable memory of this project: recall before deciding, challenge a claim before relying on it, and record what you learn as claims, evidence or RETEX. What you write is recorded as coming from an LLM.\"},\"id\":16,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":17,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{},\"clientInfo\":{\"version\":\"1\"}}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":17,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":18,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{},\"clientInfo\":{\"name\":null,\"version\":\"1\"}}}",
+          "answers": [
+            "{\"result\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"logging\":{},\"tools\":{}},\"serverInfo\":{\"name\":\"sermofur\",\"version\":\"0.0.0-dev\"},\"instructions\":\"Sermofur keeps a contestable memory of this project: recall before deciding, challenge a claim before relying on it, and record what you learn as claims, evidence or RETEX. What you write is recorded as coming from an LLM.\"},\"id\":18,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":19,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{},\"clientInfo\":{\"name\":\"A\",\"version\":5}}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":19,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":20,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"sampling\":5},\"clientInfo\":{\"name\":\"A\",\"version\":\"1\"}}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":20,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":21,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"x\":5,\"tasks\":5},\"clientInfo\":{\"name\":\"A\",\"version\":\"1\"}}}",
+          "answers": [
+            "{\"result\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"logging\":{},\"tools\":{}},\"serverInfo\":{\"name\":\"sermofur\",\"version\":\"0.0.0-dev\"},\"instructions\":\"Sermofur keeps a contestable memory of this project: recall before deciding, challenge a claim before relying on it, and record what you learn as claims, evidence or RETEX. What you write is recorded as coming from an LLM.\"},\"id\":21,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":22,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"roots\":{\"listChanged\":\"yes\"}},\"clientInfo\":{\"name\":\"A\",\"version\":\"1\"}}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":22,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":23,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"experimental\":{\"a\":[1]},\"extensions\":{\"b\":5},\"elicitation\":{\"form\":5}},\"clientInfo\":{\"name\":\"A\",\"version\":\"1\"}}}",
+          "answers": [
+            "{\"result\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"logging\":{},\"tools\":{}},\"serverInfo\":{\"name\":\"sermofur\",\"version\":\"0.0.0-dev\"},\"instructions\":\"Sermofur keeps a contestable memory of this project: recall before deciding, challenge a claim before relying on it, and record what you learn as claims, evidence or RETEX. What you write is recorded as coming from an LLM.\"},\"id\":23,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":24,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"experimental\":5},\"clientInfo\":{\"name\":\"A\",\"version\":\"1\"}}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":24,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":25,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"elicitation\":5},\"clientInfo\":{\"name\":\"A\",\"version\":\"1\"}}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":25,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":26,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"sampling\":{\"context\":{},\"tools\":5}},\"clientInfo\":{\"name\":\"A\",\"version\":\"1\"}}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":26,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":27,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":[],\"clientInfo\":{\"name\":\"A\",\"version\":\"1\"}}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":27,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":28,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{},\"clientInfo\":{\"name\":\"A\",\"version\":\"1\",\"title\":5}}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":28,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":29,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{},\"clientInfo\":{\"name\":\"A\",\"version\":\"1\",\"icons\":[{\"src\":\"s\",\"sizes\":[\"1\"]}]}}}",
+          "answers": [
+            "{\"result\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"logging\":{},\"tools\":{}},\"serverInfo\":{\"name\":\"sermofur\",\"version\":\"0.0.0-dev\"},\"instructions\":\"Sermofur keeps a contestable memory of this project: recall before deciding, challenge a claim before relying on it, and record what you learn as claims, evidence or RETEX. What you write is recorded as coming from an LLM.\"},\"id\":29,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":30,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{},\"clientInfo\":{\"name\":\"A\",\"version\":\"1\",\"icons\":[{}]}}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":30,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":31,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{},\"clientInfo\":{\"name\":\"A\",\"version\":\"1\",\"icons\":[{\"src\":\"s\",\"sizes\":[5]}]}}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":31,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":32,\"method\":\"initialize\",\"params\":{\"ProtocolVersion\":\"2024-11-05\",\"CAPABILITIES\":{},\"clientInfo\":{\"Name\":\"A\",\"version\":\"1\"}}}",
+          "answers": [
+            "{\"result\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{\"logging\":{},\"tools\":{}},\"serverInfo\":{\"name\":\"sermofur\",\"version\":\"0.0.0-dev\"},\"instructions\":\"Sermofur keeps a contestable memory of this project: recall before deciding, challenge a claim before relying on it, and record what you learn as claims, evidence or RETEX. What you write is recorded as coming from an LLM.\"},\"id\":32,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":33,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"roots\":{},\"Roots\":{}},\"clientInfo\":{\"name\":\"A\",\"name\":\"B\",\"version\":\"1\"}}}",
+          "answers": [
+            "{\"result\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"logging\":{},\"tools\":{}},\"serverInfo\":{\"name\":\"sermofur\",\"version\":\"0.0.0-dev\"},\"instructions\":\"Sermofur keeps a contestable memory of this project: recall before deciding, challenge a claim before relying on it, and record what you learn as claims, evidence or RETEX. What you write is recorded as coming from an LLM.\"},\"id\":33,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":34,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"protocolVersion\":\"2024-11-05\",\"capabilities\":{},\"clientInfo\":{\"name\":\"A\",\"version\":\"1\"}}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":34,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":35,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{},\"clientInfo\":{\"name\":\"A\",\"version\":\"1\"},\"protocolversion\":\"2024-11-05\"}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":35,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":36,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\", \"capabilities\":{},\"clientInfo\":{\"name\":\"A\",\"version\":\"1\"},\"_meta\":5}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":36,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":37,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\", \"capabilities\":{},\"clientInfo\":{\"name\":\"A\",\"version\":\"1\"},\"inputResponses\":{\"a\":5},\"_meta\":{}}}",
+          "answers": [
+            "{\"result\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"logging\":{},\"tools\":{}},\"serverInfo\":{\"name\":\"sermofur\",\"version\":\"0.0.0-dev\"},\"instructions\":\"Sermofur keeps a contestable memory of this project: recall before deciding, challenge a claim before relying on it, and record what you learn as claims, evidence or RETEX. What you write is recorded as coming from an LLM.\"},\"id\":37,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":38,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\", \"capabilities\":{},\"clientInfo\":{\"name\":\"A\",\"version\":\"1\"},\"inputResponses\":5}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":38,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":39,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\", \"capabilities\":{},\"clientInfo\":{\"name\":\"A\",\"version\":\"1\"},\"requestState\":5}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":39,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":40,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{},\"clıentInfo\":{\"name\":\"A\",\"version\":\"1\"}}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":40,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":\"40b\",\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"ſampling\":5},\"clientInfo\":{\"name\":\"A\",\"version\":\"1\"}}}",
+          "answers": [
+            "{\"result\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"logging\":{},\"tools\":{}},\"serverInfo\":{\"name\":\"sermofur\",\"version\":\"0.0.0-dev\"},\"instructions\":\"Sermofur keeps a contestable memory of this project: recall before deciding, challenge a claim before relying on it, and record what you learn as claims, evidence or RETEX. What you write is recorded as coming from an LLM.\"},\"id\":\"40b\",\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":41,\"method\":\"ping\"}",
+          "answers": [
+            "{\"result\":{},\"id\":41,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":42,\"method\":\"ping\",\"params\":[]}",
+          "answers": [
+            "{\"result\":{},\"id\":42,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":43,\"method\":\"ping\",\"params\":5}",
+          "answers": [
+            "{\"result\":{},\"id\":43,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":44,\"method\":\"ping\",\"params\":null}",
+          "answers": [
+            "{\"result\":{},\"id\":44,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":45,\"method\":\"ping\",\"params\":{\"_meta\":5}}",
+          "answers": [
+            "{\"result\":{},\"id\":45,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":46,\"method\":\"foo/bar\"}",
+          "answers": [
+            "{\"error\":{\"code\":-32601,\"message\":\"Method \\u0027foo/bar\\u0027 is not available.\"},\"id\":46,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":47,\"method\":\"\"}",
+          "answers": [
+            "{\"error\":{\"code\":-32601,\"message\":\"Method \\u0027\\u0027 is not available.\"},\"id\":47,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":48,\"method\":\"PING\"}",
+          "answers": [
+            "{\"error\":{\"code\":-32601,\"message\":\"Method \\u0027PING\\u0027 is not available.\"},\"id\":48,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":49,\"method\":\"resources/list\"}",
+          "answers": [
+            "{\"error\":{\"code\":-32601,\"message\":\"Method \\u0027resources/list\\u0027 is not available.\"},\"id\":49,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":50,\"method\":\"prompts/list\"}",
+          "answers": [
+            "{\"error\":{\"code\":-32601,\"message\":\"Method \\u0027prompts/list\\u0027 is not available.\"},\"id\":50,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":51,\"method\":\"completion/complete\",\"params\":{}}",
+          "answers": [
+            "{\"error\":{\"code\":-32601,\"message\":\"Method \\u0027completion/complete\\u0027 is not available.\"},\"id\":51,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":52,\"method\":\"notifications/initialized\"}",
+          "answers": [
+            "{\"error\":{\"code\":-32601,\"message\":\"Method \\u0027notifications/initialized\\u0027 is not available.\"},\"id\":52,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":53,\"method\":\"notifications/cancelled\",\"params\":{\"requestId\":1}}",
+          "answers": [
+            "{\"error\":{\"code\":-32601,\"message\":\"Method \\u0027notifications/cancelled\\u0027 is not available.\"},\"id\":53,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":54,\"method\":\"tools/list\"}",
+          "answers": [
+            "{\"result\":{\"tools\":[{\"name\":\"sermofur_status\",\"description\":\"Identity of the Sermofur instance of this project, current scope and counts of the visible objects.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":true}},{\"name\":\"sermofur_context\",\"description\":\"Context of this session: instance, current scope with its visible ancestors, and counts. No content.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":true}},{\"name\":\"sermofur_recall\",\"description\":\"Recalls at most 3 explained results (claims, RETEX, source passages) relevant to a question, among what this project may see. Read only.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"question\":{\"description\":\"The question, in plain words.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"limit\":{\"description\":\"Number of results, 1 to 3. Default: 3.\",\"type\":\"integer\",\"minimum\":1,\"maximum\":3}},\"additionalProperties\":false,\"required\":[\"question\"]},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":true}},{\"name\":\"sermofur_challenge\",\"description\":\"Confronts a claim (claimId) or a text not recorded yet (text) with contradictions, changed sources, status and close claims. Never decides; writes nothing. Give exactly one of claimId and text.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"claimId\":{\"description\":\"Identifier of a visible claim.\",\"type\":\"string\",\"format\":\"uuid\"},\"text\":{\"description\":\"A statement to confront; cannot start with --.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384}},\"additionalProperties\":false},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":true}},{\"name\":\"sermofur_claim\",\"description\":\"Proposes a claim in the current scope. It is recorded as coming from an LLM: its confidence only grows with independent, non-LLM evidence.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"text\":{\"description\":\"The statement.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"category\":{\"description\":\"Default: semantic.\",\"type\":\"string\",\"enum\":[\"episodic\",\"semantic\",\"procedural\"]},\"volatility\":{\"description\":\"Default: evolving.\",\"type\":\"string\",\"enum\":[\"stable\",\"evolving\",\"volatile\"]},\"key\":{\"description\":\"Idempotency key: the same key with the same content returns the same object.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384}},\"additionalProperties\":false,\"required\":[\"text\"]},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":false}},{\"name\":\"sermofur_evidence\",\"description\":\"Records evidence for a visible claim (or against it with contradicts). Evidence declared by an LLM never reinforces a claim. lineage and key cannot start with --.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"claimId\":{\"description\":\"Identifier of a visible claim.\",\"type\":\"string\",\"format\":\"uuid\"},\"kind\":{\"description\":\"Kind of evidence.\",\"type\":\"string\",\"enum\":[\"execution\",\"source_code\",\"authoritative_documentation\",\"project_decision\",\"local_documentation\",\"human_observation\",\"user_assertion\",\"llm_assertion\"]},\"reference\":{\"description\":\"What supports it: a path, a link, a short description.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"lineage\":{\"description\":\"Common origin of related evidence; evidence of one lineage counts once.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"contradicts\":{\"description\":\"True when the evidence goes against the claim.\",\"type\":\"boolean\"},\"sourceId\":{\"description\":\"Identifier of a visible source the evidence cites.\",\"type\":\"string\",\"format\":\"uuid\"},\"key\":{\"description\":\"Idempotency key: the same key with the same content returns the same object.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384}},\"additionalProperties\":false,\"required\":[\"claimId\",\"kind\",\"reference\",\"lineage\"]},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":false}},{\"name\":\"sermofur_record_retex\",\"description\":\"Records a draft RETEX (lesson learned): what happened, its impact, what to do next. A draft never changes confidence or recall. Values cannot start with --.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"event\":{\"description\":\"What happened.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"impact\":{\"description\":\"Its consequence.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"next\":{\"description\":\"What to do next time.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"key\":{\"description\":\"Idempotency key: the same key with the same content returns the same object.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384}},\"additionalProperties\":false,\"required\":[\"event\",\"impact\",\"next\"]},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":false}},{\"name\":\"sermofur_feedback\",\"description\":\"Says whether a recalled object helped, did not apply or was wrong. Kept as a draft RETEX marked as feedback, with no effect on confidence or ranking.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"targetId\":{\"description\":\"Identifier of a visible claim, RETEX or source.\",\"type\":\"string\",\"format\":\"uuid\"},\"verdict\":{\"description\":\"The verdict.\",\"type\":\"string\",\"enum\":[\"helpful\",\"not_applicable\",\"wrong\"]},\"comment\":{\"description\":\"Why; cannot start with --.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"key\":{\"description\":\"Idempotency key: the same key with the same content returns the same object.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384}},\"additionalProperties\":false,\"required\":[\"targetId\",\"verdict\"]},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":false}}]},\"id\":54,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":55,\"method\":\"tools/list\",\"params\":null}",
+          "answers": [
+            "{\"result\":{\"tools\":[{\"name\":\"sermofur_status\",\"description\":\"Identity of the Sermofur instance of this project, current scope and counts of the visible objects.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":true}},{\"name\":\"sermofur_context\",\"description\":\"Context of this session: instance, current scope with its visible ancestors, and counts. No content.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":true}},{\"name\":\"sermofur_recall\",\"description\":\"Recalls at most 3 explained results (claims, RETEX, source passages) relevant to a question, among what this project may see. Read only.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"question\":{\"description\":\"The question, in plain words.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"limit\":{\"description\":\"Number of results, 1 to 3. Default: 3.\",\"type\":\"integer\",\"minimum\":1,\"maximum\":3}},\"additionalProperties\":false,\"required\":[\"question\"]},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":true}},{\"name\":\"sermofur_challenge\",\"description\":\"Confronts a claim (claimId) or a text not recorded yet (text) with contradictions, changed sources, status and close claims. Never decides; writes nothing. Give exactly one of claimId and text.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"claimId\":{\"description\":\"Identifier of a visible claim.\",\"type\":\"string\",\"format\":\"uuid\"},\"text\":{\"description\":\"A statement to confront; cannot start with --.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384}},\"additionalProperties\":false},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":true}},{\"name\":\"sermofur_claim\",\"description\":\"Proposes a claim in the current scope. It is recorded as coming from an LLM: its confidence only grows with independent, non-LLM evidence.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"text\":{\"description\":\"The statement.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"category\":{\"description\":\"Default: semantic.\",\"type\":\"string\",\"enum\":[\"episodic\",\"semantic\",\"procedural\"]},\"volatility\":{\"description\":\"Default: evolving.\",\"type\":\"string\",\"enum\":[\"stable\",\"evolving\",\"volatile\"]},\"key\":{\"description\":\"Idempotency key: the same key with the same content returns the same object.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384}},\"additionalProperties\":false,\"required\":[\"text\"]},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":false}},{\"name\":\"sermofur_evidence\",\"description\":\"Records evidence for a visible claim (or against it with contradicts). Evidence declared by an LLM never reinforces a claim. lineage and key cannot start with --.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"claimId\":{\"description\":\"Identifier of a visible claim.\",\"type\":\"string\",\"format\":\"uuid\"},\"kind\":{\"description\":\"Kind of evidence.\",\"type\":\"string\",\"enum\":[\"execution\",\"source_code\",\"authoritative_documentation\",\"project_decision\",\"local_documentation\",\"human_observation\",\"user_assertion\",\"llm_assertion\"]},\"reference\":{\"description\":\"What supports it: a path, a link, a short description.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"lineage\":{\"description\":\"Common origin of related evidence; evidence of one lineage counts once.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"contradicts\":{\"description\":\"True when the evidence goes against the claim.\",\"type\":\"boolean\"},\"sourceId\":{\"description\":\"Identifier of a visible source the evidence cites.\",\"type\":\"string\",\"format\":\"uuid\"},\"key\":{\"description\":\"Idempotency key: the same key with the same content returns the same object.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384}},\"additionalProperties\":false,\"required\":[\"claimId\",\"kind\",\"reference\",\"lineage\"]},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":false}},{\"name\":\"sermofur_record_retex\",\"description\":\"Records a draft RETEX (lesson learned): what happened, its impact, what to do next. A draft never changes confidence or recall. Values cannot start with --.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"event\":{\"description\":\"What happened.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"impact\":{\"description\":\"Its consequence.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"next\":{\"description\":\"What to do next time.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"key\":{\"description\":\"Idempotency key: the same key with the same content returns the same object.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384}},\"additionalProperties\":false,\"required\":[\"event\",\"impact\",\"next\"]},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":false}},{\"name\":\"sermofur_feedback\",\"description\":\"Says whether a recalled object helped, did not apply or was wrong. Kept as a draft RETEX marked as feedback, with no effect on confidence or ranking.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"targetId\":{\"description\":\"Identifier of a visible claim, RETEX or source.\",\"type\":\"string\",\"format\":\"uuid\"},\"verdict\":{\"description\":\"The verdict.\",\"type\":\"string\",\"enum\":[\"helpful\",\"not_applicable\",\"wrong\"]},\"comment\":{\"description\":\"Why; cannot start with --.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"key\":{\"description\":\"Idempotency key: the same key with the same content returns the same object.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384}},\"additionalProperties\":false,\"required\":[\"targetId\",\"verdict\"]},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":false}}]},\"id\":55,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":56,\"method\":\"tools/list\",\"params\":{\"cursor\":\"abc\"}}",
+          "answers": [
+            "{\"result\":{\"tools\":[{\"name\":\"sermofur_status\",\"description\":\"Identity of the Sermofur instance of this project, current scope and counts of the visible objects.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":true}},{\"name\":\"sermofur_context\",\"description\":\"Context of this session: instance, current scope with its visible ancestors, and counts. No content.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":true}},{\"name\":\"sermofur_recall\",\"description\":\"Recalls at most 3 explained results (claims, RETEX, source passages) relevant to a question, among what this project may see. Read only.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"question\":{\"description\":\"The question, in plain words.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"limit\":{\"description\":\"Number of results, 1 to 3. Default: 3.\",\"type\":\"integer\",\"minimum\":1,\"maximum\":3}},\"additionalProperties\":false,\"required\":[\"question\"]},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":true}},{\"name\":\"sermofur_challenge\",\"description\":\"Confronts a claim (claimId) or a text not recorded yet (text) with contradictions, changed sources, status and close claims. Never decides; writes nothing. Give exactly one of claimId and text.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"claimId\":{\"description\":\"Identifier of a visible claim.\",\"type\":\"string\",\"format\":\"uuid\"},\"text\":{\"description\":\"A statement to confront; cannot start with --.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384}},\"additionalProperties\":false},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":true}},{\"name\":\"sermofur_claim\",\"description\":\"Proposes a claim in the current scope. It is recorded as coming from an LLM: its confidence only grows with independent, non-LLM evidence.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"text\":{\"description\":\"The statement.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"category\":{\"description\":\"Default: semantic.\",\"type\":\"string\",\"enum\":[\"episodic\",\"semantic\",\"procedural\"]},\"volatility\":{\"description\":\"Default: evolving.\",\"type\":\"string\",\"enum\":[\"stable\",\"evolving\",\"volatile\"]},\"key\":{\"description\":\"Idempotency key: the same key with the same content returns the same object.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384}},\"additionalProperties\":false,\"required\":[\"text\"]},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":false}},{\"name\":\"sermofur_evidence\",\"description\":\"Records evidence for a visible claim (or against it with contradicts). Evidence declared by an LLM never reinforces a claim. lineage and key cannot start with --.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"claimId\":{\"description\":\"Identifier of a visible claim.\",\"type\":\"string\",\"format\":\"uuid\"},\"kind\":{\"description\":\"Kind of evidence.\",\"type\":\"string\",\"enum\":[\"execution\",\"source_code\",\"authoritative_documentation\",\"project_decision\",\"local_documentation\",\"human_observation\",\"user_assertion\",\"llm_assertion\"]},\"reference\":{\"description\":\"What supports it: a path, a link, a short description.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"lineage\":{\"description\":\"Common origin of related evidence; evidence of one lineage counts once.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"contradicts\":{\"description\":\"True when the evidence goes against the claim.\",\"type\":\"boolean\"},\"sourceId\":{\"description\":\"Identifier of a visible source the evidence cites.\",\"type\":\"string\",\"format\":\"uuid\"},\"key\":{\"description\":\"Idempotency key: the same key with the same content returns the same object.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384}},\"additionalProperties\":false,\"required\":[\"claimId\",\"kind\",\"reference\",\"lineage\"]},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":false}},{\"name\":\"sermofur_record_retex\",\"description\":\"Records a draft RETEX (lesson learned): what happened, its impact, what to do next. A draft never changes confidence or recall. Values cannot start with --.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"event\":{\"description\":\"What happened.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"impact\":{\"description\":\"Its consequence.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"next\":{\"description\":\"What to do next time.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"key\":{\"description\":\"Idempotency key: the same key with the same content returns the same object.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384}},\"additionalProperties\":false,\"required\":[\"event\",\"impact\",\"next\"]},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":false}},{\"name\":\"sermofur_feedback\",\"description\":\"Says whether a recalled object helped, did not apply or was wrong. Kept as a draft RETEX marked as feedback, with no effect on confidence or ranking.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"targetId\":{\"description\":\"Identifier of a visible claim, RETEX or source.\",\"type\":\"string\",\"format\":\"uuid\"},\"verdict\":{\"description\":\"The verdict.\",\"type\":\"string\",\"enum\":[\"helpful\",\"not_applicable\",\"wrong\"]},\"comment\":{\"description\":\"Why; cannot start with --.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"key\":{\"description\":\"Idempotency key: the same key with the same content returns the same object.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384}},\"additionalProperties\":false,\"required\":[\"targetId\",\"verdict\"]},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":false}}]},\"id\":56,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":57,\"method\":\"tools/list\",\"params\":{\"cursor\":5}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":57,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":58,\"method\":\"tools/list\",\"params\":[]}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":58,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":59,\"method\":\"tools/list\",\"params\":{\"_meta\":null,\"cursor\":null}}",
+          "answers": [
+            "{\"result\":{\"tools\":[{\"name\":\"sermofur_status\",\"description\":\"Identity of the Sermofur instance of this project, current scope and counts of the visible objects.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":true}},{\"name\":\"sermofur_context\",\"description\":\"Context of this session: instance, current scope with its visible ancestors, and counts. No content.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":true}},{\"name\":\"sermofur_recall\",\"description\":\"Recalls at most 3 explained results (claims, RETEX, source passages) relevant to a question, among what this project may see. Read only.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"question\":{\"description\":\"The question, in plain words.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"limit\":{\"description\":\"Number of results, 1 to 3. Default: 3.\",\"type\":\"integer\",\"minimum\":1,\"maximum\":3}},\"additionalProperties\":false,\"required\":[\"question\"]},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":true}},{\"name\":\"sermofur_challenge\",\"description\":\"Confronts a claim (claimId) or a text not recorded yet (text) with contradictions, changed sources, status and close claims. Never decides; writes nothing. Give exactly one of claimId and text.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"claimId\":{\"description\":\"Identifier of a visible claim.\",\"type\":\"string\",\"format\":\"uuid\"},\"text\":{\"description\":\"A statement to confront; cannot start with --.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384}},\"additionalProperties\":false},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":true}},{\"name\":\"sermofur_claim\",\"description\":\"Proposes a claim in the current scope. It is recorded as coming from an LLM: its confidence only grows with independent, non-LLM evidence.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"text\":{\"description\":\"The statement.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"category\":{\"description\":\"Default: semantic.\",\"type\":\"string\",\"enum\":[\"episodic\",\"semantic\",\"procedural\"]},\"volatility\":{\"description\":\"Default: evolving.\",\"type\":\"string\",\"enum\":[\"stable\",\"evolving\",\"volatile\"]},\"key\":{\"description\":\"Idempotency key: the same key with the same content returns the same object.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384}},\"additionalProperties\":false,\"required\":[\"text\"]},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":false}},{\"name\":\"sermofur_evidence\",\"description\":\"Records evidence for a visible claim (or against it with contradicts). Evidence declared by an LLM never reinforces a claim. lineage and key cannot start with --.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"claimId\":{\"description\":\"Identifier of a visible claim.\",\"type\":\"string\",\"format\":\"uuid\"},\"kind\":{\"description\":\"Kind of evidence.\",\"type\":\"string\",\"enum\":[\"execution\",\"source_code\",\"authoritative_documentation\",\"project_decision\",\"local_documentation\",\"human_observation\",\"user_assertion\",\"llm_assertion\"]},\"reference\":{\"description\":\"What supports it: a path, a link, a short description.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"lineage\":{\"description\":\"Common origin of related evidence; evidence of one lineage counts once.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"contradicts\":{\"description\":\"True when the evidence goes against the claim.\",\"type\":\"boolean\"},\"sourceId\":{\"description\":\"Identifier of a visible source the evidence cites.\",\"type\":\"string\",\"format\":\"uuid\"},\"key\":{\"description\":\"Idempotency key: the same key with the same content returns the same object.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384}},\"additionalProperties\":false,\"required\":[\"claimId\",\"kind\",\"reference\",\"lineage\"]},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":false}},{\"name\":\"sermofur_record_retex\",\"description\":\"Records a draft RETEX (lesson learned): what happened, its impact, what to do next. A draft never changes confidence or recall. Values cannot start with --.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"event\":{\"description\":\"What happened.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"impact\":{\"description\":\"Its consequence.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"next\":{\"description\":\"What to do next time.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"key\":{\"description\":\"Idempotency key: the same key with the same content returns the same object.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384}},\"additionalProperties\":false,\"required\":[\"event\",\"impact\",\"next\"]},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":false}},{\"name\":\"sermofur_feedback\",\"description\":\"Says whether a recalled object helped, did not apply or was wrong. Kept as a draft RETEX marked as feedback, with no effect on confidence or ranking.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"targetId\":{\"description\":\"Identifier of a visible claim, RETEX or source.\",\"type\":\"string\",\"format\":\"uuid\"},\"verdict\":{\"description\":\"The verdict.\",\"type\":\"string\",\"enum\":[\"helpful\",\"not_applicable\",\"wrong\"]},\"comment\":{\"description\":\"Why; cannot start with --.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"key\":{\"description\":\"Idempotency key: the same key with the same content returns the same object.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384}},\"additionalProperties\":false,\"required\":[\"targetId\",\"verdict\"]},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":false}}]},\"id\":59,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":60,\"method\":\"tools/list\",\"params\":{\"zz\":1,\"ZZ\":2}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":60,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":61,\"method\":\"logging/setLevel\"}",
+          "answers": [
+            "{\"result\":{},\"id\":61,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":62,\"method\":\"logging/setLevel\",\"params\":{}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":62,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":63,\"method\":\"logging/setLevel\",\"params\":{\"Level\":\"debug\",\"level\":\"info\"}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":63,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":64,\"method\":\"logging/setLevel\",\"params\":{\"level\":\"debug\",\"level\":\"info\"}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":64,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":65,\"method\":\"logging/setLevel\",\"params\":{\"level\":\"debug\"}}",
+          "answers": [
+            "{\"result\":{},\"id\":65,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":66,\"method\":\"logging/setLevel\",\"params\":{\"level\":\"emergency\"}}",
+          "answers": [
+            "{\"result\":{},\"id\":66,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":67,\"method\":\"logging/setLevel\",\"params\":{\"level\":\"Debug\"}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":67,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":68,\"method\":\"logging/setLevel\",\"params\":{\"level\":\"DEBUG\"}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":68,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":69,\"method\":\"logging/setLevel\",\"params\":{\"level\":\" debug\"}}",
+          "answers": [
+            "{\"result\":{},\"id\":69,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":70,\"method\":\"logging/setLevel\",\"params\":{\"level\":\"info \"}}",
+          "answers": [
+            "{\"result\":{},\"id\":70,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":71,\"method\":\"logging/setLevel\",\"params\":{\"level\":\"debug, info\"}}",
+          "answers": [
+            "{\"result\":{},\"id\":71,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":72,\"method\":\"logging/setLevel\",\"params\":{\"level\":\"debug,\"}}",
+          "answers": [
+            "{\"result\":{},\"id\":72,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":73,\"method\":\"logging/setLevel\",\"params\":{\"level\":\",\"}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":73,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":74,\"method\":\"logging/setLevel\",\"params\":{\"level\":\"debug,,info\"}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":74,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":75,\"method\":\"logging/setLevel\",\"params\":{\"level\":\"\"}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":75,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":76,\"method\":\"logging/setLevel\",\"params\":{\"level\":\" \"}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":76,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":77,\"method\":\"logging/setLevel\",\"params\":{\"level\":\"0\"}}",
+          "answers": [
+            "{\"result\":{},\"id\":77,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":78,\"method\":\"logging/setLevel\",\"params\":{\"level\":\"+1\"}}",
+          "answers": [
+            "{\"result\":{},\"id\":78,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":79,\"method\":\"logging/setLevel\",\"params\":{\"level\":\" 1 \"}}",
+          "answers": [
+            "{\"result\":{},\"id\":79,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":80,\"method\":\"logging/setLevel\",\"params\":{\"level\":\"-5\"}}",
+          "answers": [
+            "{\"result\":{},\"id\":80,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":81,\"method\":\"logging/setLevel\",\"params\":{\"level\":\"99\"}}",
+          "answers": [
+            "{\"result\":{},\"id\":81,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":82,\"method\":\"logging/setLevel\",\"params\":{\"level\":\"0x1\"}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":82,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":83,\"method\":\"logging/setLevel\",\"params\":{\"level\":\"1,debug\"}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":83,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":84,\"method\":\"logging/setLevel\",\"params\":{\"level\":\"debug,7\"}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":84,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":85,\"method\":\"logging/setLevel\",\"params\":{\"level\":\"2147483648\"}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":85,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":86,\"method\":\"logging/setLevel\",\"params\":{\"level\":\"debug\\u0000\"}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":86,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":87,\"method\":\"logging/setLevel\",\"params\":{\"level\":0}}",
+          "answers": [
+            "{\"result\":{},\"id\":87,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":88,\"method\":\"logging/setLevel\",\"params\":{\"level\":99}}",
+          "answers": [
+            "{\"result\":{},\"id\":88,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":89,\"method\":\"logging/setLevel\",\"params\":{\"level\":-1}}",
+          "answers": [
+            "{\"result\":{},\"id\":89,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":90,\"method\":\"logging/setLevel\",\"params\":{\"level\":1.5}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":90,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":91,\"method\":\"logging/setLevel\",\"params\":{\"level\":2147483648}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":91,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":92,\"method\":\"logging/setLevel\",\"params\":{\"level\":true}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":92,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":93,\"method\":\"logging/setLevel\",\"params\":{\"level\":null}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":93,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "not json",
+          "answers": []
+        },
+        {
+          "send": "{}",
+          "answers": []
+        },
+        {
+          "send": "[]",
+          "answers": []
+        },
+        {
+          "send": "[{\"jsonrpc\":\"2.0\",\"id\":94,\"method\":\"ping\"}]",
+          "answers": []
+        },
+        {
+          "send": "{\"jsonrpc\":\"1.0\",\"id\":95,\"method\":\"ping\"}",
+          "answers": [
+            "{\"error\":{\"code\":-32700,\"message\":\"Failed to parse the JSON-RPC request.\"},\"id\":95,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":2,\"id\":96,\"method\":\"ping\"}",
+          "answers": [
+            "{\"error\":{\"code\":-32700,\"message\":\"Failed to parse the JSON-RPC request.\"},\"id\":96,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"JSONRPC\":\"2.0\",\"id\":97,\"method\":\"ping\"}",
+          "answers": [
+            "{\"error\":{\"code\":-32700,\"message\":\"Failed to parse the JSON-RPC request.\"},\"id\":97,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"id\":98,\"method\":\"ping\"}",
+          "answers": [
+            "{\"error\":{\"code\":-32700,\"message\":\"Failed to parse the JSON-RPC request.\"},\"id\":98,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":99}",
+          "answers": [
+            "{\"error\":{\"code\":-32700,\"message\":\"Failed to parse the JSON-RPC request.\"},\"id\":99,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"ID\":100,\"method\":\"ping\"}",
+          "answers": []
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":101,\"method\":\"ping\",\"extra\":1}",
+          "answers": [
+            "{\"result\":{},\"id\":101,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":102,\"method\":\"ping\",\"jsonrpc\":\"2.0\"}",
+          "answers": [
+            "{\"result\":{},\"id\":102,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":103,\"method\":\"ping\",\"jsonrpc\":\"1.0\"}",
+          "answers": [
+            "{\"error\":{\"code\":-32700,\"message\":\"Failed to parse the JSON-RPC request.\"},\"id\":103,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":104,\"method\":5}",
+          "answers": [
+            "{\"error\":{\"code\":-32700,\"message\":\"Failed to parse the JSON-RPC request.\"},\"id\":104,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":105,\"method\":null}",
+          "answers": [
+            "{\"error\":{\"code\":-32700,\"message\":\"Failed to parse the JSON-RPC request.\"},\"id\":105,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":106,\"method\":\"ping\",\"method\":\"tools/list\"}",
+          "answers": [
+            "{\"result\":{\"tools\":[{\"name\":\"sermofur_status\",\"description\":\"Identity of the Sermofur instance of this project, current scope and counts of the visible objects.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":true}},{\"name\":\"sermofur_context\",\"description\":\"Context of this session: instance, current scope with its visible ancestors, and counts. No content.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":true}},{\"name\":\"sermofur_recall\",\"description\":\"Recalls at most 3 explained results (claims, RETEX, source passages) relevant to a question, among what this project may see. Read only.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"question\":{\"description\":\"The question, in plain words.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"limit\":{\"description\":\"Number of results, 1 to 3. Default: 3.\",\"type\":\"integer\",\"minimum\":1,\"maximum\":3}},\"additionalProperties\":false,\"required\":[\"question\"]},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":true}},{\"name\":\"sermofur_challenge\",\"description\":\"Confronts a claim (claimId) or a text not recorded yet (text) with contradictions, changed sources, status and close claims. Never decides; writes nothing. Give exactly one of claimId and text.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"claimId\":{\"description\":\"Identifier of a visible claim.\",\"type\":\"string\",\"format\":\"uuid\"},\"text\":{\"description\":\"A statement to confront; cannot start with --.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384}},\"additionalProperties\":false},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":true}},{\"name\":\"sermofur_claim\",\"description\":\"Proposes a claim in the current scope. It is recorded as coming from an LLM: its confidence only grows with independent, non-LLM evidence.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"text\":{\"description\":\"The statement.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"category\":{\"description\":\"Default: semantic.\",\"type\":\"string\",\"enum\":[\"episodic\",\"semantic\",\"procedural\"]},\"volatility\":{\"description\":\"Default: evolving.\",\"type\":\"string\",\"enum\":[\"stable\",\"evolving\",\"volatile\"]},\"key\":{\"description\":\"Idempotency key: the same key with the same content returns the same object.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384}},\"additionalProperties\":false,\"required\":[\"text\"]},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":false}},{\"name\":\"sermofur_evidence\",\"description\":\"Records evidence for a visible claim (or against it with contradicts). Evidence declared by an LLM never reinforces a claim. lineage and key cannot start with --.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"claimId\":{\"description\":\"Identifier of a visible claim.\",\"type\":\"string\",\"format\":\"uuid\"},\"kind\":{\"description\":\"Kind of evidence.\",\"type\":\"string\",\"enum\":[\"execution\",\"source_code\",\"authoritative_documentation\",\"project_decision\",\"local_documentation\",\"human_observation\",\"user_assertion\",\"llm_assertion\"]},\"reference\":{\"description\":\"What supports it: a path, a link, a short description.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"lineage\":{\"description\":\"Common origin of related evidence; evidence of one lineage counts once.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"contradicts\":{\"description\":\"True when the evidence goes against the claim.\",\"type\":\"boolean\"},\"sourceId\":{\"description\":\"Identifier of a visible source the evidence cites.\",\"type\":\"string\",\"format\":\"uuid\"},\"key\":{\"description\":\"Idempotency key: the same key with the same content returns the same object.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384}},\"additionalProperties\":false,\"required\":[\"claimId\",\"kind\",\"reference\",\"lineage\"]},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":false}},{\"name\":\"sermofur_record_retex\",\"description\":\"Records a draft RETEX (lesson learned): what happened, its impact, what to do next. A draft never changes confidence or recall. Values cannot start with --.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"event\":{\"description\":\"What happened.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"impact\":{\"description\":\"Its consequence.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"next\":{\"description\":\"What to do next time.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"key\":{\"description\":\"Idempotency key: the same key with the same content returns the same object.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384}},\"additionalProperties\":false,\"required\":[\"event\",\"impact\",\"next\"]},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":false}},{\"name\":\"sermofur_feedback\",\"description\":\"Says whether a recalled object helped, did not apply or was wrong. Kept as a draft RETEX marked as feedback, with no effect on confidence or ranking.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"targetId\":{\"description\":\"Identifier of a visible claim, RETEX or source.\",\"type\":\"string\",\"format\":\"uuid\"},\"verdict\":{\"description\":\"The verdict.\",\"type\":\"string\",\"enum\":[\"helpful\",\"not_applicable\",\"wrong\"]},\"comment\":{\"description\":\"Why; cannot start with --.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384},\"key\":{\"description\":\"Idempotency key: the same key with the same content returns the same object.\",\"type\":\"string\",\"minLength\":1,\"maxLength\":16384}},\"additionalProperties\":false,\"required\":[\"targetId\",\"verdict\"]},\"annotations\":{\"destructiveHint\":false,\"openWorldHint\":false,\"readOnlyHint\":false}}]},\"id\":106,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":107,\"method\":\"ping\",\"id\":108}",
+          "answers": [
+            "{\"result\":{},\"id\":108,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":1.5,\"method\":\"ping\",\"id\":109}",
+          "answers": []
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":110,\"method\":\"ping\",\"id\":1.5}",
+          "answers": [
+            "{\"error\":{\"code\":-32700,\"message\":\"Failed to parse the JSON-RPC request.\"},\"id\":110,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":\"111\",\"id\":112,\"method\":5}",
+          "answers": [
+            "{\"error\":{\"code\":-32700,\"message\":\"Failed to parse the JSON-RPC request.\"},\"id\":\"111\",\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":113,\"method\":\"ping\\ud800\"}",
+          "answers": [
+            "{\"error\":{\"code\":-32700,\"message\":\"Failed to parse the JSON-RPC request.\"},\"id\":113,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":\"a\\ud800\",\"method\":\"ping\"}",
+          "answers": []
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":114,\"method\":\"ping\"",
+          "answers": [
+            "{\"error\":{\"code\":-32700,\"message\":\"Failed to parse the JSON-RPC request.\"},\"id\":114,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":115 , \"method\":\"ping\"} x",
+          "answers": [
+            "{\"error\":{\"code\":-32700,\"message\":\"Failed to parse the JSON-RPC request.\"},\"id\":115,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":5x}",
+          "answers": []
+        },
+        {
+          "send": "{\"params\":{\"id\":116},\"jsonrpc\":\"1.0\",\"method\":\"x\"}",
+          "answers": []
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":117,\"result\":{}}",
+          "answers": []
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":118,\"result\":5}",
+          "answers": []
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":119,\"result\":null}",
+          "answers": []
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":120,\"error\":{\"code\":1,\"message\":\"m\"}}",
+          "answers": []
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":121,\"error\":5}",
+          "answers": [
+            "{\"error\":{\"code\":-32700,\"message\":\"Failed to parse the JSON-RPC request.\"},\"id\":121,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":122,\"error\":null}",
+          "answers": [
+            "{\"error\":{\"code\":-32700,\"message\":\"Failed to parse the JSON-RPC request.\"},\"id\":122,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":123,\"error\":{\"code\":1}}",
+          "answers": [
+            "{\"error\":{\"code\":-32700,\"message\":\"Failed to parse the JSON-RPC request.\"},\"id\":123,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":124,\"error\":{\"code\":1.5,\"message\":\"m\"}}",
+          "answers": [
+            "{\"error\":{\"code\":-32700,\"message\":\"Failed to parse the JSON-RPC request.\"},\"id\":124,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"method\":\"ping\"}",
+          "answers": []
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_status\"}}",
+          "answers": []
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"method\":\"notifications/unknown\"}",
+          "answers": []
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"method\":\"notifications/cancelled\",\"params\":5}",
+          "answers": []
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"method\":5}",
+          "answers": []
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":\"x\\u00e9 <'&+`\\\"\\\\>\",\"method\":\"ping\"}",
+          "answers": [
+            "{\"result\":{},\"id\":\"x\\u00E9 \\u003C\\u0027\\u0026\\u002B\\u0060\\u0022\\\\\\u003E\",\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":\"\",\"method\":\"ping\"}",
+          "answers": [
+            "{\"result\":{},\"id\":\"\",\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":99999999999999,\"method\":\"ping\"}",
+          "answers": [
+            "{\"result\":{},\"id\":99999999999999,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":-1,\"method\":\"ping\"}",
+          "answers": [
+            "{\"result\":{},\"id\":-1,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":-0,\"method\":\"ping\"}",
+          "answers": [
+            "{\"result\":{},\"id\":0,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":1.0,\"method\":\"ping\"}",
+          "answers": []
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":1e2,\"method\":\"ping\"}",
+          "answers": []
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":9223372036854775807,\"method\":\"ping\"}",
+          "answers": [
+            "{\"result\":{},\"id\":9223372036854775807,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":9223372036854775808,\"method\":\"ping\"}",
+          "answers": []
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":null,\"method\":\"ping\"}",
+          "answers": []
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":true,\"method\":\"ping\"}",
+          "answers": []
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":{},\"method\":\"ping\"}",
+          "answers": []
+        },
+        {
+          "send": "  {\"jsonrpc\":\"2.0\",\"id\":125,\"method\":\"ping\"}  ",
+          "answers": [
+            "{\"result\":{},\"id\":125,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":126,\"method\":\"tools/call\"}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Unknown tool \\u0027\\u0027.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Unknown tool \\u0027\\u0027.\"},\"isError\":true},\"id\":126,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":127,\"method\":\"tools/call\",\"params\":{}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":127,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":128,\"method\":\"tools/call\",\"params\":{\"name\":5}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":128,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":129,\"method\":\"tools/call\",\"params\":{\"name\":null}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Unknown tool \\u0027\\u0027.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Unknown tool \\u0027\\u0027.\"},\"isError\":true},\"id\":129,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":130,\"method\":\"tools/call\",\"params\":{\"name\":\"nope\"}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Unknown tool \\u0027nope\\u0027.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Unknown tool \\u0027nope\\u0027.\"},\"isError\":true},\"id\":130,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":131,\"method\":\"tools/call\",\"params\":{\"Name\":\"x\"}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Unknown tool \\u0027x\\u0027.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Unknown tool \\u0027x\\u0027.\"},\"isError\":true},\"id\":131,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":132,\"method\":\"tools/call\",\"params\":{\"name\":\"x\",\"Name\":\"y\"}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":132,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":133,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"name\":5}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":133,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":134,\"method\":\"tools/call\",\"params\":{\"name\":\"x\",\"_meta\":[]}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":134,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":135,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_status\",\"arguments\":5}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":135,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":136,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_status\",\"arguments\":[]}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":136,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":137,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_status\",\"arguments\":null}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"daemon_unavailable: No Sermofur daemon answers. Run: smf daemon install (or smf daemon start), then smf daemon register in the project.\"}],\"structuredContent\":{\"code\":\"daemon_unavailable\",\"message\":\"No Sermofur daemon answers. Run: smf daemon install (or smf daemon start), then smf daemon register in the project.\"},\"isError\":true},\"id\":137,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":138,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_status\",\"arguments\":{},\"_meta\":{\"progressToken\":\"p\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"daemon_unavailable: No Sermofur daemon answers. Run: smf daemon install (or smf daemon start), then smf daemon register in the project.\"}],\"structuredContent\":{\"code\":\"daemon_unavailable\",\"message\":\"No Sermofur daemon answers. Run: smf daemon install (or smf daemon start), then smf daemon register in the project.\"},\"isError\":true},\"id\":138,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":139,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_status\",\"arguments\":{}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"daemon_unavailable: No Sermofur daemon answers. Run: smf daemon install (or smf daemon start), then smf daemon register in the project.\"}],\"structuredContent\":{\"code\":\"daemon_unavailable\",\"message\":\"No Sermofur daemon answers. Run: smf daemon install (or smf daemon start), then smf daemon register in the project.\"},\"isError\":true},\"id\":139,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":140,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_status\",\"arguments\":{\"path\":\"x\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Unknown field \\u0027path\\u0027.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Unknown field \\u0027path\\u0027.\"},\"isError\":true},\"id\":140,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":141,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_status\",\"arguments\":{\"a\":1,\"b\":2}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Unknown field \\u0027a\\u0027.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Unknown field \\u0027a\\u0027.\"},\"isError\":true},\"id\":141,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":142,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_context\",\"arguments\":{}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"daemon_unavailable: No Sermofur daemon answers. Run: smf daemon install (or smf daemon start), then smf daemon register in the project.\"}],\"structuredContent\":{\"code\":\"daemon_unavailable\",\"message\":\"No Sermofur daemon answers. Run: smf daemon install (or smf daemon start), then smf daemon register in the project.\"},\"isError\":true},\"id\":142,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":143,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"arguments\":{}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027question\\u0027 is required.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027question\\u0027 is required.\"},\"isError\":true},\"id\":143,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":144,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"arguments\":{\"question\":null}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027question\\u0027 is required.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027question\\u0027 is required.\"},\"isError\":true},\"id\":144,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":145,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"arguments\":{\"question\":\"\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027question\\u0027 takes 1 to 16384 characters, without NUL.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027question\\u0027 takes 1 to 16384 characters, without NUL.\"},\"isError\":true},\"id\":145,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":146,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"arguments\":{\"question\":\"a\\u0000b\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027question\\u0027 takes 1 to 16384 characters, without NUL.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027question\\u0027 takes 1 to 16384 characters, without NUL.\"},\"isError\":true},\"id\":146,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":147,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"arguments\":{\"question\":\"a\\ud800b\"}}}",
+          "answers": [
+            "{\"error\":{\"code\":-32603,\"message\":\"An error occurred.\"},\"id\":147,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":148,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"arguments\":{\"question\":\"@16385*x@\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027question\\u0027 takes 1 to 16384 characters, without NUL.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027question\\u0027 takes 1 to 16384 characters, without NUL.\"},\"isError\":true},\"id\":148,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":149,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"arguments\":{\"question\":\"@16384*x@\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"daemon_unavailable: No Sermofur daemon answers. Run: smf daemon install (or smf daemon start), then smf daemon register in the project.\"}],\"structuredContent\":{\"code\":\"daemon_unavailable\",\"message\":\"No Sermofur daemon answers. Run: smf daemon install (or smf daemon start), then smf daemon register in the project.\"},\"isError\":true},\"id\":149,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":150,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"arguments\":{\"question\":\"@16384*é@\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"daemon_unavailable: No Sermofur daemon answers. Run: smf daemon install (or smf daemon start), then smf daemon register in the project.\"}],\"structuredContent\":{\"code\":\"daemon_unavailable\",\"message\":\"No Sermofur daemon answers. Run: smf daemon install (or smf daemon start), then smf daemon register in the project.\"},\"isError\":true},\"id\":150,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":151,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"arguments\":{\"question\":\"@8193*\uD83D\uDE00@\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027question\\u0027 takes 1 to 16384 characters, without NUL.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027question\\u0027 takes 1 to 16384 characters, without NUL.\"},\"isError\":true},\"id\":151,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":152,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"arguments\":{\"question\":\"--x\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"daemon_unavailable: No Sermofur daemon answers. Run: smf daemon install (or smf daemon start), then smf daemon register in the project.\"}],\"structuredContent\":{\"code\":\"daemon_unavailable\",\"message\":\"No Sermofur daemon answers. Run: smf daemon install (or smf daemon start), then smf daemon register in the project.\"},\"isError\":true},\"id\":152,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":153,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"arguments\":{\"question\":5}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027question\\u0027 is a string.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027question\\u0027 is a string.\"},\"isError\":true},\"id\":153,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":154,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"arguments\":{\"question\":\"ok\",\"limit\":0}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027limit\\u0027 is an integer from 1 to 3.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027limit\\u0027 is an integer from 1 to 3.\"},\"isError\":true},\"id\":154,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":155,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"arguments\":{\"question\":\"ok\",\"limit\":4}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027limit\\u0027 is an integer from 1 to 3.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027limit\\u0027 is an integer from 1 to 3.\"},\"isError\":true},\"id\":155,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":156,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"arguments\":{\"question\":\"ok\",\"limit\":2.0}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027limit\\u0027 is an integer from 1 to 3.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027limit\\u0027 is an integer from 1 to 3.\"},\"isError\":true},\"id\":156,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":157,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"arguments\":{\"question\":\"ok\",\"limit\":-0}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027limit\\u0027 is an integer from 1 to 3.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027limit\\u0027 is an integer from 1 to 3.\"},\"isError\":true},\"id\":157,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":158,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"arguments\":{\"question\":\"ok\",\"limit\":\"2\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027limit\\u0027 is an integer from 1 to 3.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027limit\\u0027 is an integer from 1 to 3.\"},\"isError\":true},\"id\":158,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":159,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"arguments\":{\"question\":\"ok\",\"limit\":3}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"daemon_unavailable: No Sermofur daemon answers. Run: smf daemon install (or smf daemon start), then smf daemon register in the project.\"}],\"structuredContent\":{\"code\":\"daemon_unavailable\",\"message\":\"No Sermofur daemon answers. Run: smf daemon install (or smf daemon start), then smf daemon register in the project.\"},\"isError\":true},\"id\":159,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":160,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"arguments\":{\"question\":\"\",\"question\":\"ok\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"daemon_unavailable: No Sermofur daemon answers. Run: smf daemon install (or smf daemon start), then smf daemon register in the project.\"}],\"structuredContent\":{\"code\":\"daemon_unavailable\",\"message\":\"No Sermofur daemon answers. Run: smf daemon install (or smf daemon start), then smf daemon register in the project.\"},\"isError\":true},\"id\":160,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":161,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"arguments\":{\"question\":\"a\",\"question\":\"b\",\"zz\":1}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Unknown field \\u0027zz\\u0027.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Unknown field \\u0027zz\\u0027.\"},\"isError\":true},\"id\":161,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":162,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"arguments\":{\"zz\":1,\"question\":\"\",\"yy\":2}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Unknown field \\u0027zz\\u0027.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Unknown field \\u0027zz\\u0027.\"},\"isError\":true},\"id\":162,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":163,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"arguments\":{\"Question\":\"a\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Unknown field \\u0027Question\\u0027.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Unknown field \\u0027Question\\u0027.\"},\"isError\":true},\"id\":163,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":164,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_challenge\",\"arguments\":{}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Give exactly one of claimId and text.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Give exactly one of claimId and text.\"},\"isError\":true},\"id\":164,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":165,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_challenge\",\"arguments\":{\"claimId\":\"0f8fad5b-d9cb-469f-a165-70867728950e\",\"text\":\"t\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Give exactly one of claimId and text.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Give exactly one of claimId and text.\"},\"isError\":true},\"id\":165,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":166,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_challenge\",\"arguments\":{\"claimId\":\" 0f8fad5b-d9cb-469f-a165-70867728950e \"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"daemon_unavailable: No Sermofur daemon answers. Run: smf daemon install (or smf daemon start), then smf daemon register in the project.\"}],\"structuredContent\":{\"code\":\"daemon_unavailable\",\"message\":\"No Sermofur daemon answers. Run: smf daemon install (or smf daemon start), then smf daemon register in the project.\"},\"isError\":true},\"id\":166,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":167,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_challenge\",\"arguments\":{\"claimId\":\"0F8FAD5B-D9CB-469F-A165-70867728950E\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"daemon_unavailable: No Sermofur daemon answers. Run: smf daemon install (or smf daemon start), then smf daemon register in the project.\"}],\"structuredContent\":{\"code\":\"daemon_unavailable\",\"message\":\"No Sermofur daemon answers. Run: smf daemon install (or smf daemon start), then smf daemon register in the project.\"},\"isError\":true},\"id\":167,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":168,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_challenge\",\"arguments\":{\"claimId\":\"0f8fad5bd9cb469fa16570867728950e\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027claimId\\u0027 is an identifier (GUID).\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027claimId\\u0027 is an identifier (GUID).\"},\"isError\":true},\"id\":168,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":169,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_challenge\",\"arguments\":{\"claimId\":\"{0f8fad5b-d9cb-469f-a165-70867728950e}\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027claimId\\u0027 is an identifier (GUID).\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027claimId\\u0027 is an identifier (GUID).\"},\"isError\":true},\"id\":169,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":170,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_challenge\",\"arguments\":{\"claimId\":\"+0x0fad5b-d9cb-469f-a165-70867728950e\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027claimId\\u0027 is an identifier (GUID).\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027claimId\\u0027 is an identifier (GUID).\"},\"isError\":true},\"id\":170,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":171,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_challenge\",\"arguments\":{\"text\":\"--x\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027text\\u0027 cannot start with --.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027text\\u0027 cannot start with --.\"},\"isError\":true},\"id\":171,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":172,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_challenge\",\"arguments\":{\"text\":null,\"claimId\":null}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Give exactly one of claimId and text.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Give exactly one of claimId and text.\"},\"isError\":true},\"id\":172,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":173,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_claim\",\"arguments\":{\"text\":\"x\",\"origin\":\"user\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Unknown field \\u0027origin\\u0027.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Unknown field \\u0027origin\\u0027.\"},\"isError\":true},\"id\":173,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":174,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_claim\",\"arguments\":{\"text\":\"x\",\"actor\":\"someone\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Unknown field \\u0027actor\\u0027.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Unknown field \\u0027actor\\u0027.\"},\"isError\":true},\"id\":174,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":175,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_claim\",\"arguments\":{\"text\":\"x\",\"category\":\"decisions\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027category\\u0027 is one of: episodic, semantic, procedural.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027category\\u0027 is one of: episodic, semantic, procedural.\"},\"isError\":true},\"id\":175,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":176,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_claim\",\"arguments\":{\"text\":\"x\",\"category\":\"Semantic\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027category\\u0027 is one of: episodic, semantic, procedural.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027category\\u0027 is one of: episodic, semantic, procedural.\"},\"isError\":true},\"id\":176,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":177,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_claim\",\"arguments\":{\"text\":\"x\",\"volatility\":\"volatile\",\"category\":\"procedural\",\"key\":\"--k\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027key\\u0027 cannot start with --.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027key\\u0027 cannot start with --.\"},\"isError\":true},\"id\":177,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":178,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_claim\",\"arguments\":{\"text\":\"-- starts with dashes\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"daemon_unavailable: No Sermofur daemon answers. Run: smf daemon install (or smf daemon start), then smf daemon register in the project.\"}],\"structuredContent\":{\"code\":\"daemon_unavailable\",\"message\":\"No Sermofur daemon answers. Run: smf daemon install (or smf daemon start), then smf daemon register in the project.\"},\"isError\":true},\"id\":178,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":179,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_evidence\",\"arguments\":{\"claimId\":\"x\",\"kind\":\"source_code\",\"reference\":\"r\",\"lineage\":\"l\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027claimId\\u0027 is an identifier (GUID).\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027claimId\\u0027 is an identifier (GUID).\"},\"isError\":true},\"id\":179,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":180,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_evidence\",\"arguments\":{\"claimId\":\"0f8fad5b-d9cb-469f-a165-70867728950e\",\"kind\":\"proof\",\"reference\":\"r\",\"lineage\":\"l\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027kind\\u0027 is one of: execution, source_code, authoritative_documentation, project_decision, local_documentation, human_observation, user_assertion, llm_assertion.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027kind\\u0027 is one of: execution, source_code, authoritative_documentation, project_decision, local_documentation, human_observation, user_assertion, llm_assertion.\"},\"isError\":true},\"id\":180,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":181,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_evidence\",\"arguments\":{\"claimId\":\"0f8fad5b-d9cb-469f-a165-70867728950e\",\"kind\":\"execution\",\"reference\":\"--r\",\"lineage\":\"--l\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027lineage\\u0027 cannot start with --.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027lineage\\u0027 cannot start with --.\"},\"isError\":true},\"id\":181,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":182,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_evidence\",\"arguments\":{\"claimId\":\"0f8fad5b-d9cb-469f-a165-70867728950e\",\"kind\":\"execution\",\"reference\":\"r\",\"lineage\":\"l\",\"contradicts\":\"true\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027contradicts\\u0027 is a boolean.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027contradicts\\u0027 is a boolean.\"},\"isError\":true},\"id\":182,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":183,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_evidence\",\"arguments\":{\"claimId\":\"0f8fad5b-d9cb-469f-a165-70867728950e\",\"kind\":\"execution\",\"reference\":\"r\",\"lineage\":\"l\",\"contradicts\":1}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027contradicts\\u0027 is a boolean.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027contradicts\\u0027 is a boolean.\"},\"isError\":true},\"id\":183,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":184,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_evidence\",\"arguments\":{\"claimId\":\"0f8fad5b-d9cb-469f-a165-70867728950e\",\"kind\":\"execution\",\"reference\":\"r\",\"lineage\":\"l\",\"sourceId\":\"s\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027sourceId\\u0027 is an identifier (GUID).\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027sourceId\\u0027 is an identifier (GUID).\"},\"isError\":true},\"id\":184,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":185,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_evidence\",\"arguments\":{\"claimId\":\"0f8fad5b-d9cb-469f-a165-70867728950e\",\"kind\":\"execution\",\"reference\":\"r\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027lineage\\u0027 is required.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027lineage\\u0027 is required.\"},\"isError\":true},\"id\":185,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":186,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_record_retex\",\"arguments\":{\"event\":\"--e\",\"impact\":\"i\",\"next\":\"n\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027event\\u0027 cannot start with --.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027event\\u0027 cannot start with --.\"},\"isError\":true},\"id\":186,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":187,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_record_retex\",\"arguments\":{\"event\":\"e\",\"impact\":\"i\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027next\\u0027 is required.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027next\\u0027 is required.\"},\"isError\":true},\"id\":187,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":188,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_record_retex\",\"arguments\":{\"event\":\"e\",\"impact\":\"i\",\"next\":\"n\",\"key\":\"\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027key\\u0027 takes 1 to 16384 characters, without NUL.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027key\\u0027 takes 1 to 16384 characters, without NUL.\"},\"isError\":true},\"id\":188,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":189,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_feedback\",\"arguments\":{\"targetId\":\"0f8fad5b-d9cb-469f-a165-70867728950e\",\"verdict\":\"great\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027verdict\\u0027 is one of: helpful, not_applicable, wrong.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027verdict\\u0027 is one of: helpful, not_applicable, wrong.\"},\"isError\":true},\"id\":189,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":190,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_feedback\",\"arguments\":{\"targetId\":\"0f8fad5b-d9cb-469f-a165-70867728950e\",\"verdict\":\"wrong\",\"comment\":\"--c\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027comment\\u0027 cannot start with --.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027comment\\u0027 cannot start with --.\"},\"isError\":true},\"id\":190,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":191,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_feedback\",\"arguments\":{\"verdict\":\"wrong\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Field \\u0027targetId\\u0027 is required.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Field \\u0027targetId\\u0027 is required.\"},\"isError\":true},\"id\":191,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":\"\\u00E9\",\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_feedback\",\"arguments\":{\"targetId\":\"0f8fad5b-d9cb-469f-a165-70867728950e\",\"verdict\":\"helpful\",\"comment\":\"<b> & 'c'\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"daemon_unavailable: No Sermofur daemon answers. Run: smf daemon install (or smf daemon start), then smf daemon register in the project.\"}],\"structuredContent\":{\"code\":\"daemon_unavailable\",\"message\":\"No Sermofur daemon answers. Run: smf daemon install (or smf daemon start), then smf daemon register in the project.\"},\"isError\":true},\"id\":\"\\u00E9\",\"jsonrpc\":\"2.0\"}"
+          ]
+        }
+      ],
+      "exit": 0,
+      "stderr": "",
+      "log": []
+    },
+    {
+      "name": "framing",
+      "folder": "root",
+      "daemon": false,
+      "registered": false,
+      "projectDirectory": null,
+      "setup": [],
+      "cases": [
+        {
+          "send": "\uFEFF{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"ping\"}",
+          "answers": [
+            "{\"result\":{},\"id\":1,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"ping\"}\r{\"jsonrpc\":\"2.0\",\"id\":3,\"method\":\"ping\"}",
+          "answers": [
+            "{\"result\":{},\"id\":2,\"jsonrpc\":\"2.0\"}",
+            "{\"result\":{},\"id\":3,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":4,\"method\":\"ping\"}\r",
+          "answers": [
+            "{\"result\":{},\"id\":4,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "",
+          "answers": []
+        },
+        {
+          "send": "   ",
+          "answers": []
+        },
+        {
+          "send": "\t{\"jsonrpc\":\"2.0\",\"id\":5,\"method\":\"ping\"}",
+          "answers": [
+            "{\"result\":{},\"id\":5,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":6,\"method\":\"ping\"}\r\n{\"jsonrpc\":\"2.0\",\"id\":7,\"method\":\"ping\"}",
+          "answers": [
+            "{\"result\":{},\"id\":7,\"jsonrpc\":\"2.0\"}",
+            "{\"result\":{},\"id\":6,\"jsonrpc\":\"2.0\"}"
+          ]
+        }
+      ],
+      "exit": 0,
+      "stderr": "",
+      "log": []
+    },
+    {
+      "name": "not_registered",
+      "folder": "root",
+      "daemon": true,
+      "registered": false,
+      "projectDirectory": null,
+      "setup": [],
+      "cases": [
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":\"init\",\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{},\"clientInfo\":{\"name\":\"Claude Code Test\",\"version\":\"1.0\"}}}",
+          "answers": [
+            "{\"result\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"logging\":{},\"tools\":{}},\"serverInfo\":{\"name\":\"sermofur\",\"version\":\"0.0.0-dev\"},\"instructions\":\"Sermofur keeps a contestable memory of this project: recall before deciding, challenge a claim before relying on it, and record what you learn as claims, evidence or RETEX. What you write is recorded as coming from an LLM.\"},\"id\":\"init\",\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_status\",\"arguments\":{}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"not_served: The instance of <root> is not registered with the daemon. Run, in the project: smf daemon register\"}],\"structuredContent\":{\"code\":\"not_served\",\"message\":\"The instance of <root> is not registered with the daemon. Run, in the project: smf daemon register\"},\"isError\":true},\"id\":1,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"arguments\":{\"question\":\"q\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"not_served: The instance of <root> is not registered with the daemon. Run, in the project: smf daemon register\"}],\"structuredContent\":{\"code\":\"not_served\",\"message\":\"The instance of <root> is not registered with the daemon. Run, in the project: smf daemon register\"},\"isError\":true},\"id\":2,\"jsonrpc\":\"2.0\"}"
+          ]
+        }
+      ],
+      "exit": 0,
+      "stderr": "",
+      "log": [
+        "mcp_started",
+        "mcp_call not_served",
+        "mcp_call not_served",
+        "mcp_stopped"
+      ]
+    },
+    {
+      "name": "outside_an_instance",
+      "folder": "outside",
+      "daemon": true,
+      "registered": false,
+      "projectDirectory": null,
+      "setup": [],
+      "cases": [
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":\"init\",\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{},\"clientInfo\":{\"name\":\"Claude Code Test\",\"version\":\"1.0\"}}}",
+          "answers": [
+            "{\"result\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"logging\":{},\"tools\":{}},\"serverInfo\":{\"name\":\"sermofur\",\"version\":\"0.0.0-dev\"},\"instructions\":\"Sermofur keeps a contestable memory of this project: recall before deciding, challenge a claim before relying on it, and record what you learn as claims, evidence or RETEX. What you write is recorded as coming from an LLM.\"},\"id\":\"init\",\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_status\",\"arguments\":{}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"no_instance: No .sermofur instance in the parent folders. Run, in the project: smf init, then smf daemon register\"}],\"structuredContent\":{\"code\":\"no_instance\",\"message\":\"No .sermofur instance in the parent folders. Run, in the project: smf init, then smf daemon register\"},\"isError\":true},\"id\":1,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"arguments\":{\"question\":\"q\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"no_instance: No .sermofur instance in the parent folders. Run, in the project: smf init, then smf daemon register\"}],\"structuredContent\":{\"code\":\"no_instance\",\"message\":\"No .sermofur instance in the parent folders. Run, in the project: smf init, then smf daemon register\"},\"isError\":true},\"id\":2,\"jsonrpc\":\"2.0\"}"
+          ]
+        }
+      ],
+      "exit": 0,
+      "stderr": "",
+      "log": [
+        "mcp_started",
+        "mcp_call no_instance",
+        "mcp_call no_instance",
+        "mcp_stopped"
+      ]
+    },
+    {
+      "name": "tools",
+      "folder": "root",
+      "daemon": true,
+      "registered": true,
+      "projectDirectory": null,
+      "setup": [
+        {
+          "cwd": null,
+          "run": [
+            "claim",
+            "add",
+            "cache invalidation is hard",
+            "--origin",
+            "user",
+            "--json"
+          ]
+        },
+        {
+          "cwd": null,
+          "run": [
+            "claim",
+            "add",
+            "queues retry three times",
+            "--origin",
+            "user",
+            "--json"
+          ]
+        },
+        {
+          "mkdir": "client-a"
+        },
+        {
+          "mkdir": "client-b"
+        },
+        {
+          "cwd": null,
+          "run": [
+            "scope",
+            "add",
+            "client-a",
+            "client",
+            "workspace",
+            "client-a",
+            "--json"
+          ]
+        },
+        {
+          "cwd": null,
+          "run": [
+            "scope",
+            "add",
+            "client-b",
+            "client",
+            "workspace",
+            "client-b",
+            "--json"
+          ]
+        },
+        {
+          "cwd": "client-b",
+          "run": [
+            "claim",
+            "add",
+            "secret of client b",
+            "--origin",
+            "user",
+            "--json"
+          ]
+        }
+      ],
+      "cases": [
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":\"init\",\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{},\"clientInfo\":{\"name\":\"Claude Code Test\",\"version\":\"1.0\"}}}",
+          "answers": [
+            "{\"result\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"logging\":{},\"tools\":{}},\"serverInfo\":{\"name\":\"sermofur\",\"version\":\"0.0.0-dev\"},\"instructions\":\"Sermofur keeps a contestable memory of this project: recall before deciding, challenge a claim before relying on it, and record what you learn as claims, evidence or RETEX. What you write is recorded as coming from an LLM.\"},\"id\":\"init\",\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_status\",\"arguments\":{}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\u0022root\\u0022:\\u0022<root>\\u0022,\\u0022configuration\\u0022:{\\u0022schemaVersion\\u0022:2,\\u0022instanceId\\u0022:\\u0022<g4>\\u0022,\\u0022createdAt\\u0022:\\u0022<date>\\\\u002B00:00\\u0022},\\u0022scope\\u0022:\\u0022workspace\\u0022,\\u0022claims\\u0022:2,\\u0022evidence\\u0022:0,\\u0022retex\\u0022:0,\\u0022sources\\u0022:0,\\u0022mode\\u0022:\\u0022daemon\\u0022,\\u0022laya\\u0022:\\u0022unavailable\\u0022}\"}],\"structuredContent\":{\"root\":\"<root>\",\"configuration\":{\"schemaVersion\":2,\"instanceId\":\"<g4>\",\"createdAt\":\"<date>\\u002B00:00\"},\"scope\":\"workspace\",\"claims\":2,\"evidence\":0,\"retex\":0,\"sources\":0,\"mode\":\"daemon\",\"laya\":\"unavailable\"}},\"id\":1,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_context\",\"arguments\":{}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\u0022root\\u0022:\\u0022<root>\\u0022,\\u0022instance\\u0022:{\\u0022schemaVersion\\u0022:2,\\u0022instanceId\\u0022:\\u0022<g4>\\u0022,\\u0022createdAt\\u0022:\\u0022<date>\\\\u002B00:00\\u0022},\\u0022scope\\u0022:\\u0022workspace\\u0022,\\u0022scopes\\u0022:{\\u0022scope\\u0022:\\u0022workspace\\u0022,\\u0022visible\\u0022:[\\u0022workspace\\u0022]},\\u0022counts\\u0022:{\\u0022claims\\u0022:2,\\u0022evidence\\u0022:0,\\u0022retex\\u0022:0,\\u0022sources\\u0022:0}}\"}],\"structuredContent\":{\"root\":\"<root>\",\"instance\":{\"schemaVersion\":2,\"instanceId\":\"<g4>\",\"createdAt\":\"<date>\\u002B00:00\"},\"scope\":\"workspace\",\"scopes\":{\"scope\":\"workspace\",\"visible\":[\"workspace\"]},\"counts\":{\"claims\":2,\"evidence\":0,\"retex\":0,\"sources\":0}}},\"id\":2,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":3,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"arguments\":{\"question\":\"cache\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\u0022query\\u0022:\\u0022cache\\u0022,\\u0022results\\u0022:[{\\u0022kind\\u0022:\\u0022claim\\u0022,\\u0022id\\u0022:\\u0022<g1>\\u0022,\\u0022scopeId\\u0022:\\u0022workspace\\u0022,\\u0022status\\u0022:\\u0022proposed\\u0022,\\u0022applicable\\u0022:true,\\u0022confidence\\u0022:{\\u0022level\\u0022:\\u0022low\\u0022,\\u0022reasons\\u0022:[\\u0022No independent evidence available.\\u0022,\\u0022Declared evidence; no controlled execution collector in this version.\\u0022],\\u0022independentOrigins\\u0022:0},\\u0022excerpt\\u0022:\\u0022cache invalidation is hard\\u0022,\\u0022matchedTerms\\u0022:[\\u0022cache\\u0022],\\u0022freshness\\u0022:{\\u0022createdAt\\u0022:\\u0022<date>\\\\u002B00:00\\u0022,\\u0022lastVerified\\u0022:null,\\u0022reviewAfter\\u0022:null,\\u0022indexedAt\\u0022:null,\\u0022hash\\u0022:null,\\u0022sourceStatus\\u0022:null},\\u0022score\\u0022:0.693147,\\u0022path\\u0022:null}],\\u0022excluded\\u0022:0}\"}],\"structuredContent\":{\"query\":\"cache\",\"results\":[{\"kind\":\"claim\",\"id\":\"<g1>\",\"scopeId\":\"workspace\",\"status\":\"proposed\",\"applicable\":true,\"confidence\":{\"level\":\"low\",\"reasons\":[\"No independent evidence available.\",\"Declared evidence; no controlled execution collector in this version.\"],\"independentOrigins\":0},\"excerpt\":\"cache invalidation is hard\",\"matchedTerms\":[\"cache\"],\"freshness\":{\"createdAt\":\"<date>\\u002B00:00\",\"lastVerified\":null,\"reviewAfter\":null,\"indexedAt\":null,\"hash\":null,\"sourceStatus\":null},\"score\":0.693147,\"path\":null}],\"excluded\":0}},\"id\":3,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":4,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"arguments\":{\"question\":\"cache\",\"limit\":1}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\u0022query\\u0022:\\u0022cache\\u0022,\\u0022results\\u0022:[{\\u0022kind\\u0022:\\u0022claim\\u0022,\\u0022id\\u0022:\\u0022<g1>\\u0022,\\u0022scopeId\\u0022:\\u0022workspace\\u0022,\\u0022status\\u0022:\\u0022proposed\\u0022,\\u0022applicable\\u0022:true,\\u0022confidence\\u0022:{\\u0022level\\u0022:\\u0022low\\u0022,\\u0022reasons\\u0022:[\\u0022No independent evidence available.\\u0022,\\u0022Declared evidence; no controlled execution collector in this version.\\u0022],\\u0022independentOrigins\\u0022:0},\\u0022excerpt\\u0022:\\u0022cache invalidation is hard\\u0022,\\u0022matchedTerms\\u0022:[\\u0022cache\\u0022],\\u0022freshness\\u0022:{\\u0022createdAt\\u0022:\\u0022<date>\\\\u002B00:00\\u0022,\\u0022lastVerified\\u0022:null,\\u0022reviewAfter\\u0022:null,\\u0022indexedAt\\u0022:null,\\u0022hash\\u0022:null,\\u0022sourceStatus\\u0022:null},\\u0022score\\u0022:0.693147,\\u0022path\\u0022:null}],\\u0022excluded\\u0022:0}\"}],\"structuredContent\":{\"query\":\"cache\",\"results\":[{\"kind\":\"claim\",\"id\":\"<g1>\",\"scopeId\":\"workspace\",\"status\":\"proposed\",\"applicable\":true,\"confidence\":{\"level\":\"low\",\"reasons\":[\"No independent evidence available.\",\"Declared evidence; no controlled execution collector in this version.\"],\"independentOrigins\":0},\"excerpt\":\"cache invalidation is hard\",\"matchedTerms\":[\"cache\"],\"freshness\":{\"createdAt\":\"<date>\\u002B00:00\",\"lastVerified\":null,\"reviewAfter\":null,\"indexedAt\":null,\"hash\":null,\"sourceStatus\":null},\"score\":0.693147,\"path\":null}],\"excluded\":0}},\"id\":4,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":5,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"arguments\":{\"question\":\"nothing matches this\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\u0022query\\u0022:\\u0022nothing matches this\\u0022,\\u0022results\\u0022:[],\\u0022excluded\\u0022:0}\"}],\"structuredContent\":{\"query\":\"nothing matches this\",\"results\":[],\"excluded\":0}},\"id\":5,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":6,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_challenge\",\"arguments\":{\"claimId\":\"@0@\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\u0022target\\u0022:{\\u0022claimId\\u0022:\\u0022<g1>\\u0022,\\u0022text\\u0022:\\u0022cache invalidation is hard\\u0022,\\u0022status\\u0022:\\u0022proposed\\u0022},\\u0022signals\\u0022:[],\\u0022toConfront\\u0022:[]}\"}],\"structuredContent\":{\"target\":{\"claimId\":\"<g1>\",\"text\":\"cache invalidation is hard\",\"status\":\"proposed\"},\"signals\":[],\"toConfront\":[]}},\"id\":6,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":7,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_challenge\",\"arguments\":{\"claimId\":\" @0@ \"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\u0022target\\u0022:{\\u0022claimId\\u0022:\\u0022<g1>\\u0022,\\u0022text\\u0022:\\u0022cache invalidation is hard\\u0022,\\u0022status\\u0022:\\u0022proposed\\u0022},\\u0022signals\\u0022:[],\\u0022toConfront\\u0022:[]}\"}],\"structuredContent\":{\"target\":{\"claimId\":\"<g1>\",\"text\":\"cache invalidation is hard\",\"status\":\"proposed\"},\"signals\":[],\"toConfront\":[]}},\"id\":7,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":8,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_challenge\",\"arguments\":{\"text\":\"cache invalidation is easy\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\u0022target\\u0022:{\\u0022claimId\\u0022:null,\\u0022text\\u0022:\\u0022cache invalidation is easy\\u0022,\\u0022status\\u0022:null},\\u0022signals\\u0022:[],\\u0022toConfront\\u0022:[{\\u0022kind\\u0022:\\u0022claim\\u0022,\\u0022id\\u0022:\\u0022<g1>\\u0022,\\u0022scopeId\\u0022:\\u0022workspace\\u0022,\\u0022status\\u0022:\\u0022proposed\\u0022,\\u0022applicable\\u0022:true,\\u0022confidence\\u0022:{\\u0022level\\u0022:\\u0022low\\u0022,\\u0022reasons\\u0022:[\\u0022No independent evidence available.\\u0022,\\u0022Declared evidence; no controlled execution collector in this version.\\u0022],\\u0022independentOrigins\\u0022:0},\\u0022excerpt\\u0022:\\u0022cache invalidation is hard\\u0022,\\u0022matchedTerms\\u0022:[\\u0022cache\\u0022,\\u0022invalidation\\u0022,\\u0022is\\u0022],\\u0022freshness\\u0022:{\\u0022createdAt\\u0022:\\u0022<date>\\\\u002B00:00\\u0022,\\u0022lastVerified\\u0022:null,\\u0022reviewAfter\\u0022:null,\\u0022indexedAt\\u0022:null,\\u0022hash\\u0022:null,\\u0022sourceStatus\\u0022:null},\\u0022score\\u0022:2.079442,\\u0022path\\u0022:null}]}\"}],\"structuredContent\":{\"target\":{\"claimId\":null,\"text\":\"cache invalidation is easy\",\"status\":null},\"signals\":[],\"toConfront\":[{\"kind\":\"claim\",\"id\":\"<g1>\",\"scopeId\":\"workspace\",\"status\":\"proposed\",\"applicable\":true,\"confidence\":{\"level\":\"low\",\"reasons\":[\"No independent evidence available.\",\"Declared evidence; no controlled execution collector in this version.\"],\"independentOrigins\":0},\"excerpt\":\"cache invalidation is hard\",\"matchedTerms\":[\"cache\",\"invalidation\",\"is\"],\"freshness\":{\"createdAt\":\"<date>\\u002B00:00\",\"lastVerified\":null,\"reviewAfter\":null,\"indexedAt\":null,\"hash\":null,\"sourceStatus\":null},\"score\":2.079442,\"path\":null}]}},\"id\":8,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":9,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_challenge\",\"arguments\":{\"claimId\":\"0f8fad5b-d9cb-469f-a165-70867728950e\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"not_found: Object missing or inaccessible.\"}],\"structuredContent\":{\"code\":\"not_found\",\"message\":\"Object missing or inaccessible.\"},\"isError\":true},\"id\":9,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":10,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_claim\",\"arguments\":{\"text\":\"-- starts with dashes\",\"key\":\"k1\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\u0022id\\u0022:\\u0022<g5>\\u0022,\\u0022scopeId\\u0022:\\u0022workspace\\u0022,\\u0022kind\\u0022:\\u0022claim\\u0022,\\u0022status\\u0022:\\u0022proposed\\u0022,\\u0022revision\\u0022:1,\\u0022contentJson\\u0022:\\u0022{\\\\n  \\\\u0022text\\\\u0022: \\\\u0022-- starts with dashes\\\\u0022,\\\\n  \\\\u0022category\\\\u0022: \\\\u0022semantic\\\\u0022,\\\\n  \\\\u0022volatility\\\\u0022: \\\\u0022evolving\\\\u0022,\\\\n  \\\\u0022lastVerified\\\\u0022: null,\\\\n  \\\\u0022reviewAfter\\\\u0022: null\\\\n}\\u0022,\\u0022provenance\\u0022:{\\u0022origin\\u0022:\\u0022llm\\u0022,\\u0022actor\\u0022:\\u0022claude-code-test\\u0022,\\u0022timestamp\\u0022:\\u0022<date>\\\\u002B00:00\\u0022}}\"}],\"structuredContent\":{\"id\":\"<g5>\",\"scopeId\":\"workspace\",\"kind\":\"claim\",\"status\":\"proposed\",\"revision\":1,\"contentJson\":\"{\\n  \\u0022text\\u0022: \\u0022-- starts with dashes\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\"provenance\":{\"origin\":\"llm\",\"actor\":\"claude-code-test\",\"timestamp\":\"<date>\\u002B00:00\"}}},\"id\":10,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":11,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_claim\",\"arguments\":{\"text\":\"-- starts with dashes\",\"key\":\"k1\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\u0022id\\u0022:\\u0022<g5>\\u0022,\\u0022scopeId\\u0022:\\u0022workspace\\u0022,\\u0022kind\\u0022:\\u0022claim\\u0022,\\u0022status\\u0022:\\u0022proposed\\u0022,\\u0022revision\\u0022:1,\\u0022contentJson\\u0022:\\u0022{\\\\n  \\\\u0022text\\\\u0022: \\\\u0022-- starts with dashes\\\\u0022,\\\\n  \\\\u0022category\\\\u0022: \\\\u0022semantic\\\\u0022,\\\\n  \\\\u0022volatility\\\\u0022: \\\\u0022evolving\\\\u0022,\\\\n  \\\\u0022lastVerified\\\\u0022: null,\\\\n  \\\\u0022reviewAfter\\\\u0022: null\\\\n}\\u0022,\\u0022provenance\\u0022:{\\u0022origin\\u0022:\\u0022llm\\u0022,\\u0022actor\\u0022:\\u0022claude-code-test\\u0022,\\u0022timestamp\\u0022:\\u0022<date>\\\\u002B00:00\\u0022}}\"}],\"structuredContent\":{\"id\":\"<g5>\",\"scopeId\":\"workspace\",\"kind\":\"claim\",\"status\":\"proposed\",\"revision\":1,\"contentJson\":\"{\\n  \\u0022text\\u0022: \\u0022-- starts with dashes\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\"provenance\":{\"origin\":\"llm\",\"actor\":\"claude-code-test\",\"timestamp\":\"<date>\\u002B00:00\"}}},\"id\":11,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":12,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_claim\",\"arguments\":{\"text\":\"-h\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\u0022id\\u0022:\\u0022<g6>\\u0022,\\u0022scopeId\\u0022:\\u0022workspace\\u0022,\\u0022kind\\u0022:\\u0022claim\\u0022,\\u0022status\\u0022:\\u0022proposed\\u0022,\\u0022revision\\u0022:1,\\u0022contentJson\\u0022:\\u0022{\\\\n  \\\\u0022text\\\\u0022: \\\\u0022-h\\\\u0022,\\\\n  \\\\u0022category\\\\u0022: \\\\u0022semantic\\\\u0022,\\\\n  \\\\u0022volatility\\\\u0022: \\\\u0022evolving\\\\u0022,\\\\n  \\\\u0022lastVerified\\\\u0022: null,\\\\n  \\\\u0022reviewAfter\\\\u0022: null\\\\n}\\u0022,\\u0022provenance\\u0022:{\\u0022origin\\u0022:\\u0022llm\\u0022,\\u0022actor\\u0022:\\u0022claude-code-test\\u0022,\\u0022timestamp\\u0022:\\u0022<date>\\\\u002B00:00\\u0022}}\"}],\"structuredContent\":{\"id\":\"<g6>\",\"scopeId\":\"workspace\",\"kind\":\"claim\",\"status\":\"proposed\",\"revision\":1,\"contentJson\":\"{\\n  \\u0022text\\u0022: \\u0022-h\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\"provenance\":{\"origin\":\"llm\",\"actor\":\"claude-code-test\",\"timestamp\":\"<date>\\u002B00:00\"}}},\"id\":12,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":13,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_claim\",\"arguments\":{\"text\":\"Billing <paginates> & it's é \uD83D\uDE00 \\u2028\",\"category\":\"procedural\",\"volatility\":\"stable\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\u0022id\\u0022:\\u0022<g7>\\u0022,\\u0022scopeId\\u0022:\\u0022workspace\\u0022,\\u0022kind\\u0022:\\u0022claim\\u0022,\\u0022status\\u0022:\\u0022proposed\\u0022,\\u0022revision\\u0022:1,\\u0022contentJson\\u0022:\\u0022{\\\\n  \\\\u0022text\\\\u0022: \\\\u0022Billing \\\\\\\\u003Cpaginates\\\\\\\\u003E \\\\\\\\u0026 it\\\\\\\\u0027s \\\\u00E9 \\\\\\\\uD83D\\\\\\\\uDE00 \\\\\\\\u2028\\\\u0022,\\\\n  \\\\u0022category\\\\u0022: \\\\u0022procedural\\\\u0022,\\\\n  \\\\u0022volatility\\\\u0022: \\\\u0022stable\\\\u0022,\\\\n  \\\\u0022lastVerified\\\\u0022: null,\\\\n  \\\\u0022reviewAfter\\\\u0022: null\\\\n}\\u0022,\\u0022provenance\\u0022:{\\u0022origin\\u0022:\\u0022llm\\u0022,\\u0022actor\\u0022:\\u0022claude-code-test\\u0022,\\u0022timestamp\\u0022:\\u0022<date>\\\\u002B00:00\\u0022}}\"}],\"structuredContent\":{\"id\":\"<g7>\",\"scopeId\":\"workspace\",\"kind\":\"claim\",\"status\":\"proposed\",\"revision\":1,\"contentJson\":\"{\\n  \\u0022text\\u0022: \\u0022Billing \\\\u003Cpaginates\\\\u003E \\\\u0026 it\\\\u0027s \\u00E9 \\\\uD83D\\\\uDE00 \\\\u2028\\u0022,\\n  \\u0022category\\u0022: \\u0022procedural\\u0022,\\n  \\u0022volatility\\u0022: \\u0022stable\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\"provenance\":{\"origin\":\"llm\",\"actor\":\"claude-code-test\",\"timestamp\":\"<date>\\u002B00:00\"}}},\"id\":13,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":14,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_claim\",\"arguments\":{\"text\":\"-- starts with dashes\",\"key\":\"k1\",\"category\":\"episodic\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"idempotency_conflict: Key reused with different content.\"}],\"structuredContent\":{\"code\":\"idempotency_conflict\",\"message\":\"Key reused with different content.\"},\"isError\":true},\"id\":14,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":15,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_evidence\",\"arguments\":{\"claimId\":\"@0@\",\"kind\":\"source_code\",\"reference\":\"--src/a.cs\",\"lineage\":\"repo\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\u0022id\\u0022:\\u0022<g8>\\u0022,\\u0022scopeId\\u0022:\\u0022workspace\\u0022,\\u0022kind\\u0022:\\u0022evidence\\u0022,\\u0022status\\u0022:\\u0022proposed\\u0022,\\u0022revision\\u0022:1,\\u0022contentJson\\u0022:\\u0022{\\\\n  \\\\u0022claimId\\\\u0022: \\\\u0022<g1>\\\\u0022,\\\\n  \\\\u0022kind\\\\u0022: \\\\u0022source_code\\\\u0022,\\\\n  \\\\u0022reference\\\\u0022: \\\\u0022--src/a.cs\\\\u0022,\\\\n  \\\\u0022lineageId\\\\u0022: \\\\u0022repo\\\\u0022,\\\\n  \\\\u0022relation\\\\u0022: \\\\u0022supports\\\\u0022,\\\\n  \\\\u0022sourceId\\\\u0022: null,\\\\n  \\\\u0022sourceHash\\\\u0022: null\\\\n}\\u0022,\\u0022provenance\\u0022:{\\u0022origin\\u0022:\\u0022llm\\u0022,\\u0022actor\\u0022:\\u0022claude-code-test\\u0022,\\u0022timestamp\\u0022:\\u0022<date>\\\\u002B00:00\\u0022}}\"}],\"structuredContent\":{\"id\":\"<g8>\",\"scopeId\":\"workspace\",\"kind\":\"evidence\",\"status\":\"proposed\",\"revision\":1,\"contentJson\":\"{\\n  \\u0022claimId\\u0022: \\u0022<g1>\\u0022,\\n  \\u0022kind\\u0022: \\u0022source_code\\u0022,\\n  \\u0022reference\\u0022: \\u0022--src/a.cs\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022repo\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\"provenance\":{\"origin\":\"llm\",\"actor\":\"claude-code-test\",\"timestamp\":\"<date>\\u002B00:00\"}}},\"id\":15,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":16,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_evidence\",\"arguments\":{\"claimId\":\"@0@\",\"kind\":\"execution\",\"reference\":\"run\",\"lineage\":\"ci\",\"contradicts\":true,\"key\":\"e1\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\u0022id\\u0022:\\u0022<g9>\\u0022,\\u0022scopeId\\u0022:\\u0022workspace\\u0022,\\u0022kind\\u0022:\\u0022evidence\\u0022,\\u0022status\\u0022:\\u0022proposed\\u0022,\\u0022revision\\u0022:1,\\u0022contentJson\\u0022:\\u0022{\\\\n  \\\\u0022claimId\\\\u0022: \\\\u0022<g1>\\\\u0022,\\\\n  \\\\u0022kind\\\\u0022: \\\\u0022execution\\\\u0022,\\\\n  \\\\u0022reference\\\\u0022: \\\\u0022run\\\\u0022,\\\\n  \\\\u0022lineageId\\\\u0022: \\\\u0022ci\\\\u0022,\\\\n  \\\\u0022relation\\\\u0022: \\\\u0022contradicts\\\\u0022,\\\\n  \\\\u0022sourceId\\\\u0022: null,\\\\n  \\\\u0022sourceHash\\\\u0022: null\\\\n}\\u0022,\\u0022provenance\\u0022:{\\u0022origin\\u0022:\\u0022llm\\u0022,\\u0022actor\\u0022:\\u0022claude-code-test\\u0022,\\u0022timestamp\\u0022:\\u0022<date>\\\\u002B00:00\\u0022}}\"}],\"structuredContent\":{\"id\":\"<g9>\",\"scopeId\":\"workspace\",\"kind\":\"evidence\",\"status\":\"proposed\",\"revision\":1,\"contentJson\":\"{\\n  \\u0022claimId\\u0022: \\u0022<g1>\\u0022,\\n  \\u0022kind\\u0022: \\u0022execution\\u0022,\\n  \\u0022reference\\u0022: \\u0022run\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022ci\\u0022,\\n  \\u0022relation\\u0022: \\u0022contradicts\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\"provenance\":{\"origin\":\"llm\",\"actor\":\"claude-code-test\",\"timestamp\":\"<date>\\u002B00:00\"}}},\"id\":16,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":17,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_evidence\",\"arguments\":{\"claimId\":\"@0@\",\"kind\":\"execution\",\"reference\":\"run\",\"lineage\":\"ci\",\"contradicts\":false,\"key\":\"e1\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"idempotency_conflict: Key reused with different content.\"}],\"structuredContent\":{\"code\":\"idempotency_conflict\",\"message\":\"Key reused with different content.\"},\"isError\":true},\"id\":17,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":18,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_evidence\",\"arguments\":{\"claimId\":\"@0@\",\"kind\":\"execution\",\"reference\":\"run\",\"lineage\":\"ci\",\"sourceId\":\"0f8fad5b-d9cb-469f-a165-70867728950e\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"not_found: Object missing or inaccessible.\"}],\"structuredContent\":{\"code\":\"not_found\",\"message\":\"Object missing or inaccessible.\"},\"isError\":true},\"id\":18,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":19,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_evidence\",\"arguments\":{\"claimId\":\"0f8fad5b-d9cb-469f-a165-70867728950e\",\"kind\":\"llm_assertion\",\"reference\":\"r\",\"lineage\":\"l\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"not_found: Object missing or inaccessible.\"}],\"structuredContent\":{\"code\":\"not_found\",\"message\":\"Object missing or inaccessible.\"},\"isError\":true},\"id\":19,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":20,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_record_retex\",\"arguments\":{\"event\":\"e\",\"impact\":\"i\",\"next\":\"n\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\u0022id\\u0022:\\u0022<g10>\\u0022,\\u0022scopeId\\u0022:\\u0022workspace\\u0022,\\u0022kind\\u0022:\\u0022retex\\u0022,\\u0022status\\u0022:\\u0022draft\\u0022,\\u0022revision\\u0022:1,\\u0022contentJson\\u0022:\\u0022{\\\\n  \\\\u0022event\\\\u0022: \\\\u0022e\\\\u0022,\\\\n  \\\\u0022impact\\\\u0022: \\\\u0022i\\\\u0022,\\\\n  \\\\u0022nextAction\\\\u0022: \\\\u0022n\\\\u0022\\\\n}\\u0022,\\u0022provenance\\u0022:{\\u0022origin\\u0022:\\u0022llm\\u0022,\\u0022actor\\u0022:\\u0022claude-code-test\\u0022,\\u0022timestamp\\u0022:\\u0022<date>\\\\u002B00:00\\u0022}}\"}],\"structuredContent\":{\"id\":\"<g10>\",\"scopeId\":\"workspace\",\"kind\":\"retex\",\"status\":\"draft\",\"revision\":1,\"contentJson\":\"{\\n  \\u0022event\\u0022: \\u0022e\\u0022,\\n  \\u0022impact\\u0022: \\u0022i\\u0022,\\n  \\u0022nextAction\\u0022: \\u0022n\\u0022\\n}\",\"provenance\":{\"origin\":\"llm\",\"actor\":\"claude-code-test\",\"timestamp\":\"<date>\\u002B00:00\"}}},\"id\":20,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":21,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_record_retex\",\"arguments\":{\"event\":\"e\",\"impact\":\"i\",\"next\":\"n\",\"key\":\"r1\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\u0022id\\u0022:\\u0022<g11>\\u0022,\\u0022scopeId\\u0022:\\u0022workspace\\u0022,\\u0022kind\\u0022:\\u0022retex\\u0022,\\u0022status\\u0022:\\u0022draft\\u0022,\\u0022revision\\u0022:1,\\u0022contentJson\\u0022:\\u0022{\\\\n  \\\\u0022event\\\\u0022: \\\\u0022e\\\\u0022,\\\\n  \\\\u0022impact\\\\u0022: \\\\u0022i\\\\u0022,\\\\n  \\\\u0022nextAction\\\\u0022: \\\\u0022n\\\\u0022\\\\n}\\u0022,\\u0022provenance\\u0022:{\\u0022origin\\u0022:\\u0022llm\\u0022,\\u0022actor\\u0022:\\u0022claude-code-test\\u0022,\\u0022timestamp\\u0022:\\u0022<date>\\\\u002B00:00\\u0022}}\"}],\"structuredContent\":{\"id\":\"<g11>\",\"scopeId\":\"workspace\",\"kind\":\"retex\",\"status\":\"draft\",\"revision\":1,\"contentJson\":\"{\\n  \\u0022event\\u0022: \\u0022e\\u0022,\\n  \\u0022impact\\u0022: \\u0022i\\u0022,\\n  \\u0022nextAction\\u0022: \\u0022n\\u0022\\n}\",\"provenance\":{\"origin\":\"llm\",\"actor\":\"claude-code-test\",\"timestamp\":\"<date>\\u002B00:00\"}}},\"id\":21,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":22,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_feedback\",\"arguments\":{\"targetId\":\"@1@\",\"verdict\":\"wrong\",\"comment\":\"it retries five times\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\u0022id\\u0022:\\u0022<g12>\\u0022,\\u0022scopeId\\u0022:\\u0022workspace\\u0022,\\u0022kind\\u0022:\\u0022retex\\u0022,\\u0022status\\u0022:\\u0022draft\\u0022,\\u0022revision\\u0022:1,\\u0022contentJson\\u0022:\\u0022{\\\\n  \\\\u0022event\\\\u0022: \\\\u0022feedback wrong on claim <g2>\\\\u0022,\\\\n  \\\\u0022impact\\\\u0022: \\\\u0022it retries five times\\\\u0022,\\\\n  \\\\u0022nextAction\\\\u0022: \\\\u0022to review by Reflect/Learn\\\\u0022\\\\n}\\u0022,\\u0022provenance\\u0022:{\\u0022origin\\u0022:\\u0022llm\\u0022,\\u0022actor\\u0022:\\u0022claude-code-test\\u0022,\\u0022timestamp\\u0022:\\u0022<date>\\\\u002B00:00\\u0022}}\"}],\"structuredContent\":{\"id\":\"<g12>\",\"scopeId\":\"workspace\",\"kind\":\"retex\",\"status\":\"draft\",\"revision\":1,\"contentJson\":\"{\\n  \\u0022event\\u0022: \\u0022feedback wrong on claim <g2>\\u0022,\\n  \\u0022impact\\u0022: \\u0022it retries five times\\u0022,\\n  \\u0022nextAction\\u0022: \\u0022to review by Reflect/Learn\\u0022\\n}\",\"provenance\":{\"origin\":\"llm\",\"actor\":\"claude-code-test\",\"timestamp\":\"<date>\\u002B00:00\"}}},\"id\":22,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":23,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_feedback\",\"arguments\":{\"targetId\":\"@1@\",\"verdict\":\"helpful\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\u0022id\\u0022:\\u0022<g13>\\u0022,\\u0022scopeId\\u0022:\\u0022workspace\\u0022,\\u0022kind\\u0022:\\u0022retex\\u0022,\\u0022status\\u0022:\\u0022draft\\u0022,\\u0022revision\\u0022:1,\\u0022contentJson\\u0022:\\u0022{\\\\n  \\\\u0022event\\\\u0022: \\\\u0022feedback helpful on claim <g2>\\\\u0022,\\\\n  \\\\u0022impact\\\\u0022: \\\\u0022none\\\\u0022,\\\\n  \\\\u0022nextAction\\\\u0022: \\\\u0022to review by Reflect/Learn\\\\u0022\\\\n}\\u0022,\\u0022provenance\\u0022:{\\u0022origin\\u0022:\\u0022llm\\u0022,\\u0022actor\\u0022:\\u0022claude-code-test\\u0022,\\u0022timestamp\\u0022:\\u0022<date>\\\\u002B00:00\\u0022}}\"}],\"structuredContent\":{\"id\":\"<g13>\",\"scopeId\":\"workspace\",\"kind\":\"retex\",\"status\":\"draft\",\"revision\":1,\"contentJson\":\"{\\n  \\u0022event\\u0022: \\u0022feedback helpful on claim <g2>\\u0022,\\n  \\u0022impact\\u0022: \\u0022none\\u0022,\\n  \\u0022nextAction\\u0022: \\u0022to review by Reflect/Learn\\u0022\\n}\",\"provenance\":{\"origin\":\"llm\",\"actor\":\"claude-code-test\",\"timestamp\":\"<date>\\u002B00:00\"}}},\"id\":23,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":24,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_feedback\",\"arguments\":{\"targetId\":\"0f8fad5b-d9cb-469f-a165-70867728950e\",\"verdict\":\"not_applicable\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"not_found: Unknown identifier, or one of a scope that is not visible.\"}],\"structuredContent\":{\"code\":\"not_found\",\"message\":\"Unknown identifier, or one of a scope that is not visible.\"},\"isError\":true},\"id\":24,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":25,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"arguments\":{\"question\":\"queues retry\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\u0022query\\u0022:\\u0022queues retry\\u0022,\\u0022results\\u0022:[{\\u0022kind\\u0022:\\u0022claim\\u0022,\\u0022id\\u0022:\\u0022<g2>\\u0022,\\u0022scopeId\\u0022:\\u0022workspace\\u0022,\\u0022status\\u0022:\\u0022proposed\\u0022,\\u0022applicable\\u0022:true,\\u0022confidence\\u0022:{\\u0022level\\u0022:\\u0022low\\u0022,\\u0022reasons\\u0022:[\\u0022No independent evidence available.\\u0022,\\u0022Declared evidence; no controlled execution collector in this version.\\u0022],\\u0022independentOrigins\\u0022:0},\\u0022excerpt\\u0022:\\u0022queues retry three times\\u0022,\\u0022matchedTerms\\u0022:[\\u0022queues\\u0022,\\u0022retry\\u0022],\\u0022freshness\\u0022:{\\u0022createdAt\\u0022:\\u0022<date>\\\\u002B00:00\\u0022,\\u0022lastVerified\\u0022:null,\\u0022reviewAfter\\u0022:null,\\u0022indexedAt\\u0022:null,\\u0022hash\\u0022:null,\\u0022sourceStatus\\u0022:null},\\u0022score\\u0022:4.443445,\\u0022path\\u0022:null}],\\u0022excluded\\u0022:0}\"}],\"structuredContent\":{\"query\":\"queues retry\",\"results\":[{\"kind\":\"claim\",\"id\":\"<g2>\",\"scopeId\":\"workspace\",\"status\":\"proposed\",\"applicable\":true,\"confidence\":{\"level\":\"low\",\"reasons\":[\"No independent evidence available.\",\"Declared evidence; no controlled execution collector in this version.\"],\"independentOrigins\":0},\"excerpt\":\"queues retry three times\",\"matchedTerms\":[\"queues\",\"retry\"],\"freshness\":{\"createdAt\":\"<date>\\u002B00:00\",\"lastVerified\":null,\"reviewAfter\":null,\"indexedAt\":null,\"hash\":null,\"sourceStatus\":null},\"score\":4.443445,\"path\":null}],\"excluded\":0}},\"id\":25,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":26,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_status\",\"arguments\":{}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\u0022root\\u0022:\\u0022<root>\\u0022,\\u0022configuration\\u0022:{\\u0022schemaVersion\\u0022:2,\\u0022instanceId\\u0022:\\u0022<g4>\\u0022,\\u0022createdAt\\u0022:\\u0022<date>\\\\u002B00:00\\u0022},\\u0022scope\\u0022:\\u0022workspace\\u0022,\\u0022claims\\u0022:5,\\u0022evidence\\u0022:2,\\u0022retex\\u0022:4,\\u0022sources\\u0022:0,\\u0022mode\\u0022:\\u0022daemon\\u0022,\\u0022laya\\u0022:\\u0022unavailable\\u0022}\"}],\"structuredContent\":{\"root\":\"<root>\",\"configuration\":{\"schemaVersion\":2,\"instanceId\":\"<g4>\",\"createdAt\":\"<date>\\u002B00:00\"},\"scope\":\"workspace\",\"claims\":5,\"evidence\":2,\"retex\":4,\"sources\":0,\"mode\":\"daemon\",\"laya\":\"unavailable\"}},\"id\":26,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":\"init\",\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{},\"clientInfo\":{\"name\":\"Other Host\",\"version\":\"1.0\"}}}",
+          "answers": [
+            "{\"result\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"logging\":{},\"tools\":{}},\"serverInfo\":{\"name\":\"sermofur\",\"version\":\"0.0.0-dev\"},\"instructions\":\"Sermofur keeps a contestable memory of this project: recall before deciding, challenge a claim before relying on it, and record what you learn as claims, evidence or RETEX. What you write is recorded as coming from an LLM.\"},\"id\":\"init\",\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":27,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_claim\",\"arguments\":{\"text\":\"written by another host\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\u0022id\\u0022:\\u0022<g14>\\u0022,\\u0022scopeId\\u0022:\\u0022workspace\\u0022,\\u0022kind\\u0022:\\u0022claim\\u0022,\\u0022status\\u0022:\\u0022proposed\\u0022,\\u0022revision\\u0022:1,\\u0022contentJson\\u0022:\\u0022{\\\\n  \\\\u0022text\\\\u0022: \\\\u0022written by another host\\\\u0022,\\\\n  \\\\u0022category\\\\u0022: \\\\u0022semantic\\\\u0022,\\\\n  \\\\u0022volatility\\\\u0022: \\\\u0022evolving\\\\u0022,\\\\n  \\\\u0022lastVerified\\\\u0022: null,\\\\n  \\\\u0022reviewAfter\\\\u0022: null\\\\n}\\u0022,\\u0022provenance\\u0022:{\\u0022origin\\u0022:\\u0022llm\\u0022,\\u0022actor\\u0022:\\u0022other-host\\u0022,\\u0022timestamp\\u0022:\\u0022<date>\\\\u002B00:00\\u0022}}\"}],\"structuredContent\":{\"id\":\"<g14>\",\"scopeId\":\"workspace\",\"kind\":\"claim\",\"status\":\"proposed\",\"revision\":1,\"contentJson\":\"{\\n  \\u0022text\\u0022: \\u0022written by another host\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\"provenance\":{\"origin\":\"llm\",\"actor\":\"other-host\",\"timestamp\":\"<date>\\u002B00:00\"}}},\"id\":27,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":28,\"method\":\"initialize\"}",
+          "answers": [
+            "{\"result\":{\"protocolVersion\":\"2025-11-25\",\"capabilities\":{\"logging\":{},\"tools\":{}},\"serverInfo\":{\"name\":\"sermofur\",\"version\":\"0.0.0-dev\"},\"instructions\":\"Sermofur keeps a contestable memory of this project: recall before deciding, challenge a claim before relying on it, and record what you learn as claims, evidence or RETEX. What you write is recorded as coming from an LLM.\"},\"id\":28,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":29,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_claim\",\"arguments\":{\"text\":\"written by an unnamed host\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\u0022id\\u0022:\\u0022<g15>\\u0022,\\u0022scopeId\\u0022:\\u0022workspace\\u0022,\\u0022kind\\u0022:\\u0022claim\\u0022,\\u0022status\\u0022:\\u0022proposed\\u0022,\\u0022revision\\u0022:1,\\u0022contentJson\\u0022:\\u0022{\\\\n  \\\\u0022text\\\\u0022: \\\\u0022written by an unnamed host\\\\u0022,\\\\n  \\\\u0022category\\\\u0022: \\\\u0022semantic\\\\u0022,\\\\n  \\\\u0022volatility\\\\u0022: \\\\u0022evolving\\\\u0022,\\\\n  \\\\u0022lastVerified\\\\u0022: null,\\\\n  \\\\u0022reviewAfter\\\\u0022: null\\\\n}\\u0022,\\u0022provenance\\u0022:{\\u0022origin\\u0022:\\u0022llm\\u0022,\\u0022actor\\u0022:\\u0022mcp-client\\u0022,\\u0022timestamp\\u0022:\\u0022<date>\\\\u002B00:00\\u0022}}\"}],\"structuredContent\":{\"id\":\"<g15>\",\"scopeId\":\"workspace\",\"kind\":\"claim\",\"status\":\"proposed\",\"revision\":1,\"contentJson\":\"{\\n  \\u0022text\\u0022: \\u0022written by an unnamed host\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\"provenance\":{\"origin\":\"llm\",\"actor\":\"mcp-client\",\"timestamp\":\"<date>\\u002B00:00\"}}},\"id\":29,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":30,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_status\",\"arguments\":{\"zz\":1}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Unknown field \\u0027zz\\u0027.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Unknown field \\u0027zz\\u0027.\"},\"isError\":true},\"id\":30,\"jsonrpc\":\"2.0\"}"
+          ]
+        }
+      ],
+      "exit": 0,
+      "stderr": "",
+      "log": [
+        "mcp_started",
+        "mcp_call",
+        "mcp_call",
+        "mcp_call",
+        "mcp_call",
+        "mcp_call",
+        "mcp_call",
+        "mcp_call",
+        "mcp_call",
+        "mcp_call not_found",
+        "mcp_call",
+        "mcp_call",
+        "mcp_call",
+        "mcp_call",
+        "mcp_call idempotency_conflict",
+        "mcp_call",
+        "mcp_call",
+        "mcp_call idempotency_conflict",
+        "mcp_call not_found",
+        "mcp_call not_found",
+        "mcp_call",
+        "mcp_call",
+        "mcp_call",
+        "mcp_call",
+        "mcp_call not_found",
+        "mcp_call",
+        "mcp_call",
+        "mcp_call",
+        "mcp_call",
+        "mcp_call invalid_input",
+        "mcp_stopped"
+      ]
+    },
+    {
+      "name": "sibling_scope",
+      "folder": "root/client-a",
+      "daemon": true,
+      "registered": true,
+      "projectDirectory": null,
+      "setup": [
+        {
+          "cwd": null,
+          "run": [
+            "claim",
+            "add",
+            "cache invalidation is hard",
+            "--origin",
+            "user",
+            "--json"
+          ]
+        },
+        {
+          "cwd": null,
+          "run": [
+            "claim",
+            "add",
+            "queues retry three times",
+            "--origin",
+            "user",
+            "--json"
+          ]
+        },
+        {
+          "mkdir": "client-a"
+        },
+        {
+          "mkdir": "client-b"
+        },
+        {
+          "cwd": null,
+          "run": [
+            "scope",
+            "add",
+            "client-a",
+            "client",
+            "workspace",
+            "client-a",
+            "--json"
+          ]
+        },
+        {
+          "cwd": null,
+          "run": [
+            "scope",
+            "add",
+            "client-b",
+            "client",
+            "workspace",
+            "client-b",
+            "--json"
+          ]
+        },
+        {
+          "cwd": "client-b",
+          "run": [
+            "claim",
+            "add",
+            "secret of client b",
+            "--origin",
+            "user",
+            "--json"
+          ]
+        }
+      ],
+      "cases": [
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":\"init\",\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{},\"clientInfo\":{\"name\":\"Claude Code Test\",\"version\":\"1.0\"}}}",
+          "answers": [
+            "{\"result\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"logging\":{},\"tools\":{}},\"serverInfo\":{\"name\":\"sermofur\",\"version\":\"0.0.0-dev\"},\"instructions\":\"Sermofur keeps a contestable memory of this project: recall before deciding, challenge a claim before relying on it, and record what you learn as claims, evidence or RETEX. What you write is recorded as coming from an LLM.\"},\"id\":\"init\",\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_challenge\",\"arguments\":{\"claimId\":\"@6@\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"not_found: Object missing or inaccessible.\"}],\"structuredContent\":{\"code\":\"not_found\",\"message\":\"Object missing or inaccessible.\"},\"isError\":true},\"id\":1,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_feedback\",\"arguments\":{\"targetId\":\"@6@\",\"verdict\":\"wrong\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"not_found: Unknown identifier, or one of a scope that is not visible.\"}],\"structuredContent\":{\"code\":\"not_found\",\"message\":\"Unknown identifier, or one of a scope that is not visible.\"},\"isError\":true},\"id\":2,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":3,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_evidence\",\"arguments\":{\"claimId\":\"@6@\",\"kind\":\"llm_assertion\",\"reference\":\"r\",\"lineage\":\"l\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"not_found: Object missing or inaccessible.\"}],\"structuredContent\":{\"code\":\"not_found\",\"message\":\"Object missing or inaccessible.\"},\"isError\":true},\"id\":3,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":4,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"arguments\":{\"question\":\"secret client\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\u0022query\\u0022:\\u0022secret client\\u0022,\\u0022results\\u0022:[],\\u0022excluded\\u0022:0}\"}],\"structuredContent\":{\"query\":\"secret client\",\"results\":[],\"excluded\":0}},\"id\":4,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":5,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_status\",\"arguments\":{\"path\":\"x\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Unknown field \\u0027path\\u0027.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Unknown field \\u0027path\\u0027.\"},\"isError\":true},\"id\":5,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":6,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"arguments\":{\"question\":\"x\",\"scope\":\"client-b\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"invalid_input: Unknown field \\u0027scope\\u0027.\"}],\"structuredContent\":{\"code\":\"invalid_input\",\"message\":\"Unknown field \\u0027scope\\u0027.\"},\"isError\":true},\"id\":6,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":7,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_context\",\"arguments\":{}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\u0022root\\u0022:\\u0022<root>\\u0022,\\u0022instance\\u0022:{\\u0022schemaVersion\\u0022:2,\\u0022instanceId\\u0022:\\u0022<g4>\\u0022,\\u0022createdAt\\u0022:\\u0022<date>\\\\u002B00:00\\u0022},\\u0022scope\\u0022:\\u0022client-a\\u0022,\\u0022scopes\\u0022:{\\u0022scope\\u0022:\\u0022client-a\\u0022,\\u0022visible\\u0022:[\\u0022client-a\\u0022,\\u0022workspace\\u0022]},\\u0022counts\\u0022:{\\u0022claims\\u0022:2,\\u0022evidence\\u0022:0,\\u0022retex\\u0022:0,\\u0022sources\\u0022:0}}\"}],\"structuredContent\":{\"root\":\"<root>\",\"instance\":{\"schemaVersion\":2,\"instanceId\":\"<g4>\",\"createdAt\":\"<date>\\u002B00:00\"},\"scope\":\"client-a\",\"scopes\":{\"scope\":\"client-a\",\"visible\":[\"client-a\",\"workspace\"]},\"counts\":{\"claims\":2,\"evidence\":0,\"retex\":0,\"sources\":0}}},\"id\":7,\"jsonrpc\":\"2.0\"}"
+          ]
+        }
+      ],
+      "exit": 0,
+      "stderr": "",
+      "log": [
+        "mcp_started",
+        "mcp_call not_found",
+        "mcp_call not_found",
+        "mcp_call not_found",
+        "mcp_call",
+        "mcp_call invalid_input",
+        "mcp_call invalid_input",
+        "mcp_call",
+        "mcp_stopped"
+      ]
+    },
+    {
+      "name": "project_directory",
+      "folder": "outside",
+      "daemon": true,
+      "registered": true,
+      "projectDirectory": "root",
+      "setup": [],
+      "cases": [
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":\"init\",\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{},\"clientInfo\":{\"name\":\"Claude Code Test\",\"version\":\"1.0\"}}}",
+          "answers": [
+            "{\"result\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"logging\":{},\"tools\":{}},\"serverInfo\":{\"name\":\"sermofur\",\"version\":\"0.0.0-dev\"},\"instructions\":\"Sermofur keeps a contestable memory of this project: recall before deciding, challenge a claim before relying on it, and record what you learn as claims, evidence or RETEX. What you write is recorded as coming from an LLM.\"},\"id\":\"init\",\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_status\",\"arguments\":{}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\u0022root\\u0022:\\u0022<root>\\u0022,\\u0022configuration\\u0022:{\\u0022schemaVersion\\u0022:2,\\u0022instanceId\\u0022:\\u0022<g1>\\u0022,\\u0022createdAt\\u0022:\\u0022<date>\\\\u002B00:00\\u0022},\\u0022scope\\u0022:\\u0022workspace\\u0022,\\u0022claims\\u0022:0,\\u0022evidence\\u0022:0,\\u0022retex\\u0022:0,\\u0022sources\\u0022:0,\\u0022mode\\u0022:\\u0022daemon\\u0022,\\u0022laya\\u0022:\\u0022unavailable\\u0022}\"}],\"structuredContent\":{\"root\":\"<root>\",\"configuration\":{\"schemaVersion\":2,\"instanceId\":\"<g1>\",\"createdAt\":\"<date>\\u002B00:00\"},\"scope\":\"workspace\",\"claims\":0,\"evidence\":0,\"retex\":0,\"sources\":0,\"mode\":\"daemon\",\"laya\":\"unavailable\"}},\"id\":1,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"arguments\":{\"question\":\"q\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\u0022query\\u0022:\\u0022q\\u0022,\\u0022results\\u0022:[],\\u0022excluded\\u0022:0}\"}],\"structuredContent\":{\"query\":\"q\",\"results\":[],\"excluded\":0}},\"id\":2,\"jsonrpc\":\"2.0\"}"
+          ]
+        }
+      ],
+      "exit": 0,
+      "stderr": "",
+      "log": [
+        "mcp_started",
+        "mcp_call",
+        "mcp_call",
+        "mcp_stopped"
+      ]
+    },
+    {
+      "name": "relative_project_directory",
+      "folder": "outside",
+      "daemon": true,
+      "registered": true,
+      "projectDirectory": "relative",
+      "setup": [],
+      "cases": [
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":\"init\",\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{},\"clientInfo\":{\"name\":\"Claude Code Test\",\"version\":\"1.0\"}}}",
+          "answers": [
+            "{\"result\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"logging\":{},\"tools\":{}},\"serverInfo\":{\"name\":\"sermofur\",\"version\":\"0.0.0-dev\"},\"instructions\":\"Sermofur keeps a contestable memory of this project: recall before deciding, challenge a claim before relying on it, and record what you learn as claims, evidence or RETEX. What you write is recorded as coming from an LLM.\"},\"id\":\"init\",\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_status\",\"arguments\":{}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"no_instance: No .sermofur instance in the parent folders. Run, in the project: smf init, then smf daemon register\"}],\"structuredContent\":{\"code\":\"no_instance\",\"message\":\"No .sermofur instance in the parent folders. Run, in the project: smf init, then smf daemon register\"},\"isError\":true},\"id\":1,\"jsonrpc\":\"2.0\"}"
+          ]
+        },
+        {
+          "send": "{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/call\",\"params\":{\"name\":\"sermofur_recall\",\"arguments\":{\"question\":\"q\"}}}",
+          "answers": [
+            "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"no_instance: No .sermofur instance in the parent folders. Run, in the project: smf init, then smf daemon register\"}],\"structuredContent\":{\"code\":\"no_instance\",\"message\":\"No .sermofur instance in the parent folders. Run, in the project: smf init, then smf daemon register\"},\"isError\":true},\"id\":2,\"jsonrpc\":\"2.0\"}"
+          ]
+        }
+      ],
+      "exit": 0,
+      "stderr": "",
+      "log": [
+        "mcp_started",
+        "mcp_call no_instance",
+        "mcp_call no_instance",
+        "mcp_stopped"
+      ]
+    }
+  ]
+}

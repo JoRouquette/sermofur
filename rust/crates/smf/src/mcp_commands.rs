@@ -1,5 +1,5 @@
-//! `smf mcp install` and `smf mcp uninstall` (`McpCommands`, `McpDeclaration`): always run by
-//! the CLI itself, never through the daemon. `smf mcp serve` comes with lot 8.4.
+//! `smf mcp serve`, `smf mcp install` and `smf mcp uninstall` (`McpCommands`, `McpDeclaration`):
+//! always run by the CLI itself, never through the daemon.
 
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -17,7 +17,7 @@ use sermofur_daemon::registry::InstanceRegistry;
 use sermofur_mcp::{codex_config, mcp_config};
 
 use crate::args::CommandArguments;
-use crate::runner::{combine, not_ported, to_json, write_line};
+use crate::runner::{combine, to_json, write_line};
 
 pub const CLAUDE_CODE: &str = "claude-code";
 pub const CODEX: &str = "codex";
@@ -50,8 +50,9 @@ pub fn run(
     }
     let subcommand = args.positionals()[1].clone();
     if subcommand == "serve" {
-        // ponytail: the stdio bridge is lot 8.4.
-        return Err(not_ported());
+        args.require_count(2)?;
+        args.validate_used()?;
+        return serve(working_directory, out);
     }
     let target = match args.option("path") {
         Some(value) => get_full_path(&combine(value, working_directory))?,
@@ -72,6 +73,33 @@ pub fn run(
     };
     // `Write(result, json)`: a report is always written as JSON.
     write_line(out, &to_json(&report)?);
+    Ok(0)
+}
+
+/// `McpCommands.Serve`: the bridge on stdio, until the host closes stdin or stops the process
+/// (Ctrl+C or SIGTERM, each one only asks the stop).
+fn serve(working_directory: &Path, out: &mut dyn Write) -> Result<i32> {
+    let paths = DaemonPaths::for_current_user()?;
+    let folder = sermofur_mcp::tools::launch_folder_of_process(working_directory)?;
+    let log = sermofur_daemon::log::DaemonLog::new(&paths.log_file());
+    let channel = sermofur_mcp::channel::DaemonChannel::new(paths, sermofur_core::VERSION, &folder);
+    let stop = async {
+        match crate::daemon_run::Signals::register() {
+            Ok(mut signals) => {
+                signals.next().await;
+            }
+            Err(_) => std::future::pending().await,
+        }
+    };
+    sermofur_mcp::server::serve(
+        channel,
+        sermofur_core::VERSION,
+        Some(log),
+        std::io::stdin(),
+        out,
+        stop,
+    )
+    .map_err(|error| SermofurError::new("internal_error", error.to_string(), 70))?;
     Ok(0)
 }
 
