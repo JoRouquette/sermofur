@@ -4,6 +4,7 @@ mod args;
 mod daemon_commands;
 mod daemon_run;
 mod help;
+mod mcp_commands;
 mod memory_commands;
 mod router;
 mod runner;

@@ -4,7 +4,7 @@
 //! `laya`, `model` and `mcp` always close the report.
 
 use std::collections::HashSet;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use rusqlite::Connection;
 use rusqlite::types::ValueRef;
@@ -534,44 +534,4 @@ pub fn daemon_check(
             ),
         },
     })
-}
-
-/// The `mcp` check of the CLI: no declaration file at all is "not declared". Reading a file
-/// that exists (`.mcp.json`, the Codex tables) comes with the editors of lots 8.1 and 8.2;
-/// until then such a file is reported as the oracle reports a bridge it does not probe.
-pub fn mcp_check(
-    root: &Path,
-    variable: &dyn Fn(&str) -> Option<String>,
-) -> Result<DiagnosticCheck> {
-    // ponytail: the profile folder comes from USERPROFILE or HOME; .NET asks the system
-    // (`GetFolderPath(UserProfile)`, the passwd entry on Unix). Without the variable there is
-    // no user configuration to look at, never a path relative to the working directory. Lot
-    // 8.3 ports the exact lookup with `CodexConfigFile.UserPath`.
-    let codex_home = variable("CODEX_HOME")
-        .filter(|home| !home.is_empty())
-        .map(PathBuf::from)
-        .or_else(|| {
-            let profile = if cfg!(windows) { "USERPROFILE" } else { "HOME" };
-            variable(profile)
-                .filter(|home| !home.is_empty())
-                .map(|home| Path::new(&home).join(".codex"))
-        });
-    let mut candidates = vec![
-        root.join(".mcp.json"),
-        root.join(".codex").join("config.toml"),
-    ];
-    candidates.extend(codex_home.map(|home| home.join("config.toml")));
-    // `File.Exists`: a file, links followed.
-    if candidates
-        .iter()
-        .any(|file| std::fs::metadata(file).is_ok_and(|metadata| metadata.is_file()))
-    {
-        // ponytail: declarations read with the editors of lots 8.1 and 8.2.
-        return Ok(DiagnosticCheck::new("mcp", "warning", NOT_DELIVERED));
-    }
-    Ok(DiagnosticCheck::new(
-        "mcp",
-        "warning",
-        "Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.",
-    ))
 }

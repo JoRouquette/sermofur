@@ -81,7 +81,7 @@ fn codex_config_matches_the_oracle() {
 
 mod properties {
     use proptest::prelude::*;
-    use sermofur_mcp::codex_config::{with_block, without_block};
+    use sermofur_mcp::codex_config::{declares, with_block, without_block};
 
     fn serve() -> Vec<String> {
         vec!["mcp".to_owned(), "serve".to_owned()]
@@ -106,6 +106,39 @@ mod properties {
             }
         }
         seen
+    }
+
+    /// Text built from the pieces of the TOML grammar that the editor cuts on.
+    fn toml_like() -> impl Strategy<Value = String> {
+        let pieces = vec![
+            "[",
+            "]",
+            "[[",
+            "]]",
+            ".",
+            "\"",
+            "'",
+            "'''",
+            "\"\"\"",
+            "#",
+            "=",
+            "\r",
+            "\n",
+            " ",
+            "\t",
+            "mcp_servers",
+            "sermofur",
+            "command",
+            "args",
+            "\u{a0}",
+            "\u{2003}",
+            "\u{3000}",
+            "\u{feff}",
+            "x",
+            "1",
+        ];
+        prop::collection::vec(prop::sample::select(pieces), 0..40)
+            .prop_map(|pieces| pieces.concat())
     }
 
     proptest! {
@@ -154,12 +187,20 @@ mod properties {
 
         /// Any text: an answer or a refusal, never a panic. A second install is not always a
         /// no-op (a lone carriage return turns the line ending to CRLF), as with the oracle.
+        /// An answer declares the bridge and, when the text declared nothing, keeps it whole
+        /// in front of the block.
         #[test]
-        fn arbitrary_text_never_panics(content in "(?s).{0,200}", wrapped in any::<bool>()) {
+        fn arbitrary_text_never_panics(
+            content in prop_oneof!["(?s).{0,200}", toml_like()],
+            wrapped in any::<bool>(),
+        ) {
             let content = if wrapped { format!("[mcp_servers.sermofur]\n{content}") } else { content };
             let _ = without_block(&content);
             if let Ok(Some(out)) = with_block(Some(&content), "smf", &serve()) {
-                prop_assert!(sermofur_mcp::codex_config::declares(&out).is_ok());
+                prop_assert!(matches!(declares(&out), Ok(true)), "{out:?}");
+                if matches!(declares(&content), Ok(false)) {
+                    prop_assert!(out.starts_with(&content), "{content:?} -> {out:?}");
+                }
             }
         }
     }

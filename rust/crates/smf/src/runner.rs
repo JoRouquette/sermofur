@@ -174,13 +174,6 @@ fn execute(
         return Ok(0);
     }
     let mut parsed = CommandArguments::parse(arguments)?;
-    if parsed
-        .positionals()
-        .first()
-        .is_some_and(|command| command == "mcp")
-    {
-        return Err(not_ported());
-    }
     // `Path.GetFullPath(args.Option("path", workingDirectory), workingDirectory)`: a relative
     // `--path` is taken from the working directory, then normalized as `GetFullPath` does
     // (`sub ` is `sub`), before any command; its `ArgumentException` is `invalid_storage_or_path`.
@@ -196,6 +189,14 @@ fn execute(
     {
         // Lots 7.4 and 7.6; the services come with lot 7.7.
         return crate::daemon_commands::run(&mut parsed, json, &working_directory, out, err);
+    }
+    if parsed
+        .positionals()
+        .first()
+        .is_some_and(|command| command == "mcp")
+    {
+        // Lot 8.3; `mcp serve` comes with lot 8.4.
+        return crate::mcp_commands::run(&mut parsed, &working_directory, out);
     }
     let path: PathBuf = match parsed.option("path") {
         Some(value) => get_full_path(&combine(value, &working_directory))?,
@@ -223,7 +224,7 @@ fn execute(
             &root,
             &SystemOwnership,
             Some(&|| doctor::daemon_check(&variable, &SystemOwnership, &crate::router::probe)),
-            Some(&|root: &Path| doctor::mcp_check(root, &variable)),
+            Some(&crate::mcp_commands::doctor_check),
         )?;
         if json {
             write_line(out, &to_json(&report)?);
