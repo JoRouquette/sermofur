@@ -2,14 +2,16 @@
 //! after five restarts in a minute, and gives up after three quick failures in a row.
 //!
 //! The child inherits the whole environment of the supervisor, the recorded variables laid on
-//! top, as `ProcessStartInfo.Environment` does (gap E3, reproduced). The job object that ties the
-//! daemon to the supervisor under Windows waits for the decision on its crate: the command line
-//! does not supervise under Windows yet.
+//! top, as `ProcessStartInfo.Environment` does (gap E3, reproduced). Under Windows the daemon
+//! lives in a job object (`WindowsJob`, crate `win32job`, decision of John of 2026-11-17), so it
+//! never outlives its supervisor, even when the supervisor is killed.
 
 use std::process::{Child, Command};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
 use std::time::{Duration, Instant};
+
+use sermofur_core::error::Result;
 
 use crate::log::DaemonLog;
 use crate::services::{ServiceDefinition, exit_code};
@@ -75,13 +77,17 @@ impl Supervisor {
     }
 
     /// `Supervisor.Run`: the exit code of the supervisor; `stop` set ends it after the daemon.
-    pub fn run(&self, stop: &AtomicBool) -> i32 {
+    /// Under Windows, a job object that cannot be made is `invalid_storage_or_path`, as the
+    /// `InvalidOperationException` of the oracle that `CommandRunner` maps.
+    pub fn run(&self, stop: &AtomicBool) -> Result<i32> {
         let code = self.supervise(stop);
         self.log.flush_before_exit();
         code
     }
 
-    fn supervise(&self, stop: &AtomicBool) -> i32 {
+    fn supervise(&self, stop: &AtomicBool) -> Result<i32> {
+        #[cfg(windows)]
+        let job = windows_job()?;
         let mut quick_failures = 0;
         let mut restarts: Vec<Instant> = Vec::new();
         loop {
@@ -90,14 +96,18 @@ impl Supervisor {
                 // `Process.Start` throws: the supervisor ends as a failed process.
                 self.log
                     .write("supervised_give_up", Some("not_started"), None, None);
-                return 1;
+                return Ok(1);
             };
+            // `job.Assign(daemon)`: the oracle does not check the result either.
+            #[cfg(windows)]
+            let _ = job
+                .assign_process(std::os::windows::io::AsRawHandle::as_raw_handle(&daemon) as isize);
             let pid = i32::try_from(daemon.id()).ok();
             self.log.write("supervised_start", None, pid, None);
             let status = loop {
                 if stop.load(Ordering::SeqCst) {
                     self.stop_daemon(&mut daemon);
-                    return 0;
+                    return Ok(0);
                 }
                 match daemon.try_wait() {
                     Ok(Some(status)) => break status,
@@ -107,14 +117,14 @@ impl Supervisor {
                         self.stop_daemon(&mut daemon);
                         self.log
                             .write("supervised_give_up", Some("wait_failed"), pid, None);
-                        return 1;
+                        return Ok(1);
                     }
                 }
             };
             let code = exit_code(status);
             if code == 0 {
                 self.log.write("supervised_stop", None, None, None);
-                return 0;
+                return Ok(0);
             }
             let lived = alive.elapsed();
             let exit = format!("exit_{code}");
@@ -132,7 +142,7 @@ impl Supervisor {
             if quick_failures >= 3 {
                 self.log
                     .write("supervised_give_up", Some(&exit), None, None);
-                return code;
+                return Ok(code);
             }
             let now = Instant::now();
             restarts.push(now);
@@ -146,7 +156,7 @@ impl Supervisor {
             let waited = Instant::now();
             while waited.elapsed() < delay {
                 if stop.load(Ordering::SeqCst) {
-                    return 0;
+                    return Ok(0);
                 }
                 thread::sleep(POLL.min(delay));
             }
@@ -169,4 +179,14 @@ impl Supervisor {
         let _ = daemon.kill();
         let _ = daemon.wait();
     }
+}
+
+/// `WindowsJob.Create`: a job object that kills its processes when its last handle closes, that
+/// is when the supervisor ends, even when it is killed.
+#[cfg(windows)]
+fn windows_job() -> Result<win32job::Job> {
+    let mut limits = win32job::ExtendedLimitInfo::new();
+    limits.limit_kill_on_job_close();
+    win32job::Job::create_with_limit_info(&limits)
+        .map_err(|_| sermofur_core::instance::invalid_storage())
 }

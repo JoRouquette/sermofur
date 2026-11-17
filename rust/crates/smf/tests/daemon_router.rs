@@ -1167,7 +1167,7 @@ fn the_supervisor_restarts_a_killed_daemon_and_stops_cleanly() {
     let (done, finished) = mpsc::channel();
     let asked = Arc::clone(&stop);
     let supervising = thread::spawn(move || {
-        let _ = done.send(supervisor.run(&asked));
+        let _ = done.send(supervisor.run(&asked).ok());
     });
     let first = wait_for_pid(&paths, None);
     kill(first);
@@ -1180,7 +1180,7 @@ fn the_supervisor_restarts_a_killed_daemon_and_stops_cleanly() {
     );
     assert_ne!(first, second);
     stop.store(true, Ordering::SeqCst);
-    assert_eq!(finished.recv_timeout(Duration::from_secs(20)), Ok(0));
+    assert_eq!(finished.recv_timeout(Duration::from_secs(20)), Ok(Some(0)));
     supervising.join().expect("the supervisor");
     let gone = tokio::runtime::Builder::new_current_thread()
         .enable_all()
@@ -1243,13 +1243,8 @@ fn instance_files(root: &Path) -> BTreeMap<PathBuf, Vec<u8>> {
 }
 
 /// Port of `RealServiceTests.InstallRestartAfterAKillPilotAndUninstall`, behind the guard of
-/// `ServiceFactAttribute`. Under Windows the task runs `daemon run --supervise`, which waits for
-/// the job object of the supervisor: the test is ignored there until then.
+/// `ServiceFactAttribute`.
 #[test]
-#[cfg_attr(
-    windows,
-    ignore = "the Windows supervisor waits for its job object (decision on win32job)"
-)]
 fn a_real_service_installs_restarts_after_a_kill_and_uninstalls() {
     if !real_services_allowed() {
         eprintln!("Installs a real service: runs in CI, or set SERMOFUR_SERVICE_TESTS=1.");
@@ -1321,36 +1316,49 @@ fn a_real_service_installs_restarts_after_a_kill_and_uninstalls() {
     }
 }
 
-/// Review of lot 7.7 (Fort): under Windows, while the supervisor waits for the win32job
-/// question, `install`, `start` and `restart` answer `not_ported` before a running daemon is
-/// stopped or anything is written; `status` still runs.
+/// The job object of the Windows supervisor (`WindowsJob` of the oracle): `daemon run
+/// --supervise` started by hand runs the daemon as its child, and the daemon never outlives its
+/// supervisor, even when the supervisor is killed without a chance to stop it.
 #[cfg(windows)]
 #[test]
-fn install_start_and_restart_are_refused_under_windows_before_any_effect() {
-    let _alone = alone();
-    let home = Home::new("no-supervisor");
-    let _daemon = home.daemon(SMF);
-    for subcommand in ["install", "start", "restart"] {
-        let output = std::process::Command::new(SMF)
-            .args(["daemon", subcommand, "--json"])
+fn the_daemon_dies_with_its_killed_supervisor_under_windows() {
+    let home = Home::new("supervise");
+    // Killed on drop: a failed test leaves no supervisor behind.
+    let mut supervisor = Daemon(
+        Command::new(SMF)
+            .args(["daemon", "run", "--supervise"])
             .env(HOME_VARIABLE, home.home())
+            .stdin(Stdio::null())
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .spawn()
+            .expect("the supervisor starts"),
+    );
+    let daemon = wait_for_pid(&home.paths(), None);
+    assert_ne!(
+        u32::try_from(daemon).ok(),
+        Some(supervisor.0.id()),
+        "the daemon is a child"
+    );
+    // `taskkill /F` without `/T`: only the supervisor is ended; the job takes the daemon.
+    kill(i32::try_from(supervisor.0.id()).expect("a pid"));
+    let _ = supervisor.0.wait();
+    let started = Instant::now();
+    loop {
+        let listed = Command::new("tasklist")
+            .args(["/FI", &format!("PID eq {daemon}"), "/NH", "/FO", "CSV"])
             .output()
-            .expect("smf runs");
-        let stderr = String::from_utf8_lossy(&output.stderr);
-        assert_ne!(output.status.code(), Some(0), "{subcommand}: {stderr}");
-        assert!(stderr.contains("not_ported"), "{subcommand}: {stderr}");
-        assert!(
-            !home.paths().state_directory.join("service.json").exists(),
-            "{subcommand}"
-        );
+            .expect("tasklist runs");
+        if !String::from_utf8_lossy(&listed.stdout).contains(&format!("\"{daemon}\"")) {
+            break;
+        }
+        if started.elapsed() > LIMIT {
+            // Ended here, or it would hold the output pipe of the test run open.
+            kill(daemon);
+            panic!("the daemon outlived its supervisor");
+        }
+        thread::sleep(Duration::from_millis(100));
     }
-    let status = std::process::Command::new(SMF)
-        .args(["daemon", "status", "--json"])
-        .env(HOME_VARIABLE, home.home())
-        .output()
-        .expect("smf runs");
-    let status: serde_json::Value = serde_json::from_slice(&status.stdout).expect("JSON");
-    assert_eq!(status["state"], "running", "{status}");
 }
 
 /// Minor of lot 7.7, closed at lot 8.4: `daemon run --supervise` started by hand under Unix
@@ -1359,32 +1367,35 @@ fn install_start_and_restart_are_refused_under_windows_before_any_effect() {
 #[test]
 fn the_supervisor_runs_the_daemon_and_stops_with_it_on_sigterm() {
     let home = Home::new("supervise");
-    let mut supervisor = Command::new(SMF)
-        .args(["daemon", "run", "--supervise"])
-        .env(HOME_VARIABLE, home.home())
-        .stdin(Stdio::null())
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .spawn()
-        .expect("the supervisor starts");
+    // Killed on drop: a failed test leaves no supervisor behind.
+    let mut supervisor = Daemon(
+        Command::new(SMF)
+            .args(["daemon", "run", "--supervise"])
+            .env(HOME_VARIABLE, home.home())
+            .stdin(Stdio::null())
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .spawn()
+            .expect("the supervisor starts"),
+    );
     let daemon = wait_for_pid(&home.paths(), None);
     assert_ne!(
         u32::try_from(daemon).ok(),
-        Some(supervisor.id()),
+        Some(supervisor.0.id()),
         "the daemon is a child"
     );
     let signalled = Command::new("kill")
-        .args(["-TERM", &supervisor.id().to_string()])
+        .args(["-TERM", &supervisor.0.id().to_string()])
         .status()
         .expect("kill runs");
     assert!(signalled.success());
     let started = Instant::now();
     let code = loop {
-        if let Some(status) = supervisor.try_wait().expect("the status") {
+        if let Some(status) = supervisor.0.try_wait().expect("the status") {
             break status.code();
         }
         if started.elapsed() > LIMIT {
-            let _ = supervisor.kill();
+            let _ = supervisor.0.kill();
             panic!("the supervisor did not stop on SIGTERM");
         }
         thread::sleep(Duration::from_millis(100));

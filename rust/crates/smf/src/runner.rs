@@ -4,8 +4,9 @@
 //! Ported commands: `init` and `root` (lot 1b.4), `status`, `scope`, `export`, `claim`,
 //! `evidence` and `retex` (lot 3.4), `recall` (lot 4.2), `challenge` (lot 4.3), `source`
 //! (lot 5.2), `index` (lot 5.3), `migrate` (lot 6.1), `doctor` (lot 6.2), `daemon run`
-//! (lot 7.4), `daemon register`, `unregister`, `instances` and `status` (lot 7.6); the others
-//! answer `not_ported`.
+//! (lot 7.4), `daemon register`, `unregister`, `instances` and `status` (lot 7.6), `daemon
+//! install`, `uninstall`, `start`, `stop`, `restart` and `run --supervise` (lot 7.7), `mcp`
+//! (lots 8.3 and 8.4).
 
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -30,8 +31,8 @@ use crate::args::{
 use crate::help;
 use crate::memory_commands::{dispatch, writes};
 
-/// Exit code of a command that exists in the .NET tool but is not ported yet.
-const NOT_PORTED_EXIT_CODE: i32 = 70;
+/// Exit code of an `internal_error` (`EX_SOFTWARE`).
+const INTERNAL_ERROR_EXIT_CODE: i32 = 70;
 
 #[derive(Serialize)]
 struct VersionBody<'a> {
@@ -275,15 +276,6 @@ fn execute(
     Ok(0)
 }
 
-/// A command of the .NET tool that the port does not run yet.
-pub(crate) fn not_ported() -> SermofurError {
-    SermofurError::new(
-        "not_ported",
-        "This command is not ported to Rust yet.",
-        NOT_PORTED_EXIT_CODE,
-    )
-}
-
 /// `invalid_storage_or_path`, exit 3: what `CommandRunner.Run` answers to an IO failure.
 fn invalid_storage() -> SermofurError {
     SermofurError::new(
@@ -295,7 +287,11 @@ fn invalid_storage() -> SermofurError {
 
 pub(crate) fn to_json<T: Serialize>(value: &T) -> Result<String> {
     json::to_string(value).map_err(|error| {
-        SermofurError::new("internal_error", error.to_string(), NOT_PORTED_EXIT_CODE)
+        SermofurError::new(
+            "internal_error",
+            error.to_string(),
+            INTERNAL_ERROR_EXIT_CODE,
+        )
     })
 }
 

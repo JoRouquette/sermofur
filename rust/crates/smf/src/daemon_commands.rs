@@ -26,7 +26,7 @@ use tokio::io::AsyncWriteExt;
 
 use crate::args::CommandArguments;
 use crate::router::{block_on, temporary_folder};
-use crate::runner::{combine, not_ported, to_json, write_line};
+use crate::runner::{combine, to_json, write_line};
 
 const SUBCOMMANDS: &str =
     "install, uninstall, start, stop, restart, status, register, unregister, instances, run";
@@ -76,9 +76,6 @@ pub fn run(
                 .map(Listed::from)
                 .collect::<Vec<_>>(),
         )?,
-        // ponytail: the Windows task runs `daemon run --supervise`, not ported until the
-        // win32job question of lot 7.7 is settled; refused before anything stops or is written.
-        "install" | "start" | "restart" if cfg!(windows) => return Err(not_ported()),
         "status" | "install" | "uninstall" | "start" | "stop" | "restart" => {
             let manager = services::for_current_system(&paths);
             let mut pilot = Pilot {

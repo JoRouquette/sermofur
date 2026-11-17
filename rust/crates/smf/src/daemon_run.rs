@@ -22,7 +22,7 @@ use crate::args::{
     CommandArguments, HELP, HELP_SHORTCUT, VERSION as VERSION_OPTION, VERSION_SHORTCUT,
 };
 use crate::memory_commands::writes;
-use crate::runner::{combine, not_ported, run_in, write_line};
+use crate::runner::{combine, run_in, write_line};
 
 /// `CliRouter.LocalOnly`: help, version, no command, and the commands that run only in the
 /// process of the user.
@@ -110,10 +110,6 @@ pub fn run(
     args.require_count(2)?;
     args.validate_used()?;
     if supervise {
-        // The job object of the Windows supervisor waits for the decision on its crate.
-        if cfg!(windows) {
-            return Err(not_ported());
-        }
         return supervise_daemon(paths);
     }
     let _lock = file_turn::acquire(&paths)?;
@@ -297,7 +293,7 @@ fn supervise_daemon(paths: DaemonPaths) -> Result<i32> {
             crate::daemon_commands::shutdown(&stopper, &mut |_| {});
         }),
     );
-    Ok(supervisor.run(&stop))
+    supervisor.run(&stop)
 }
 
 /// `SignalStop.Handle`: the first signal runs `on_first` and asks the stop, then lets the
