@@ -15,6 +15,18 @@ use sermofur_core::ownership::{EntryStatus, FileOwnership, SystemOwnership};
 use sermofur_core::records::write;
 use uuid::Uuid;
 
+/// The temporary directory as the oracle's `TestInstance.TempRoot` sees it: links resolved, since
+/// on macOS `/var` is a link to `/private/var` and the store refuses links on every ancestor.
+/// Windows keeps `temp_dir` as is (`canonicalize` would add the `\\?\` prefix).
+fn temp_base() -> PathBuf {
+    let dir = std::env::temp_dir();
+    if cfg!(windows) {
+        dir
+    } else {
+        std::fs::canonicalize(dir).expect("the temporary directory resolves")
+    }
+}
+
 /// A folder under the temporary directory, removed on drop (doctor closes its store itself).
 struct Folder(PathBuf);
 
@@ -63,9 +75,8 @@ fn reports_match_the_dotnet_oracle() {
             "unreadable_owner" => &Unreadable,
             other => panic!("unknown case {other}"),
         };
-        let folder = Folder(
-            std::env::temp_dir().join(format!("sermofur-doctor-{}", Uuid::new_v4().simple())),
-        );
+        let folder =
+            Folder(temp_base().join(format!("sermofur-doctor-{}", Uuid::new_v4().simple())));
         fs::create_dir_all(&folder.0).expect("folder");
         let root = initialize(&folder.0).expect("instance").root;
         let mut report = inspect(&root, owners, None, None).expect("report");

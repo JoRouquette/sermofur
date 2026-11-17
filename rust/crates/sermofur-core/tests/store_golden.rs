@@ -15,6 +15,18 @@ use sermofur_core::scope_policy::validate_tree;
 use sermofur_core::store::Store;
 use uuid::Uuid;
 
+/// The temporary directory as the oracle's `TestInstance.TempRoot` sees it: links resolved, since
+/// on macOS `/var` is a link to `/private/var` and the store refuses links on every ancestor.
+/// Windows keeps `temp_dir` as is (`canonicalize` would add the `\\?\` prefix).
+fn temp_base() -> PathBuf {
+    let dir = std::env::temp_dir();
+    if cfg!(windows) {
+        dir
+    } else {
+        std::fs::canonicalize(dir).expect("the temporary directory resolves")
+    }
+}
+
 struct Scratch(PathBuf);
 
 impl Drop for Scratch {
@@ -197,8 +209,7 @@ fn the_store_answers_like_the_dotnet_store() {
     let path = format!("{}/../../tests/golden/{file}", env!("CARGO_MANIFEST_DIR"));
     let golden: Value =
         serde_json::from_str(&std::fs::read_to_string(path).expect("golden file")).expect("JSON");
-    let scratch =
-        Scratch(std::env::temp_dir().join(format!("sermofur-store-{}", Uuid::new_v4().simple())));
+    let scratch = Scratch(temp_base().join(format!("sermofur-store-{}", Uuid::new_v4().simple())));
     let root = scratch.0.clone();
     std::fs::create_dir_all(root.join(".sermofur")).expect("marker");
     let instance = Uuid::parse_str("11111111-2222-4333-8444-555555555555").expect("GUID");
@@ -604,8 +615,7 @@ fn the_store_answers_like_the_dotnet_store() {
 /// write fail with `storage_busy`, as the code 5 or 6 of `SqliteException` in the CLI.
 #[test]
 fn a_held_write_lock_is_storage_busy() {
-    let scratch =
-        Scratch(std::env::temp_dir().join(format!("sermofur-busy-{}", Uuid::new_v4().simple())));
+    let scratch = Scratch(temp_base().join(format!("sermofur-busy-{}", Uuid::new_v4().simple())));
     std::fs::create_dir_all(scratch.0.join(".sermofur")).expect("marker");
     let instance = Uuid::new_v4();
     let database = scratch.0.join(".sermofur").join("memory.db");
@@ -627,8 +637,7 @@ fn a_held_write_lock_is_storage_busy() {
 /// answer is `projection_pending`, and nothing is written in the folder the link points to.
 #[test]
 fn a_link_on_the_records_folder_is_never_followed() {
-    let scratch =
-        Scratch(std::env::temp_dir().join(format!("sermofur-link-{}", Uuid::new_v4().simple())));
+    let scratch = Scratch(temp_base().join(format!("sermofur-link-{}", Uuid::new_v4().simple())));
     let root = scratch.0.join("instance");
     let outside = scratch.0.join("outside");
     std::fs::create_dir_all(root.join(".sermofur")).expect("marker");

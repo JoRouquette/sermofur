@@ -18,6 +18,18 @@ use sermofur_core::records::*;
 use sermofur_core::store::Store;
 use uuid::Uuid;
 
+/// The temporary directory as the oracle's `TestInstance.TempRoot` sees it: links resolved, since
+/// on macOS `/var` is a link to `/private/var` and the store refuses links on every ancestor.
+/// Windows keeps `temp_dir` as is (`canonicalize` would add the `\\?\` prefix).
+fn temp_base() -> PathBuf {
+    let dir = std::env::temp_dir();
+    if cfg!(windows) {
+        dir
+    } else {
+        std::fs::canonicalize(dir).expect("the temporary directory resolves")
+    }
+}
+
 struct Scratch(PathBuf);
 
 impl Drop for Scratch {
@@ -27,9 +39,8 @@ impl Drop for Scratch {
 }
 
 fn instance() -> (Scratch, Store) {
-    let scratch = Scratch(
-        std::env::temp_dir().join(format!("sermofur-challenge-{}", Uuid::new_v4().simple())),
-    );
+    let scratch =
+        Scratch(temp_base().join(format!("sermofur-challenge-{}", Uuid::new_v4().simple())));
     std::fs::create_dir_all(scratch.0.join(".sermofur")).expect("marker");
     let id = Uuid::parse_str("11111111-2222-4333-8444-555555555555").expect("GUID");
     sermofur_core::schema::create_database(&scratch.0.join(".sermofur").join("memory.db"), id)

@@ -334,13 +334,17 @@ fn reads_match_the_oracle() {
     let golden = golden();
     let allow_skip = std::env::var("SERMOFUR_ALLOW_SYMLINK_SKIP").is_ok_and(|v| v == "1");
     // The root as the oracle passes it, a full path: on Windows its 8.3 names expanded, as
-    // `Path.GetFullPath(Path.GetTempPath())`.
-    let scratch = Scratch(
-        sermofur_core::discovery::expand_short_names(&std::env::temp_dir()).join(format!(
-            "sermofur-source-golden-{}",
-            Uuid::new_v4().simple()
-        )),
-    );
+    // `Path.GetFullPath(Path.GetTempPath())`; elsewhere links resolved, as `TestInstance.TempRoot`.
+    let temp = std::env::temp_dir();
+    let temp = if cfg!(windows) {
+        sermofur_core::discovery::expand_short_names(&temp)
+    } else {
+        fs::canonicalize(temp).expect("the temporary directory resolves")
+    };
+    let scratch = Scratch(temp.join(format!(
+        "sermofur-source-golden-{}",
+        Uuid::new_v4().simple()
+    )));
     let mut checked = 0;
     for (index, row) in rows(&golden, "reads").iter().enumerate() {
         let name = row["name"].as_str().expect("name");
