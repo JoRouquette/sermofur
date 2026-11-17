@@ -62,17 +62,15 @@ if (!OperatingSystem.IsWindows())
 
 File.WriteAllText(
     args[0],
-    new JsonObject
-    {
-        ["os"] = OperatingSystem.IsWindows() ? "windows" : "unix",
-        ["zones"] = zones,
-    }.ToJsonString(
-        new JsonSerializerOptions
-        {
-            WriteIndented = true,
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        }
-    ).Replace("\r\n", "\n") + "\n"
+    new JsonObject { ["os"] = OperatingSystem.IsWindows() ? "windows" : "unix", ["zones"] = zones }
+        .ToJsonString(
+            new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            }
+        )
+        .Replace("\r\n", "\n") + "\n"
 );
 
 static JsonObject Zone()
@@ -168,7 +166,10 @@ static JsonObject Zone()
             {
                 ["utc_ticks"] = ticks,
                 ["offset_minutes"] = (int)local.Offset.TotalMinutes,
-                ["text"] = local.ToString("yyyy-MM-dd'T'HH:mm:ss.fffzzz", CultureInfo.InvariantCulture),
+                ["text"] = local.ToString(
+                    "yyyy-MM-dd'T'HH:mm:ss.fffzzz",
+                    CultureInfo.InvariantCulture
+                ),
             }
         );
     }

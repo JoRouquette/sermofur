@@ -31,7 +31,11 @@ string oracle =
     : Environment.GetEnvironmentVariable("SMF_ORACLE") is { Length: > 0 } variable ? variable
     : OperatingSystem.IsWindows()
         ? Path.GetFullPath(Path.Combine("..", "..", "target", "oracle", "Sermofur.Cli.exe"))
-    : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "sermofur-oracle-bin", "Sermofur.Cli");
+    : Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+        "sermofur-oracle-bin",
+        "Sermofur.Cli"
+    );
 
 const string Unknown = "0f8fad5b-d9cb-469f-a165-70867728950e";
 string Init(string name = "Claude Code Test") =>
@@ -39,12 +43,20 @@ string Init(string name = "Claude Code Test") =>
     + JsonSerializer.Serialize(name)
     + ""","version":"1.0"}}}""";
 string Request(object id, string method, string? parameters = null) =>
-    """{"jsonrpc":"2.0","id":""" + JsonSerializer.Serialize(id) + ""","method":""" + JsonSerializer.Serialize(method)
+    """{"jsonrpc":"2.0","id":"""
+    + JsonSerializer.Serialize(id)
+    + ""","method":"""
+    + JsonSerializer.Serialize(method)
     + (parameters is null ? "}" : ""","params":""" + parameters + "}");
 string Call(object id, string tool, string arguments = "{}") =>
-    Request(id, "tools/call", """{"name":""" + JsonSerializer.Serialize(tool) + ""","arguments":""" + arguments + "}");
+    Request(
+        id,
+        "tools/call",
+        """{"name":""" + JsonSerializer.Serialize(tool) + ""","arguments":""" + arguments + "}"
+    );
 string Initialize(object id, string parameters) => Request(id, "initialize", parameters);
-string Level(object id, string level) => Request(id, "logging/setLevel", """{"level":""" + level + "}");
+string Level(object id, string level) =>
+    Request(id, "logging/setLevel", """{"level":""" + level + "}");
 string unknownN = Unknown.Replace("-", "");
 string unknownUpper = Unknown.ToUpperInvariant();
 const string Full = """ "capabilities":{},"clientInfo":{"name":"A","version":"1"}""";
@@ -68,33 +80,102 @@ List<string> protocol =
     Initialize(12, $$$"""{{{{Full}}}}"""),
     Initialize(13, """{"protocolVersion":"2025-06-18","clientInfo":{"name":"A","version":"1"}}"""),
     Initialize(14, """{"protocolVersion":"2025-06-18","capabilities":{}}"""),
-    Initialize(15, """{"protocolVersion":5,"capabilities":{},"clientInfo":{"name":"A","version":"1"}}"""),
+    Initialize(
+        15,
+        """{"protocolVersion":5,"capabilities":{},"clientInfo":{"name":"A","version":"1"}}"""
+    ),
     Initialize(16, """{"protocolVersion":"2025-06-18","capabilities":null,"clientInfo":null}"""),
-    Initialize(17, """{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"version":"1"}}"""),
-    Initialize(18, """{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":null,"version":"1"}}"""),
-    Initialize(19, """{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"A","version":5}}"""),
-    Initialize(20, """{"protocolVersion":"2025-06-18","capabilities":{"sampling":5},"clientInfo":{"name":"A","version":"1"}}"""),
-    Initialize(21, """{"protocolVersion":"2025-06-18","capabilities":{"x":5,"tasks":5},"clientInfo":{"name":"A","version":"1"}}"""),
-    Initialize(22, """{"protocolVersion":"2025-06-18","capabilities":{"roots":{"listChanged":"yes"}},"clientInfo":{"name":"A","version":"1"}}"""),
-    Initialize(23, """{"protocolVersion":"2025-06-18","capabilities":{"experimental":{"a":[1]},"extensions":{"b":5},"elicitation":{"form":5}},"clientInfo":{"name":"A","version":"1"}}"""),
-    Initialize(24, """{"protocolVersion":"2025-06-18","capabilities":{"experimental":5},"clientInfo":{"name":"A","version":"1"}}"""),
-    Initialize(25, """{"protocolVersion":"2025-06-18","capabilities":{"elicitation":5},"clientInfo":{"name":"A","version":"1"}}"""),
-    Initialize(26, """{"protocolVersion":"2025-06-18","capabilities":{"sampling":{"context":{},"tools":5}},"clientInfo":{"name":"A","version":"1"}}"""),
-    Initialize(27, """{"protocolVersion":"2025-06-18","capabilities":[],"clientInfo":{"name":"A","version":"1"}}"""),
-    Initialize(28, """{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"A","version":"1","title":5}}"""),
-    Initialize(29, """{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"A","version":"1","icons":[{"src":"s","sizes":["1"]}]}}"""),
-    Initialize(30, """{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"A","version":"1","icons":[{}]}}"""),
-    Initialize(31, """{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"A","version":"1","icons":[{"src":"s","sizes":[5]}]}}"""),
-    Initialize(32, """{"ProtocolVersion":"2024-11-05","CAPABILITIES":{},"clientInfo":{"Name":"A","version":"1"}}"""),
-    Initialize(33, """{"protocolVersion":"2025-06-18","capabilities":{"roots":{},"Roots":{}},"clientInfo":{"name":"A","name":"B","version":"1"}}"""),
-    Initialize(34, """{"protocolVersion":"2025-06-18","protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"A","version":"1"}}"""),
-    Initialize(35, """{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"A","version":"1"},"protocolversion":"2024-11-05"}"""),
+    Initialize(
+        17,
+        """{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"version":"1"}}"""
+    ),
+    Initialize(
+        18,
+        """{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":null,"version":"1"}}"""
+    ),
+    Initialize(
+        19,
+        """{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"A","version":5}}"""
+    ),
+    Initialize(
+        20,
+        """{"protocolVersion":"2025-06-18","capabilities":{"sampling":5},"clientInfo":{"name":"A","version":"1"}}"""
+    ),
+    Initialize(
+        21,
+        """{"protocolVersion":"2025-06-18","capabilities":{"x":5,"tasks":5},"clientInfo":{"name":"A","version":"1"}}"""
+    ),
+    Initialize(
+        22,
+        """{"protocolVersion":"2025-06-18","capabilities":{"roots":{"listChanged":"yes"}},"clientInfo":{"name":"A","version":"1"}}"""
+    ),
+    Initialize(
+        23,
+        """{"protocolVersion":"2025-06-18","capabilities":{"experimental":{"a":[1]},"extensions":{"b":5},"elicitation":{"form":5}},"clientInfo":{"name":"A","version":"1"}}"""
+    ),
+    Initialize(
+        24,
+        """{"protocolVersion":"2025-06-18","capabilities":{"experimental":5},"clientInfo":{"name":"A","version":"1"}}"""
+    ),
+    Initialize(
+        25,
+        """{"protocolVersion":"2025-06-18","capabilities":{"elicitation":5},"clientInfo":{"name":"A","version":"1"}}"""
+    ),
+    Initialize(
+        26,
+        """{"protocolVersion":"2025-06-18","capabilities":{"sampling":{"context":{},"tools":5}},"clientInfo":{"name":"A","version":"1"}}"""
+    ),
+    Initialize(
+        27,
+        """{"protocolVersion":"2025-06-18","capabilities":[],"clientInfo":{"name":"A","version":"1"}}"""
+    ),
+    Initialize(
+        28,
+        """{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"A","version":"1","title":5}}"""
+    ),
+    Initialize(
+        29,
+        """{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"A","version":"1","icons":[{"src":"s","sizes":["1"]}]}}"""
+    ),
+    Initialize(
+        30,
+        """{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"A","version":"1","icons":[{}]}}"""
+    ),
+    Initialize(
+        31,
+        """{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"A","version":"1","icons":[{"src":"s","sizes":[5]}]}}"""
+    ),
+    Initialize(
+        32,
+        """{"ProtocolVersion":"2024-11-05","CAPABILITIES":{},"clientInfo":{"Name":"A","version":"1"}}"""
+    ),
+    Initialize(
+        33,
+        """{"protocolVersion":"2025-06-18","capabilities":{"roots":{},"Roots":{}},"clientInfo":{"name":"A","name":"B","version":"1"}}"""
+    ),
+    Initialize(
+        34,
+        """{"protocolVersion":"2025-06-18","protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"A","version":"1"}}"""
+    ),
+    Initialize(
+        35,
+        """{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"A","version":"1"},"protocolversion":"2024-11-05"}"""
+    ),
     Initialize(36, $$$"""{"protocolVersion":"2025-06-18",{{{Full}}},"_meta":5}"""),
-    Initialize(37, $$$"""{"protocolVersion":"2025-06-18",{{{Full}}},"inputResponses":{"a":5},"_meta":{}}"""),
+    Initialize(
+        37,
+        $$$"""{"protocolVersion":"2025-06-18",{{{Full}}},"inputResponses":{"a":5},"_meta":{}}"""
+    ),
     Initialize(38, $$$"""{"protocolVersion":"2025-06-18",{{{Full}}},"inputResponses":5}"""),
     Initialize(39, $$$"""{"protocolVersion":"2025-06-18",{{{Full}}},"requestState":5}"""),
-    Initialize(40, """{"protocolVersion":"2025-06-18","capabilities":{},"clıentInfo":{"name":"A","version":"1"}}"""),
-    Initialize("40b", """{"protocolVersion":"2025-06-18","capabilities":{"ſampling":5},"clientInfo":{"name":"A","version":"1"}}"""),
+    Initialize(
+        40,
+        """{"protocolVersion":"2025-06-18","capabilities":{},"clıentInfo":{"name":"A","version":"1"}}"""
+    ),
+    Initialize(
+        "40b",
+        """{"protocolVersion":"2025-06-18","capabilities":{"ſampling":5},"clientInfo":{"name":"A","version":"1"}}"""
+    ),
     // Methods.
     Request(41, "ping"),
     Request(42, "ping", "[]"),
@@ -120,13 +201,35 @@ List<string> protocol =
     Request(62, "logging/setLevel", "{}"),
     Request(63, "logging/setLevel", """{"Level":"debug","level":"info"}"""),
     Request(64, "logging/setLevel", """{"level":"debug","level":"info"}"""),
-    Level(65, "\"debug\""), Level(66, "\"emergency\""), Level(67, "\"Debug\""), Level(68, "\"DEBUG\""),
-    Level(69, "\" debug\""), Level(70, "\"info \""), Level(71, "\"debug, info\""), Level(72, "\"debug,\""),
-    Level(73, "\",\""), Level(74, "\"debug,,info\""), Level(75, "\"\""), Level(76, "\" \""),
-    Level(77, "\"0\""), Level(78, "\"+1\""), Level(79, "\" 1 \""), Level(80, "\"-5\""), Level(81, "\"99\""),
-    Level(82, "\"0x1\""), Level(83, "\"1,debug\""), Level(84, "\"debug,7\""), Level(85, "\"2147483648\""),
-    Level(86, "\"debug\\u0000\""), Level(87, "0"), Level(88, "99"), Level(89, "-1"), Level(90, "1.5"),
-    Level(91, "2147483648"), Level(92, "true"), Level(93, "null"),
+    Level(65, "\"debug\""),
+    Level(66, "\"emergency\""),
+    Level(67, "\"Debug\""),
+    Level(68, "\"DEBUG\""),
+    Level(69, "\" debug\""),
+    Level(70, "\"info \""),
+    Level(71, "\"debug, info\""),
+    Level(72, "\"debug,\""),
+    Level(73, "\",\""),
+    Level(74, "\"debug,,info\""),
+    Level(75, "\"\""),
+    Level(76, "\" \""),
+    Level(77, "\"0\""),
+    Level(78, "\"+1\""),
+    Level(79, "\" 1 \""),
+    Level(80, "\"-5\""),
+    Level(81, "\"99\""),
+    Level(82, "\"0x1\""),
+    Level(83, "\"1,debug\""),
+    Level(84, "\"debug,7\""),
+    Level(85, "\"2147483648\""),
+    Level(86, "\"debug\\u0000\""),
+    Level(87, "0"),
+    Level(88, "99"),
+    Level(89, "-1"),
+    Level(90, "1.5"),
+    Level(91, "2147483648"),
+    Level(92, "true"),
+    Level(93, "null"),
     // Envelopes.
     "not json",
     "{}",
@@ -196,7 +299,11 @@ List<string> protocol =
     Request(135, "tools/call", """{"name":"sermofur_status","arguments":5}"""),
     Request(136, "tools/call", """{"name":"sermofur_status","arguments":[]}"""),
     Request(137, "tools/call", """{"name":"sermofur_status","arguments":null}"""),
-    Request(138, "tools/call", """{"name":"sermofur_status","arguments":{},"_meta":{"progressToken":"p"}}"""),
+    Request(
+        138,
+        "tools/call",
+        """{"name":"sermofur_status","arguments":{},"_meta":{"progressToken":"p"}}"""
+    ),
     Call(139, "sermofur_status"),
     Call(140, "sermofur_status", """{"path":"x"}"""),
     Call(141, "sermofur_status", """{"a":1,"b":2}"""),
@@ -235,22 +342,62 @@ List<string> protocol =
     Call(174, "sermofur_claim", """{"text":"x","actor":"someone"}"""),
     Call(175, "sermofur_claim", """{"text":"x","category":"decisions"}"""),
     Call(176, "sermofur_claim", """{"text":"x","category":"Semantic"}"""),
-    Call(177, "sermofur_claim", """{"text":"x","volatility":"volatile","category":"procedural","key":"--k"}"""),
+    Call(
+        177,
+        "sermofur_claim",
+        """{"text":"x","volatility":"volatile","category":"procedural","key":"--k"}"""
+    ),
     Call(178, "sermofur_claim", """{"text":"-- starts with dashes"}"""),
-    Call(179, "sermofur_evidence", """{"claimId":"x","kind":"source_code","reference":"r","lineage":"l"}"""),
-    Call(180, "sermofur_evidence", $$$"""{"claimId":"{{{Unknown}}}","kind":"proof","reference":"r","lineage":"l"}"""),
-    Call(181, "sermofur_evidence", $$$"""{"claimId":"{{{Unknown}}}","kind":"execution","reference":"--r","lineage":"--l"}"""),
-    Call(182, "sermofur_evidence", $$$"""{"claimId":"{{{Unknown}}}","kind":"execution","reference":"r","lineage":"l","contradicts":"true"}"""),
-    Call(183, "sermofur_evidence", $$$"""{"claimId":"{{{Unknown}}}","kind":"execution","reference":"r","lineage":"l","contradicts":1}"""),
-    Call(184, "sermofur_evidence", $$$"""{"claimId":"{{{Unknown}}}","kind":"execution","reference":"r","lineage":"l","sourceId":"s"}"""),
-    Call(185, "sermofur_evidence", $$$"""{"claimId":"{{{Unknown}}}","kind":"execution","reference":"r"}"""),
+    Call(
+        179,
+        "sermofur_evidence",
+        """{"claimId":"x","kind":"source_code","reference":"r","lineage":"l"}"""
+    ),
+    Call(
+        180,
+        "sermofur_evidence",
+        $$$"""{"claimId":"{{{Unknown}}}","kind":"proof","reference":"r","lineage":"l"}"""
+    ),
+    Call(
+        181,
+        "sermofur_evidence",
+        $$$"""{"claimId":"{{{Unknown}}}","kind":"execution","reference":"--r","lineage":"--l"}"""
+    ),
+    Call(
+        182,
+        "sermofur_evidence",
+        $$$"""{"claimId":"{{{Unknown}}}","kind":"execution","reference":"r","lineage":"l","contradicts":"true"}"""
+    ),
+    Call(
+        183,
+        "sermofur_evidence",
+        $$$"""{"claimId":"{{{Unknown}}}","kind":"execution","reference":"r","lineage":"l","contradicts":1}"""
+    ),
+    Call(
+        184,
+        "sermofur_evidence",
+        $$$"""{"claimId":"{{{Unknown}}}","kind":"execution","reference":"r","lineage":"l","sourceId":"s"}"""
+    ),
+    Call(
+        185,
+        "sermofur_evidence",
+        $$$"""{"claimId":"{{{Unknown}}}","kind":"execution","reference":"r"}"""
+    ),
     Call(186, "sermofur_record_retex", """{"event":"--e","impact":"i","next":"n"}"""),
     Call(187, "sermofur_record_retex", """{"event":"e","impact":"i"}"""),
     Call(188, "sermofur_record_retex", """{"event":"e","impact":"i","next":"n","key":""}"""),
     Call(189, "sermofur_feedback", $$$"""{"targetId":"{{{Unknown}}}","verdict":"great"}"""),
-    Call(190, "sermofur_feedback", $$$"""{"targetId":"{{{Unknown}}}","verdict":"wrong","comment":"--c"}"""),
+    Call(
+        190,
+        "sermofur_feedback",
+        $$$"""{"targetId":"{{{Unknown}}}","verdict":"wrong","comment":"--c"}"""
+    ),
     Call(191, "sermofur_feedback", """{"verdict":"wrong"}"""),
-    Call("é", "sermofur_feedback", $$$"""{"targetId":"{{{Unknown}}}","verdict":"helpful","comment":"<b> & 'c'"}"""),
+    Call(
+        "é",
+        "sermofur_feedback",
+        $$$"""{"targetId":"{{{Unknown}}}","verdict":"helpful","comment":"<b> & 'c'"}"""
+    ),
 ];
 
 List<string> framing =
@@ -264,7 +411,12 @@ List<string> framing =
     Request(6, "ping") + "\r\n" + Request(7, "ping"),
 ];
 
-List<string> unserved = [Init(), Call(1, "sermofur_status"), Call(2, "sermofur_recall", """{"question":"q"}""")];
+List<string> unserved =
+[
+    Init(),
+    Call(1, "sermofur_status"),
+    Call(2, "sermofur_recall", """{"question":"q"}"""),
+];
 
 List<string> tools =
 [
@@ -281,16 +433,48 @@ List<string> tools =
     Call(10, "sermofur_claim", """{"text":"-- starts with dashes","key":"k1"}"""),
     Call(11, "sermofur_claim", """{"text":"-- starts with dashes","key":"k1"}"""),
     Call(12, "sermofur_claim", """{"text":"-h"}"""),
-    Call(13, "sermofur_claim", """{"text":"Billing <paginates> & it's é 😀 \u2028","category":"procedural","volatility":"stable"}"""),
-    Call(14, "sermofur_claim", """{"text":"-- starts with dashes","key":"k1","category":"episodic"}"""),
-    Call(15, "sermofur_evidence", """{"claimId":"@0@","kind":"source_code","reference":"--src/a.cs","lineage":"repo"}"""),
-    Call(16, "sermofur_evidence", """{"claimId":"@0@","kind":"execution","reference":"run","lineage":"ci","contradicts":true,"key":"e1"}"""),
-    Call(17, "sermofur_evidence", """{"claimId":"@0@","kind":"execution","reference":"run","lineage":"ci","contradicts":false,"key":"e1"}"""),
-    Call(18, "sermofur_evidence", $$$"""{"claimId":"@0@","kind":"execution","reference":"run","lineage":"ci","sourceId":"{{{Unknown}}}"}"""),
-    Call(19, "sermofur_evidence", $$$"""{"claimId":"{{{Unknown}}}","kind":"llm_assertion","reference":"r","lineage":"l"}"""),
+    Call(
+        13,
+        "sermofur_claim",
+        """{"text":"Billing <paginates> & it's é 😀 \u2028","category":"procedural","volatility":"stable"}"""
+    ),
+    Call(
+        14,
+        "sermofur_claim",
+        """{"text":"-- starts with dashes","key":"k1","category":"episodic"}"""
+    ),
+    Call(
+        15,
+        "sermofur_evidence",
+        """{"claimId":"@0@","kind":"source_code","reference":"--src/a.cs","lineage":"repo"}"""
+    ),
+    Call(
+        16,
+        "sermofur_evidence",
+        """{"claimId":"@0@","kind":"execution","reference":"run","lineage":"ci","contradicts":true,"key":"e1"}"""
+    ),
+    Call(
+        17,
+        "sermofur_evidence",
+        """{"claimId":"@0@","kind":"execution","reference":"run","lineage":"ci","contradicts":false,"key":"e1"}"""
+    ),
+    Call(
+        18,
+        "sermofur_evidence",
+        $$$"""{"claimId":"@0@","kind":"execution","reference":"run","lineage":"ci","sourceId":"{{{Unknown}}}"}"""
+    ),
+    Call(
+        19,
+        "sermofur_evidence",
+        $$$"""{"claimId":"{{{Unknown}}}","kind":"llm_assertion","reference":"r","lineage":"l"}"""
+    ),
     Call(20, "sermofur_record_retex", """{"event":"e","impact":"i","next":"n"}"""),
     Call(21, "sermofur_record_retex", """{"event":"e","impact":"i","next":"n","key":"r1"}"""),
-    Call(22, "sermofur_feedback", """{"targetId":"@1@","verdict":"wrong","comment":"it retries five times"}"""),
+    Call(
+        22,
+        "sermofur_feedback",
+        """{"targetId":"@1@","verdict":"wrong","comment":"it retries five times"}"""
+    ),
     Call(23, "sermofur_feedback", """{"targetId":"@1@","verdict":"helpful"}"""),
     Call(24, "sermofur_feedback", $$$"""{"targetId":"{{{Unknown}}}","verdict":"not_applicable"}"""),
     Call(25, "sermofur_recall", """{"question":"queues retry"}"""),
@@ -312,7 +496,11 @@ List<string> sibling =
     Init(),
     Call(1, "sermofur_challenge", """{"claimId":"@6@"}"""),
     Call(2, "sermofur_feedback", """{"targetId":"@6@","verdict":"wrong"}"""),
-    Call(3, "sermofur_evidence", """{"claimId":"@6@","kind":"llm_assertion","reference":"r","lineage":"l"}"""),
+    Call(
+        3,
+        "sermofur_evidence",
+        """{"claimId":"@6@","kind":"llm_assertion","reference":"r","lineage":"l"}"""
+    ),
     Call(4, "sermofur_recall", """{"question":"secret client"}"""),
     Call(5, "sermofur_status", """{"path":"x"}"""),
     Call(6, "sermofur_recall", """{"question":"x","scope":"client-b"}"""),
@@ -339,7 +527,15 @@ JsonArray sessions =
     Session("tools", "root", daemon: true, registered: true, null, setup, tools),
     Session("sibling_scope", "root/client-a", daemon: true, registered: true, null, setup, sibling),
     Session("project_directory", "outside", daemon: true, registered: true, "root", [], unserved),
-    Session("relative_project_directory", "outside", daemon: true, registered: true, "relative", [], unserved),
+    Session(
+        "relative_project_directory",
+        "outside",
+        daemon: true,
+        registered: true,
+        "relative",
+        [],
+        unserved
+    ),
 ];
 
 JsonObject golden = new JsonObject
@@ -360,7 +556,11 @@ File.WriteAllText(
 return 0;
 
 JsonObject Step(string? folder, params string[] words) =>
-    new JsonObject { ["cwd"] = folder, ["run"] = new JsonArray([.. words.Select(w => JsonValue.Create(w))]) };
+    new JsonObject
+    {
+        ["cwd"] = folder,
+        ["run"] = new JsonArray([.. words.Select(w => JsonValue.Create(w))]),
+    };
 
 JsonObject Mkdir(string folder) => new JsonObject { ["mkdir"] = folder };
 
@@ -394,7 +594,11 @@ JsonObject Session(
                 continue;
             }
             string cwd = step["cwd"] is { } sub ? Path.Combine(root, sub.GetValue<string>()) : root;
-            string printed = Run(cwd, home, [.. step["run"]!.AsArray().Select(w => w!.GetValue<string>())]);
+            string printed = Run(
+                cwd,
+                home,
+                [.. step["run"]!.AsArray().Select(w => w!.GetValue<string>())]
+            );
             ids.Add(JsonNode.Parse(printed)?["id"]?.GetValue<string>() ?? "");
         }
         if (daemon)
@@ -429,7 +633,13 @@ JsonObject Session(
             }
         );
         StringBuilder errors = new StringBuilder();
-        serve.ErrorDataReceived += (_, line) => { lock (errors) { errors.Append(line.Data); } };
+        serve.ErrorDataReceived += (_, line) =>
+        {
+            lock (errors)
+            {
+                errors.Append(line.Data);
+            }
+        };
         serve.BeginErrorReadLine();
         System.Collections.Concurrent.BlockingCollection<string> lines = [];
         Thread reader = new Thread(() =>
@@ -455,8 +665,18 @@ JsonObject Session(
             {
                 send = send.Replace($"@{index}@", ids[index]);
             }
-            send = Patterns.Repeat().Replace(send, match =>
-                string.Concat(Enumerable.Repeat(match.Groups[2].Value, int.Parse(match.Groups[1].Value))));
+            send = Patterns
+                .Repeat()
+                .Replace(
+                    send,
+                    match =>
+                        string.Concat(
+                            Enumerable.Repeat(
+                                match.Groups[2].Value,
+                                int.Parse(match.Groups[1].Value)
+                            )
+                        )
+                );
             Write(input, send);
             Write(input, """{"jsonrpc":"2.0","id":"sync","method":"ping"}""");
             List<string> answers = [];
@@ -472,7 +692,9 @@ JsonObject Session(
                 {
                     if (!synced)
                     {
-                        throw new TimeoutException($"{name}: no answer to the sync ping after {send}");
+                        throw new TimeoutException(
+                            $"{name}: no answer to the sync ping after {send}"
+                        );
                     }
                     break;
                 }
@@ -483,11 +705,13 @@ JsonObject Session(
                 }
                 answers.Add(names.Normalize(line));
             }
-            cases.Add(new JsonObject
-            {
-                ["send"] = template,
-                ["answers"] = new JsonArray([.. answers.Select(a => JsonValue.Create(a))]),
-            });
+            cases.Add(
+                new JsonObject
+                {
+                    ["send"] = template,
+                    ["answers"] = new JsonArray([.. answers.Select(a => JsonValue.Create(a))]),
+                }
+            );
         }
         input.Close();
         if (!serve.WaitForExit(20_000))
@@ -506,14 +730,18 @@ JsonObject Session(
                 string evt = line?["event"]?.GetValue<string>() ?? "";
                 if (evt.StartsWith("mcp_", StringComparison.Ordinal))
                 {
-                    events.Add(line?["code"] is { } code ? $"{evt} {code.GetValue<string>()}" : evt);
+                    events.Add(
+                        line?["code"] is { } code ? $"{evt} {code.GetValue<string>()}" : evt
+                    );
                 }
             }
         }
         string all = string.Join("\n", cases.Select(c => c!.ToJsonString()));
         if (all.Contains(tag, StringComparison.Ordinal))
         {
-            throw new InvalidOperationException($"{name}: a path of this machine is left after normalization");
+            throw new InvalidOperationException(
+                $"{name}: a path of this machine is left after normalization"
+            );
         }
         Console.Error.WriteLine($"{name}: {cases.Count} cases");
         return new JsonObject
@@ -534,7 +762,11 @@ JsonObject Session(
     {
         if (daemonProcess is not null)
         {
-            try { Run(root, home, ["daemon", "stop"]); } catch (Exception) { }
+            try
+            {
+                Run(root, home, ["daemon", "stop"]);
+            }
+            catch (Exception) { }
             if (!daemonProcess.WaitForExit(10_000))
             {
                 daemonProcess.Kill(true);
@@ -542,9 +774,18 @@ JsonObject Session(
         }
         for (int attempt = 0; attempt < 20 && Directory.Exists(@base); attempt++)
         {
-            try { Directory.Delete(@base, recursive: true); }
-            catch (IOException) { Thread.Sleep(250); }
-            catch (UnauthorizedAccessException) { Thread.Sleep(250); }
+            try
+            {
+                Directory.Delete(@base, recursive: true);
+            }
+            catch (IOException)
+            {
+                Thread.Sleep(250);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                Thread.Sleep(250);
+            }
         }
     }
 }
@@ -556,7 +797,13 @@ static void Write(Stream input, string line)
     input.Flush();
 }
 
-Process Start(string cwd, string home, string[] words, bool redirectInput, string? projectDirectory = null)
+Process Start(
+    string cwd,
+    string home,
+    string[] words,
+    bool redirectInput,
+    string? projectDirectory = null
+)
 {
     ProcessStartInfo start = new ProcessStartInfo(oracle)
     {
@@ -590,7 +837,9 @@ string Run(string cwd, string home, string[] words)
     process.WaitForExit();
     if (process.ExitCode != 0)
     {
-        throw new InvalidOperationException($"{string.Join(' ', words)}: {process.ExitCode} {error.Result}");
+        throw new InvalidOperationException(
+            $"{string.Join(' ', words)}: {process.ExitCode} {error.Result}"
+        );
     }
     return text;
 }
@@ -614,18 +863,24 @@ sealed partial class Normalizer(string root, string @base)
         {
             string once = JsonSerializer.Serialize(path)[1..^1];
             string twice = JsonSerializer.Serialize(once)[1..^1];
-            text = text.Replace(twice, placeholder).Replace(once, placeholder).Replace(path, placeholder);
+            text = text.Replace(twice, placeholder)
+                .Replace(once, placeholder)
+                .Replace(path, placeholder);
         }
-        text = Guid().Replace(text, match =>
-        {
-            string key = match.Value.ToLowerInvariant();
-            if (!guids.TryGetValue(key, out string? name))
-            {
-                name = $"<g{guids.Count + 1}>";
-                guids[key] = name;
-            }
-            return name;
-        });
+        text = Guid()
+            .Replace(
+                text,
+                match =>
+                {
+                    string key = match.Value.ToLowerInvariant();
+                    if (!guids.TryGetValue(key, out string? name))
+                    {
+                        name = $"<g{guids.Count + 1}>";
+                        guids[key] = name;
+                    }
+                    return name;
+                }
+            );
         text = Instant().Replace(text, "<date>");
         return text.Replace(@"\\r\\n", @"\\n").Replace(@"\r\n", @"\n");
     }

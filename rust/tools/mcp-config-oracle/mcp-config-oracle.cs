@@ -20,7 +20,11 @@ JsonNode Outcome(Func<object?> run)
         return result switch
         {
             null => new JsonObject { ["null"] = true },
-            byte[] bytes when bytes.Length > 4096 => new JsonObject { ["sha256"] = Hex(System.Security.Cryptography.SHA256.HashData(bytes)), ["length"] = bytes.Length },
+            byte[] bytes when bytes.Length > 4096 => new JsonObject
+            {
+                ["sha256"] = Hex(System.Security.Cryptography.SHA256.HashData(bytes)),
+                ["length"] = bytes.Length,
+            },
             byte[] bytes => new JsonObject { ["bytes"] = Hex(bytes) },
             bool flag => new JsonObject { ["object"] = flag },
             _ => throw new InvalidOperationException("unexpected"),
@@ -98,10 +102,22 @@ Text("bad_number", "{\"a\": 1.}");
 Text("control_char", "{\"a\": \"x\u0001y\"}");
 Text("bad_escape", "{\"a\": \"\\q\"}");
 Text("bad_hex", "{\"a\": \"\\u12G4\"}");
-Text("only_entry", "{\"mcpServers\": {\"sermofur\": {\"type\": \"stdio\", \"command\": \"smf\", \"args\": [\"mcp\", \"serve\"]}}}");
-Text("entry_same_reordered", "{\"mcpServers\": {\"sermofur\": {\"args\": [\"mcp\", \"serve\"], \"command\": \"smf\", \"type\": \"stdio\"}}}");
-Text("entry_extra_key", "{\"mcpServers\": {\"sermofur\": {\"type\": \"stdio\", \"command\": \"smf\", \"args\": [\"mcp\", \"serve\"], \"env\": {}}}}");
-Text("entry_escaped_value", "{\"mcpServers\": {\"sermofur\": {\"type\": \"\\u0073tdio\", \"command\": \"smf\", \"args\": [\"mcp\", \"serve\"]}}}");
+Text(
+    "only_entry",
+    "{\"mcpServers\": {\"sermofur\": {\"type\": \"stdio\", \"command\": \"smf\", \"args\": [\"mcp\", \"serve\"]}}}"
+);
+Text(
+    "entry_same_reordered",
+    "{\"mcpServers\": {\"sermofur\": {\"args\": [\"mcp\", \"serve\"], \"command\": \"smf\", \"type\": \"stdio\"}}}"
+);
+Text(
+    "entry_extra_key",
+    "{\"mcpServers\": {\"sermofur\": {\"type\": \"stdio\", \"command\": \"smf\", \"args\": [\"mcp\", \"serve\"], \"env\": {}}}}"
+);
+Text(
+    "entry_escaped_value",
+    "{\"mcpServers\": {\"sermofur\": {\"type\": \"\\u0073tdio\", \"command\": \"smf\", \"args\": [\"mcp\", \"serve\"]}}}"
+);
 Text("entry_number", "{\"mcpServers\": {\"sermofur\": 1}}");
 Text("entry_array", "{\"mcpServers\": {\"sermofur\": [1, {\"a\": 2}]}}");
 Text("entry_null", "{\"mcpServers\": {\"sermofur\": null}}");
@@ -113,20 +129,35 @@ Text("entry_escaped_name", "{\"mcpServers\": {\"\\u0073ermofur\": {}}}");
 Text("servers_escaped_name", "{\"mcp\\u0053ervers\": {\"a\": 1}}");
 Text("entry_twice", "{\"mcpServers\": {\"sermofur\": 1, \"a\": 2, \"sermofur\": 3}}");
 Text("servers_twice", "{\"mcpServers\": {\"sermofur\": 1}, \"x\": 0, \"mcpServers\": {\"a\": 2}}");
-Text("servers_twice_second_entry", "{\"mcpServers\": {\"a\": 1}, \"mcpServers\": {\"sermofur\": 2}}");
-Text("entry_duplicate_key", "{\"mcpServers\": {\"sermofur\": {\"type\": \"stdio\", \"type\": \"stdio\", \"command\": \"smf\", \"args\": [\"mcp\", \"serve\"]}}}");
+Text(
+    "servers_twice_second_entry",
+    "{\"mcpServers\": {\"a\": 1}, \"mcpServers\": {\"sermofur\": 2}}"
+);
+Text(
+    "entry_duplicate_key",
+    "{\"mcpServers\": {\"sermofur\": {\"type\": \"stdio\", \"type\": \"stdio\", \"command\": \"smf\", \"args\": [\"mcp\", \"serve\"]}}}"
+);
 Text("entry_lone_surrogate", "{\"mcpServers\": {\"sermofur\": {\"command\": \"\\ud800\"}}}");
 Text("name_lone_surrogate", "{\"mcpServers\": {\"\\ud800\": 1}}");
 Text("other_lone_surrogate", "{\"mcpServers\": {\"a\": \"\\udc00\"}}");
 Raw("invalid_utf8_other", [.. Utf8("{\"mcpServers\": {\"a\": \""), 0xFF, .. Utf8("\"}}")]);
-Raw("invalid_utf8_entry", [.. Utf8("{\"mcpServers\": {\"sermofur\": {\"command\": \""), 0xC3, .. Utf8("\"}}}")]);
+Raw(
+    "invalid_utf8_entry",
+    [.. Utf8("{\"mcpServers\": {\"sermofur\": {\"command\": \""), 0xC3, .. Utf8("\"}}}")]
+);
 Raw("invalid_utf8_name", [.. Utf8("{\"mcpServers\": {\""), 0xFE, .. Utf8("\": 1}}")]);
 Text("unicode_others", "{\"mcpServers\": {\"été\": {\"command\": \"😀\"}}, \"z\": \"\u2028\"}");
 Text("depth_64", "{\"a\": " + new string('[', 62) + new string(']', 62) + "}");
 Text("depth_65", "{\"a\": " + new string('[', 63) + new string(']', 63) + "}");
-Text("entry_depth_64", "{\"mcpServers\": {\"sermofur\": " + new string('[', 61) + new string(']', 61) + "}}");
+Text(
+    "entry_depth_64",
+    "{\"mcpServers\": {\"sermofur\": " + new string('[', 61) + new string(']', 61) + "}}"
+);
 Text("depth_65_real", "{\"a\": " + new string('[', 64) + new string(']', 64) + "}");
-Text("entry_depth_65", "{\"mcpServers\": {\"sermofur\": " + new string('[', 63) + new string(']', 63) + "}}");
+Text(
+    "entry_depth_65",
+    "{\"mcpServers\": {\"sermofur\": " + new string('[', 63) + new string(']', 63) + "}}"
+);
 Text("servers_array_broken", "{\"mcpServers\": [}");
 Text("array_broken", "[1,}");
 Text("skipped_broken", "{\"a\": [}");
@@ -137,15 +168,39 @@ Text("servers_number_letter", "{\"mcpServers\": 1x}");
 Text("servers_true_letter", "{\"mcpServers\": truex}");
 Text("root_null_letter", "nullx");
 Text("root_true_letter", "truex");
-Text("entry3_lone_command", "{\"mcpServers\": {\"sermofur\": {\"type\": \"stdio\", \"command\": \"\ud800\", \"args\": []}}}");
-Text("entry3_lone_name", "{\"mcpServers\": {\"sermofur\": {\"type\": \"stdio\", \"\ud800\": \"smf\", \"args\": []}}}");
-Text("entry3_lone_type_first", "{\"mcpServers\": {\"sermofur\": {\"type\": \"\udc00\", \"command\": \"smf\", \"args\": [\"mcp\", \"serve\"]}}}");
-Raw("entry3_invalid_utf8_command", [.. Utf8("{\"mcpServers\": {\"sermofur\": {\"type\": \"stdio\", \"command\": \""), 0xC3, .. Utf8("\", \"args\": []}}}")]);
-Raw("entry3_invalid_utf8_name", [.. Utf8("{\"mcpServers\": {\"sermofur\": {\"type\": \"stdio\", \""), 0xFF, .. Utf8("\": \"smf\", \"args\": []}}}")]);
+Text(
+    "entry3_lone_command",
+    "{\"mcpServers\": {\"sermofur\": {\"type\": \"stdio\", \"command\": \"\ud800\", \"args\": []}}}"
+);
+Text(
+    "entry3_lone_name",
+    "{\"mcpServers\": {\"sermofur\": {\"type\": \"stdio\", \"\ud800\": \"smf\", \"args\": []}}}"
+);
+Text(
+    "entry3_lone_type_first",
+    "{\"mcpServers\": {\"sermofur\": {\"type\": \"\udc00\", \"command\": \"smf\", \"args\": [\"mcp\", \"serve\"]}}}"
+);
+Raw(
+    "entry3_invalid_utf8_command",
+    [
+        .. Utf8("{\"mcpServers\": {\"sermofur\": {\"type\": \"stdio\", \"command\": \""),
+        0xC3,
+        .. Utf8("\", \"args\": []}}}"),
+    ]
+);
+Raw(
+    "entry3_invalid_utf8_name",
+    [
+        .. Utf8("{\"mcpServers\": {\"sermofur\": {\"type\": \"stdio\", \""),
+        0xFF,
+        .. Utf8("\": \"smf\", \"args\": []}}}"),
+    ]
+);
 Text("tabs_layout", "{\t\"mcpServers\"\t:\t{\t\"a\"\t:\t1\t}\t}");
 Text("no_space_layout", "{\"mcpServers\":{\"a\":1},\"b\":2}");
 Raw("too_large", Utf8("{\"a\": \"" + new string('x', 1024 * 1024) + "\"}"));
 Raw("exactly_limit", Utf8("{\"a\":\"" + new string('x', 1024 * 1024 - 8) + "\"}"));
+
 // Shapes of the FsCheck property: generated servers, compact or indented.
 Random random = new Random(20261116);
 for (int index = 0; index < 40; index++)
@@ -154,7 +209,9 @@ for (int index = 0; index < 40; index++)
     int count = random.Next(0, 5);
     for (int k = 0; k < count; k++)
     {
-        string key = new string([.. Enumerable.Range(0, random.Next(1, 6)).Select(_ => (char)random.Next(0x20, 0x250))]);
+        string key = new string([
+            .. Enumerable.Range(0, random.Next(1, 6)).Select(_ => (char)random.Next(0x20, 0x250)),
+        ]);
         if (key != "sermofur" && !servers.ContainsKey(key))
         {
             servers[key] = new JsonObject { ["command"] = key };
@@ -172,32 +229,48 @@ foreach ((string name, byte[] content) in cases)
     JsonArray withEntry = [];
     foreach ((string command, string[] arguments) in entries)
     {
-        withEntry.Add(Outcome(() => McpConfigFile.WithEntry(content, McpConfigFile.Entry(command, arguments))));
+        withEntry.Add(
+            Outcome(() => McpConfigFile.WithEntry(content, McpConfigFile.Entry(command, arguments)))
+        );
     }
-    results.Add(new JsonObject
-    {
-        ["name"] = name,
-        ["content"] = content.Length > 4096 ? null : Hex(content),
-        ["withEntry"] = withEntry,
-        ["withoutEntry"] = Outcome(() => McpConfigFile.WithoutEntry(content)),
-        ["currentEntry"] = Outcome(() => McpConfigFile.CurrentEntry(content) is not null),
-    });
+    results.Add(
+        new JsonObject
+        {
+            ["name"] = name,
+            ["content"] = content.Length > 4096 ? null : Hex(content),
+            ["withEntry"] = withEntry,
+            ["withoutEntry"] = Outcome(() => McpConfigFile.WithoutEntry(content)),
+            ["currentEntry"] = Outcome(() => McpConfigFile.CurrentEntry(content) is not null),
+        }
+    );
 }
 JsonArray absent = [];
 foreach ((string command, string[] arguments) in entries)
 {
-    absent.Add(Outcome(() => McpConfigFile.WithEntry(null, McpConfigFile.Entry(command, arguments))));
+    absent.Add(
+        Outcome(() => McpConfigFile.WithEntry(null, McpConfigFile.Entry(command, arguments)))
+    );
 }
 JsonObject document = new JsonObject
 {
     ["runtime"] = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription,
-    ["entries"] = new JsonArray([.. entries.Select(e => (JsonNode)new JsonObject
-    {
-        ["command"] = e.Command,
-        ["args"] = new JsonArray([.. e.Arguments.Select(a => (JsonNode)JsonValue.Create(a))]),
-    })]),
+    ["entries"] = new JsonArray([
+        .. entries.Select(e =>
+            (JsonNode)
+                new JsonObject
+                {
+                    ["command"] = e.Command,
+                    ["args"] = new JsonArray([
+                        .. e.Arguments.Select(a => (JsonNode)JsonValue.Create(a)),
+                    ]),
+                }
+        ),
+    ]),
     ["absent"] = absent,
     ["cases"] = results,
 };
-File.WriteAllText(args[0], document.ToJsonString(new JsonSerializerOptions { WriteIndented = true }) + "\n");
+File.WriteAllText(
+    args[0],
+    document.ToJsonString(new JsonSerializerOptions { WriteIndented = true }) + "\n"
+);
 Console.WriteLine($"{results.Count} cases");

@@ -20,9 +20,18 @@ string scratch = Path.Combine(
     Path.GetTempPath(),
     "sermofur-services-oracle-" + Guid.NewGuid().ToString("N")
 );
-DaemonPaths paths = new DaemonPaths(scratch, Path.Combine(scratch, "state"), Path.Combine(scratch, "s"));
+DaemonPaths paths = new DaemonPaths(
+    scratch,
+    Path.Combine(scratch, "state"),
+    Path.Combine(scratch, "s")
+);
 
-ServiceDefinition Def(string executable, string[] arguments, string version, params string[][] environment)
+ServiceDefinition Def(
+    string executable,
+    string[] arguments,
+    string version,
+    params string[][] environment
+)
 {
     Dictionary<string, string> variables = [];
     foreach (string[] pair in environment)
@@ -59,11 +68,24 @@ string? Code(Action action)
 
 ServiceDefinition[] definitions =
 [
-    Def("/opt/tools/smf", ["daemon", "run", "a b", "100%", "q\"uote"], "0.4.0", ["PATH", "/usr/bin:/bin"], ["DOTNET_ROOT", "/opt/dotnet & co"]),
+    Def(
+        "/opt/tools/smf",
+        ["daemon", "run", "a b", "100%", "q\"uote"],
+        "0.4.0",
+        ["PATH", "/usr/bin:/bin"],
+        ["DOTNET_ROOT", "/opt/dotnet & co"]
+    ),
     Def("/home/a$b/smf", ["daemon", "run"], "0.4.0", ["DOTNET_ROOT", "/opt/$dotnet"]),
     Def("/home/a$b/smf", ["daemon", "run"], "0.4.0", ["PATH", "/bin\nExecStartPre=/x"]),
     Def(@"C:\Users\Jérôme\.dotnet\tools\smf.exe", ["daemon", "run", "--supervise"], "0.4.0"),
-    Def(@"C:\a b\smf.exe", ["daemon", "run", "", "x\\\"y", "tab\there", "<&>'", "end\\"], "1.0.0-rc.1+a<b>", ["SERMOFUR_DAEMON_HOME", "/h'o\"me"], ["Z", "é\u0001%"], ["A", "1"]),
+    Def(
+        @"C:\a b\smf.exe",
+        ["daemon", "run", "", "x\\\"y", "tab\there", "<&>'", "end\\"],
+        "1.0.0-rc.1+a<b>",
+        ["SERMOFUR_DAEMON_HOME", "/h'o\"me"],
+        ["Z", "é\u0001%"],
+        ["A", "1"]
+    ),
     Def("/opt/smf", ["daemon", "run"], "0.4.0", ["PATH", "/a\0b"]),
     Def("/opt/s\rmf", ["daemon", "run"], "0.4.0"),
     Def("/opt/smf", ["daemon", "run"], "0.4.0"),
@@ -81,7 +103,9 @@ foreach (ServiceDefinition definition in definitions)
     entry["unitError"] = unitError;
     entry["plist"] = LaunchAgentService.Plist(definition, "/logs");
     entry["taskXml"] = WindowsScheduledTask.TaskXml(definition, users[index++ % users.Length]);
-    entry["serviceJson"] = Convert.ToBase64String(File.ReadAllBytes(InstalledDefinition.File(paths)));
+    entry["serviceJson"] = Convert.ToBase64String(
+        File.ReadAllBytes(InstalledDefinition.File(paths))
+    );
     described.Add(entry);
 }
 InstalledDefinition.Delete(paths);
@@ -90,10 +114,35 @@ MethodInfo quoteArgument = typeof(WindowsScheduledTask).GetMethod(
     "QuoteArgument",
     BindingFlags.NonPublic | BindingFlags.Static
 )!;
-string[] quoted = ["", "a", "a b", @"C:\a b\", "q\"uote", "a\\\\\"b", @"\\", "tab\there", @"x\", "\"", "a\\b c", "--supervise"];
-JsonArray quotes = [.. quoted.Select(text => (JsonNode)new JsonArray(text, (string)quoteArgument.Invoke(null, [text])!))];
+string[] quoted =
+[
+    "",
+    "a",
+    "a b",
+    @"C:\a b\",
+    "q\"uote",
+    "a\\\\\"b",
+    @"\\",
+    "tab\there",
+    @"x\",
+    "\"",
+    "a\\b c",
+    "--supervise",
+];
+JsonArray quotes =
+[
+    .. quoted.Select(text =>
+        (JsonNode)new JsonArray(text, (string)quoteArgument.Invoke(null, [text])!)
+    ),
+];
 
-ServiceDefinition baseline = Def("/opt/smf", ["daemon", "run"], "0.4.0", ["PATH", "/a"], ["DOTNET_ROOT", "/d"]);
+ServiceDefinition baseline = Def(
+    "/opt/smf",
+    ["daemon", "run"],
+    "0.4.0",
+    ["PATH", "/a"],
+    ["DOTNET_ROOT", "/d"]
+);
 ServiceDefinition?[] others =
 [
     Def("/opt/smf", ["daemon", "run"], "0.4.0", ["PATH", "/b"], ["DOTNET_ROOT", "/d"]),
@@ -103,24 +152,65 @@ ServiceDefinition?[] others =
     Def("/opt/smf", ["daemon", "run"], "0.4.0", ["DOTNET_ROOT", "/d"], ["X", "1"]),
     Def("/opt/smf", ["daemon", "run"], "0.4.1", ["PATH", "/a"], ["DOTNET_ROOT", "/d"]),
     Def("/opt/smf2", ["daemon", "run"], "0.4.0", ["PATH", "/a"], ["DOTNET_ROOT", "/d"]),
-    Def("/opt/smf", ["daemon", "run", "--supervise"], "0.4.0", ["PATH", "/a"], ["DOTNET_ROOT", "/d"]),
+    Def(
+        "/opt/smf",
+        ["daemon", "run", "--supervise"],
+        "0.4.0",
+        ["PATH", "/a"],
+        ["DOTNET_ROOT", "/d"]
+    ),
     Def("/opt/smf", ["daemon", "run"], "0.4.0", ["DOTNET_ROOT", "/D"]),
 ];
 JsonArray same = [];
 foreach (ServiceDefinition? other in others)
 {
-    same.Add(new JsonObject { ["left"] = Describe(baseline), ["right"] = Describe(other!), ["same"] = ServiceManagers.Same(baseline, other!) });
-    same.Add(new JsonObject { ["left"] = Describe(other!), ["right"] = Describe(baseline), ["same"] = ServiceManagers.Same(other, baseline) });
+    same.Add(
+        new JsonObject
+        {
+            ["left"] = Describe(baseline),
+            ["right"] = Describe(other!),
+            ["same"] = ServiceManagers.Same(baseline, other!),
+        }
+    );
+    same.Add(
+        new JsonObject
+        {
+            ["left"] = Describe(other!),
+            ["right"] = Describe(baseline),
+            ["same"] = ServiceManagers.Same(other, baseline),
+        }
+    );
 }
 
 string[][][] environments =
 [
-    [["PATH", "/usr/bin:rel:/bin"], ["DOTNET_ROOT", "/d"]],
-    [["PATH", @"C:\a;rel;D:\b;;"], ["DOTNET_ROOT", @"C:\dotnet"]],
-    [["PATH", "rel:other"], ["DOTNET_ROOT", "relative"], ["SERMOFUR_DAEMON_HOME", "/home"]],
-    [["SERMOFUR_DAEMON_HOME", @"C:\home"], ["path", "/x"], ["UNKNOWN", "/y"], ["PATH", ""]],
-    [["PATH", "::"], ["DOTNET_ROOT", ""], ["HOME", "/root"]],
-    [["PATH", @"\\server\share;C:rel;\rooted"]],
+    [
+        ["PATH", "/usr/bin:rel:/bin"],
+        ["DOTNET_ROOT", "/d"],
+    ],
+    [
+        ["PATH", @"C:\a;rel;D:\b;;"],
+        ["DOTNET_ROOT", @"C:\dotnet"],
+    ],
+    [
+        ["PATH", "rel:other"],
+        ["DOTNET_ROOT", "relative"],
+        ["SERMOFUR_DAEMON_HOME", "/home"],
+    ],
+    [
+        ["SERMOFUR_DAEMON_HOME", @"C:\home"],
+        ["path", "/x"],
+        ["UNKNOWN", "/y"],
+        ["PATH", ""],
+    ],
+    [
+        ["PATH", "::"],
+        ["DOTNET_ROOT", ""],
+        ["HOME", "/root"],
+    ],
+    [
+        ["PATH", @"\\server\share;C:rel;\rooted"],
+    ],
 ];
 JsonArray carried = [];
 foreach (string[][] environment in environments)
@@ -129,13 +219,17 @@ foreach (string[][] environment in environments)
     List<string> narrowed = [];
     IReadOnlyDictionary<string, string> kept = Def("/opt/smf", ["daemon", "run"], "1", environment)
         .CarriedEnvironment(dropped.Add, narrowed.Add);
-    carried.Add(new JsonObject
-    {
-        ["environment"] = new JsonArray([.. environment.Select(pair => (JsonNode)new JsonArray(pair[0], pair[1]))]),
-        ["carried"] = Pairs(kept),
-        ["dropped"] = new JsonArray([.. dropped.Select(name => (JsonNode)name)]),
-        ["narrowed"] = new JsonArray([.. narrowed.Select(name => (JsonNode)name)]),
-    });
+    carried.Add(
+        new JsonObject
+        {
+            ["environment"] = new JsonArray([
+                .. environment.Select(pair => (JsonNode)new JsonArray(pair[0], pair[1])),
+            ]),
+            ["carried"] = Pairs(kept),
+            ["dropped"] = new JsonArray([.. dropped.Select(name => (JsonNode)name)]),
+            ["narrowed"] = new JsonArray([.. narrowed.Select(name => (JsonNode)name)]),
+        }
+    );
 }
 
 string exe = @"C:\\smf.exe";
@@ -167,8 +261,16 @@ List<byte[]> files =
         $"{{\"executable\":\"{exe}\",{run},\"version\":1}}",
         $"{{\"executable\":\"{exe}\",{run},\"version\":\"1\",\"environment\":{{\"PATH\":\"/a\",\"B\":null,\"DOTNET_ROOT\":\"/d\",\"PATH\":\"/b\"}}}}",
     }.Select(Encoding.UTF8.GetBytes),
-    [.. "{\"executable\":\"x"u8, 0xFF, .. "\",\"arguments\":[\"daemon\",\"run\"],\"version\":\"1\"}"u8],
-    [.. "{\"executable\":\"x\",\"arguments\":[\"daemon\",\"run\"],\"version\":\"1\",\"z\":\""u8, 0xFF, .. "\"}"u8],
+    [
+        .. "{\"executable\":\"x"u8,
+        0xFF,
+        .. "\",\"arguments\":[\"daemon\",\"run\"],\"version\":\"1\"}"u8,
+    ],
+    [
+        .. "{\"executable\":\"x\",\"arguments\":[\"daemon\",\"run\"],\"version\":\"1\",\"z\":\""u8,
+        0xFF,
+        .. "\"}"u8,
+    ],
 ];
 JsonArray reads = [];
 Directory.CreateDirectory(paths.StateDirectory);
@@ -184,7 +286,9 @@ foreach (byte[] content in files)
             ["executable"] = read.Executable,
             ["arguments"] = new JsonArray([.. read.Arguments.Select(a => (JsonNode?)a)]),
             ["version"] = read.Version,
-            ["environment"] = new JsonArray([.. read.Environment.Select(pair => (JsonNode)new JsonArray(pair.Key, pair.Value))]),
+            ["environment"] = new JsonArray([
+                .. read.Environment.Select(pair => (JsonNode)new JsonArray(pair.Key, pair.Value)),
+            ]),
         };
     }
     else
@@ -204,5 +308,10 @@ JsonObject golden = new JsonObject
     ["carried"] = carried,
     ["reads"] = reads,
 };
-File.WriteAllText(args[0], golden.ToJsonString(new JsonSerializerOptions { WriteIndented = true }) + "\n");
-Console.WriteLine($"{described.Count} definitions, {quotes.Count} quotes, {same.Count} comparisons, {carried.Count} environments, {reads.Count} reads");
+File.WriteAllText(
+    args[0],
+    golden.ToJsonString(new JsonSerializerOptions { WriteIndented = true }) + "\n"
+);
+Console.WriteLine(
+    $"{described.Count} definitions, {quotes.Count} quotes, {same.Count} comparisons, {carried.Count} environments, {reads.Count} reads"
+);

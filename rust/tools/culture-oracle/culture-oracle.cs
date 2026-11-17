@@ -41,18 +41,41 @@ foreach (CultureInfo culture in CultureInfo.GetCultures(CultureTypes.AllCultures
 }
 
 DateTimeOffset instant = new DateTimeOffset(2026, 11, 9, 10, 11, 12, 345, TimeSpan.FromMinutes(90));
-string scratch = Path.Combine(Path.GetTempPath(), "sermofur-culture-oracle-" + Guid.NewGuid().ToString("N"));
+string scratch = Path.Combine(
+    Path.GetTempPath(),
+    "sermofur-culture-oracle-" + Guid.NewGuid().ToString("N")
+);
 Directory.CreateDirectory(scratch);
 string root = Path.Combine(scratch, "instance");
 Directory.CreateDirectory(root);
 new InstanceManager().Initialize(root);
 
 JsonObject Bytes(string text) =>
-    new JsonObject { ["text"] = text, ["utf8"] = Convert.ToHexString(Encoding.UTF8.GetBytes(text)) };
+    new JsonObject
+    {
+        ["text"] = text,
+        ["utf8"] = Convert.ToHexString(Encoding.UTF8.GetBytes(text)),
+    };
 
 JsonArray cultures = [];
-List<string> names = ["", "en-US", "fr-FR", "th-TH", "fi-FI", "fa-IR", "ar-SA", "ja-JP-u-ca-japanese", "he-IL"];
-names.AddRange(separators.Select(entry => entry!["culture"]!.GetValue<string>()).Where(name => name != "").Take(5));
+List<string> names =
+[
+    "",
+    "en-US",
+    "fr-FR",
+    "th-TH",
+    "fi-FI",
+    "fa-IR",
+    "ar-SA",
+    "ja-JP-u-ca-japanese",
+    "he-IL",
+];
+names.AddRange(
+    separators
+        .Select(entry => entry!["culture"]!.GetValue<string>())
+        .Where(name => name != "")
+        .Take(5)
+);
 foreach (string name in names.Distinct())
 {
     JsonObject entry = new JsonObject { ["culture"] = name };
@@ -95,11 +118,13 @@ File.WriteAllText(
         ["instant"] = "2026-11-09T10:11:12.345+01:30",
         ["cultures"] = cultures,
         ["time_separators"] = separators,
-    }.ToJsonString(
-        new JsonSerializerOptions
-        {
-            WriteIndented = true,
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        }
-    ).Replace("\r\n", "\n") + "\n"
+    }
+        .ToJsonString(
+            new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            }
+        )
+        .Replace("\r\n", "\n") + "\n"
 );

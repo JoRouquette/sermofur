@@ -80,22 +80,35 @@ Case("existing_no_final", Existing);
 Case("existing_crlf", Crlf(Existing + "\n"));
 Case("existing_installed", Existing + "\n\n" + Ours);
 Case("existing_installed_crlf", Crlf(Existing + "\n\n" + Ours));
-Case("middle", "[a]\nx = 1\n\n[mcp_servers.sermofur]\ncommand = 'old'\n\n[mcp_servers.sermofur.env]\nK = 'v'\n\n[b]\ny = 2\n");
-Case("middle_approval", "[a]\nx = 1\n\n[mcp_servers.sermofur]\ncommand = 'smf'\nargs = ['mcp', 'serve']\ndefault_tools_approval_mode = \"writes\"\n\n[mcp_servers.sermofur.env]\nK = 'v'\n\n[b]\ny = 2\n");
+Case(
+    "middle",
+    "[a]\nx = 1\n\n[mcp_servers.sermofur]\ncommand = 'old'\n\n[mcp_servers.sermofur.env]\nK = 'v'\n\n[b]\ny = 2\n"
+);
+Case(
+    "middle_approval",
+    "[a]\nx = 1\n\n[mcp_servers.sermofur]\ncommand = 'smf'\nargs = ['mcp', 'serve']\ndefault_tools_approval_mode = \"writes\"\n\n[mcp_servers.sermofur.env]\nK = 'v'\n\n[b]\ny = 2\n"
+);
 Case("args_multiline", "[mcp_servers.sermofur]\nargs = [\n  'x',\n]\n");
 Case("model_crlf", "model = \"x\"\r\n");
 Case("unsafe_inline_table", "[mcp_servers]\nsermofur = { command = \"smf\" }\n");
 Case("unsafe_dotted_key", "mcp_servers.sermofur.command = \"smf\"\n");
 Case("unsafe_root_inline", "mcp_servers = { sermofur = { command = \"smf\" } }\n");
 Case("unsafe_unclosed", "notes = \"\"\"\nnever closed\n");
-Case("unsafe_twice", "[mcp_servers.sermofur]\ncommand = 'a'\n[mcp_servers.sermofur]\ncommand = 'b'\n");
+Case(
+    "unsafe_twice",
+    "[mcp_servers.sermofur]\ncommand = 'a'\n[mcp_servers.sermofur]\ncommand = 'b'\n"
+);
 Case("array_values", "matrix = [\n  [\"a\", \"b\"],\n  [\"c\"]\n]\n");
 foreach (string nl in new[] { "\n", "\r\n" })
 {
     string suffix = nl == "\n" ? "lf" : "crlf";
-    Case($"comments_above_{suffix}", $"[a]{nl}x = 1{nl}{nl}[mcp_servers.sermofur]{nl}# ours{nl}command = 'smf'{nl}args = ['mcp', 'serve']{nl}{nl}# docs server{nl}# second line{nl}[mcp_servers.docs]{nl}command = 'd'{nl}");
+    Case(
+        $"comments_above_{suffix}",
+        $"[a]{nl}x = 1{nl}{nl}[mcp_servers.sermofur]{nl}# ours{nl}command = 'smf'{nl}args = ['mcp', 'serve']{nl}{nl}# docs server{nl}# second line{nl}[mcp_servers.docs]{nl}command = 'd'{nl}"
+    );
 }
 Case("no_final_newline", "a = 1");
+
 // Edges.
 Case("empty", "");
 Case("lf_only", "\n");
@@ -119,7 +132,10 @@ Case("ours_only_args", "[mcp_servers.sermofur]\nargs = ['mcp', 'serve']\n");
 Case("ours_command_twice", "[mcp_servers.sermofur]\ncommand = 'a'\ncommand = 'b'\nargs = []\n");
 Case("ours_comment_header", "[mcp_servers.sermofur]  # ours\ncommand = 'smf'\n");
 Case("ours_spaced_header", "  [ mcp_servers . sermofur ]  \ncommand = 'smf'\n");
-Case("ours_quoted_header", "[\"mcp_servers\".'sermofur']\ncommand = 'smf'\nargs = ['mcp', 'serve']\n");
+Case(
+    "ours_quoted_header",
+    "[\"mcp_servers\".'sermofur']\ncommand = 'smf'\nargs = ['mcp', 'serve']\n"
+);
 Case("ours_unicode_spaces", "[\u00a0mcp_servers\u3000.sermofur\u2028]\u2009# c\ncommand = 'smf'\n");
 Case("ours_array_header", "[[mcp_servers.sermofur]]\ncommand = 'smf'\n");
 Case("ours_half_array", "[[mcp_servers.sermofur]\ncommand = 'smf'\n");
@@ -129,9 +145,18 @@ Case("ours_mixed_newlines", "a = 1\nb = 2\r\n[mcp_servers.sermofur]\ncommand = '
 Case("ours_double_cr", "[mcp_servers.sermofur]\r\r\ncommand = 'old'\r\r\n");
 Case("ours_cr_in_line", "x = 1\r2\n[mcp_servers.sermofur]\ncommand = 'x'\r\r\nargs = []\n");
 Case("ours_sub_only", "[mcp_servers.sermofur.env]\nK = 1\n");
-Case("ours_sub_before", "[mcp_servers.sermofur.env]\nK = 1\n\n[mcp_servers.sermofur]\ncommand = 'smf'\n");
-Case("ours_sub_and_next", "[mcp_servers.sermofur]\ncommand = 'old'\n[mcp_servers.sermofur.env]\nK = 1\n# about b\n\n# about b too\n[b]\n");
-Case("ours_command_in_sub", "[mcp_servers.sermofur]\n[mcp_servers.sermofur.env]\ncommand = 'x'\nargs = [\n");
+Case(
+    "ours_sub_before",
+    "[mcp_servers.sermofur.env]\nK = 1\n\n[mcp_servers.sermofur]\ncommand = 'smf'\n"
+);
+Case(
+    "ours_sub_and_next",
+    "[mcp_servers.sermofur]\ncommand = 'old'\n[mcp_servers.sermofur.env]\nK = 1\n# about b\n\n# about b too\n[b]\n"
+);
+Case(
+    "ours_command_in_sub",
+    "[mcp_servers.sermofur]\n[mcp_servers.sermofur.env]\ncommand = 'x'\nargs = [\n"
+);
 Case("ours_comment_last", "[mcp_servers.sermofur]\ncommand = 'smf'\n# trailing\n");
 Case("ours_comment_then_table", "[mcp_servers.sermofur]\ncommand = 'smf'\n\n# c1\n\n# c2\n[z]\n");
 Case("ours_indented_comment", "[mcp_servers.sermofur]\ncommand = 'smf'\n  # c\n[z]\n");
@@ -151,35 +176,60 @@ Case("hash_in_string", "s = \"#\"\"\"\n[x]\n");
 Case("unclosed_literal", "s = '''\n[mcp_servers.sermofur]\n");
 Case("unicode_text", "été = '😀'\n[mcp_servers.sermofur]\ncommand = 'é\\\\'\n");
 Case("escaped_backslash_unicode", "s = \"\\é\"\"\"\nx\n\"\"\"\n");
-Case("table_then_ours_no_blank", "[a]\nx = 1\n[mcp_servers.sermofur]\ncommand = 'smf'\nargs = ['mcp', 'serve']\n");
+Case(
+    "table_then_ours_no_blank",
+    "[a]\nx = 1\n[mcp_servers.sermofur]\ncommand = 'smf'\nargs = ['mcp', 'serve']\n"
+);
+
 // A launch value in a multi-line string (lot 8.4): WithLaunchLines replaces its first line and
 // leaves the rest; each output is recorded again as a case, so Declares on it is measured too.
-foreach ((string name, string content) in new[]
-{
-    ("multiline_command", "[mcp_servers.sermofur]\ncommand=\"\"\"\n\"\"\""),
-    ("multiline_command_literal", "[mcp_servers.sermofur]\ncommand = '''\nsmf\n'''\nargs = ['mcp', 'serve']\n"),
-    ("multiline_args", "[mcp_servers.sermofur]\ncommand = 'smf'\nargs = [\"\"\"\nmcp\"\"\", 'serve']\n"),
-    ("multiline_args_string", "[mcp_servers.sermofur]\ncommand = 'smf'\nargs = '''\nmcp serve\n'''\n"),
-})
+foreach (
+    (string name, string content) in new[]
+    {
+        ("multiline_command", "[mcp_servers.sermofur]\ncommand=\"\"\"\n\"\"\""),
+        (
+            "multiline_command_literal",
+            "[mcp_servers.sermofur]\ncommand = '''\nsmf\n'''\nargs = ['mcp', 'serve']\n"
+        ),
+        (
+            "multiline_args",
+            "[mcp_servers.sermofur]\ncommand = 'smf'\nargs = [\"\"\"\nmcp\"\"\", 'serve']\n"
+        ),
+        (
+            "multiline_args_string",
+            "[mcp_servers.sermofur]\ncommand = 'smf'\nargs = '''\nmcp serve\n'''\n"
+        ),
+    }
+)
 {
     Case(name, content);
     try
     {
-        Case(name + "_installed", CodexConfigFile.WithBlock(content, entries[0].Command, entries[0].Arguments) ?? "");
+        Case(
+            name + "_installed",
+            CodexConfigFile.WithBlock(content, entries[0].Command, entries[0].Arguments) ?? ""
+        );
     }
     catch (SermofurException)
     {
         // Refused: the case above records it.
     }
 }
+
 // Shapes of the FsCheck properties.
 string Tables(IEnumerable<string> names, string nl, bool comments) =>
-    string.Concat(names.Select(name =>
-        (comments ? $"# server {name}{nl}" : "")
-        + $"[mcp_servers.{name}]{nl}command = '{name}'{nl}"
-        + $"[mcp_servers.{name}.env]{nl}K = '{name}'  # kept{nl}{nl}"));
+    string.Concat(
+        names.Select(name =>
+            (comments ? $"# server {name}{nl}" : "")
+            + $"[mcp_servers.{name}]{nl}command = '{name}'{nl}"
+            + $"[mcp_servers.{name}.env]{nl}K = '{name}'  # kept{nl}{nl}"
+        )
+    );
 Random random = new Random(20261116);
-string Name() => new string([.. Enumerable.Range(0, random.Next(1, 6)).Select(_ => "abcXYZ019"[random.Next(9)])]);
+string Name() =>
+    new string([
+        .. Enumerable.Range(0, random.Next(1, 6)).Select(_ => "abcXYZ019"[random.Next(9)]),
+    ]);
 for (int index = 0; index < 32; index++)
 {
     string nl = index % 2 == 0 ? "\r\n" : "\n";
@@ -191,7 +241,12 @@ for (int index = 0; index < 32; index++)
     }
     Case($"generated_{index}", content);
     string after = Tables([.. names.Reverse(), "last"], nl, true);
-    Case($"generated_middle_{index}", content + $"[mcp_servers.sermofur]{nl}command = 'smf'{nl}args = ['mcp', 'serve']{nl}{nl}[mcp_servers.sermofur.env]{nl}K = 'v'{nl}{nl}" + after);
+    Case(
+        $"generated_middle_{index}",
+        content
+            + $"[mcp_servers.sermofur]{nl}command = 'smf'{nl}args = ['mcp', 'serve']{nl}{nl}[mcp_servers.sermofur.env]{nl}K = 'v'{nl}{nl}"
+            + after
+    );
 }
 
 JsonArray results = [];
@@ -202,14 +257,16 @@ foreach ((string name, string content) in cases)
     {
         withBlock.Add(Outcome(() => CodexConfigFile.WithBlock(content, command, arguments)));
     }
-    results.Add(new JsonObject
-    {
-        ["name"] = name,
-        ["content"] = content,
-        ["withBlock"] = withBlock,
-        ["withoutBlock"] = Outcome(() => CodexConfigFile.WithoutBlock(content)),
-        ["declares"] = Outcome(() => CodexConfigFile.Declares(content)),
-    });
+    results.Add(
+        new JsonObject
+        {
+            ["name"] = name,
+            ["content"] = content,
+            ["withBlock"] = withBlock,
+            ["withoutBlock"] = Outcome(() => CodexConfigFile.WithoutBlock(content)),
+            ["declares"] = Outcome(() => CodexConfigFile.Declares(content)),
+        }
+    );
 }
 JsonArray absent = [];
 foreach ((string command, string[] arguments) in entries)
@@ -219,13 +276,23 @@ foreach ((string command, string[] arguments) in entries)
 JsonObject document = new JsonObject
 {
     ["runtime"] = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription,
-    ["entries"] = new JsonArray([.. entries.Select(e => (JsonNode)new JsonObject
-    {
-        ["command"] = e.Command,
-        ["args"] = new JsonArray([.. e.Arguments.Select(a => (JsonNode)JsonValue.Create(a))]),
-    })]),
+    ["entries"] = new JsonArray([
+        .. entries.Select(e =>
+            (JsonNode)
+                new JsonObject
+                {
+                    ["command"] = e.Command,
+                    ["args"] = new JsonArray([
+                        .. e.Arguments.Select(a => (JsonNode)JsonValue.Create(a)),
+                    ]),
+                }
+        ),
+    ]),
     ["absent"] = absent,
     ["cases"] = results,
 };
-File.WriteAllText(args[0], document.ToJsonString(new JsonSerializerOptions { WriteIndented = true }) + "\n");
+File.WriteAllText(
+    args[0],
+    document.ToJsonString(new JsonSerializerOptions { WriteIndented = true }) + "\n"
+);
 Console.WriteLine($"{results.Count} cases");

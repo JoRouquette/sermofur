@@ -26,23 +26,39 @@ string oracle =
     : Environment.GetEnvironmentVariable("SMF_ORACLE") is { Length: > 0 } variable ? variable
     : OperatingSystem.IsWindows()
         ? Path.GetFullPath(Path.Combine("..", "..", "target", "oracle", "Sermofur.Cli.exe"))
-    : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "sermofur-oracle-bin", "Sermofur.Cli");
+    : Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+        "sermofur-oracle-bin",
+        "Sermofur.Cli"
+    );
 
-Assembly cli = Assembly.LoadFrom(Path.Combine(Path.GetDirectoryName(Path.GetFullPath(oracle))!, "Sermofur.Cli.dll"));
+Assembly cli = Assembly.LoadFrom(
+    Path.Combine(Path.GetDirectoryName(Path.GetFullPath(oracle))!, "Sermofur.Cli.dll")
+);
 Type help = cli.GetType("Sermofur.Cli.CommandHelp", throwOnError: true)!;
 List<string> commands = [];
 foreach (object topic in (IEnumerable)help.GetProperty("Topics")!.GetValue(null)!)
 {
     commands.Add((string)topic.GetType().GetProperty("Command")!.GetValue(topic)!);
 }
-List<string> groups = commands.Where(c => c.Contains(' ')).Select(c => c.Split(' ')[0]).Distinct().ToList();
+List<string> groups = commands
+    .Where(c => c.Contains(' '))
+    .Select(c => c.Split(' ')[0])
+    .Distinct()
+    .ToList();
 
-string elsewhere = Path.Combine(Path.GetTempPath(), "sermofur-help-oracle-nothing-" + Guid.NewGuid().ToString("N"));
+string elsewhere = Path.Combine(
+    Path.GetTempPath(),
+    "sermofur-help-oracle-nothing-" + Guid.NewGuid().ToString("N")
+);
 JsonArray cases = [];
 
 void Case(string name, params string[] arguments)
 {
-    string folder = Path.Combine(Path.GetTempPath(), "sermofur-help-oracle-" + Guid.NewGuid().ToString("N"));
+    string folder = Path.Combine(
+        Path.GetTempPath(),
+        "sermofur-help-oracle-" + Guid.NewGuid().ToString("N")
+    );
     Directory.CreateDirectory(folder);
     ProcessStartInfo start = new(oracle)
     {
@@ -132,12 +148,14 @@ Case("empty_second_word", "claim", "", "-h");
 
 File.WriteAllText(
     output,
-    new JsonObject { ["cases"] = cases }.ToJsonString(
-        new JsonSerializerOptions
-        {
-            WriteIndented = true,
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        }
-    ).Replace("\r\n", "\n") + "\n"
+    new JsonObject { ["cases"] = cases }
+        .ToJsonString(
+            new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            }
+        )
+        .Replace("\r\n", "\n") + "\n"
 );
 Console.Error.WriteLine($"{cases.Count} cases ({commands.Count} topics, {groups.Count} groups)");

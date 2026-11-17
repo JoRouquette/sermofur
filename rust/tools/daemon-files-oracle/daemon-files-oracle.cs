@@ -114,7 +114,9 @@ void Paths(string name, Dictionary<string, string?> variables, Dictionary<string
             ["registry"] = resolved.RegistryFile,
             ["log"] = resolved.LogFile,
             ["lock"] = resolved.LockFile,
-            ["runtime"] = resolved.RuntimeDirectory is null ? null : Anonymous(resolved.RuntimeDirectory),
+            ["runtime"] = resolved.RuntimeDirectory is null
+                ? null
+                : Anonymous(resolved.RuntimeDirectory),
         };
     }
     catch (TargetInvocationException exception)
@@ -221,17 +223,9 @@ else
     // sermofur/daemon.sock adds 21 bytes: 82 bytes of runtime folder make 103, 83 make 104.
     Paths("runtime_103_bytes", new() { ["XDG_RUNTIME_DIR"] = "/" + new string('r', 81) }, home);
     Paths("runtime_104_bytes", new() { ["XDG_RUNTIME_DIR"] = "/" + new string('r', 82) }, home);
-    Paths(
-        "runtime_trailing_separator",
-        new() { ["XDG_RUNTIME_DIR"] = "/run/user/1000/" },
-        home
-    );
+    Paths("runtime_trailing_separator", new() { ["XDG_RUNTIME_DIR"] = "/run/user/1000/" }, home);
     Paths("profile_trailing_separator", [], new() { ["UserProfile"] = "/home/u/" });
-    Paths(
-        "runtime_doubled_separators",
-        new() { ["XDG_RUNTIME_DIR"] = "/run//user/1000" },
-        home
-    );
+    Paths("runtime_doubled_separators", new() { ["XDG_RUNTIME_DIR"] = "/run//user/1000" }, home);
 }
 
 JsonNode? nonUnicodeHome = null;
@@ -240,7 +234,11 @@ if (!OperatingSystem.IsWindows())
     // A home that is not UTF-8: the bytes /tmp/smf-a<FF>b, set by the shell.
     System.Diagnostics.ProcessStartInfo start = new System.Diagnostics.ProcessStartInfo(
         "/bin/bash",
-        ["-c", "SERMOFUR_DAEMON_HOME=\"$(printf '/tmp/smf-a\\377b')\" exec \"$0\" --home-probe", Environment.ProcessPath!]
+        [
+            "-c",
+            "SERMOFUR_DAEMON_HOME=\"$(printf '/tmp/smf-a\\377b')\" exec \"$0\" --home-probe",
+            Environment.ProcessPath!,
+        ]
     )
     {
         RedirectStandardOutput = true,
@@ -270,7 +268,10 @@ foreach (
 
 // ---------------------------------------------------------------- scratch folder
 string temporary = LongPath.Of(Path.GetTempPath());
-string scratch = Path.Combine(temporary, "sermofur-daemon-files-oracle-" + Guid.NewGuid().ToString("N"));
+string scratch = Path.Combine(
+    temporary,
+    "sermofur-daemon-files-oracle-" + Guid.NewGuid().ToString("N")
+);
 Directory.CreateDirectory(scratch);
 string escapedScratch = JsonEncodedText.Encode(scratch).ToString();
 
@@ -374,10 +375,11 @@ LockCase(
     folder =>
     {
         string file = Path.Combine(folder, "a", "b", "x.lock");
-        using FileStream? turn = (FileStream?)tryTake.Invoke(
-            null,
-            [file, TimeSpan.FromMilliseconds(50), TimeSpan.FromMilliseconds(10)]
-        );
+        using FileStream? turn = (FileStream?)
+            tryTake.Invoke(
+                null,
+                [file, TimeSpan.FromMilliseconds(50), TimeSpan.FromMilliseconds(10)]
+            );
         return turn is not null && File.Exists(file);
     }
 );
@@ -387,10 +389,11 @@ LockCase(
     {
         string file = Path.Combine(folder, "x.lock");
         using FileStream held = Take(file);
-        using FileStream? turn = (FileStream?)tryTake.Invoke(
-            null,
-            [file, TimeSpan.FromMilliseconds(50), TimeSpan.FromMilliseconds(10)]
-        );
+        using FileStream? turn = (FileStream?)
+            tryTake.Invoke(
+                null,
+                [file, TimeSpan.FromMilliseconds(50), TimeSpan.FromMilliseconds(10)]
+            );
         return turn is null ? "null" : "taken";
     }
 );
@@ -400,10 +403,11 @@ LockCase(
     {
         string file = Path.Combine(folder, "x.lock");
         Directory.CreateDirectory(file);
-        using FileStream? turn = (FileStream?)tryTake.Invoke(
-            null,
-            [file, TimeSpan.FromMilliseconds(50), TimeSpan.FromMilliseconds(10)]
-        );
+        using FileStream? turn = (FileStream?)
+            tryTake.Invoke(
+                null,
+                [file, TimeSpan.FromMilliseconds(50), TimeSpan.FromMilliseconds(10)]
+            );
         return turn is null ? "null" : "taken";
     }
 );
@@ -412,10 +416,15 @@ LockCase(
     folder =>
     {
         File.WriteAllText(Path.Combine(folder, "f"), "");
-        using FileStream? turn = (FileStream?)tryTake.Invoke(
-            null,
-            [Path.Combine(folder, "f", "x.lock"), TimeSpan.FromMilliseconds(50), TimeSpan.FromMilliseconds(10)]
-        );
+        using FileStream? turn = (FileStream?)
+            tryTake.Invoke(
+                null,
+                [
+                    Path.Combine(folder, "f", "x.lock"),
+                    TimeSpan.FromMilliseconds(50),
+                    TimeSpan.FromMilliseconds(10),
+                ]
+            );
         return turn is null ? "null" : "taken";
     }
 );
@@ -423,10 +432,14 @@ LockCase(
     "acquire",
     folder =>
     {
-        DaemonPaths home = (DaemonPaths)resolve.Invoke(
-            null,
-            [(Func<string, string?>)(key => key == DaemonPaths.HomeVariable ? folder : null), (Func<Environment.SpecialFolder, string>)(_ => "")]
-        )!;
+        DaemonPaths home = (DaemonPaths)
+            resolve.Invoke(
+                null,
+                [
+                    (Func<string, string?>)(key => key == DaemonPaths.HomeVariable ? folder : null),
+                    (Func<Environment.SpecialFolder, string>)(_ => ""),
+                ]
+            )!;
         using FileStream held = DaemonLock.Acquire(home);
         JsonObject state = new JsonObject
         {
@@ -449,10 +462,14 @@ LockCase(
     folder =>
     {
         File.WriteAllText(Path.Combine(folder, "state"), "");
-        DaemonPaths home = (DaemonPaths)resolve.Invoke(
-            null,
-            [(Func<string, string?>)(key => key == DaemonPaths.HomeVariable ? folder : null), (Func<Environment.SpecialFolder, string>)(_ => "")]
-        )!;
+        DaemonPaths home = (DaemonPaths)
+            resolve.Invoke(
+                null,
+                [
+                    (Func<string, string?>)(key => key == DaemonPaths.HomeVariable ? folder : null),
+                    (Func<Environment.SpecialFolder, string>)(_ => ""),
+                ]
+            )!;
         using FileStream held = DaemonLock.Acquire(home);
         return "taken";
     }
@@ -527,7 +544,8 @@ void LogCase(
     );
 }
 
-DateTimeOffset At(string text) => DateTimeOffset.Parse(text, System.Globalization.CultureInfo.InvariantCulture);
+DateTimeOffset At(string text) =>
+    DateTimeOffset.Parse(text, System.Globalization.CultureInfo.InvariantCulture);
 
 DateTimeOffset[] clocks =
 [
@@ -638,15 +656,13 @@ LogCase(
 JsonArray reads = [];
 
 JsonNode Entries(IReadOnlyList<RegisteredInstance> entries) =>
-    new JsonArray(
-        [
-            .. entries.Select(entry => new JsonObject
-            {
-                ["root"] = entry.Root,
-                ["registeredAt"] = entry.RegisteredAt,
-            }),
-        ]
-    );
+    new JsonArray([
+        .. entries.Select(entry => new JsonObject
+        {
+            ["root"] = entry.Root,
+            ["registeredAt"] = entry.RegisteredAt,
+        }),
+    ]);
 
 void Read(string name, byte[]? content, Action<string>? prepare = null)
 {
@@ -713,7 +729,10 @@ ReadText("names_other_case", "{\"Version\":1,\"Instances\":[]}");
 ReadText("duplicate_version_last_wins", "{\"version\":2,\"version\":1,\"instances\":[]}");
 ReadText("duplicate_version_bad_first", "{\"version\":\"x\",\"version\":1,\"instances\":[]}");
 ReadText("duplicate_instances", $"{{\"version\":1,\"instances\":null,\"instances\":[]}}");
-ReadText("unknown_property", "{\"version\":1,\"extra\":{\"deep\":[1,2,{\"a\":null}]},\"instances\":[]}");
+ReadText(
+    "unknown_property",
+    "{\"version\":1,\"extra\":{\"deep\":[1,2,{\"a\":null}]},\"instances\":[]}"
+);
 ReadText("unknown_lone_surrogate", "{\"version\":1,\"extra\":\"\\uD800\",\"instances\":[]}");
 ReadText("trailing_comma", "{\"version\":1,\"instances\":[],}");
 ReadText("comment", "{\"version\":1,/* c */\"instances\":[]}");
@@ -722,8 +741,22 @@ ReadText("two_documents", Doc("") + Doc(""));
 ReadText("indented_crlf", "{\r\n  \"version\": 1,\r\n  \"instances\": []\r\n}\r\n");
 Read("bom", [0xEF, 0xBB, 0xBF, .. Encoding.UTF8.GetBytes(Doc(""))]);
 Read("utf16_bom", [0xFF, 0xFE, .. Encoding.Unicode.GetBytes(Doc(""))]);
-Read("invalid_utf8_in_root", [.. Encoding.UTF8.GetBytes("{\"version\":1,\"instances\":[{\"root\":\"/a"), 0xFF, .. Encoding.UTF8.GetBytes("\",\"registeredAt\":\"x\"}]}")]);
-Read("invalid_utf8_ignored", [.. Encoding.UTF8.GetBytes("{\"version\":1,\"x\":\""), 0xFF, .. Encoding.UTF8.GetBytes("\",\"instances\":[]}")]);
+Read(
+    "invalid_utf8_in_root",
+    [
+        .. Encoding.UTF8.GetBytes("{\"version\":1,\"instances\":[{\"root\":\"/a"),
+        0xFF,
+        .. Encoding.UTF8.GetBytes("\",\"registeredAt\":\"x\"}]}"),
+    ]
+);
+Read(
+    "invalid_utf8_ignored",
+    [
+        .. Encoding.UTF8.GetBytes("{\"version\":1,\"x\":\""),
+        0xFF,
+        .. Encoding.UTF8.GetBytes("\",\"instances\":[]}"),
+    ]
+);
 Read(
     "invalid_utf8_after_backslash_ignored",
     [
@@ -743,9 +776,18 @@ ReadText("root_case_insensitive_name", Doc($"{{\"Root\":\"{absolute}\",\"registe
 ReadText("registered_at_missing", Doc($"{{\"root\":\"{absolute}\"}}"));
 ReadText("registered_at_null", Doc($"{{\"root\":\"{absolute}\",\"registeredAt\":null}}"));
 ReadText("registered_at_number", Doc($"{{\"root\":\"{absolute}\",\"registeredAt\":1}}"));
-ReadText("duplicate_root_last_wins", Doc($"{{\"root\":\"relative\",\"root\":\"{absolute}\",\"registeredAt\":\"x\"}}"));
-ReadText("duplicate_root_bad_last", Doc($"{{\"root\":\"{absolute}\",\"root\":\"relative\",\"registeredAt\":\"x\"}}"));
-ReadText("entry_extra_property", Doc($"{{\"root\":\"{absolute}\",\"registeredAt\":\"x\",\"more\":[true]}}"));
+ReadText(
+    "duplicate_root_last_wins",
+    Doc($"{{\"root\":\"relative\",\"root\":\"{absolute}\",\"registeredAt\":\"x\"}}")
+);
+ReadText(
+    "duplicate_root_bad_last",
+    Doc($"{{\"root\":\"{absolute}\",\"root\":\"relative\",\"registeredAt\":\"x\"}}")
+);
+ReadText(
+    "entry_extra_property",
+    Doc($"{{\"root\":\"{absolute}\",\"registeredAt\":\"x\",\"more\":[true]}}")
+);
 ReadText("entry_null", Doc("null"));
 ReadText("entry_array", Doc("[]"));
 ReadText("entry_empty_object", Doc("{}"));
@@ -758,10 +800,32 @@ ReadText("root_device", One(@"\\\\?\\C:\\a"));
 ReadText("root_slash", One("/a"));
 ReadText("root_drive_only", One("C:"));
 ReadText("root_whitespace", One(" "));
-ReadText("depth_64", "{\"version\":1,\"x\":" + new string('[', 63) + new string(']', 63) + ",\"instances\":[]}");
-ReadText("depth_65", "{\"version\":1,\"x\":" + new string('[', 64) + new string(']', 64) + ",\"instances\":[]}");
-ReadText("entries_256", Doc(string.Join(",", Enumerable.Repeat($"{{\"root\":\"{absolute}\",\"registeredAt\":\"x\"}}", 256))));
-ReadText("entries_257", Doc(string.Join(",", Enumerable.Repeat($"{{\"root\":\"{absolute}\",\"registeredAt\":\"x\"}}", 257))));
+ReadText(
+    "depth_64",
+    "{\"version\":1,\"x\":" + new string('[', 63) + new string(']', 63) + ",\"instances\":[]}"
+);
+ReadText(
+    "depth_65",
+    "{\"version\":1,\"x\":" + new string('[', 64) + new string(']', 64) + ",\"instances\":[]}"
+);
+ReadText(
+    "entries_256",
+    Doc(
+        string.Join(
+            ",",
+            Enumerable.Repeat($"{{\"root\":\"{absolute}\",\"registeredAt\":\"x\"}}", 256)
+        )
+    )
+);
+ReadText(
+    "entries_257",
+    Doc(
+        string.Join(
+            ",",
+            Enumerable.Repeat($"{{\"root\":\"{absolute}\",\"registeredAt\":\"x\"}}", 257)
+        )
+    )
+);
 ReadText("max_bytes", Doc("").PadRight(InstanceRegistry.MaxBytes));
 ReadText("max_bytes_plus_one", Doc("").PadRight(InstanceRegistry.MaxBytes + 1));
 Read("path_is_a_directory", null, file => Directory.CreateDirectory(file));
@@ -852,9 +916,7 @@ void Step(string operation, string? path, Func<JsonNode?> run)
         }
         entry["error"] = error;
     }
-    entry["file"] = File.Exists(registryFile)
-        ? Scrub(File.ReadAllText(registryFile))
-        : null;
+    entry["file"] = File.Exists(registryFile) ? Scrub(File.ReadAllText(registryFile)) : null;
     steps.Add(entry);
 }
 
@@ -862,16 +924,14 @@ JsonNode Registered(RegisteredInstance entry) =>
     new JsonObject { ["root"] = entry.Root, ["registeredAt"] = entry.RegisteredAt };
 
 JsonNode Listed(IReadOnlyList<RegistryEntry> entries) =>
-    new JsonArray(
-        [
-            .. entries.Select(entry => new JsonObject
-            {
-                ["root"] = entry.Root,
-                ["registeredAt"] = entry.RegisteredAt,
-                ["missing"] = entry.Missing,
-            }),
-        ]
-    );
+    new JsonArray([
+        .. entries.Select(entry => new JsonObject
+        {
+            ["root"] = entry.Root,
+            ["registeredAt"] = entry.RegisteredAt,
+            ["missing"] = entry.Missing,
+        }),
+    ]);
 
 string a = Instance("a");
 string b = Instance("b");
@@ -882,8 +942,15 @@ string legacy = Path.Combine(scratch, "legacy");
 Directory.CreateDirectory(Path.Combine(legacy, InstanceManager.Marker));
 File.Copy(
     Path.Combine(
-        Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Environment.CurrentDirectory)!)!)!,
-        "tests", "Sermofur.Tests", "Fixtures", "instance-v1", "marker", "instance.json"
+        Path.GetDirectoryName(
+            Path.GetDirectoryName(Path.GetDirectoryName(Environment.CurrentDirectory)!)!
+        )!,
+        "tests",
+        "Sermofur.Tests",
+        "Fixtures",
+        "instance-v1",
+        "marker",
+        "instance.json"
     ),
     Path.Combine(legacy, InstanceManager.Marker, InstanceManager.ConfigurationFile)
 );
@@ -891,30 +958,83 @@ string none = NewFolder("none");
 
 Step("list", null, () => Listed(registry.List()));
 Step("register", none, () => Registered(registry.Register(none, At("2026-11-09T10:11:12+01:00"))));
-Step("register", legacy, () => Registered(registry.Register(legacy, At("2026-11-09T10:11:12+01:00"))));
-Step("register", Path.Combine(scratch, "absent"), () => Registered(registry.Register(Path.Combine(scratch, "absent"), At("2026-11-09T10:11:12+01:00"))));
+Step(
+    "register",
+    legacy,
+    () => Registered(registry.Register(legacy, At("2026-11-09T10:11:12+01:00")))
+);
+Step(
+    "register",
+    Path.Combine(scratch, "absent"),
+    () =>
+        Registered(
+            registry.Register(Path.Combine(scratch, "absent"), At("2026-11-09T10:11:12+01:00"))
+        )
+);
 InstanceRegistry foreign = new InstanceRegistry(
     registryFile,
     new InstanceManager(new ForeignOwnership())
 );
-Step("register_foreign_owner", a, () => Registered(foreign.Register(a, At("2026-11-09T10:11:12+01:00"))));
+Step(
+    "register_foreign_owner",
+    a,
+    () => Registered(foreign.Register(a, At("2026-11-09T10:11:12+01:00")))
+);
 Step("register", a, () => Registered(registry.Register(a, At("2026-11-09T10:11:12.999+01:00"))));
-Step("register", Path.Combine(a, "deep", "er"), () => Registered(registry.Register(Path.Combine(a, "deep", "er"), At("2027-01-01T00:00:00+00:00"))));
-Step("register", a + Path.DirectorySeparatorChar, () => Registered(registry.Register(a + Path.DirectorySeparatorChar, At("2027-01-01T00:00:00+00:00"))));
+Step(
+    "register",
+    Path.Combine(a, "deep", "er"),
+    () =>
+        Registered(
+            registry.Register(Path.Combine(a, "deep", "er"), At("2027-01-01T00:00:00+00:00"))
+        )
+);
+Step(
+    "register",
+    a + Path.DirectorySeparatorChar,
+    () =>
+        Registered(
+            registry.Register(a + Path.DirectorySeparatorChar, At("2027-01-01T00:00:00+00:00"))
+        )
+);
 if (OperatingSystem.IsWindows())
 {
     string upper = Path.Combine(scratch, "A");
-    Step("register", upper, () => Registered(registry.Register(upper, At("2027-01-01T00:00:00+00:00"))));
+    Step(
+        "register",
+        upper,
+        () => Registered(registry.Register(upper, At("2027-01-01T00:00:00+00:00")))
+    );
 }
 Step("register", b, () => Registered(registry.Register(b, At("2026-11-09T10:11:12-05:30"))));
-Step("register", unicode, () => Registered(registry.Register(unicode, At("0001-01-01T14:00:00+14:00"))));
-Step("register", moved, () => Registered(registry.Register(moved, At("9999-12-31T09:59:59-14:00"))));
+Step(
+    "register",
+    unicode,
+    () => Registered(registry.Register(unicode, At("0001-01-01T14:00:00+14:00")))
+);
+Step(
+    "register",
+    moved,
+    () => Registered(registry.Register(moved, At("9999-12-31T09:59:59-14:00")))
+);
 Step("list", null, () => Listed(registry.List()));
 Directory.Delete(moved, true);
 Step("list", null, () => Listed(registry.List()));
-Step("unregister", Path.Combine(a, "deep"), () => Registered(registry.Unregister(Path.Combine(a, "deep"))));
-Step("unregister", Path.Combine(a, "deep"), () => Registered(registry.Unregister(Path.Combine(a, "deep"))));
-Step("unregister", moved + Path.DirectorySeparatorChar, () => Registered(registry.Unregister(moved + Path.DirectorySeparatorChar)));
+Step(
+    "unregister",
+    Path.Combine(a, "deep"),
+    () => Registered(registry.Unregister(Path.Combine(a, "deep")))
+);
+Step(
+    "unregister",
+    Path.Combine(a, "deep"),
+    () => Registered(registry.Unregister(Path.Combine(a, "deep")))
+);
+Step(
+    "unregister",
+    moved + Path.DirectorySeparatorChar,
+    () => Registered(registry.Unregister(moved + Path.DirectorySeparatorChar))
+);
 Step("unregister", moved, () => Registered(registry.Unregister(moved)));
 Step("unregister", none, () => Registered(registry.Unregister(none)));
 if (OperatingSystem.IsWindows())
@@ -934,10 +1054,20 @@ else
 Step("list", null, () => Listed(registry.List()));
 Step("read", null, () => Entries(registry.Read()));
 Step("unregister", unicode, () => Registered(registry.Unregister(unicode)));
+
 // A registry full of 256 entries refuses the 257th.
 File.WriteAllText(
     registryFile,
-    Doc(string.Join(",", Enumerable.Range(0, 256).Select(index => $"{{\"root\":\"{JsonEncodedText.Encode(Path.Combine(scratch, $"x{index}"))}\",\"registeredAt\":\"x\"}}")))
+    Doc(
+        string.Join(
+            ",",
+            Enumerable
+                .Range(0, 256)
+                .Select(index =>
+                    $"{{\"root\":\"{JsonEncodedText.Encode(Path.Combine(scratch, $"x{index}"))}\",\"registeredAt\":\"x\"}}"
+                )
+        )
+    )
 );
 Step("register", a, () => Registered(registry.Register(a, At("2026-11-09T10:11:12+01:00"))));
 File.WriteAllText(registryFile, "not json");
@@ -947,11 +1077,25 @@ Step("list", null, () => Listed(registry.List()));
 File.Delete(registryFile);
 using (Take(registry.LockFile))
 {
-    InstanceRegistry hurried = new InstanceRegistry(registryFile, lockTimeout: TimeSpan.FromMilliseconds(300));
-    Step("register_while_locked", a, () => Registered(hurried.Register(a, At("2026-11-09T10:11:12+01:00"))));
+    InstanceRegistry hurried = new InstanceRegistry(
+        registryFile,
+        lockTimeout: TimeSpan.FromMilliseconds(300)
+    );
+    Step(
+        "register_while_locked",
+        a,
+        () => Registered(hurried.Register(a, At("2026-11-09T10:11:12+01:00")))
+    );
     Step("unregister_while_locked", a, () => Registered(hurried.Unregister(a)));
-    InstanceRegistry slower = new InstanceRegistry(registryFile, lockTimeout: TimeSpan.FromMilliseconds(1600));
-    Step("register_while_locked_1600ms", a, () => Registered(slower.Register(a, At("2026-11-09T10:11:12+01:00"))));
+    InstanceRegistry slower = new InstanceRegistry(
+        registryFile,
+        lockTimeout: TimeSpan.FromMilliseconds(1600)
+    );
+    Step(
+        "register_while_locked_1600ms",
+        a,
+        () => Registered(slower.Register(a, At("2026-11-09T10:11:12+01:00")))
+    );
 }
 Step("register", a, () => Registered(registry.Register(a, At("2026-11-09T10:11:12+01:00"))));
 
@@ -972,13 +1116,15 @@ Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();
 Directory.Delete(scratch, recursive: true);
 File.WriteAllText(
     args[0],
-    output.ToJsonString(
-        new JsonSerializerOptions
-        {
-            WriteIndented = true,
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        }
-    ).Replace("\r\n", "\n") + "\n"
+    output
+        .ToJsonString(
+            new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            }
+        )
+        .Replace("\r\n", "\n") + "\n"
 );
 
 static string CurrentSid()
