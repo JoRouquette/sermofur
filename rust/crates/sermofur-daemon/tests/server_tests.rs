@@ -333,19 +333,32 @@ fn a_read_without_a_place_is_refused() {
 /// `ShutdownRefusesAWriteThatHasNotStarted` and `ShutdownLetsAStartedWriteAnswer`.
 #[test]
 fn a_stop_refuses_a_write_that_has_not_started() {
-    let fixture = Fixture::new("stop-queued", Duration::from_secs(10));
+    // Gated like the oracle, not timed: on a loaded machine a sleeping command could end before
+    // the stop and let the queued write start.
+    let (mut fixture, gated) = Fixture::gated(
+        "stop-queued",
+        DaemonLimits {
+            request_timeout: Duration::from_secs(10),
+            ..DaemonLimits::default()
+        },
+    );
     block_on(async {
-        let mut started = session(&fixture).await;
-        send(&mut started, &run(&fixture, 1, &["sleep", "500"])).await;
-        tokio::time::sleep(Duration::from_millis(100)).await;
+        let mut held = session(&fixture).await;
+        send(&mut held, &run(&fixture, 1, &["block", "write"])).await;
+        until(|| gated.blocked() == 1).await;
         let mut queued = session(&fixture).await;
-        send(&mut queued, &run(&fixture, 2, &["quick"])).await;
-        tokio::time::sleep(Duration::from_millis(100)).await;
+        send(&mut queued, &run(&fixture, 2, &["queued", "write"])).await;
+        until(|| gated.planned("queued")).await;
         fixture.server.stop();
         assert_eq!(code(answer(&mut queued).await), error("daemon_stopping", 3));
-        let done = answer(&mut started).await.expect("a result");
+        gated.release();
+        let done = answer(&mut held).await.expect("a result");
         assert_eq!((done.kind.as_str(), done.exit_code), ("result", Some(0)));
     });
+    // `await stopped`: the drain ends once the held command has answered.
+    fixture.stop();
+    assert!(fixture.journal().contains("\"event\":\"stopped\""));
+    assert!(!gated.ran("queued"));
 }
 
 /// `GatedExecutor`: answers its first argument; "write" anywhere plans a write, "block" waits
