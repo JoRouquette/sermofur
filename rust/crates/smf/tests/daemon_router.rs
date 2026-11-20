@@ -1131,6 +1131,7 @@ fn kill(pid: i32) {
 #[test]
 fn the_supervisor_restarts_a_killed_daemon_and_stops_cleanly() {
     use sermofur_daemon::supervisor::{ChildStart, Supervisor};
+    let _alone = alone();
     let home = Home::new("supervisor");
     let paths = home.paths();
     let child = ChildStart {
@@ -1243,9 +1244,12 @@ fn instance_files(root: &Path) -> BTreeMap<PathBuf, Vec<u8>> {
 }
 
 /// Port of `RealServiceTests.InstallRestartAfterAKillPilotAndUninstall`, behind the guard of
-/// `ServiceFactAttribute`.
+/// `ServiceFactAttribute`. One test at a time, as `RealServiceTests` is in the collection
+/// "Daemon timing": the service it installs is the one of the user, which `daemon status` of
+/// every other test of this file reports (`installed_stopped` while it is installed).
 #[test]
 fn a_real_service_installs_restarts_after_a_kill_and_uninstalls() {
+    let _alone = alone();
     if !real_services_allowed() {
         eprintln!("Installs a real service: runs in CI, or set SERMOFUR_SERVICE_TESTS=1.");
         return;
@@ -1322,6 +1326,7 @@ fn a_real_service_installs_restarts_after_a_kill_and_uninstalls() {
 #[cfg(windows)]
 #[test]
 fn the_daemon_dies_with_its_killed_supervisor_under_windows() {
+    let _alone = alone();
     let home = Home::new("supervise");
     // Killed on drop: a failed test leaves no supervisor behind.
     let mut supervisor = Daemon(
@@ -1366,6 +1371,7 @@ fn the_daemon_dies_with_its_killed_supervisor_under_windows() {
 #[cfg(unix)]
 #[test]
 fn the_supervisor_runs_the_daemon_and_stops_with_it_on_sigterm() {
+    let _alone = alone();
     let home = Home::new("supervise");
     // Killed on drop: a failed test leaves no supervisor behind.
     let mut supervisor = Daemon(
