@@ -969,6 +969,10 @@ fn status_of(program: &str, home: &Home) -> Value {
 /// Lot 7.6: `daemon status` reports the daemon of the home: absent, running and answering,
 /// of another version, or silent before its hello. With `SMF_ORACLE`, the oracle prints the
 /// same object, `clients` apart, for the daemon of the port and for its own.
+///
+/// Precondition: no smf service is installed on the machine. The test isolates the daemon
+/// endpoint (`SERMOFUR_DAEMON_HOME`), not the state of the service, which `status` reads from the
+/// service manager of the user (an installed service gives `installed_stopped`, not `absent`).
 #[test]
 fn status_reports_the_daemon_as_the_oracle_does() {
     let _alone = alone();
@@ -980,7 +984,14 @@ fn status_reports_the_daemon_as_the_oracle_does() {
             port["state"]
                 .as_str()
                 .is_some_and(|s| expected.contains(&s)),
-            "{port}"
+            "{port}: expected one of {expected:?}{}",
+            if port["state"] == "installed_stopped" {
+                ". Precondition: no smf service is installed on this machine (the test isolates \
+                 the daemon endpoint, not the service state); run `smf daemon uninstall` to \
+                 uninstall the smf service before running this test"
+            } else {
+                ""
+            }
         );
         for program in &programs[1..] {
             assert_eq!(status_of(program, &home), port, "{program}");
