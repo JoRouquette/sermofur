@@ -6,11 +6,13 @@
 //! daemon of the port. Every home is fresh, under the temporary directory; every daemon is
 //! killed at the end of its test, even on failure.
 
+#[path = "../../../tests/support/scratch.rs"]
+mod scratch;
+
 use std::fs;
 use std::io::{BufRead, BufReader};
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
-use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::mpsc;
 use std::thread;
 use std::time::{Duration, Instant};
@@ -32,25 +34,20 @@ struct Home(PathBuf);
 
 impl Home {
     fn new(name: &str) -> Self {
-        static COUNT: AtomicUsize = AtomicUsize::new(0);
         let temporary = std::env::temp_dir();
         let temporary = if cfg!(windows) {
             sermofur_core::discovery::expand_short_names(&temporary)
         } else {
             fs::canonicalize(temporary).expect("the temporary directory resolves")
         };
-        let folder = temporary.join(format!(
-            "smfs-{name}-{}-{}",
-            std::process::id(),
-            COUNT.fetch_add(1, Ordering::SeqCst)
-        ));
+        let folder = temporary.join(scratch::name("ss", name));
         let _ = fs::remove_dir_all(&folder);
-        fs::create_dir_all(folder.join("home")).expect("the home");
+        fs::create_dir_all(folder.join(scratch::HOME)).expect("the home");
         Self(folder)
     }
 
     fn home(&self) -> PathBuf {
-        self.0.join("home")
+        self.0.join(scratch::HOME)
     }
 
     fn paths(&self) -> DaemonPaths {

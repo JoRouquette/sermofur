@@ -11,12 +11,14 @@
 //! bridge of each tool talks to the daemon of the other (lecture croisée, on an instance made by
 //! that other tool).
 
+#[path = "../../../tests/support/scratch.rs"]
+mod scratch;
+
 use std::collections::HashMap;
 use std::fs;
 use std::io::{BufRead, BufReader, Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Child, ChildStdin, Command, Stdio};
-use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::mpsc::{Receiver, channel};
 use std::thread;
 use std::time::Duration;
@@ -62,18 +64,13 @@ struct Base(PathBuf);
 
 impl Base {
     fn new() -> Self {
-        static COUNT: AtomicUsize = AtomicUsize::new(0);
         let temporary = std::env::temp_dir();
         let temporary = if cfg!(windows) {
             sermofur_core::discovery::expand_short_names(&temporary)
         } else {
             fs::canonicalize(temporary).expect("the temporary directory resolves")
         };
-        let base = temporary.join(format!(
-            "smf-mcp-{}-{}",
-            std::process::id(),
-            COUNT.fetch_add(1, Ordering::SeqCst)
-        ));
+        let base = temporary.join(scratch::name("sp", "golden_mcp_serve"));
         let _ = fs::remove_dir_all(&base);
         fs::create_dir_all(base.join("proj é")).expect("root");
         fs::create_dir_all(base.join("outside")).expect("outside");
@@ -129,7 +126,7 @@ fn output(program: &str, cwd: &Path, home: &Path, words: &[&str]) -> String {
 fn run(session: &Value, bridge: &str, daemon_program: &str) -> Result<(), String> {
     let base = Base::new();
     let root = base.0.join("proj é");
-    let home = base.0.join("home");
+    let home = base.0.join(scratch::HOME);
     output(daemon_program, &root, &home, &["init"]);
     let mut ids: Vec<String> = Vec::new();
     for step in session["setup"].as_array().expect("setup") {
@@ -182,7 +179,7 @@ fn run(session: &Value, bridge: &str, daemon_program: &str) -> Result<(), String
     let served_home = if with_daemon {
         home.clone()
     } else {
-        base.0.join("absent")
+        base.0.join("a")
     };
     let mut serve = command(bridge, &working, &served_home, &["mcp", "serve"]);
     match session["projectDirectory"].as_str() {

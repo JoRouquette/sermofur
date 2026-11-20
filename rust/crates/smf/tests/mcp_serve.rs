@@ -2,10 +2,12 @@
 //! ports of the `McpTests` that compare the bridge with the command line. With `SMF_ORACLE`,
 //! each test runs on the oracle too (its bridge, its daemon, its command line).
 
+#[path = "../../../tests/support/scratch.rs"]
+mod scratch;
+
 use std::io::{BufRead, BufReader, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Child, ChildStdin, Command, Stdio};
-use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::mpsc::{Receiver, channel};
 use std::time::{Duration, Instant};
 use std::{fs, thread};
@@ -31,24 +33,19 @@ struct Fixture {
 
 impl Fixture {
     fn new(program: &str) -> Self {
-        static COUNT: AtomicUsize = AtomicUsize::new(0);
         let temporary = std::env::temp_dir();
         let temporary = if cfg!(windows) {
             sermofur_core::discovery::expand_short_names(&temporary)
         } else {
             fs::canonicalize(temporary).expect("the temporary directory resolves")
         };
-        let base = temporary.join(format!(
-            "smf-mcpt-{}-{}",
-            std::process::id(),
-            COUNT.fetch_add(1, Ordering::SeqCst)
-        ));
+        let base = temporary.join(scratch::name("st", "mcp_serve"));
         let _ = fs::remove_dir_all(&base);
         let root = base.join("project");
         fs::create_dir_all(&root).expect("root");
         let fixture = Self {
             program: program.to_owned(),
-            home: base.join("home"),
+            home: base.join(scratch::HOME),
             base,
             root,
             daemon: None,
@@ -285,7 +282,7 @@ fn the_real_protocol_lists_the_eight_tools_and_runs_them() {
 fn without_daemon_the_bridge_answers_with_the_remedy() {
     for program in programs() {
         let fixture = Fixture::new(&program);
-        let home = fixture.base.join("no-daemon");
+        let home = fixture.base.join("n");
         let mut client = Bridge::open(&fixture, &fixture.root, &home, "test host");
         let tools = client.request("tools/list", json!({}));
         assert_eq!(tools["tools"].as_array().expect("tools").len(), 8);

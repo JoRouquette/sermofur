@@ -3,12 +3,14 @@
 //! endpoint of the other, and the port talks to the oracle through it. Every home is fresh,
 //! under the temporary directory.
 
+#[path = "../../../tests/support/scratch.rs"]
+mod scratch;
+
 use std::fs;
 use std::future::Future;
 use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
-use std::sync::atomic::{AtomicUsize, Ordering};
 use std::thread;
 use std::time::{Duration, Instant};
 
@@ -23,18 +25,13 @@ struct Home(PathBuf);
 
 impl Home {
     fn new(name: &str) -> Self {
-        static COUNT: AtomicUsize = AtomicUsize::new(0);
         let temporary = std::env::temp_dir();
         let temporary = if cfg!(windows) {
             sermofur_core::discovery::expand_short_names(&temporary)
         } else {
             fs::canonicalize(temporary).expect("the temporary directory resolves")
         };
-        let folder = temporary.join(format!(
-            "smfe-{name}-{}-{}",
-            std::process::id(),
-            COUNT.fetch_add(1, Ordering::SeqCst)
-        ));
+        let folder = temporary.join(scratch::name("se", name));
         let _ = fs::remove_dir_all(&folder);
         fs::create_dir_all(&folder).expect("the home");
         Self(folder)

@@ -13,6 +13,9 @@
 // Each test crate uses a part of the harness.
 #![allow(dead_code)]
 
+#[path = "../../../../tests/support/scratch.rs"]
+pub mod scratch;
+
 use std::collections::{BTreeMap, HashMap, HashSet};
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -35,10 +38,14 @@ pub struct Captured {
     pub stderr: String,
 }
 
+/// A daemon home and a Codex home that are never created (see [`run`]).
+pub const NO_DAEMON: &str = "smf-nd";
+
 pub fn run(program: &str, arguments: &[String], cwd: &Path) -> Captured {
     // A daemon home and a Codex home that never exist: doctor sees no daemon and no user
     // declaration of the MCP bridge, whatever runs on the machine.
-    let elsewhere = temp_base().join("sermofur-cli-no-daemon");
+    scratch::assert_fits("a command without daemon", NO_DAEMON);
+    let elsewhere = temp_base().join(NO_DAEMON);
     let output = Command::new(program)
         .args(arguments)
         .env("SERMOFUR_NO_DAEMON", "1")
@@ -77,8 +84,18 @@ pub fn temp_base() -> &'static Path {
 pub struct Scratch(pub PathBuf);
 
 impl Scratch {
+    /// A scenario folder. Its long name matters: a scenario of lot 5.2 needs a root of 35 bytes
+    /// or more to go past 16 384 units once combined with it, also under `/tmp`.
     pub fn new() -> Self {
         let root = temp_base().join(format!("sermofur-cli-{}", Uuid::new_v4().simple()));
+        fs::create_dir_all(&root).expect("scratch");
+        Self(root)
+    }
+
+    /// A folder short enough to hold a daemon home [`scratch::HOME`] (see `scratch::name`).
+    pub fn short() -> Self {
+        let root = temp_base().join(scratch::name("sc", "a daemon home"));
+        let _ = fs::remove_dir_all(&root);
         fs::create_dir_all(&root).expect("scratch");
         Self(root)
     }

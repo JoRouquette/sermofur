@@ -9,6 +9,9 @@
 //! runner of the oracle answers the first two; a lock-file call sorts them as [`FileError`].
 #![cfg(any(windows, target_os = "linux"))]
 
+#[path = "../../../tests/support/scratch.rs"]
+mod scratch;
+
 use std::cell::RefCell;
 use std::fs;
 use std::io;
@@ -67,21 +70,14 @@ struct Scratch(PathBuf);
 
 impl Scratch {
     fn new(name: &str) -> Self {
-        static COUNT: AtomicUsize = AtomicUsize::new(0);
         let temporary = std::env::temp_dir();
         let temporary = if cfg!(windows) {
             sermofur_core::discovery::expand_short_names(&temporary)
         } else {
             fs::canonicalize(temporary).expect("the temporary directory resolves")
         };
-        let nanos = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .map_or(0, |d| d.subsec_nanos());
-        let folder = temporary.join(format!(
-            "sermofur-{name}-{}-{nanos}-{}",
-            std::process::id(),
-            COUNT.fetch_add(1, Ordering::SeqCst)
-        ));
+        let folder = temporary.join(scratch::name("sf", name));
+        let _ = fs::remove_dir_all(&folder);
         fs::create_dir_all(&folder).expect("the scratch folder");
         Self(folder)
     }

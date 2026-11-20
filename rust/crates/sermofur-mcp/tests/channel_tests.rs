@@ -3,6 +3,9 @@
 //! (`StubDaemon`). Ports of `McpTests.OtherVersionAndRestartedDaemon` and of the MCP cases of
 //! `DaemonSessionTests`.
 
+#[path = "../../../tests/support/scratch.rs"]
+mod scratch;
+
 use std::io::Write;
 use std::path::PathBuf;
 use std::rc::Rc;
@@ -39,23 +42,18 @@ struct Scratch {
 
 impl Scratch {
     fn new(name: &str) -> Self {
-        static COUNT: AtomicUsize = AtomicUsize::new(0);
         let temporary = std::env::temp_dir();
         let temporary = if cfg!(windows) {
             sermofur_core::discovery::expand_short_names(&temporary)
         } else {
             std::fs::canonicalize(temporary).expect("the temporary directory resolves")
         };
-        let folder = temporary.join(format!(
-            "smfm-{name}-{}-{}",
-            std::process::id(),
-            COUNT.fetch_add(1, Ordering::SeqCst)
-        ));
+        let folder = temporary.join(scratch::name("sm", name));
         let _ = std::fs::remove_dir_all(&folder);
         let root = folder.join("instance");
         std::fs::create_dir_all(&root).expect("root");
         sermofur_core::init::initialize(&root).expect("an instance");
-        let home = folder.join("home").to_string_lossy().into_owned();
+        let home = folder.join(scratch::HOME).to_string_lossy().into_owned();
         let paths =
             DaemonPaths::resolve(&|key| (key == HOME_VARIABLE).then(|| home.clone()), &|_| {
                 String::new()

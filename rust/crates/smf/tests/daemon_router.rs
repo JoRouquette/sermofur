@@ -7,13 +7,16 @@
 //! file run one at a time, as the `Daemon timing` collection of .NET: their timeouts and their
 //! measures must not compete for the machine.
 
+#[path = "../../../tests/support/scratch.rs"]
+mod scratch;
+
 use std::collections::BTreeMap;
 use std::ffi::OsStr;
 use std::fs;
 use std::io::{BufRead, BufReader};
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
-use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex, mpsc};
 use std::thread;
 use std::time::{Duration, Instant};
@@ -54,25 +57,20 @@ struct Home(PathBuf);
 
 impl Home {
     fn new(name: &str) -> Self {
-        static COUNT: AtomicUsize = AtomicUsize::new(0);
         let temporary = std::env::temp_dir();
         let temporary = if cfg!(windows) {
             sermofur_core::discovery::expand_short_names(&temporary)
         } else {
             fs::canonicalize(temporary).expect("the temporary directory resolves")
         };
-        let folder = temporary.join(format!(
-            "smfr-{name}-{}-{}",
-            std::process::id(),
-            COUNT.fetch_add(1, Ordering::SeqCst)
-        ));
+        let folder = temporary.join(scratch::name("sr", name));
         let _ = fs::remove_dir_all(&folder);
-        fs::create_dir_all(folder.join("home")).expect("the home");
+        fs::create_dir_all(folder.join(scratch::HOME)).expect("the home");
         Self(folder)
     }
 
     fn home(&self) -> PathBuf {
-        self.0.join("home")
+        self.0.join(scratch::HOME)
     }
 
     fn paths(&self) -> DaemonPaths {
@@ -902,7 +900,7 @@ fn registry_commands_print_what_the_oracle_prints() {
         &["daemon", "instances", "--path"],
         &["daemon", "instances", "--bogus", "x"],
     ];
-    let (port_home, oracle_home) = (cwd.join("home-port"), cwd.join("home-oracle"));
+    let (port_home, oracle_home) = (cwd.join("hp"), cwd.join("ho"));
     let compare = |step: &[&str], context: &str| {
         assert_eq!(
             shown(SMF, &port_home, cwd, step),

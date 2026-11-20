@@ -3,9 +3,11 @@
 //! of a response. Only codes and kinds are checked here; the texts are compared with the
 //! daemon of the oracle by `smf/tests/daemon_server.rs`.
 
+#[path = "../../../tests/support/scratch.rs"]
+mod scratch;
+
 use std::fs;
 use std::path::PathBuf;
-use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, Condvar, Mutex, PoisonError};
 use std::thread;
 use std::time::{Duration, Instant};
@@ -86,23 +88,18 @@ impl Fixture {
     }
 
     fn serving(name: &str, limits: DaemonLimits, executor: Arc<dyn CommandExecutor>) -> Self {
-        static COUNT: AtomicUsize = AtomicUsize::new(0);
         let temporary = std::env::temp_dir();
         let temporary = if cfg!(windows) {
             sermofur_core::discovery::expand_short_names(&temporary)
         } else {
             fs::canonicalize(temporary).expect("the temporary directory resolves")
         };
-        let folder = temporary.join(format!(
-            "smfv-{name}-{}-{}",
-            std::process::id(),
-            COUNT.fetch_add(1, Ordering::SeqCst)
-        ));
+        let folder = temporary.join(scratch::name("sv", name));
         let _ = fs::remove_dir_all(&folder);
         let root = folder.join("instance");
         fs::create_dir_all(&root).expect("root");
         sermofur_core::init::initialize(&root).expect("an instance");
-        let home = folder.join("home").to_string_lossy().into_owned();
+        let home = folder.join(scratch::HOME).to_string_lossy().into_owned();
         let paths =
             DaemonPaths::resolve(&|key| (key == HOME_VARIABLE).then(|| home.clone()), &|_| {
                 String::new()

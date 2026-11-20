@@ -529,9 +529,9 @@ fn the_endpoint_of_a_running_daemon_is_found() {
         return;
     };
     let rust = env!("CARGO_BIN_EXE_smf");
-    let scratch = Scratch::new();
+    let scratch = Scratch::short();
     let root = scratch.0.join("instance");
-    let home = scratch.0.join("home");
+    let home = scratch.0.join(common::scratch::HOME);
     std::fs::create_dir_all(&root).expect("folder");
     assert_eq!(run(rust, &arguments(&["init"]), &root).exit_code, 0);
     let mut daemon = Daemon(

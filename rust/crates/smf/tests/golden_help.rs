@@ -6,6 +6,10 @@
 //!
 //! With `SMF_ORACLE` (the `smf` of .NET 0.4.3), the oracle replays the same file.
 
+#[path = "../../../tests/support/scratch.rs"]
+#[allow(dead_code)] // only the guard of a fixed home is used here
+mod scratch;
+
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
@@ -32,7 +36,8 @@ fn golden() -> Vec<Value> {
 /// The differences between what `program` prints and the golden file, one line per case.
 fn replay(program: &str) -> Vec<String> {
     static COUNT: AtomicUsize = AtomicUsize::new(0);
-    let elsewhere = std::env::temp_dir().join("sermofur-help-golden-nothing");
+    scratch::assert_fits("the help golden", "smf-nh");
+    let elsewhere = std::env::temp_dir().join("smf-nh");
     let mut differences = Vec::new();
     for case in golden() {
         let name = case["name"].as_str().expect("name");

@@ -3,10 +3,12 @@
 //! `smf` of .NET 0.4.3): each side sees the lock and the registry of the other. Every folder
 //! lives under the temporary directory; `SERMOFUR_DAEMON_HOME` points the oracle there.
 
+#[path = "../../../tests/support/scratch.rs"]
+mod scratch;
+
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command};
-use std::sync::atomic::{AtomicUsize, Ordering};
 use std::thread;
 use std::time::{Duration, Instant};
 
@@ -20,18 +22,13 @@ struct Scratch(PathBuf);
 
 impl Scratch {
     fn new(name: &str) -> Self {
-        static COUNT: AtomicUsize = AtomicUsize::new(0);
         let temporary = std::env::temp_dir();
         let temporary = if cfg!(windows) {
             sermofur_core::discovery::expand_short_names(&temporary)
         } else {
             fs::canonicalize(temporary).expect("the temporary directory resolves")
         };
-        let folder = temporary.join(format!(
-            "smfd-{name}-{}-{}",
-            std::process::id(),
-            COUNT.fetch_add(1, Ordering::SeqCst)
-        ));
+        let folder = temporary.join(scratch::name("sd", name));
         let _ = fs::remove_dir_all(&folder);
         fs::create_dir_all(&folder).expect("the scratch folder");
         Self(folder)
@@ -77,7 +74,7 @@ fn now() -> sermofur_core::format::DateTimeOffset {
 #[test]
 fn concurrent_registrations_are_all_kept() {
     let scratch = Scratch::new("concurrent");
-    let file = home_paths(&scratch.0.join("home")).registry_file();
+    let file = home_paths(&scratch.0.join(scratch::HOME)).registry_file();
     let instances: Vec<PathBuf> = (0..8).map(|i| scratch.instance(&format!("i{i}"))).collect();
     thread::scope(|scope| {
         for root in &instances {
@@ -100,7 +97,7 @@ fn concurrent_registrations_are_all_kept() {
 #[test]
 fn registry_opened_by_a_reader_is_replaced_once_the_reader_lets_go() {
     let scratch = Scratch::new("reader");
-    let file = home_paths(&scratch.0.join("home")).registry_file();
+    let file = home_paths(&scratch.0.join(scratch::HOME)).registry_file();
     let registry = InstanceRegistry::new(&file);
     registry
         .register(&scratch.instance("first"), now())
@@ -231,7 +228,7 @@ fn run_oracle(oracle: &str, home: &Path, args: &[&str]) -> (i32, String) {
 fn the_lock_of_a_daemon_excludes_the_other_tool() {
     let Some(oracle) = oracle() else { return };
     let scratch = Scratch::new("cross-lock");
-    let home = scratch.0.join("home");
+    let home = scratch.0.join(scratch::HOME);
     let paths = home_paths(&home);
     // A daemon of the oracle holds the lock: the port sees it and is refused.
     let mut daemon = Daemon(
@@ -276,7 +273,7 @@ fn the_lock_of_a_daemon_excludes_the_other_tool() {
 fn each_tool_reads_and_changes_the_registry_of_the_other() {
     let Some(oracle) = oracle() else { return };
     let scratch = Scratch::new("cross-registry");
-    let home = scratch.0.join("home");
+    let home = scratch.0.join(scratch::HOME);
     let first = scratch.instance("first");
     let second = scratch.instance("second");
     let (code, output) = run_oracle(

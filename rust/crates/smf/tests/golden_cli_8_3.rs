@@ -20,15 +20,15 @@ struct Out {
     stderr: String,
 }
 
-/// One run with the homes of `scratch` (`daemon`, `codex`) and `instance` as working folder.
+/// One run with the homes of `scratch` (`h`, `codex`) and `instance` as working folder.
 fn smf(program: &str, scratch: &Path, arguments: &[&str]) -> Out {
     let output = Command::new(program)
         .args(arguments)
         .env("SERMOFUR_NO_DAEMON", "1")
-        .env("SERMOFUR_DAEMON_HOME", scratch.join("daemon"))
+        .env("SERMOFUR_DAEMON_HOME", scratch.join(common::scratch::HOME))
         .env("CODEX_HOME", scratch.join("codex"))
         // The folder of the program is never on this PATH: the launcher names it in full.
-        .env("PATH", scratch.join("daemon"))
+        .env("PATH", scratch.join(common::scratch::HOME))
         .current_dir(scratch.join("instance"))
         .output()
         .expect("the program starts");
@@ -42,7 +42,7 @@ fn smf(program: &str, scratch: &Path, arguments: &[&str]) -> Out {
 
 /// A fresh scratch with an initialized instance.
 fn instance(program: &str) -> Scratch {
-    let scratch = Scratch::new();
+    let scratch = Scratch::short();
     fs::create_dir_all(scratch.0.join("instance")).expect("instance folder");
     assert_eq!(smf(program, &scratch.0, &["init"]).code, 0);
     scratch
