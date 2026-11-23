@@ -42,8 +42,14 @@ mod windows;
 /// its lines, so the port does too.
 pub const NEW_LINE: &str = if cfg!(windows) { "\r\n" } else { "\n" };
 
-/// Version of the port, taken from the crate manifest.
-pub const VERSION: &str = env!("CARGO_PKG_VERSION");
+/// Version of the port: the release build injects the version of the tag through the
+/// compile-time variable `SMF_BUILD_VERSION` (lot 10, `.github/scripts/package-rust.sh`), so
+/// `Cargo.toml` keeps the development version of the oracle. Without it, the crate manifest
+/// gives the version.
+pub const VERSION: &str = match option_env!("SMF_BUILD_VERSION") {
+    Some(version) => version,
+    None => env!("CARGO_PKG_VERSION"),
+};
 
 #[cfg(test)]
 mod tests {
