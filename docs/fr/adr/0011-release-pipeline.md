@@ -53,3 +53,18 @@ que si ce workflow l'a attesté sur `main` pour cette version, et sinon s'arrêt
 tag, qui doit être sur `main`, avec le script de packaging de `main` ; `publish` ne pousse que ce
 paquet. Les dépendances sont épinglées, verrouillées et installées sans
 scripts.
+
+Distribution Rust : les mêmes jobs remettent les binaires Rust `smf` à la GitHub Release du tag
+(`package-rust`, puis `package-rust-release`, qui écrit `SHA256SUMS`, atteste les archives et
+joint les archives, le fichier d'attestation `attestations-X.Y.Z.jsonl` et `SHA256SUMS`). Ici la
+GitHub Release est la seule source : un job avec `contents: write` pourrait remplacer les assets
+après coup. Les installeurs (`rust/dist/install.sh`, `install.ps1`) vérifient donc chaque archive
+avec `gh attestation verify --bundle` (le bundle est lu sur la Release, sans appel d'API), qui
+n'accepte qu'une attestation signée par `ci.yml` sur `main`, et refusent l'installation sinon.
+Une attestation lie des octets, pas une version : les installeurs exigent aussi que la version
+rapportée par le binaire égale le tag. Risque accepté : sans `gh` utilisable (absent, ou sans la
+commande d'attestation), ou avec `SMF_SKIP_ATTESTATION=1`, un installeur ne contrôle que la somme
+de la même Release, donc qui peut écrire sur la Release peut remplacer l'archive et la somme
+ensemble ; l'installeur avertit, et `SMF_REQUIRE_ATTESTATION=1` refuse l'installation à la
+place. Reste à confirmer sur la première vraie release que `gh` vérifie un fichier d'attestation
+sans connexion.

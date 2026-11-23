@@ -5,12 +5,19 @@
 #   .\install.ps1 [-Tag vX.Y.Z]
 #
 # Without a tag (parameter or SMF_VERSION), the latest Release is installed. The archive is
-# checked against the SHA256SUMS of the same Release; any mismatch stops the install before
-# anything is written. No administrator rights: the folder is added to the user PATH.
+# checked against the SHA256SUMS of the same Release, then, when `gh` is installed, against its
+# provenance attestation (signed by ci.yml on main, read from the Release and verified offline);
+# any failure stops the install before anything is written. Without a usable `gh`, only the
+# checksum is checked, and a warning says so. The version the binary reports must also equal the
+# tag. The two SMF_*_ATTESTATION switches together are refused. No administrator rights: the
+# folder is added to the user PATH.
 # Environment:
-#   SMF_INSTALL_DIR      target folder (default: %LOCALAPPDATA%\Programs\smf\bin)
-#   SMF_RELEASES_URL     releases base (default: https://github.com/JoRouquette/sermofur/releases)
-#   SMF_NO_MODIFY_PATH   set to 1 to leave the user PATH unchanged
+#   SMF_INSTALL_DIR          target folder (default: %LOCALAPPDATA%\Programs\smf\bin)
+#   SMF_RELEASES_URL         releases base (default: https://github.com/JoRouquette/sermofur/releases)
+#   SMF_NO_MODIFY_PATH       set to 1 to leave the user PATH unchanged
+#   SMF_REQUIRE_ATTESTATION  set to 1 to refuse the install when gh is missing
+#   SMF_SKIP_ATTESTATION     set to 1 to install on the checksum alone (offline gh, no login), with a warning
+#   SMF_GH                   gh executable (default: gh)
 param([string]$Tag = $env:SMF_VERSION)
 
 # Everything runs inside this function: under `irm | iex`, the preferences and working
@@ -73,10 +80,59 @@ function Install-Smf([string]$Tag) {
         $actual = (Get-FileHash -LiteralPath (Join-Path $tmp $archive) -Algorithm SHA256).Hash
         if ($actual -ne $expected) { throw "install.ps1: checksum mismatch for ${archive}: nothing installed" }
 
+        # Provenance: the checksum comes from the same Release, so whoever can write to the
+        # Release can replace both. The attestation bundle is signed by ci.yml on main and cannot
+        # be forged for another archive; `gh` checks it against the archive just downloaded, with the
+        # bundle read from the Release (the signature roots are fetched by gh). An attestation binds
+        # bytes, not a version: the version the binary reports is compared with the tag below.
+        $repo = 'JoRouquette/sermofur'
+        $gh = if ($env:SMF_GH) { $env:SMF_GH } else { 'gh' }
+        # A gh without the attestation command counts as absent.
+        $ghUsable = $false
+        if (Get-Command $gh -ErrorAction SilentlyContinue) {
+            $ErrorActionPreference = 'Continue'
+            & $gh attestation verify --help 2>&1 | Out-Null
+            $ghUsable = ($LASTEXITCODE -eq 0)
+            $ErrorActionPreference = 'Stop'
+        }
+        if ($env:SMF_SKIP_ATTESTATION -eq '1' -and $env:SMF_REQUIRE_ATTESTATION -eq '1') {
+            throw 'install.ps1: SMF_SKIP_ATTESTATION and SMF_REQUIRE_ATTESTATION contradict each other: nothing installed'
+        } elseif ($env:SMF_SKIP_ATTESTATION -eq '1') {
+            Write-Warning 'install.ps1: attestation not checked (SMF_SKIP_ATTESTATION=1); only the checksum was verified.'
+        } elseif ($ghUsable) {
+            $bundle = "attestations-$($Tag.Substring(1)).jsonl"
+            try {
+                Invoke-WebRequest -Uri "$releases/download/$Tag/$bundle" -OutFile (Join-Path $tmp $bundle) -UseBasicParsing
+            } catch {
+                throw "install.ps1: the Release $Tag carries no attestation ($bundle): nothing installed"
+            }
+            # Windows PowerShell 5.1 turns a native command's stderr into a terminating error
+            # under 'Stop': read the exit code instead.
+            $ErrorActionPreference = 'Continue'
+            $ghOutput = & $gh attestation verify (Join-Path $tmp $archive) --repo $repo `
+                --signer-workflow "$repo/.github/workflows/ci.yml" --source-ref refs/heads/main `
+                --deny-self-hosted-runners --bundle (Join-Path $tmp $bundle) 2>&1
+            $ghExit = $LASTEXITCODE
+            $ErrorActionPreference = 'Stop'
+            if ($ghExit -ne 0) {
+                [Console]::Error.WriteLine(($ghOutput | Out-String))
+                throw "install.ps1: attestation of $archive not verified: nothing installed"
+            }
+            Write-Host "install.ps1: attestation verified for $archive"
+        } elseif ($env:SMF_REQUIRE_ATTESTATION -eq '1') {
+            throw 'install.ps1: a gh with the attestation command is required (SMF_REQUIRE_ATTESTATION=1): nothing installed'
+        } else {
+            Write-Warning 'install.ps1: gh not found or too old (no attestation command), so only the checksum of the same Release was verified; install a recent gh to verify the provenance.'
+        }
+
         Expand-Archive -LiteralPath (Join-Path $tmp $archive) -DestinationPath (Join-Path $tmp 'x')
         # Start the new binary before it replaces a working one.
         $printed = & (Join-Path $tmp 'x\smf.exe') --version
         if ($LASTEXITCODE -ne 0) { throw "install.ps1: the downloaded smf.exe does not run on this system: nothing replaced" }
+        # An older, genuinely attested release renamed as this one would pass the attestation.
+        if ("$printed" -ne "Sermofur $($Tag.Substring(1))") {
+            throw "install.ps1: the downloaded smf.exe reports '$printed', not Sermofur $($Tag.Substring(1)): nothing replaced"
+        }
         New-Item -ItemType Directory -Path $dir -Force | Out-Null
         # A running smf.exe (the daemon) cannot be overwritten, but it can be renamed; a unique
         # name keeps an older copy still in use from blocking this update.

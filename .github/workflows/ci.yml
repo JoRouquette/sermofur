@@ -439,6 +439,11 @@ jobs:
           # An attestation binds the bytes, not the name: the assets must be the three archives
           # of this version, listed exactly in SHA256SUMS.
           version="${TAG#v}"
+          # The installers verify the archives offline against this bundle: it must be there.
+          if ! grep -qx "attestations-$version.jsonl" <<< "$names"; then
+            echo "::error::$TAG carries SHA256SUMS but no attestations-$version.jsonl: the installers need it. To repair, delete SHA256SUMS from the Release, then republish the tag."
+            exit 1
+          fi
           expected="$(printf 'smf-%s-%s\n' "$version" linux-x64.tar.gz "$version" macos-arm64.tar.gz \
             "$version" windows-x64.zip | sort)"
           attached="$(grep '^smf-' <<< "$names" | sort || true)"
@@ -447,7 +452,8 @@ jobs:
             exit 1
           fi
           mkdir -p artifacts/attached
-          gh release download "$TAG" --pattern "smf-$version-*" --pattern SHA256SUMS --dir artifacts/attached
+          gh release download "$TAG" --pattern "smf-$version-*" --pattern SHA256SUMS \
+            --pattern "attestations-$version.jsonl" --dir artifacts/attached
           cd artifacts/attached
           listed="$(awk '{ sub(/^\*/, "", $2); print $2 }' SHA256SUMS | sort)"
           if [[ "$listed" != "$expected" ]]; then
@@ -459,6 +465,13 @@ jobs:
             gh attestation verify "$file" --repo "$GITHUB_REPOSITORY" \
               --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/ci.yml" \
               --source-ref refs/heads/main --deny-self-hosted-runners
+          done
+          # The installers use the attached bundle, not the API: it must cover every archive.
+          for file in smf-*; do
+            gh attestation verify "$file" --repo "$GITHUB_REPOSITORY" \
+              --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/ci.yml" \
+              --source-ref refs/heads/main --deny-self-hosted-runners \
+              --bundle "attestations-$version.jsonl"
           done
           echo "::notice::$TAG already carries attested Rust archives: they are left as they are."
           echo "done=true" >> "$GITHUB_OUTPUT"
@@ -479,23 +492,51 @@ jobs:
           sha256sum smf-* > SHA256SUMS
           cat SHA256SUMS
       - name: Attest the archives
+        id: attest
         if: steps.existing.outputs.done != 'true'
         uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
           subject-path: |
             artifacts/rust/smf-*
             artifacts/rust/SHA256SUMS
+      - name: Keep the attestation bundle next to the archives
+        # The installers check an archive against this file, offline, with `gh attestation verify
+        # --bundle`: it carries the signature of this workflow on main and cannot be forged for
+        # another archive. Its name does not start with `smf-`, so the checks above ignore it.
+        if: steps.existing.outputs.done != 'true'
+        env:
+          BUNDLE: ${{ steps.attest.outputs.bundle-path }}
+        run: |
+          [[ -s "$BUNDLE" ]] || { echo "::error::The attestation bundle is missing."; exit 1; }
+          cp "$BUNDLE" "artifacts/rust/attestations-${TAG#v}.jsonl"
+      - name: Check that the bundle covers every archive
+        # What the installers will do, before anything is attached: a bundle that gh cannot read,
+        # or that misses an archive, stops the job here and not at the first install.
+        if: steps.existing.outputs.done != 'true'
+        working-directory: artifacts/rust
+        run: |
+          for file in smf-*; do
+            gh attestation verify "$file" --repo "$GITHUB_REPOSITORY" \
+              --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/ci.yml" \
+              --source-ref refs/heads/main --deny-self-hosted-runners \
+              --bundle "attestations-${TAG#v}.jsonl"
+          done
       - name: Attach to the GitHub Release
         if: steps.existing.outputs.done != 'true'
-        # --clobber replaces the archives of an interrupted run, which never attached SHA256SUMS.
+        # --clobber replaces the assets of an interrupted run, which never attached SHA256SUMS:
+        # it goes last, as the sign that everything else is there.
         run: |
           gh release upload "$TAG" artifacts/rust/smf-* --clobber
+          gh release upload "$TAG" "artifacts/rust/attestations-${TAG#v}.jsonl" --clobber
           gh release upload "$TAG" artifacts/rust/SHA256SUMS --clobber
 
   install-rust:
     # Lot 10: builds the Rust archive of this commit with package-rust.sh (test version 0.0.1),
     # then runs rust/dist/install.sh or install.ps1 against a local server that mimics GitHub
-    # Releases: install by tag, latest Release, wrong checksum and missing line refused.
+    # Releases, with a stand-in gh: install by tag, latest Release, wrong checksum, missing line,
+    # attestation of another archive, missing attestation, no gh, gh without the attestation
+    # command, skipped attestation, both switches refused, and a version replay (Linux and macOS:
+    # fake archive). The full list is in the docstring of test-install.py.
     if: github.event_name != 'workflow_dispatch'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30

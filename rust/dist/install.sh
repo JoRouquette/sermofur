@@ -5,10 +5,16 @@
 #   sh install.sh [vX.Y.Z]
 #
 # Without a tag (argument or SMF_VERSION), the latest Release is installed. The archive is checked against the
-# SHA256SUMS of the same Release; any mismatch stops the install before anything is written.
+# SHA256SUMS of the same Release, then, when `gh` is installed, against its provenance attestation
+# (signed by ci.yml on main, read from the Release and verified offline); any failure stops the
+# install before anything is written. Without a usable `gh`, only the checksum is checked, and a warning says so.
+# The version the binary reports must also equal the tag. The two SMF_*_ATTESTATION switches together are refused.
 # Environment:
-#   SMF_INSTALL_DIR   target folder (default: $HOME/.local/bin), created without sudo
-#   SMF_RELEASES_URL  releases base (default: https://github.com/JoRouquette/sermofur/releases)
+#   SMF_INSTALL_DIR          target folder (default: $HOME/.local/bin), created without sudo
+#   SMF_RELEASES_URL         releases base (default: https://github.com/JoRouquette/sermofur/releases)
+#   SMF_REQUIRE_ATTESTATION  set to 1 to refuse the install when gh is missing
+#   SMF_SKIP_ATTESTATION     set to 1 to install on the checksum alone (offline gh, no login), with a warning
+#   SMF_GH                   gh executable (default: gh)
 set -eu
 
 fail() {
@@ -66,6 +72,34 @@ fi
 [ "$(echo "$expected" | tr 'A-F' 'a-f')" = "$actual" ] ||
   fail "checksum mismatch for $archive: nothing installed"
 
+# Provenance: the checksum comes from the same Release, so whoever can write to the Release can
+# replace both. The attestation bundle is signed by ci.yml on main and cannot be forged for
+# another archive; `gh` checks it against the archive just downloaded, with the bundle read from
+# the Release (the signature roots are fetched by gh). An attestation binds bytes, not a version:
+# the version the binary reports is compared with the tag below.
+repo="JoRouquette/sermofur"
+gh="${SMF_GH:-gh}"
+if [ "${SMF_SKIP_ATTESTATION:-}" = 1 ] && [ "${SMF_REQUIRE_ATTESTATION:-}" = 1 ]; then
+  fail "SMF_SKIP_ATTESTATION and SMF_REQUIRE_ATTESTATION contradict each other: nothing installed"
+elif [ "${SMF_SKIP_ATTESTATION:-}" = 1 ]; then
+  echo "install.sh: warning: attestation not checked (SMF_SKIP_ATTESTATION=1); only the checksum was verified." >&2
+elif command -v "$gh" > /dev/null 2>&1 && "$gh" attestation verify --help > /dev/null 2>&1; then
+  bundle="attestations-${tag#v}.jsonl"
+  curl $secure -fsSL -o "$tmp/$bundle" "$releases/download/$tag/$bundle" ||
+    fail "the Release $tag carries no attestation ($bundle): nothing installed"
+  "$gh" attestation verify "$tmp/$archive" --repo "$repo" \
+    --signer-workflow "$repo/.github/workflows/ci.yml" --source-ref refs/heads/main \
+    --deny-self-hosted-runners --bundle "$tmp/$bundle" > "$tmp/gh.log" 2>&1 || {
+    cat "$tmp/gh.log" >&2
+    fail "attestation of $archive not verified: nothing installed"
+  }
+  echo "install.sh: attestation verified for $archive"
+elif [ "${SMF_REQUIRE_ATTESTATION:-}" = 1 ]; then
+  fail "a gh with the attestation command is required (SMF_REQUIRE_ATTESTATION=1): nothing installed"
+else
+  echo "install.sh: warning: gh not found or too old (no attestation command), so only the checksum of the same Release was verified; install a recent gh to verify the provenance." >&2
+fi
+
 tar -xzf "$tmp/$archive" -C "$tmp" smf
 mkdir -p "$dir"
 # Copy then rename in the same folder: a running smf keeps its old file.
@@ -75,6 +109,11 @@ chmod 755 "$dir/.smf.new"
 printed="$("$dir/.smf.new" --version)" || {
   rm -f "$dir/.smf.new"
   fail "the downloaded smf does not run on this system: nothing replaced"
+}
+# An older, genuinely attested release renamed as this one would pass the attestation.
+[ "$printed" = "Sermofur ${tag#v}" ] || {
+  rm -f "$dir/.smf.new"
+  fail "the downloaded smf reports '$printed', not Sermofur ${tag#v}: nothing replaced"
 }
 mv -f "$dir/.smf.new" "$dir/smf"
 echo "install.sh: installed $printed to $dir/smf"
