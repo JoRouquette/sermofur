@@ -1,0 +1,96 @@
+{
+  "entries": [
+    "elsewhere/",
+    "work/"
+  ],
+  "projections": {},
+  "steps": [
+    {
+      "output": {
+        "exitCode": 2,
+        "stderr": "smf: no_instance: No .sermofur instance in the parent folders.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 2,
+        "stderr": "{\n  \"code\": \"no_instance\",\n  \"message\": \"No .sermofur instance in the parent folders.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 2,
+        "stderr": "smf: no_instance: No .sermofur instance in the parent folders.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "doctor",
+          "extra"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": "work"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": "elsewhere"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "link": "work/.sermofur",
+        "target": "elsewhere"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 4,
+        "stderr": "{\n  \"code\": \"unsafe_path\",\n  \"message\": \"Links and junctions are not supported in this version.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "doctor"
+        ],
+        "cwd": "work"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 4,
+        "stderr": "smf: unsafe_path: Links and junctions are not supported in this version.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": "work"
+      }
+    }
+  ]
+}

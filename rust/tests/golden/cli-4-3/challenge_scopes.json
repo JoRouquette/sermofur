@@ -1,0 +1,349 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/",
+    ".sermofur/records/<g2>.md",
+    ".sermofur/records/<g3>.md",
+    ".sermofur/records/<g4>.md",
+    ".sermofur/records/<g5>.md",
+    "a/",
+    "b/",
+    "c/"
+  ],
+  "projections": {
+    "<g2>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g2>\",\n  \"scopeId\": \"a\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Claim <g2>\n\n```json\n{\n  \"text\": \"secret de a\",\n  \"category\": \"semantic\",\n  \"volatility\": \"evolving\",\n  \"lastVerified\": null,\n  \"reviewAfter\": null\n}\n```\n",
+    "<g3>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g3>\",\n  \"scopeId\": \"c\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 2,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"john\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Source <g3>\n\n```json\n{\n  \"relativePath\": \"c/plan.md\",\n  \"status\": \"indexed\",\n  \"hash\": \"9F86D081884C7D659A2FEAA0C55AD015A3BF4F1B2B0B822CD15D6C15B0F00A08\",\n  \"size\": 4,\n  \"indexedAt\": null,\n  \"passages\": 1,\n  \"rejection\": null\n}\n```\n",
+    "<g4>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g4>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Claim <g4>\n\n```json\n{\n  \"text\": \"le plan existe\",\n  \"category\": \"semantic\",\n  \"volatility\": \"evolving\",\n  \"lastVerified\": null,\n  \"reviewAfter\": null\n}\n```\n",
+    "<g5>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g5>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Evidence <g5>\n\n```json\n{\n  \"claimId\": \"<g4>\",\n  \"kind\": \"project_decision\",\n  \"reference\": \"plan\",\n  \"lineageId\": \"plan\",\n  \"relation\": \"supports\",\n  \"sourceId\": \"<g3>\",\n  \"sourceHash\": \"9F86D081884C7D659A2FEAA0C55AD015A3BF4F1B2B0B822CD15D6C15B0F00A08\"\n}\n```\n"
+  },
+  "steps": [
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"created\": true\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "init"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": "a"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": "b"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": "c"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"a\",\n  \"kind\": \"client\",\n  \"parentId\": \"workspace\",\n  \"relativePath\": \"a\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "a",
+          "client",
+          "workspace",
+          "a"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"b\",\n  \"kind\": \"client\",\n  \"parentId\": \"workspace\",\n  \"relativePath\": \"b\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "b",
+          "client",
+          "workspace",
+          "b"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g2>\",\n  \"scopeId\": \"a\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022secret de a\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "add",
+          "secret de a",
+          "--origin",
+          "user"
+        ],
+        "cwd": "a"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: not_found: Object missing or inaccessible.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "{6}"
+        ],
+        "cwd": "b"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: not_found: Object missing or inaccessible.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "0f8fad5b-d9cb-469f-a165-70867728950e"
+        ],
+        "cwd": "b"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"target\": {\n    \"claimId\": null,\n    \"text\": \"secret\",\n    \"status\": null\n  },\n  \"signals\": [],\n  \"toConfront\": []\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "--text",
+          "secret"
+        ],
+        "cwd": "b"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"target\": {\n    \"claimId\": null,\n    \"text\": \"secret\",\n    \"status\": null\n  },\n  \"signals\": [],\n  \"toConfront\": [\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g2>\",\n      \"scopeId\": \"a\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"low\",\n        \"reasons\": [\n          \"No independent evidence available.\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 0\n      },\n      \"excerpt\": \"secret de a\",\n      \"matchedTerms\": [\n        \"secret\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 0.287682,\n      \"path\": null\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "--text",
+          "secret"
+        ],
+        "cwd": "a"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: not_found: Object missing or inaccessible.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "{6}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"target\": {\n    \"claimId\": \"<g2>\",\n    \"text\": \"secret de a\",\n    \"status\": \"proposed\"\n  },\n  \"signals\": [],\n  \"toConfront\": []\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "{6}"
+        ],
+        "cwd": "a"
+      }
+    },
+    {
+      "output": "{\n  \"id\": \"<g3>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022c/plan.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u00229F86D081884C7D659A2FEAA0C55AD015A3BF4F1B2B0B822CD15D6C15B0F00A08\\u0022,\\n  \\u0022size\\u0022: 4,\\n  \\u0022indexedAt\\u0022: null,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"john\",\n    \"timestamp\": \"<date>\"\n  }\n}",
+      "step": {
+        "indexed": true,
+        "scope": "workspace",
+        "source": "c/plan.md"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g4>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022le plan existe\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "add",
+          "le plan existe",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g5>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g4>\\u0022,\\n  \\u0022kind\\u0022: \\u0022project_decision\\u0022,\\n  \\u0022reference\\u0022: \\u0022plan\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022plan\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: \\u0022<g3>\\u0022,\\n  \\u0022sourceHash\\u0022: \\u00229F86D081884C7D659A2FEAA0C55AD015A3BF4F1B2B0B822CD15D6C15B0F00A08\\u0022\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{14}",
+          "project_decision",
+          "plan",
+          "--lineage",
+          "plan",
+          "--origin",
+          "user",
+          "--source",
+          "{13}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"target\": {\n    \"claimId\": \"<g4>\",\n    \"text\": \"le plan existe\",\n    \"status\": \"proposed\"\n  },\n  \"signals\": [],\n  \"toConfront\": []\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "{14}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"c\",\n  \"kind\": \"client\",\n  \"parentId\": \"workspace\",\n  \"relativePath\": \"c\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "c",
+          "client",
+          "workspace",
+          "c"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/instance.json",
+        "added .sermofur/memory.db",
+        "added .sermofur/records/<g2>.md",
+        "added .sermofur/records/<g3>.md",
+        "added .sermofur/records/<g4>.md",
+        "added .sermofur/records/<g5>.md"
+      ],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"target\": {\n    \"claimId\": \"<g4>\",\n    \"text\": \"le plan existe\",\n    \"status\": \"proposed\"\n  },\n  \"signals\": [\n    {\n      \"type\": \"source_unavailable\",\n      \"objectId\": \"<g4>\",\n      \"explanation\": \"Source cited by evidence \\u0022plan\\u0022 is no longer visible from this scope.\",\n      \"evidenceId\": \"<g5>\",\n      \"sourceId\": \"<g3>\",\n      \"recordedHash\": \"9F86D081884C7D659A2FEAA0C55AD015A3BF4F1B2B0B822CD15D6C15B0F00A08\",\n      \"currentHash\": null\n    }\n  ],\n  \"toConfront\": []\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "{14}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"target\": {\n    \"claimId\": \"<g4>\",\n    \"text\": \"le plan existe\",\n    \"status\": \"proposed\"\n  },\n  \"signals\": [],\n  \"toConfront\": []\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "{14}"
+        ],
+        "cwd": "c"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: not_found: Object missing or inaccessible.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "{13}"
+        ],
+        "cwd": "c"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"target\": {\n    \"claimId\": null,\n    \"text\": \"plan\",\n    \"status\": null\n  },\n  \"signals\": [],\n  \"toConfront\": [\n    {\n      \"kind\": \"claim\",\n      \"id\": \"<g4>\",\n      \"scopeId\": \"workspace\",\n      \"status\": \"proposed\",\n      \"applicable\": true,\n      \"confidence\": {\n        \"level\": \"medium\",\n        \"reasons\": [\n          \"Origin plan: support Medium; repetitions grouped.\",\n          \"Declared evidence; no controlled execution collector in this version.\"\n        ],\n        \"independentOrigins\": 1\n      },\n      \"excerpt\": \"le plan existe\",\n      \"matchedTerms\": [\n        \"plan\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": null,\n        \"hash\": null,\n        \"sourceStatus\": null\n      },\n      \"score\": 0.31645,\n      \"path\": null\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "--text",
+          "plan"
+        ],
+        "cwd": "c"
+      }
+    },
+    {
+      "output": [],
+      "step": {
+        "changes": true
+      }
+    }
+  ]
+}

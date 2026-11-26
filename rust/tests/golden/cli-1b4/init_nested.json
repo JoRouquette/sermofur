@@ -1,0 +1,13 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/",
+    "sub/"
+  ],
+  "exitCode": 4,
+  "instanceJson": "{\n  \"schemaVersion\": 2,\n  \"instanceId\": \"<guid>\",\n  \"createdAt\": \"<date>\"\n}",
+  "stderr": "{\n  \"code\": \"nested_instance\",\n  \"message\": \"An ancestor instance exists; nested initialization refused.\"\n}\n",
+  "stdout": ""
+}

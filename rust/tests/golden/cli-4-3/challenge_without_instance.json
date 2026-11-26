@@ -1,0 +1,49 @@
+{
+  "entries": [],
+  "projections": {},
+  "steps": [
+    {
+      "output": {
+        "exitCode": 2,
+        "stderr": "smf: no_instance: No .sermofur instance in the parent folders.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "0f8fad5b-d9cb-469f-a165-70867728950e"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 2,
+        "stderr": "{\n  \"code\": \"no_instance\",\n  \"message\": \"No .sermofur instance in the parent folders.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "--text",
+          "x",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 2,
+        "stderr": "smf: no_instance: No .sermofur instance in the parent folders.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge"
+        ],
+        "cwd": ""
+      }
+    }
+  ]
+}

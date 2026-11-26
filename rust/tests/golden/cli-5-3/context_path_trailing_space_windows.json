@@ -1,0 +1,167 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/",
+    ".sermofur/records/<g2>.md",
+    "sub/",
+    "sub/doc.md"
+  ],
+  "projections": {
+    "<g2>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g2>\",\n  \"scopeId\": \"s\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Source <g2>\n\n```json\n{\n  \"relativePath\": \"sub/doc.md\",\n  \"status\": \"indexed\",\n  \"hash\": \"c04caf2c9542759c511614906644bcd7630f77045ebe988c79a1024d7f2852dd\",\n  \"size\": 8,\n  \"indexedAt\": \"<date>\",\n  \"passages\": 1,\n  \"rejection\": null\n}\n```\n"
+  },
+  "steps": [
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"created\": true\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "init"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": "sub"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "file": "sub/doc.md"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"scope\": \"workspace\",\n  \"visible\": [\n    \"workspace\"\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "--path",
+          "sub ",
+          "scope",
+          "current"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"s\",\n  \"kind\": \"client\",\n  \"parentId\": \"workspace\",\n  \"relativePath\": \"sub\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "s",
+          "client",
+          "workspace",
+          "sub"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"scope\": \"s\",\n  \"visible\": [\n    \"s\",\n    \"workspace\"\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "--path",
+          "sub ",
+          "scope",
+          "current"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g2>\",\n  \"scopeId\": \"s\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022sub/doc.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u0022c04caf2c9542759c511614906644bcd7630f77045ebe988c79a1024d7f2852dd\\u0022,\\n  \\u0022size\\u0022: 8,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "--path",
+          "sub ",
+          "source",
+          "add",
+          "doc.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "[\n  {\n    \"id\": \"<g2>\",\n    \"scopeId\": \"s\",\n    \"kind\": \"source\",\n    \"status\": \"active\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022sub/doc.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u0022c04caf2c9542759c511614906644bcd7630f77045ebe988c79a1024d7f2852dd\\u0022,\\n  \\u0022size\\u0022: 8,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  }\n]\n"
+      },
+      "step": {
+        "arguments": [
+          "--path",
+          "sub. ",
+          "source",
+          "list"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"scope\": \"s\",\n  \"claims\": 0,\n  \"evidence\": 0,\n  \"retex\": 0,\n  \"sources\": 1,\n  \"mode\": \"direct\",\n  \"laya\": \"unavailable\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "--path",
+          "sub ",
+          "status"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"indexed\": 1,\n  \"changedSources\": 0\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "--path",
+          "sub ",
+          "index",
+          "rebuild"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/instance.json",
+        "added .sermofur/memory.db",
+        "added .sermofur/records/<g2>.md"
+      ],
+      "step": {
+        "changes": true
+      }
+    }
+  ]
+}

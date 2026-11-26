@@ -1,0 +1,280 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/",
+    "target/",
+    "x/",
+    "x/y/"
+  ],
+  "projections": {},
+  "steps": [
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"created\": true\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "init"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": "a/b"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"a\",\n  \"kind\": \"client\",\n  \"parentId\": \"workspace\",\n  \"relativePath\": \"a\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "a",
+          "client",
+          "workspace",
+          "a"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "sql": "INSERT INTO scopes VALUES('nested','Client','workspace','a/b')"
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/instance.json",
+        "added .sermofur/memory.db"
+      ],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": {
+        "exitCode": 5,
+        "stderr": "",
+        "stdout": "Sermofur Doctor\n  ok: instance — Compatible configuration and version.\n  ok: schema — Consistent SQLite schema and identity.\n  ok: storage — SQLite integrity check.\n  ok: orphan_records — 0 inconsistent references.\n  ok: scopes — Valid scope tree.\n  ok: scope_mappings — 0 missing mappings.\n  error: scope_overlap — 1 conflicting mapping pairs.\n  ok: memory_consistency — 0 inconsistencies detected.\n  ok: projections — 0 missing or diverging projections; run export to rebuild.\n  ok: record_columns — 0 inconsistent metadata rows.\n  ok: fts5 — SQLite full-text search engine.\n  ok: search_index — 0 objects missing from the index or misplaced, 0 entries without object; run index rebuild.\n  ok: source_scopes — 0 sources attached to a broader scope than their file.\n  ok: sqlite — Native version <sqlite>; journal delete.\n  warning: daemon — absent: commands run directly.\n  warning: laya — Capability not delivered in this version.\n  warning: model — Capability not delivered in this version.\n  warning: mcp — Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\nOverall: unhealthy\n"
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "sql": "DELETE FROM scopes WHERE id='nested'"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": "x/y"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "sql": "INSERT INTO scopes VALUES('legacy','Client','workspace','x\\y')"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "Sermofur Doctor\n  ok: instance — Compatible configuration and version.\n  ok: schema — Consistent SQLite schema and identity.\n  ok: storage — SQLite integrity check.\n  ok: orphan_records — 0 inconsistent references.\n  ok: scopes — Valid scope tree.\n  ok: scope_mappings — 0 missing mappings.\n  ok: scope_overlap — 0 conflicting mapping pairs.\n  ok: memory_consistency — 0 inconsistencies detected.\n  ok: projections — 0 missing or diverging projections; run export to rebuild.\n  ok: record_columns — 0 inconsistent metadata rows.\n  ok: fts5 — SQLite full-text search engine.\n  ok: search_index — 0 objects missing from the index or misplaced, 0 entries without object; run index rebuild.\n  ok: source_scopes — 0 sources attached to a broader scope than their file.\n  ok: sqlite — Native version <sqlite>; journal delete.\n  warning: daemon — absent: commands run directly.\n  warning: laya — Capability not delivered in this version.\n  warning: model — Capability not delivered in this version.\n  warning: mcp — Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\nOverall: healthy_with_warnings\n"
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "sql": "INSERT INTO scopes VALUES('lost','Client','nowhere','lost')"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 5,
+        "stderr": "",
+        "stdout": "Sermofur Doctor\n  ok: instance — Compatible configuration and version.\n  ok: schema — Consistent SQLite schema and identity.\n  ok: storage — SQLite integrity check.\n  error: orphan_records — 1 inconsistent references.\n  error: instance_storage — invalid_scope_tree\n  warning: daemon — absent: commands run directly.\n  warning: laya — Capability not delivered in this version.\n  warning: model — Capability not delivered in this version.\n  warning: mcp — Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\nOverall: unhealthy\n"
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "sql": "DELETE FROM scopes WHERE id='lost'"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "sql": "INSERT INTO scopes VALUES('odd','Galaxy','workspace',NULL)"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 5,
+        "stderr": "",
+        "stdout": "Sermofur Doctor\n  ok: instance — Compatible configuration and version.\n  ok: schema — Consistent SQLite schema and identity.\n  ok: storage — SQLite integrity check.\n  ok: orphan_records — 0 inconsistent references.\n  error: instance_storage — invalid_storage\n  warning: daemon — absent: commands run directly.\n  warning: laya — Capability not delivered in this version.\n  warning: model — Capability not delivered in this version.\n  warning: mcp — Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\nOverall: unhealthy\n"
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "sql": "UPDATE scopes SET kind='7' WHERE id='odd'"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 5,
+        "stderr": "",
+        "stdout": "Sermofur Doctor\n  ok: instance — Compatible configuration and version.\n  ok: schema — Consistent SQLite schema and identity.\n  ok: storage — SQLite integrity check.\n  ok: orphan_records — 0 inconsistent references.\n  error: instance_storage — invalid_scope_tree\n  warning: daemon — absent: commands run directly.\n  warning: laya — Capability not delivered in this version.\n  warning: model — Capability not delivered in this version.\n  warning: mcp — Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\nOverall: unhealthy\n"
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "sql": "UPDATE scopes SET kind='Repository' WHERE id='odd'"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 5,
+        "stderr": "",
+        "stdout": "Sermofur Doctor\n  ok: instance — Compatible configuration and version.\n  ok: schema — Consistent SQLite schema and identity.\n  ok: storage — SQLite integrity check.\n  ok: orphan_records — 0 inconsistent references.\n  error: instance_storage — invalid_scope_tree\n  warning: daemon — absent: commands run directly.\n  warning: laya — Capability not delivered in this version.\n  warning: model — Capability not delivered in this version.\n  warning: mcp — Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\nOverall: unhealthy\n"
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "sql": "DELETE FROM scopes WHERE id='odd'"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "sql": "UPDATE scopes SET relative_path='../out' WHERE id='a'"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 5,
+        "stderr": "",
+        "stdout": "Sermofur Doctor\n  ok: instance — Compatible configuration and version.\n  ok: schema — Consistent SQLite schema and identity.\n  ok: storage — SQLite integrity check.\n  ok: orphan_records — 0 inconsistent references.\n  ok: scopes — Valid scope tree.\n  error: instance_storage — scope_boundary\n  warning: daemon — absent: commands run directly.\n  warning: laya — Capability not delivered in this version.\n  warning: model — Capability not delivered in this version.\n  warning: mcp — Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\nOverall: unhealthy\n"
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "sql": "UPDATE scopes SET relative_path='C:/out' WHERE id='a'"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 5,
+        "stderr": "",
+        "stdout": "Sermofur Doctor\n  ok: instance — Compatible configuration and version.\n  ok: schema — Consistent SQLite schema and identity.\n  ok: storage — SQLite integrity check.\n  ok: orphan_records — 0 inconsistent references.\n  ok: scopes — Valid scope tree.\n  error: instance_storage — unsafe_path\n  warning: daemon — absent: commands run directly.\n  warning: laya — Capability not delivered in this version.\n  warning: model — Capability not delivered in this version.\n  warning: mcp — Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\nOverall: unhealthy\n"
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "sql": "UPDATE scopes SET relative_path='a' WHERE id='a'"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "rmdir": "a"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": "target"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "link": "a",
+        "target": "target"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 5,
+        "stderr": "",
+        "stdout": "Sermofur Doctor\n  ok: instance — Compatible configuration and version.\n  ok: schema — Consistent SQLite schema and identity.\n  ok: storage — SQLite integrity check.\n  ok: orphan_records — 0 inconsistent references.\n  ok: scopes — Valid scope tree.\n  error: instance_storage — unsafe_path\n  warning: daemon — absent: commands run directly.\n  warning: laya — Capability not delivered in this version.\n  warning: model — Capability not delivered in this version.\n  warning: mcp — Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\nOverall: unhealthy\n"
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    }
+  ]
+}

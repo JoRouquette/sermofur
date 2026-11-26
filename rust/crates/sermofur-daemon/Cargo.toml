@@ -1,0 +1,27 @@
+[package]
+name = "sermofur-daemon"
+description = "Sermofur daemon: frames and messages of the local protocol (layer 7 of the Rust port)."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+sermofur-core = { path = "../sermofur-core" }
+# Decision A2 of John: tokio for the daemon and its client only, the core stays synchronous.
+tokio = { version = "1.54.1", default-features = false, features = ["io-util", "net", "rt", "sync", "time"] }
+
+[dev-dependencies]
+proptest = "1"
+serde_json = "1"
+sha2 = "0.11.1"
+tokio = { version = "1.54.1", default-features = false, features = ["io-util", "rt"] }
+
+# Decision of John, 2026-11-17 (option A of lot 7.7): the job object of the Windows supervisor,
+# without unsafe in our code.
+[target.'cfg(windows)'.dependencies]
+win32job = "=2.0.3"

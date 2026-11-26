@@ -1,0 +1,904 @@
+{
+  "cases": [
+    {
+      "name": "topic init",
+      "arguments": [
+        "init",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] init\n\nCreates an instance (.sermofur) in the context directory, or returns the existing one. Refused inside another instance.\n\nErrors (code, exit):\n  invalid_path (1)      The directory does not exist.\n  nested_instance (4)   A valid instance exists above.\n  invalid_instance (3)  The nearest .sermofur entry is not a valid instance.\n  unsafe_path (4)       Network path, link or junction.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf init\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic root",
+      "arguments": [
+        "root",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] root\n\nPrints the root of the nearest instance going up from the context directory.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf root\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic status",
+      "arguments": [
+        "status",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] status\n\nIdentity of the instance, current scope and counts of the visible objects.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf status --json\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic doctor",
+      "arguments": [
+        "doctor",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] doctor\n\nRead-only health check: integrity, schema, scopes, mappings, index, projections. Exit 5 when unhealthy, 0 when healthy, with or without warnings.\n\nErrors (code, exit):\n  unsafe_path (4)  The .sermofur entry is a link.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf doctor\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic export",
+      "arguments": [
+        "export",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] export\n\nRebuilds the Markdown projections of the visible objects and lists their files.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf export\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic migrate",
+      "arguments": [
+        "migrate",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] migrate\n\nMigrates an instance from format 1 (0.1) to format 2: consistency check, backup in .sermofur/backups/, one transaction. Resumes after an interruption; nothing to do on format 2.\n\nErrors (code, exit):\n  storage_error (3)  The instance is not consistent: run smf doctor first.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf migrate\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic scope current",
+      "arguments": [
+        "scope",
+        "current",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] scope current\n\nCurrent scope (from the context directory) and its visible ancestors.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf scope current\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic scope list",
+      "arguments": [
+        "scope",
+        "list",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] scope list\n\nVisible scopes: the current one and its ancestors, never siblings or descendants.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf scope list\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic scope tree",
+      "arguments": [
+        "scope",
+        "tree",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] scope tree\n\nSame as scope list in this version.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf scope tree\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic scope add",
+      "arguments": [
+        "scope",
+        "add",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] scope add ID KIND PARENT RELATIVE_PATH\n\nRegisters a direct child of the current scope, mapped to an existing directory. The mapping is stored as the folder is named on disk.\n\nArguments:\n  ID             New identifier: [a-z][a-z0-9-]{0,63}.\n  KIND           client, project, repository or task, compatible with the parent.\n  PARENT         The current scope (workspace at the instance root).\n  RELATIVE_PATH  Directory relative to the instance root, inside the parent's directory.\n\nErrors (code, exit):\n  invalid_scope (1)      Bad identifier or kind, or identifier taken.\n  duplicate_mapping (1)  Directory already mapped by another scope.\n  invalid_path (1)       The directory does not exist.\n  scope_boundary (4)     Wrong parent, or mapping outside the parent or overlapping another branch.\n  unsafe_path (4)        Absolute path, drive, link, junction or network path, or an alias.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf scope add acme client workspace acme\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic claim add",
+      "arguments": [
+        "claim",
+        "add",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] claim add TEXT --origin user|llm\n\nRecords a proposed claim in the current scope. Its confidence is computed when read, from its evidence.\n\nArguments:\n  TEXT  The statement. Put it after -- if it starts with -- or is -h or -v.\n\nOptions:\n  --origin user|llm        Required, no default. Declared origin of the record.\n  --category CATEGORY      episodic, semantic, procedural, preferences or decisions. Default: semantic. preferences and decisions require --origin user.\n  --volatility VOLATILITY  stable, evolving or volatile. Default: evolving.\n  --actor NAME             Name recorded in the history. Default: local-user.\n  --key KEY                Idempotency key: the same key with the same content returns the same object.\n\nErrors (code, exit):\n  invalid_arguments (1)     Missing origin, bad value or unknown option.\n  user_choice_required (1)  preferences or decisions with --origin llm.\n  idempotency_conflict (1)  Key reused with another content.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf claim add \"The billing API paginates with cursors\" --origin user\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic claim list",
+      "arguments": [
+        "claim",
+        "list",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] claim list\n\nVisible claims.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf claim list --json\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic claim show",
+      "arguments": [
+        "claim",
+        "show",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] claim show ID\n\nThe claim with its evidence, its explained confidence and its history.\n\nArguments:\n  ID  Identifier (GUID) of a visible claim.\n\nErrors (code, exit):\n  not_found (1)  Unknown identifier, or one of a scope that is not visible.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf claim show 7f8c1a3e-0000-4000-8000-000000000001\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic claim invalidate",
+      "arguments": [
+        "claim",
+        "invalidate",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] claim invalidate ID --reason TEXT\n\nInvalidates a claim of the current scope, with an auditable reason.\n\nArguments:\n  ID  Identifier (GUID) of a visible claim of the current scope.\n\nOptions:\n  --reason TEXT  Required. Why the claim no longer holds.\n  --actor NAME   Name recorded in the history. Default: local-user.\n\nErrors (code, exit):\n  not_found (1)       Unknown identifier, or one of a scope that is not visible.\n  scope_boundary (4)  The claim belongs to an ancestor scope.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf claim invalidate 7f8c1a3e-0000-4000-8000-000000000001 --reason \"Replaced by cursors v2\"\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic evidence add",
+      "arguments": [
+        "evidence",
+        "add",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] evidence add CLAIM_ID KIND REFERENCE --lineage ORIGIN --origin user|llm\n\nRecords evidence for (or with --contradicts, against) a claim, in the claim's scope. Evidence of the same lineage counts as one origin.\n\nArguments:\n  CLAIM_ID   Identifier (GUID) of a visible claim.\n  KIND       execution, source_code, authoritative_documentation, project_decision, local_documentation, human_observation, user_assertion or llm_assertion.\n  REFERENCE  Where the evidence can be checked (file, URL, run...).\n\nOptions:\n  --lineage ORIGIN    Required. Common origin of related evidence.\n  --origin user|llm   Required, no default. Declared origin of the record.\n  --contradicts       Evidence against the claim. From a non-LLM origin, it caps confidence at medium.\n  --source SOURCE_ID  Visible indexed source supporting the evidence; its hash is kept.\n  --actor NAME        Name recorded in the history. Default: local-user.\n  --key KEY           Idempotency key: the same key with the same content returns the same object.\n\nErrors (code, exit):\n  not_found (1)             Unknown identifier, or one of a scope that is not visible.\n  scope_boundary (4)        The claim is not in the current scope.\n  source_unavailable (1)    The source is missing, unreadable or rejected.\n  idempotency_conflict (1)  Key reused with another content.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf evidence add 7f8c1a3e-0000-4000-8000-000000000001 source_code src/Billing/Pagination.cs --lineage billing-repo --origin user\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic evidence list",
+      "arguments": [
+        "evidence",
+        "list",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] evidence list\n\nVisible evidence.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf evidence list\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic evidence show",
+      "arguments": [
+        "evidence",
+        "show",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] evidence show ID\n\nOne piece of evidence.\n\nArguments:\n  ID  Identifier (GUID) of a visible evidence.\n\nErrors (code, exit):\n  not_found (1)  Unknown identifier, or one of a scope that is not visible.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf evidence show 7f8c1a3e-0000-4000-8000-000000000002\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic retex add",
+      "arguments": [
+        "retex",
+        "add",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] retex add --event TEXT --impact TEXT --next TEXT --origin user|llm\n\nRecords a lesson learned (RETEX) as a draft; nothing is learned implicitly.\n\nOptions:\n  --event TEXT       Required. What happened.\n  --impact TEXT      Required. What it caused.\n  --next TEXT        Required. What to do next time.\n  --origin user|llm  Required, no default. Declared origin of the record.\n  --actor NAME       Name recorded in the history. Default: local-user.\n  --key KEY          Idempotency key: the same key with the same content returns the same object.\n\nErrors (code, exit):\n  invalid_arguments (1)     Missing option or unknown option.\n  idempotency_conflict (1)  Key reused with another content.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf retex add --event \"Cache cleared on deploy\" --impact \"Slow start\" --next \"Warm the cache\" --origin user\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic retex list",
+      "arguments": [
+        "retex",
+        "list",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] retex list\n\nVisible RETEX.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf retex list\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic retex show",
+      "arguments": [
+        "retex",
+        "show",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] retex show ID\n\nOne RETEX.\n\nArguments:\n  ID  Identifier (GUID) of a visible RETEX.\n\nErrors (code, exit):\n  not_found (1)  Unknown identifier, or one of a scope that is not visible.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf retex show 7f8c1a3e-0000-4000-8000-000000000003\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic source add",
+      "arguments": [
+        "source",
+        "add",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] source add FILE --origin user|llm\n\nDeclares a local UTF-8 text file (at most 1 MiB) as a source of the current scope: read once, hashed and indexed. Idempotent by path.\n\nArguments:\n  FILE  Relative to the context directory; inside the current scope's directory and outside any narrower scope.\n\nOptions:\n  --origin user|llm  Required, no default. Declared origin of the record.\n  --actor NAME       Name recorded in the history. Default: local-user.\n\nErrors (code, exit):\n  source_rejected (1)  Empty, binary or larger than 1 MiB.\n  invalid_path (1)     Missing, a folder, or unreadable.\n  scope_boundary (4)   Outside the scope's directory, in a narrower scope, or a source of another scope.\n  unsafe_path (4)      Link, junction, network path, alias, or a file of .sermofur.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf source add docs/adr/0001.md --origin user\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic source list",
+      "arguments": [
+        "source",
+        "list",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] source list\n\nVisible sources.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf source list\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic source show",
+      "arguments": [
+        "source",
+        "show",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] source show ID\n\nA source with its history.\n\nArguments:\n  ID  Identifier (GUID) of a visible source.\n\nErrors (code, exit):\n  not_found (1)  Unknown identifier, or one of a scope that is not visible.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf source show 7f8c1a3e-0000-4000-8000-000000000004\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic source reindex",
+      "arguments": [
+        "source",
+        "reindex",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] source reindex [ID]\n\nReads again the sources of the current scope (or one of them): unchanged, modified, missing, unreadable, rejected, restored, or skipped when another command changed it meanwhile.\n\nArguments:\n  ID  Optional. Identifier (GUID) of a source of the current scope.\n\nOptions:\n  --actor NAME  Name recorded in the history. Default: local-user.\n\nErrors (code, exit):\n  not_found (1)  Unknown identifier, or one of a scope that is not visible.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf source reindex\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic index rebuild",
+      "arguments": [
+        "index",
+        "rebuild",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] index rebuild\n\nRebuilds the full-text index of the whole instance in one write transaction and reads every source again. Other commands wait up to 5 s, then fail with storage_busy.\n\nErrors (code, exit):\n  storage_busy (3)  Another command holds the instance: run again.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf index rebuild\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic recall",
+      "arguments": [
+        "recall",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] recall QUESTION\n\nAt most 3 explained results among visible claims, RETEX and source passages. The question is plain text; case and accents are ignored. Writes nothing.\n\nArguments:\n  QUESTION  Free text.\n\nOptions:\n  --limit 1-3  Number of results. Default: 3.\n\nErrors (code, exit):\n  invalid_arguments (1)  Limit outside 1-3.\n  invalid_input (1)      No searchable term in the question.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf recall \"how does billing paginate\"\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic challenge",
+      "arguments": [
+        "challenge",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] challenge CLAIM_ID | --text TEXT\n\nSignals about a claim or a text: contradictions, changed or unavailable sources, status, review date, and at most 3 close claims to confront. Decides nothing, writes nothing.\n\nArguments:\n  CLAIM_ID  Identifier (GUID) of a visible claim.\n\nOptions:\n  --text TEXT  A text that is not a claim yet, instead of CLAIM_ID.\n\nErrors (code, exit):\n  not_found (1)  Unknown identifier, or one of a scope that is not visible.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf challenge --text \"Billing paginates with offsets\"\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic daemon install",
+      "arguments": [
+        "daemon",
+        "install",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] daemon install\n\nInstalls the daemon as a service of your session (no administrator rights) and starts it. Run again: nothing changes when the same version is installed; another version or executable replaces the service.\n\nErrors (code, exit):\n  service_manager_unavailable (3)  No service manager in this session (container, WSL without systemd); the CLI keeps working directly.\n  service_install_failed (3)       The service manager refused the service; the previous state is restored.\n  daemon_unavailable (3)           The service is registered but the daemon did not answer; see its journal.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf daemon install\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic daemon uninstall",
+      "arguments": [
+        "daemon",
+        "uninstall",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] daemon uninstall\n\nStops and removes the service. Instances, backups and the registry are left untouched.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf daemon uninstall\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic daemon start",
+      "arguments": [
+        "daemon",
+        "start",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] daemon start\n\nStarts the installed service.\n\nErrors (code, exit):\n  daemon_unavailable (3)  The service is not installed.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf daemon start\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic daemon stop",
+      "arguments": [
+        "daemon",
+        "stop",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] daemon stop\n\nStops the daemon; commands then run directly. Stop it before updating smf on Windows, and close the hosts that run smf mcp serve: both hold the files of the tool.\n\nErrors (code, exit):\n  daemon_unavailable (3)  The service is not installed.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf daemon stop\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic daemon restart",
+      "arguments": [
+        "daemon",
+        "restart",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] daemon restart\n\nStops then starts the service: the way to load a new version of smf.\n\nErrors (code, exit):\n  daemon_unavailable (3)  The service is not installed.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf daemon restart\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic daemon status",
+      "arguments": [
+        "daemon",
+        "status",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] daemon status\n\nState of the daemon: absent, installed_stopped, running, version_mismatch, foreign_endpoint or service_manager_unavailable; whether a running daemon answers within 5 s (answering), version, process, start time, open instances, clients.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf daemon status --json\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic daemon register",
+      "arguments": [
+        "daemon",
+        "register",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] daemon register\n\nLets the daemon serve the instance found from the context directory, with the checks of a direct command. Idempotent.\n\nErrors (code, exit):\n  invalid_registry (3)  The registry cannot be read; it is left untouched.\n  registry_busy (3)     Another smf process has been changing the registry for 10 s, or another program holds it open; nothing changed, run again.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf daemon register\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic daemon unregister",
+      "arguments": [
+        "daemon",
+        "unregister",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] daemon unregister\n\nStops serving an instance, found from the context directory or registered at that exact path.\n\nErrors (code, exit):\n  not_registered (1)  No such instance in the registry.\n  registry_busy (3)   Another smf process has been changing the registry for 10 s, or another program holds it open; nothing changed, run again.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf daemon unregister --path ~/work\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic daemon instances",
+      "arguments": [
+        "daemon",
+        "instances",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] daemon instances\n\nInstances the daemon may serve; missing marks one no longer found where it was registered.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf daemon instances\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic daemon run",
+      "arguments": [
+        "daemon",
+        "run",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] daemon run\n\nServes in the foreground: what the service runs, useful to diagnose. A first Ctrl+C or SIGTERM lets the running commands finish, a second one stops at once. --supervise restarts the daemon after an abnormal exit (Windows service).\n\nOptions:\n  --supervise  Runs the daemon as a child and restarts it within a second after a crash.\n\nErrors (code, exit):\n  daemon_already_running (3)  A daemon already serves this user.\n  foreign_endpoint (4)        The endpoint or its folder belongs to another account.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf daemon run\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic mcp install",
+      "arguments": [
+        "mcp",
+        "install",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] mcp install\n\nDeclares the Sermofur MCP server to a host, changing only its own entry: .mcp.json of the context directory for Claude Code, the [mcp_servers.sermofur] table of .codex/config.toml (or of the Codex user configuration) for Codex. Idempotent; says what remains to do (daemon, registration, trust).\n\nOptions:\n  --host claude-code|codex  MCP host. Default: claude-code.\n  --scope project|user      Codex only: configuration of the project (.codex/config.toml, loaded when the project is trusted) or of the user. Default: project.\n\nErrors (code, exit):\n  invalid_mcp_config (3)  The file cannot be changed safely (not a JSON object, mcpServers not an object, TOML the edit cannot handle); it is left untouched.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf mcp install --host codex\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic mcp uninstall",
+      "arguments": [
+        "mcp",
+        "uninstall",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] mcp uninstall\n\nRemoves the Sermofur entry of the host configuration, and nothing else.\n\nOptions:\n  --host claude-code|codex  MCP host. Default: claude-code.\n  --scope project|user      Codex only: configuration of the project (.codex/config.toml, loaded when the project is trusted) or of the user. Default: project.\n\nErrors (code, exit):\n  invalid_mcp_config (3)  The file cannot be read safely; it is left untouched.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf mcp uninstall\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "topic mcp serve",
+      "arguments": [
+        "mcp",
+        "serve",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] mcp serve\n\nThe MCP server on stdio, started by the host (Claude Code, Codex), not by hand. Its tools run through the daemon in the scope of the project; what they write comes from an LLM.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf mcp serve\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "group scope",
+      "arguments": [
+        "scope",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] scope SUBCOMMAND ...\n\nSubcommands:\n  scope current                           Current scope (from the context directory) and its visible ancestors.\n  scope list                              Visible scopes: the current one and its ancestors, never siblings or descendants.\n  scope tree                              Same as scope list in this version.\n  scope add ID KIND PARENT RELATIVE_PATH  Registers a direct child of the current scope, mapped to an existing directory.\n\nRun smf scope SUBCOMMAND -h for the details of one subcommand.\n",
+      "stderr": ""
+    },
+    {
+      "name": "group claim",
+      "arguments": [
+        "claim",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] claim SUBCOMMAND ...\n\nSubcommands:\n  claim add TEXT --origin user|llm   Records a proposed claim in the current scope.\n  claim list                         Visible claims.\n  claim show ID                      The claim with its evidence, its explained confidence and its history.\n  claim invalidate ID --reason TEXT  Invalidates a claim of the current scope, with an auditable reason.\n\nRun smf claim SUBCOMMAND -h for the details of one subcommand.\n",
+      "stderr": ""
+    },
+    {
+      "name": "group evidence",
+      "arguments": [
+        "evidence",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] evidence SUBCOMMAND ...\n\nSubcommands:\n  evidence add CLAIM_ID KIND REFERENCE --lineage ORIGIN --origin user|llm  Records evidence for (or with --contradicts, against) a claim, in the claim's scope.\n  evidence list                                                            Visible evidence.\n  evidence show ID                                                         One piece of evidence.\n\nRun smf evidence SUBCOMMAND -h for the details of one subcommand.\n",
+      "stderr": ""
+    },
+    {
+      "name": "group retex",
+      "arguments": [
+        "retex",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] retex SUBCOMMAND ...\n\nSubcommands:\n  retex add --event TEXT --impact TEXT --next TEXT --origin user|llm  Records a lesson learned (RETEX) as a draft; nothing is learned implicitly.\n  retex list                                                          Visible RETEX.\n  retex show ID                                                       One RETEX.\n\nRun smf retex SUBCOMMAND -h for the details of one subcommand.\n",
+      "stderr": ""
+    },
+    {
+      "name": "group source",
+      "arguments": [
+        "source",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] source SUBCOMMAND ...\n\nSubcommands:\n  source add FILE --origin user|llm  Declares a local UTF-8 text file (at most 1 MiB) as a source of the current scope: read once, hashed and indexed.\n  source list                        Visible sources.\n  source show ID                     A source with its history.\n  source reindex [ID]                Reads again the sources of the current scope (or one of them): unchanged, modified, missing, unreadable, rejected, restored, or skipped when another command changed it meanwhile.\n\nRun smf source SUBCOMMAND -h for the details of one subcommand.\n",
+      "stderr": ""
+    },
+    {
+      "name": "group index",
+      "arguments": [
+        "index",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] index SUBCOMMAND ...\n\nSubcommands:\n  index rebuild  Rebuilds the full-text index of the whole instance in one write transaction and reads every source again.\n\nRun smf index SUBCOMMAND -h for the details of one subcommand.\n",
+      "stderr": ""
+    },
+    {
+      "name": "group daemon",
+      "arguments": [
+        "daemon",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] daemon SUBCOMMAND ...\n\nSubcommands:\n  daemon install     Installs the daemon as a service of your session (no administrator rights) and starts it.\n  daemon uninstall   Stops and removes the service.\n  daemon start       Starts the installed service.\n  daemon stop        Stops the daemon; commands then run directly.\n  daemon restart     Stops then starts the service: the way to load a new version of smf.\n  daemon status      State of the daemon: absent, installed_stopped, running, version_mismatch, foreign_endpoint or service_manager_unavailable; whether a running daemon answers within 5 s (answering), version, process, start time, open instances, clients.\n  daemon register    Lets the daemon serve the instance found from the context directory, with the checks of a direct command.\n  daemon unregister  Stops serving an instance, found from the context directory or registered at that exact path.\n  daemon instances   Instances the daemon may serve; missing marks one no longer found where it was registered.\n  daemon run         Serves in the foreground: what the service runs, useful to diagnose.\n\nRun smf daemon SUBCOMMAND -h for the details of one subcommand.\n",
+      "stderr": ""
+    },
+    {
+      "name": "group mcp",
+      "arguments": [
+        "mcp",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] mcp SUBCOMMAND ...\n\nSubcommands:\n  mcp install    Declares the Sermofur MCP server to a host, changing only its own entry: .mcp.json of the context directory for Claude Code, the [mcp_servers.sermofur] table of .codex/config.toml (or of the Codex user configuration) for Codex.\n  mcp uninstall  Removes the Sermofur entry of the host configuration, and nothing else.\n  mcp serve      The MCP server on stdio, started by the host (Claude Code, Codex), not by hand.\n\nRun smf mcp SUBCOMMAND -h for the details of one subcommand.\n",
+      "stderr": ""
+    },
+    {
+      "name": "long_form",
+      "arguments": [
+        "claim",
+        "add",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] claim add TEXT --origin user|llm\n\nRecords a proposed claim in the current scope. Its confidence is computed when read, from its evidence.\n\nArguments:\n  TEXT  The statement. Put it after -- if it starts with -- or is -h or -v.\n\nOptions:\n  --origin user|llm        Required, no default. Declared origin of the record.\n  --category CATEGORY      episodic, semantic, procedural, preferences or decisions. Default: semantic. preferences and decisions require --origin user.\n  --volatility VOLATILITY  stable, evolving or volatile. Default: evolving.\n  --actor NAME             Name recorded in the history. Default: local-user.\n  --key KEY                Idempotency key: the same key with the same content returns the same object.\n\nErrors (code, exit):\n  invalid_arguments (1)     Missing origin, bad value or unknown option.\n  user_choice_required (1)  preferences or decisions with --origin llm.\n  idempotency_conflict (1)  Key reused with another content.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf claim add \"The billing API paginates with cursors\" --origin user\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "help_first",
+      "arguments": [
+        "-h",
+        "claim",
+        "add"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] claim add TEXT --origin user|llm\n\nRecords a proposed claim in the current scope. Its confidence is computed when read, from its evidence.\n\nArguments:\n  TEXT  The statement. Put it after -- if it starts with -- or is -h or -v.\n\nOptions:\n  --origin user|llm        Required, no default. Declared origin of the record.\n  --category CATEGORY      episodic, semantic, procedural, preferences or decisions. Default: semantic. preferences and decisions require --origin user.\n  --volatility VOLATILITY  stable, evolving or volatile. Default: evolving.\n  --actor NAME             Name recorded in the history. Default: local-user.\n  --key KEY                Idempotency key: the same key with the same content returns the same object.\n\nErrors (code, exit):\n  invalid_arguments (1)     Missing origin, bad value or unknown option.\n  user_choice_required (1)  preferences or decisions with --origin llm.\n  idempotency_conflict (1)  Key reused with another content.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf claim add \"The billing API paginates with cursors\" --origin user\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "help_between",
+      "arguments": [
+        "claim",
+        "-h",
+        "add"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] claim add TEXT --origin user|llm\n\nRecords a proposed claim in the current scope. Its confidence is computed when read, from its evidence.\n\nArguments:\n  TEXT  The statement. Put it after -- if it starts with -- or is -h or -v.\n\nOptions:\n  --origin user|llm        Required, no default. Declared origin of the record.\n  --category CATEGORY      episodic, semantic, procedural, preferences or decisions. Default: semantic. preferences and decisions require --origin user.\n  --volatility VOLATILITY  stable, evolving or volatile. Default: evolving.\n  --actor NAME             Name recorded in the history. Default: local-user.\n  --key KEY                Idempotency key: the same key with the same content returns the same object.\n\nErrors (code, exit):\n  invalid_arguments (1)     Missing origin, bad value or unknown option.\n  user_choice_required (1)  preferences or decisions with --origin llm.\n  idempotency_conflict (1)  Key reused with another content.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf claim add \"The billing API paginates with cursors\" --origin user\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "with_path",
+      "arguments": [
+        "--path",
+        ".",
+        "claim",
+        "show",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] claim show ID\n\nThe claim with its evidence, its explained confidence and its history.\n\nArguments:\n  ID  Identifier (GUID) of a visible claim.\n\nErrors (code, exit):\n  not_found (1)  Unknown identifier, or one of a scope that is not visible.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf claim show 7f8c1a3e-0000-4000-8000-000000000001\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "with_json",
+      "arguments": [
+        "--json",
+        "claim",
+        "add",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] claim add TEXT --origin user|llm\n\nRecords a proposed claim in the current scope. Its confidence is computed when read, from its evidence.\n\nArguments:\n  TEXT  The statement. Put it after -- if it starts with -- or is -h or -v.\n\nOptions:\n  --origin user|llm        Required, no default. Declared origin of the record.\n  --category CATEGORY      episodic, semantic, procedural, preferences or decisions. Default: semantic. preferences and decisions require --origin user.\n  --volatility VOLATILITY  stable, evolving or volatile. Default: evolving.\n  --actor NAME             Name recorded in the history. Default: local-user.\n  --key KEY                Idempotency key: the same key with the same content returns the same object.\n\nErrors (code, exit):\n  invalid_arguments (1)     Missing origin, bad value or unknown option.\n  user_choice_required (1)  preferences or decisions with --origin llm.\n  idempotency_conflict (1)  Key reused with another content.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf claim add \"The billing API paginates with cursors\" --origin user\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "json_between",
+      "arguments": [
+        "claim",
+        "--json",
+        "add",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] claim add TEXT --origin user|llm\n\nRecords a proposed claim in the current scope. Its confidence is computed when read, from its evidence.\n\nArguments:\n  TEXT  The statement. Put it after -- if it starts with -- or is -h or -v.\n\nOptions:\n  --origin user|llm        Required, no default. Declared origin of the record.\n  --category CATEGORY      episodic, semantic, procedural, preferences or decisions. Default: semantic. preferences and decisions require --origin user.\n  --volatility VOLATILITY  stable, evolving or volatile. Default: evolving.\n  --actor NAME             Name recorded in the history. Default: local-user.\n  --key KEY                Idempotency key: the same key with the same content returns the same object.\n\nErrors (code, exit):\n  invalid_arguments (1)     Missing origin, bad value or unknown option.\n  user_choice_required (1)  preferences or decisions with --origin llm.\n  idempotency_conflict (1)  Key reused with another content.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf claim add \"The billing API paginates with cursors\" --origin user\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "version_shortcut_skipped",
+      "arguments": [
+        "-v",
+        "claim",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] claim SUBCOMMAND ...\n\nSubcommands:\n  claim add TEXT --origin user|llm   Records a proposed claim in the current scope.\n  claim list                         Visible claims.\n  claim show ID                      The claim with its evidence, its explained confidence and its history.\n  claim invalidate ID --reason TEXT  Invalidates a claim of the current scope, with an auditable reason.\n\nRun smf claim SUBCOMMAND -h for the details of one subcommand.\n",
+      "stderr": ""
+    },
+    {
+      "name": "help_wins_over_version",
+      "arguments": [
+        "recall",
+        "--version",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] recall QUESTION\n\nAt most 3 explained results among visible claims, RETEX and source passages. The question is plain text; case and accents are ignored. Writes nothing.\n\nArguments:\n  QUESTION  Free text.\n\nOptions:\n  --limit 1-3  Number of results. Default: 3.\n\nErrors (code, exit):\n  invalid_arguments (1)  Limit outside 1-3.\n  invalid_input (1)      No searchable term in the question.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf recall \"how does billing paginate\"\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "extra_positionals",
+      "arguments": [
+        "claim",
+        "add",
+        "x",
+        "--help",
+        "--json"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] claim add TEXT --origin user|llm\n\nRecords a proposed claim in the current scope. Its confidence is computed when read, from its evidence.\n\nArguments:\n  TEXT  The statement. Put it after -- if it starts with -- or is -h or -v.\n\nOptions:\n  --origin user|llm        Required, no default. Declared origin of the record.\n  --category CATEGORY      episodic, semantic, procedural, preferences or decisions. Default: semantic. preferences and decisions require --origin user.\n  --volatility VOLATILITY  stable, evolving or volatile. Default: evolving.\n  --actor NAME             Name recorded in the history. Default: local-user.\n  --key KEY                Idempotency key: the same key with the same content returns the same object.\n\nErrors (code, exit):\n  invalid_arguments (1)     Missing origin, bad value or unknown option.\n  user_choice_required (1)  preferences or decisions with --origin llm.\n  idempotency_conflict (1)  Key reused with another content.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf claim add \"The billing API paginates with cursors\" --origin user\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "option_with_value",
+      "arguments": [
+        "recall",
+        "--limit",
+        "2",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] recall QUESTION\n\nAt most 3 explained results among visible claims, RETEX and source passages. The question is plain text; case and accents are ignored. Writes nothing.\n\nArguments:\n  QUESTION  Free text.\n\nOptions:\n  --limit 1-3  Number of results. Default: 3.\n\nErrors (code, exit):\n  invalid_arguments (1)  Limit outside 1-3.\n  invalid_input (1)      No searchable term in the question.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf recall \"how does billing paginate\"\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "all_arguments",
+      "arguments": [
+        "scope",
+        "add",
+        "a",
+        "client",
+        "workspace",
+        "a",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] scope add ID KIND PARENT RELATIVE_PATH\n\nRegisters a direct child of the current scope, mapped to an existing directory. The mapping is stored as the folder is named on disk.\n\nArguments:\n  ID             New identifier: [a-z][a-z0-9-]{0,63}.\n  KIND           client, project, repository or task, compatible with the parent.\n  PARENT         The current scope (workspace at the instance root).\n  RELATIVE_PATH  Directory relative to the instance root, inside the parent's directory.\n\nErrors (code, exit):\n  invalid_scope (1)      Bad identifier or kind, or identifier taken.\n  duplicate_mapping (1)  Directory already mapped by another scope.\n  invalid_path (1)       The directory does not exist.\n  scope_boundary (4)     Wrong parent, or mapping outside the parent or overlapping another branch.\n  unsafe_path (4)        Absolute path, drive, link, junction or network path, or an alias.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf scope add acme client workspace acme\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "unknown_subcommand",
+      "arguments": [
+        "claim",
+        "bogus",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] claim SUBCOMMAND ...\n\nSubcommands:\n  claim add TEXT --origin user|llm   Records a proposed claim in the current scope.\n  claim list                         Visible claims.\n  claim show ID                      The claim with its evidence, its explained confidence and its history.\n  claim invalidate ID --reason TEXT  Invalidates a claim of the current scope, with an auditable reason.\n\nRun smf claim SUBCOMMAND -h for the details of one subcommand.\n",
+      "stderr": ""
+    },
+    {
+      "name": "subcommand_of_another_group",
+      "arguments": [
+        "claim",
+        "rebuild",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] claim SUBCOMMAND ...\n\nSubcommands:\n  claim add TEXT --origin user|llm   Records a proposed claim in the current scope.\n  claim list                         Visible claims.\n  claim show ID                      The claim with its evidence, its explained confidence and its history.\n  claim invalidate ID --reason TEXT  Invalidates a claim of the current scope, with an auditable reason.\n\nRun smf claim SUBCOMMAND -h for the details of one subcommand.\n",
+      "stderr": ""
+    },
+    {
+      "name": "extra_word_after_a_command",
+      "arguments": [
+        "init",
+        "extra",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] init\n\nCreates an instance (.sermofur) in the context directory, or returns the existing one. Refused inside another instance.\n\nErrors (code, exit):\n  invalid_path (1)      The directory does not exist.\n  nested_instance (4)   A valid instance exists above.\n  invalid_instance (3)  The nearest .sermofur entry is not a valid instance.\n  unsafe_path (4)       Network path, link or junction.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf init\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "extra_word_after_a_two_word_command",
+      "arguments": [
+        "daemon",
+        "run",
+        "now",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] daemon run\n\nServes in the foreground: what the service runs, useful to diagnose. A first Ctrl+C or SIGTERM lets the running commands finish, a second one stops at once. --supervise restarts the daemon after an abnormal exit (Windows service).\n\nOptions:\n  --supervise  Runs the daemon as a child and restarts it within a second after a crash.\n\nErrors (code, exit):\n  daemon_already_running (3)  A daemon already serves this user.\n  foreign_endpoint (4)        The endpoint or its folder belongs to another account.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf daemon run\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "group_name_alone_as_second_word",
+      "arguments": [
+        "status",
+        "claim",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] status\n\nIdentity of the instance, current scope and counts of the visible objects.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf status --json\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "unknown_command",
+      "arguments": [
+        "nothing",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nGlobal options: [--path DIRECTORY] [--json]\nsmf init | root | status | doctor | export | migrate\nsmf scope current | list | tree\nsmf scope add ID KIND PARENT RELATIVE_PATH\nsmf claim add TEXT --origin user|llm [--category CATEGORY] [--volatility VOLATILITY] [--actor NAME] [--key KEY]\nsmf claim list | show ID | invalidate ID --reason TEXT [--actor NAME]\nsmf evidence add CLAIM_ID KIND REFERENCE --lineage ORIGIN --origin user|llm [--contradicts] [--source SOURCE_ID] [--actor NAME] [--key KEY]\nsmf evidence list | show ID\nsmf retex add --event TEXT --impact TEXT --next TEXT --origin user|llm [--actor NAME] [--key KEY]\nsmf retex list | show ID\nsmf source add FILE --origin user|llm [--actor NAME]\nsmf source list | show ID | reindex [ID] [--actor NAME]\nsmf index rebuild\nsmf recall QUESTION [--limit 1-3]\nsmf challenge CLAIM_ID | challenge --text TEXT\nsmf daemon install | uninstall | start | stop | restart | status\nsmf daemon register | unregister | instances\nsmf daemon run [--supervise]\nsmf mcp install | uninstall [--host claude-code|codex] [--scope project|user]\nsmf mcp serve\nsmf COMMAND -h | smf GROUP -h       help of one command, or the subcommands of a group\nsmf --version | -v                  version\n--help (-h) and --version (-v) are recognized anywhere before --, except as an option value; --help wins.\n-- ends options: every following argument is positional (text starting with --).\nAn option value cannot start with --; see https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md for values and exit codes.\n",
+      "stderr": ""
+    },
+    {
+      "name": "case_sensitive",
+      "arguments": [
+        "CLAIM",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nGlobal options: [--path DIRECTORY] [--json]\nsmf init | root | status | doctor | export | migrate\nsmf scope current | list | tree\nsmf scope add ID KIND PARENT RELATIVE_PATH\nsmf claim add TEXT --origin user|llm [--category CATEGORY] [--volatility VOLATILITY] [--actor NAME] [--key KEY]\nsmf claim list | show ID | invalidate ID --reason TEXT [--actor NAME]\nsmf evidence add CLAIM_ID KIND REFERENCE --lineage ORIGIN --origin user|llm [--contradicts] [--source SOURCE_ID] [--actor NAME] [--key KEY]\nsmf evidence list | show ID\nsmf retex add --event TEXT --impact TEXT --next TEXT --origin user|llm [--actor NAME] [--key KEY]\nsmf retex list | show ID\nsmf source add FILE --origin user|llm [--actor NAME]\nsmf source list | show ID | reindex [ID] [--actor NAME]\nsmf index rebuild\nsmf recall QUESTION [--limit 1-3]\nsmf challenge CLAIM_ID | challenge --text TEXT\nsmf daemon install | uninstall | start | stop | restart | status\nsmf daemon register | unregister | instances\nsmf daemon run [--supervise]\nsmf mcp install | uninstall [--host claude-code|codex] [--scope project|user]\nsmf mcp serve\nsmf COMMAND -h | smf GROUP -h       help of one command, or the subcommands of a group\nsmf --version | -v                  version\n--help (-h) and --version (-v) are recognized anywhere before --, except as an option value; --help wins.\n-- ends options: every following argument is positional (text starting with --).\nAn option value cannot start with --; see https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md for values and exit codes.\n",
+      "stderr": ""
+    },
+    {
+      "name": "case_sensitive_subcommand",
+      "arguments": [
+        "claim",
+        "ADD",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] claim SUBCOMMAND ...\n\nSubcommands:\n  claim add TEXT --origin user|llm   Records a proposed claim in the current scope.\n  claim list                         Visible claims.\n  claim show ID                      The claim with its evidence, its explained confidence and its history.\n  claim invalidate ID --reason TEXT  Invalidates a claim of the current scope, with an auditable reason.\n\nRun smf claim SUBCOMMAND -h for the details of one subcommand.\n",
+      "stderr": ""
+    },
+    {
+      "name": "path_value_skipped",
+      "arguments": [
+        "--path",
+        ".",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nGlobal options: [--path DIRECTORY] [--json]\nsmf init | root | status | doctor | export | migrate\nsmf scope current | list | tree\nsmf scope add ID KIND PARENT RELATIVE_PATH\nsmf claim add TEXT --origin user|llm [--category CATEGORY] [--volatility VOLATILITY] [--actor NAME] [--key KEY]\nsmf claim list | show ID | invalidate ID --reason TEXT [--actor NAME]\nsmf evidence add CLAIM_ID KIND REFERENCE --lineage ORIGIN --origin user|llm [--contradicts] [--source SOURCE_ID] [--actor NAME] [--key KEY]\nsmf evidence list | show ID\nsmf retex add --event TEXT --impact TEXT --next TEXT --origin user|llm [--actor NAME] [--key KEY]\nsmf retex list | show ID\nsmf source add FILE --origin user|llm [--actor NAME]\nsmf source list | show ID | reindex [ID] [--actor NAME]\nsmf index rebuild\nsmf recall QUESTION [--limit 1-3]\nsmf challenge CLAIM_ID | challenge --text TEXT\nsmf daemon install | uninstall | start | stop | restart | status\nsmf daemon register | unregister | instances\nsmf daemon run [--supervise]\nsmf mcp install | uninstall [--host claude-code|codex] [--scope project|user]\nsmf mcp serve\nsmf COMMAND -h | smf GROUP -h       help of one command, or the subcommands of a group\nsmf --version | -v                  version\n--help (-h) and --version (-v) are recognized anywhere before --, except as an option value; --help wins.\n-- ends options: every following argument is positional (text starting with --).\nAn option value cannot start with --; see https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md for values and exit codes.\n",
+      "stderr": ""
+    },
+    {
+      "name": "path_value_is_a_group",
+      "arguments": [
+        "--path",
+        "claim",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nGlobal options: [--path DIRECTORY] [--json]\nsmf init | root | status | doctor | export | migrate\nsmf scope current | list | tree\nsmf scope add ID KIND PARENT RELATIVE_PATH\nsmf claim add TEXT --origin user|llm [--category CATEGORY] [--volatility VOLATILITY] [--actor NAME] [--key KEY]\nsmf claim list | show ID | invalidate ID --reason TEXT [--actor NAME]\nsmf evidence add CLAIM_ID KIND REFERENCE --lineage ORIGIN --origin user|llm [--contradicts] [--source SOURCE_ID] [--actor NAME] [--key KEY]\nsmf evidence list | show ID\nsmf retex add --event TEXT --impact TEXT --next TEXT --origin user|llm [--actor NAME] [--key KEY]\nsmf retex list | show ID\nsmf source add FILE --origin user|llm [--actor NAME]\nsmf source list | show ID | reindex [ID] [--actor NAME]\nsmf index rebuild\nsmf recall QUESTION [--limit 1-3]\nsmf challenge CLAIM_ID | challenge --text TEXT\nsmf daemon install | uninstall | start | stop | restart | status\nsmf daemon register | unregister | instances\nsmf daemon run [--supervise]\nsmf mcp install | uninstall [--host claude-code|codex] [--scope project|user]\nsmf mcp serve\nsmf COMMAND -h | smf GROUP -h       help of one command, or the subcommands of a group\nsmf --version | -v                  version\n--help (-h) and --version (-v) are recognized anywhere before --, except as an option value; --help wins.\n-- ends options: every following argument is positional (text starting with --).\nAn option value cannot start with --; see https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md for values and exit codes.\n",
+      "stderr": ""
+    },
+    {
+      "name": "unknown_option_takes_the_group",
+      "arguments": [
+        "--x",
+        "claim",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nGlobal options: [--path DIRECTORY] [--json]\nsmf init | root | status | doctor | export | migrate\nsmf scope current | list | tree\nsmf scope add ID KIND PARENT RELATIVE_PATH\nsmf claim add TEXT --origin user|llm [--category CATEGORY] [--volatility VOLATILITY] [--actor NAME] [--key KEY]\nsmf claim list | show ID | invalidate ID --reason TEXT [--actor NAME]\nsmf evidence add CLAIM_ID KIND REFERENCE --lineage ORIGIN --origin user|llm [--contradicts] [--source SOURCE_ID] [--actor NAME] [--key KEY]\nsmf evidence list | show ID\nsmf retex add --event TEXT --impact TEXT --next TEXT --origin user|llm [--actor NAME] [--key KEY]\nsmf retex list | show ID\nsmf source add FILE --origin user|llm [--actor NAME]\nsmf source list | show ID | reindex [ID] [--actor NAME]\nsmf index rebuild\nsmf recall QUESTION [--limit 1-3]\nsmf challenge CLAIM_ID | challenge --text TEXT\nsmf daemon install | uninstall | start | stop | restart | status\nsmf daemon register | unregister | instances\nsmf daemon run [--supervise]\nsmf mcp install | uninstall [--host claude-code|codex] [--scope project|user]\nsmf mcp serve\nsmf COMMAND -h | smf GROUP -h       help of one command, or the subcommands of a group\nsmf --version | -v                  version\n--help (-h) and --version (-v) are recognized anywhere before --, except as an option value; --help wins.\n-- ends options: every following argument is positional (text starting with --).\nAn option value cannot start with --; see https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md for values and exit codes.\n",
+      "stderr": ""
+    },
+    {
+      "name": "unknown_option_takes_the_subcommand",
+      "arguments": [
+        "claim",
+        "--x",
+        "add",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] claim SUBCOMMAND ...\n\nSubcommands:\n  claim add TEXT --origin user|llm   Records a proposed claim in the current scope.\n  claim list                         Visible claims.\n  claim show ID                      The claim with its evidence, its explained confidence and its history.\n  claim invalidate ID --reason TEXT  Invalidates a claim of the current scope, with an auditable reason.\n\nRun smf claim SUBCOMMAND -h for the details of one subcommand.\n",
+      "stderr": ""
+    },
+    {
+      "name": "option_value_is_the_shortcut",
+      "arguments": [
+        "claim",
+        "add",
+        "--origin",
+        "-h",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] claim add TEXT --origin user|llm\n\nRecords a proposed claim in the current scope. Its confidence is computed when read, from its evidence.\n\nArguments:\n  TEXT  The statement. Put it after -- if it starts with -- or is -h or -v.\n\nOptions:\n  --origin user|llm        Required, no default. Declared origin of the record.\n  --category CATEGORY      episodic, semantic, procedural, preferences or decisions. Default: semantic. preferences and decisions require --origin user.\n  --volatility VOLATILITY  stable, evolving or volatile. Default: evolving.\n  --actor NAME             Name recorded in the history. Default: local-user.\n  --key KEY                Idempotency key: the same key with the same content returns the same object.\n\nErrors (code, exit):\n  invalid_arguments (1)     Missing origin, bad value or unknown option.\n  user_choice_required (1)  preferences or decisions with --origin llm.\n  idempotency_conflict (1)  Key reused with another content.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf claim add \"The billing API paginates with cursors\" --origin user\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "flag_before_the_shortcut",
+      "arguments": [
+        "claim",
+        "add",
+        "--contradicts",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] claim add TEXT --origin user|llm\n\nRecords a proposed claim in the current scope. Its confidence is computed when read, from its evidence.\n\nArguments:\n  TEXT  The statement. Put it after -- if it starts with -- or is -h or -v.\n\nOptions:\n  --origin user|llm        Required, no default. Declared origin of the record.\n  --category CATEGORY      episodic, semantic, procedural, preferences or decisions. Default: semantic. preferences and decisions require --origin user.\n  --volatility VOLATILITY  stable, evolving or volatile. Default: evolving.\n  --actor NAME             Name recorded in the history. Default: local-user.\n  --key KEY                Idempotency key: the same key with the same content returns the same object.\n\nErrors (code, exit):\n  invalid_arguments (1)     Missing origin, bad value or unknown option.\n  user_choice_required (1)  preferences or decisions with --origin llm.\n  idempotency_conflict (1)  Key reused with another content.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf claim add \"The billing API paginates with cursors\" --origin user\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "option_before_double_dash_word",
+      "arguments": [
+        "claim",
+        "add",
+        "--origin",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] claim add TEXT --origin user|llm\n\nRecords a proposed claim in the current scope. Its confidence is computed when read, from its evidence.\n\nArguments:\n  TEXT  The statement. Put it after -- if it starts with -- or is -h or -v.\n\nOptions:\n  --origin user|llm        Required, no default. Declared origin of the record.\n  --category CATEGORY      episodic, semantic, procedural, preferences or decisions. Default: semantic. preferences and decisions require --origin user.\n  --volatility VOLATILITY  stable, evolving or volatile. Default: evolving.\n  --actor NAME             Name recorded in the history. Default: local-user.\n  --key KEY                Idempotency key: the same key with the same content returns the same object.\n\nErrors (code, exit):\n  invalid_arguments (1)     Missing origin, bad value or unknown option.\n  user_choice_required (1)  preferences or decisions with --origin llm.\n  idempotency_conflict (1)  Key reused with another content.\n\nAny command: invalid_arguments (1) for a bad command line or a malformed ID, invalid_input (1) for an empty or blank text. On an instance: no_instance (2), migration_required (3, except migrate, root and doctor), storage_busy (3).\n\nExample:\n  smf claim add \"The billing API paginates with cursors\" --origin user\n\nReference: https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md\n",
+      "stderr": ""
+    },
+    {
+      "name": "help_then_separator",
+      "arguments": [
+        "-h",
+        "--",
+        "claim"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nGlobal options: [--path DIRECTORY] [--json]\nsmf init | root | status | doctor | export | migrate\nsmf scope current | list | tree\nsmf scope add ID KIND PARENT RELATIVE_PATH\nsmf claim add TEXT --origin user|llm [--category CATEGORY] [--volatility VOLATILITY] [--actor NAME] [--key KEY]\nsmf claim list | show ID | invalidate ID --reason TEXT [--actor NAME]\nsmf evidence add CLAIM_ID KIND REFERENCE --lineage ORIGIN --origin user|llm [--contradicts] [--source SOURCE_ID] [--actor NAME] [--key KEY]\nsmf evidence list | show ID\nsmf retex add --event TEXT --impact TEXT --next TEXT --origin user|llm [--actor NAME] [--key KEY]\nsmf retex list | show ID\nsmf source add FILE --origin user|llm [--actor NAME]\nsmf source list | show ID | reindex [ID] [--actor NAME]\nsmf index rebuild\nsmf recall QUESTION [--limit 1-3]\nsmf challenge CLAIM_ID | challenge --text TEXT\nsmf daemon install | uninstall | start | stop | restart | status\nsmf daemon register | unregister | instances\nsmf daemon run [--supervise]\nsmf mcp install | uninstall [--host claude-code|codex] [--scope project|user]\nsmf mcp serve\nsmf COMMAND -h | smf GROUP -h       help of one command, or the subcommands of a group\nsmf --version | -v                  version\n--help (-h) and --version (-v) are recognized anywhere before --, except as an option value; --help wins.\n-- ends options: every following argument is positional (text starting with --).\nAn option value cannot start with --; see https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md for values and exit codes.\n",
+      "stderr": ""
+    },
+    {
+      "name": "group_then_separator",
+      "arguments": [
+        "claim",
+        "-h",
+        "--",
+        "add"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] claim SUBCOMMAND ...\n\nSubcommands:\n  claim add TEXT --origin user|llm   Records a proposed claim in the current scope.\n  claim list                         Visible claims.\n  claim show ID                      The claim with its evidence, its explained confidence and its history.\n  claim invalidate ID --reason TEXT  Invalidates a claim of the current scope, with an auditable reason.\n\nRun smf claim SUBCOMMAND -h for the details of one subcommand.\n",
+      "stderr": ""
+    },
+    {
+      "name": "separator_first",
+      "arguments": [
+        "--",
+        "claim",
+        "-h"
+      ],
+      "exit_code": 2,
+      "stdout": "",
+      "stderr": "smf: no_instance: No .sermofur instance in the parent folders.\n"
+    },
+    {
+      "name": "help_after_separator",
+      "arguments": [
+        "status",
+        "--",
+        "-h"
+      ],
+      "exit_code": 2,
+      "stdout": "",
+      "stderr": "smf: no_instance: No .sermofur instance in the parent folders.\n"
+    },
+    {
+      "name": "long_help_after_separator",
+      "arguments": [
+        "claim",
+        "add",
+        "--",
+        "--help"
+      ],
+      "exit_code": 2,
+      "stdout": "",
+      "stderr": "smf: no_instance: No .sermofur instance in the parent folders.\n"
+    },
+    {
+      "name": "group_without_subcommand",
+      "arguments": [
+        "claim"
+      ],
+      "exit_code": 2,
+      "stdout": "",
+      "stderr": "smf: no_instance: No .sermofur instance in the parent folders.\n"
+    },
+    {
+      "name": "empty_word",
+      "arguments": [
+        "",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nGlobal options: [--path DIRECTORY] [--json]\nsmf init | root | status | doctor | export | migrate\nsmf scope current | list | tree\nsmf scope add ID KIND PARENT RELATIVE_PATH\nsmf claim add TEXT --origin user|llm [--category CATEGORY] [--volatility VOLATILITY] [--actor NAME] [--key KEY]\nsmf claim list | show ID | invalidate ID --reason TEXT [--actor NAME]\nsmf evidence add CLAIM_ID KIND REFERENCE --lineage ORIGIN --origin user|llm [--contradicts] [--source SOURCE_ID] [--actor NAME] [--key KEY]\nsmf evidence list | show ID\nsmf retex add --event TEXT --impact TEXT --next TEXT --origin user|llm [--actor NAME] [--key KEY]\nsmf retex list | show ID\nsmf source add FILE --origin user|llm [--actor NAME]\nsmf source list | show ID | reindex [ID] [--actor NAME]\nsmf index rebuild\nsmf recall QUESTION [--limit 1-3]\nsmf challenge CLAIM_ID | challenge --text TEXT\nsmf daemon install | uninstall | start | stop | restart | status\nsmf daemon register | unregister | instances\nsmf daemon run [--supervise]\nsmf mcp install | uninstall [--host claude-code|codex] [--scope project|user]\nsmf mcp serve\nsmf COMMAND -h | smf GROUP -h       help of one command, or the subcommands of a group\nsmf --version | -v                  version\n--help (-h) and --version (-v) are recognized anywhere before --, except as an option value; --help wins.\n-- ends options: every following argument is positional (text starting with --).\nAn option value cannot start with --; see https://github.com/JoRouquette/sermofur/blob/main/docs/cli.md for values and exit codes.\n",
+      "stderr": ""
+    },
+    {
+      "name": "empty_second_word",
+      "arguments": [
+        "claim",
+        "",
+        "-h"
+      ],
+      "exit_code": 0,
+      "stdout": "Sermofur 0.0.0-dev\nUsage: smf [--path DIRECTORY] [--json] claim SUBCOMMAND ...\n\nSubcommands:\n  claim add TEXT --origin user|llm   Records a proposed claim in the current scope.\n  claim list                         Visible claims.\n  claim show ID                      The claim with its evidence, its explained confidence and its history.\n  claim invalidate ID --reason TEXT  Invalidates a claim of the current scope, with an auditable reason.\n\nRun smf claim SUBCOMMAND -h for the details of one subcommand.\n",
+      "stderr": ""
+    }
+  ]
+}

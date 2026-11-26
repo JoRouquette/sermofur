@@ -1,0 +1,580 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/",
+    ".sermofur/records/<g2>.md",
+    ".sermofur/records/<g3>.md"
+  ],
+  "projections": {
+    "<g2>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Claim <g2>\n\n```json\n{\n  \"text\": \"cache chaud\",\n  \"category\": \"semantic\",\n  \"volatility\": \"evolving\",\n  \"lastVerified\": null,\n  \"reviewAfter\": null\n}\n```\n",
+    "<g3>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g3>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Evidence <g3>\n\n```json\n{\n  \"claimId\": \"<g2>\",\n  \"kind\": \"execution\",\n  \"reference\": \"bench\",\n  \"lineageId\": \"b\",\n  \"relation\": \"supports\",\n  \"sourceId\": null,\n  \"sourceHash\": null\n}\n```\n"
+  },
+  "steps": [
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"created\": true\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "init"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022cache chaud\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "add",
+          "cache chaud",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g3>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022execution\\u0022,\\n  \\u0022reference\\u0022: \\u0022bench\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022b\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{1}",
+          "execution",
+          "bench",
+          "--lineage",
+          "b",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/instance.json",
+        "added .sermofur/memory.db",
+        "added .sermofur/records/<g2>.md",
+        "added .sermofur/records/<g3>.md"
+      ],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Wrong number of arguments.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"Wrong number of arguments.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: GUID identifier required.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "x"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"GUID identifier required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "x",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: GUID identifier required.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "00000000-0000-0000-0000-000000000000"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: not_found: Object missing or inaccessible.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "0f8fad5b-d9cb-469f-a165-70867728950e"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"target\": {\n    \"claimId\": \"<g2>\",\n    \"text\": \"cache chaud\",\n    \"status\": \"proposed\"\n  },\n  \"signals\": [],\n  \"toConfront\": []\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "{1:N}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"target\": {\n    \"claimId\": \"<g2>\",\n    \"text\": \"cache chaud\",\n    \"status\": \"proposed\"\n  },\n  \"signals\": [],\n  \"toConfront\": []\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "{1:B}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"target\": {\n    \"claimId\": \"<g2>\",\n    \"text\": \"cache chaud\",\n    \"status\": \"proposed\"\n  },\n  \"signals\": [],\n  \"toConfront\": []\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "{1:U}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"target\": {\n    \"claimId\": \"<g2>\",\n    \"text\": \"cache chaud\",\n    \"status\": \"proposed\"\n  },\n  \"signals\": [],\n  \"toConfront\": []\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "{1:X}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: not_found: Object missing or inaccessible.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "{2}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Wrong number of arguments.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "{1}",
+          "extra"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Wrong number of arguments.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "x",
+          "extra"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Unknown option for this command.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "{1}",
+          "--limit",
+          "1"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Unknown option for this command.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "x",
+          "--limit",
+          "1"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Unknown option for this command.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "{1}",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Unknown option for this command.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "{1}",
+          "--contradicts"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Option value required.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "--text"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"Option value required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "--text",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_input: Text required, limited to 16,384 characters without NUL.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "--text",
+          ""
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_input\",\n  \"message\": \"Text required, limited to 16,384 characters without NUL.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "--text",
+          "",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_input: Text required, limited to 16,384 characters without NUL.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "--text",
+          "   "
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_input: The question holds no searchable term.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "--text",
+          "!?"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_input\",\n  \"message\": \"The question holds no searchable term.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "--text",
+          "!?",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Wrong number of arguments.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "--text",
+          "cache",
+          "{1}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Wrong number of arguments.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "{1}",
+          "--text",
+          "cache"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Wrong number of arguments.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "--text",
+          "",
+          "extra"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Unknown option for this command.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "--text",
+          "",
+          "--limit",
+          "1"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Duplicate option.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "--text",
+          "a",
+          "--text",
+          "b"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: GUID identifier required.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "--",
+          "--text"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"target\": {\n    \"claimId\": \"<g2>\",\n    \"text\": \"cache chaud\",\n    \"status\": \"proposed\"\n  },\n  \"signals\": [],\n  \"toConfront\": []\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "--",
+          "{1}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"target\": {\n    \"claimId\": null,\n    \"text\": \"-h\",\n    \"status\": null\n  },\n  \"signals\": [],\n  \"toConfront\": []\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "--text",
+          "-h"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Option value required.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "challenge",
+          "--text",
+          "--",
+          "cache"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [],
+      "step": {
+        "changes": true
+      }
+    }
+  ]
+}

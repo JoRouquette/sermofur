@@ -1,0 +1,330 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/",
+    ".sermofur/records/<g2>.md"
+  ],
+  "projections": {
+    "<g2>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Claim <g2>\n\n```json\n{\n  \"text\": \"cache chaud\",\n  \"category\": \"semantic\",\n  \"volatility\": \"evolving\",\n  \"lastVerified\": null,\n  \"reviewAfter\": null\n}\n```\n"
+  },
+  "steps": [
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"created\": true\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "init"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022cache chaud\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "add",
+          "cache chaud",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/instance.json",
+        "added .sermofur/memory.db",
+        "added .sermofur/records/<g2>.md"
+      ],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Wrong number of arguments.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "recall"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"Wrong number of arguments.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Wrong number of arguments.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "cache",
+          "chaud"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Unknown option for this command.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "cache",
+          "--text",
+          "x"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"Unknown option for this command.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "cache",
+          "--origin",
+          "user",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Unknown option for this command.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "cache",
+          "--contradicts"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_input: Text required, limited to 16,384 characters without NUL.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          ""
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_input\",\n  \"message\": \"Text required, limited to 16,384 characters without NUL.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_input: Text required, limited to 16,384 characters without NUL.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "   "
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_input: The question holds no searchable term.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "!? \" --"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_input\",\n  \"message\": \"The question holds no searchable term.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "!? \" --",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: The limit is between 1 and 3.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "",
+          "--limit",
+          "x"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_input: Text required, limited to 16,384 characters without NUL.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "",
+          "--limit",
+          "0"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: The limit is between 1 and 3.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "!?",
+          "--limit",
+          "0"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: The limit is between 1 and 3.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "!?",
+          "--limit",
+          "x"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"query\": \"--limit\",\n  \"results\": [],\n  \"excluded\": 0\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "--",
+          "--limit"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"query\": \"add\",\n  \"results\": [],\n  \"excluded\": 0\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "add"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Wrong number of arguments.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "show",
+          "x"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [],
+      "step": {
+        "changes": true
+      }
+    }
+  ]
+}

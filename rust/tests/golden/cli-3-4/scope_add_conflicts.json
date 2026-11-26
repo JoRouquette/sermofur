@@ -1,0 +1,386 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/",
+    "a/",
+    "a/b/",
+    "p/",
+    "p/q/",
+    "x/",
+    "x/y/"
+  ],
+  "projections": {},
+  "steps": [
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"created\": true\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "init"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": "a/b"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": "x/y"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": "p/q"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"a\",\n  \"kind\": \"client\",\n  \"parentId\": \"workspace\",\n  \"relativePath\": \"a\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "a",
+          "client",
+          "workspace",
+          "a"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_scope: Scope identifier unavailable.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "a",
+          "client",
+          "workspace",
+          "x"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: duplicate_mapping: Mapping already assigned.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "a2",
+          "client",
+          "workspace",
+          "a"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 4,
+        "stderr": "smf: scope_boundary: Mapping nested in another branch of scopes.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "b",
+          "client",
+          "workspace",
+          "a/b"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"y\",\n  \"kind\": \"client\",\n  \"parentId\": \"workspace\",\n  \"relativePath\": \"x/y\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "y",
+          "client",
+          "workspace",
+          "x/y"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 4,
+        "stderr": "smf: scope_boundary: Mapping nested in another branch of scopes.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "x",
+          "client",
+          "workspace",
+          "x"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 4,
+        "stderr": "smf: scope_boundary: The new scope must be a child of the current context.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "c",
+          "client",
+          "workspace",
+          "a/b"
+        ],
+        "cwd": "a"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 4,
+        "stderr": "smf: scope_boundary: Child mapping must lie inside its parent; only a repository may share its project's path.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "ab",
+          "project",
+          "a",
+          "x"
+        ],
+        "cwd": "a"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 4,
+        "stderr": "smf: scope_boundary: Child mapping must lie inside its parent; only a repository may share its project's path.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "ab",
+          "project",
+          "a",
+          "a"
+        ],
+        "cwd": "a"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_scope: Scope identifier unavailable.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "a",
+          "project",
+          "a",
+          "a/b"
+        ],
+        "cwd": "a"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"ab\",\n  \"kind\": \"project\",\n  \"parentId\": \"a\",\n  \"relativePath\": \"a/b\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "ab",
+          "project",
+          "a",
+          "a/b"
+        ],
+        "cwd": "a"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: duplicate_mapping: Mapping already assigned.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "ab2",
+          "project",
+          "a",
+          "a/b"
+        ],
+        "cwd": "a"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 4,
+        "stderr": "smf: scope_boundary: The new scope must be a child of the current context.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "w",
+          "project",
+          "a",
+          "a/b"
+        ],
+        "cwd": "a/b"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"p\",\n  \"kind\": \"client\",\n  \"parentId\": \"workspace\",\n  \"relativePath\": \"p\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "p",
+          "client",
+          "workspace",
+          "p"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"q\",\n  \"kind\": \"project\",\n  \"parentId\": \"p\",\n  \"relativePath\": \"p/q\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "q",
+          "project",
+          "p",
+          "p/q"
+        ],
+        "cwd": "p"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_scope: Scope identifier unavailable.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "q",
+          "repository",
+          "q",
+          "p/q"
+        ],
+        "cwd": "p/q"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"qr\",\n  \"kind\": \"repository\",\n  \"parentId\": \"q\",\n  \"relativePath\": \"p/q\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "qr",
+          "repository",
+          "q",
+          "p/q"
+        ],
+        "cwd": "p/q"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 4,
+        "stderr": "smf: scope_boundary: Child mapping must lie inside its parent; only a repository may share its project's path.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "qt",
+          "task",
+          "qr",
+          "p/q"
+        ],
+        "cwd": "p/q"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "[\n  {\n    \"id\": \"workspace\",\n    \"kind\": \"workspace\",\n    \"parentId\": null,\n    \"relativePath\": null\n  }\n]\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "list"
+        ],
+        "cwd": ""
+      }
+    }
+  ]
+}

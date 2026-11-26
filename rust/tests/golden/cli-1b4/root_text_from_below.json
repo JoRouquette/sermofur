@@ -1,0 +1,14 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/",
+    "a/",
+    "a/b/"
+  ],
+  "exitCode": 0,
+  "instanceJson": "{\n  \"schemaVersion\": 2,\n  \"instanceId\": \"<guid>\",\n  \"createdAt\": \"<date>\"\n}",
+  "stderr": "",
+  "stdout": "<root>\n"
+}

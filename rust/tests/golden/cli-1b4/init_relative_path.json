@@ -1,0 +1,13 @@
+{
+  "entries": [
+    "sub/",
+    "sub/.sermofur/",
+    "sub/.sermofur/instance.json",
+    "sub/.sermofur/memory.db",
+    "sub/.sermofur/records/"
+  ],
+  "exitCode": 0,
+  "instanceJson": null,
+  "stderr": "",
+  "stdout": "{\n  \"root\": \"<root>/sub\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<guid>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"created\": true\n}\n"
+}

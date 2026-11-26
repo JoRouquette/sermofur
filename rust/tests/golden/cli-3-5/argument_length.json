@@ -1,0 +1,486 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/",
+    ".sermofur/records/<g2>.md",
+    ".sermofur/records/<g3>.md",
+    ".sermofur/records/<g4>.md",
+    ".sermofur/records/<g5>.md",
+    ".sermofur/records/<g6>.md",
+    ".sermofur/records/<g7>.md",
+    "c/"
+  ],
+  "projections": {
+    "<g2>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Claim <g2>\n\n```json\n{\n  \"text\": \"<a×16384>\",\n  \"category\": \"semantic\",\n  \"volatility\": \"evolving\",\n  \"lastVerified\": null,\n  \"reviewAfter\": null\n}\n```\n",
+    "<g3>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g3>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"invalidated\",\n  \"revision\": 2,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Claim <g3>\n\n```json\n{\n  \"text\": \"<\\uD83D\\uDE00×8192>\",\n  \"category\": \"semantic\",\n  \"volatility\": \"evolving\",\n  \"lastVerified\": null,\n  \"reviewAfter\": null\n}\n```\n",
+    "<g4>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g4>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Claim <g4>\n\n```json\n{\n  \"text\": \"<é×16384>\",\n  \"category\": \"semantic\",\n  \"volatility\": \"evolving\",\n  \"lastVerified\": null,\n  \"reviewAfter\": null\n}\n```\n",
+    "<g5>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g5>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"<a×16384>\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Claim <g5>\n\n```json\n{\n  \"text\": \"x\",\n  \"category\": \"semantic\",\n  \"volatility\": \"evolving\",\n  \"lastVerified\": null,\n  \"reviewAfter\": null\n}\n```\n",
+    "<g6>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g6>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Evidence <g6>\n\n```json\n{\n  \"claimId\": \"<g3>\",\n  \"kind\": \"source_code\",\n  \"reference\": \"<r×16384>\",\n  \"lineageId\": \"l\",\n  \"relation\": \"supports\",\n  \"sourceId\": null,\n  \"sourceHash\": null\n}\n```\n",
+    "<g7>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g7>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"retex\",\n  \"status\": \"draft\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Retex <g7>\n\n```json\n{\n  \"event\": \"<e×16384>\",\n  \"impact\": \"i\",\n  \"nextAction\": \"n\"\n}\n```\n"
+  },
+  "steps": [
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"created\": true\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "init"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": "c"
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/instance.json",
+        "added .sermofur/memory.db"
+      ],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"Argument limited to 16,384 characters without NUL.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "scope",
+          "add",
+          "x",
+          "client",
+          "workspace",
+          "<a×16385>"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Argument limited to 16,384 characters without NUL.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "<a×16385>",
+          "client",
+          "workspace",
+          "c"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_scope: Scope identifier: slug of 1 to 64 characters.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "<a×16384>",
+          "client",
+          "workspace",
+          "c"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_scope: Invalid scope parent.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "c",
+          "client",
+          "<w×16384>",
+          "c"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Argument limited to 16,384 characters without NUL.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "add",
+          "<a×16385>",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Argument limited to 16,384 characters without NUL.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "add",
+          "<😀×8193>",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Argument limited to 16,384 characters without NUL.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "add",
+          "x",
+          "--origin",
+          "user",
+          "--actor",
+          "<a×16385>"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Argument limited to 16,384 characters without NUL.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "add",
+          "x",
+          "--origin",
+          "user",
+          "--key",
+          "<k×16385>"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Argument limited to 16,384 characters without NUL.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "add",
+          "x",
+          "--origin",
+          "<u×16385>"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022<a×16384>\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "add",
+          "<a×16384>",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g3>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022<\\\\uD83D\\\\uDE00×8192>\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "add",
+          "<😀×8192>",
+          "--origin",
+          "user",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g4>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022<é×16384>\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "add",
+          "<é×16384>",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g5>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022x\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"<a×16384>\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "add",
+          "x",
+          "--origin",
+          "user",
+          "--actor",
+          "<a×16384>",
+          "--key",
+          "<k×15000>"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/records/<g2>.md",
+        "added .sermofur/records/<g3>.md",
+        "added .sermofur/records/<g4>.md",
+        "added .sermofur/records/<g5>.md",
+        "changed .sermofur/memory.db"
+      ],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Argument limited to 16,384 characters without NUL.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{14}",
+          "source_code",
+          "<r×16385>",
+          "--lineage",
+          "l",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Argument limited to 16,384 characters without NUL.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{14}",
+          "source_code",
+          "r",
+          "--lineage",
+          "<l×16385>",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g6>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g3>\\u0022,\\n  \\u0022kind\\u0022: \\u0022source_code\\u0022,\\n  \\u0022reference\\u0022: \\u0022<r×16384>\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022l\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{14}",
+          "source_code",
+          "<r×16384>",
+          "--lineage",
+          "l",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Argument limited to 16,384 characters without NUL.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "retex",
+          "add",
+          "--event",
+          "e",
+          "--impact",
+          "i",
+          "--next",
+          "<n×16385>",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g7>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"retex\",\n  \"status\": \"draft\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022event\\u0022: \\u0022<e×16384>\\u0022,\\n  \\u0022impact\\u0022: \\u0022i\\u0022,\\n  \\u0022nextAction\\u0022: \\u0022n\\u0022\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "retex",
+          "add",
+          "--event",
+          "<e×16384>",
+          "--impact",
+          "i",
+          "--next",
+          "n",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Argument limited to 16,384 characters without NUL.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "invalidate",
+          "{14}",
+          "--reason",
+          "<r×16385>"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g3>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"invalidated\",\n  \"revision\": 2,\n  \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022<\\\\uD83D\\\\uDE00×8192>\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "invalidate",
+          "{14}",
+          "--reason",
+          "<r×16384>"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"claim\": {\n    \"id\": \"<g3>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"claim\",\n    \"status\": \"invalidated\",\n    \"revision\": 2,\n    \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022<\\\\uD83D\\\\uDE00×8192>\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  },\n  \"confidence\": {\n    \"level\": \"low\",\n    \"reasons\": [\n      \"Knowledge not applicable: invalidated or superseded.\"\n    ],\n    \"independentOrigins\": 0\n  },\n  \"evidence\": [\n    {\n      \"id\": \"<g6>\",\n      \"scopeId\": \"workspace\",\n      \"kind\": \"evidence\",\n      \"status\": \"proposed\",\n      \"revision\": 1,\n      \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g3>\\u0022,\\n  \\u0022kind\\u0022: \\u0022source_code\\u0022,\\n  \\u0022reference\\u0022: \\u0022<r×16384>\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022l\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n      \"provenance\": {\n        \"origin\": \"user\",\n        \"actor\": \"local-user\",\n        \"timestamp\": \"<date>\"\n      }\n    }\n  ],\n  \"history\": [\n    {\n      \"sequence\": 2,\n      \"objectId\": \"<g3>\",\n      \"scopeId\": \"workspace\",\n      \"previousState\": null,\n      \"newState\": \"{\\n  \\u0022id\\u0022: \\u0022<g3>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022claim\\u0022,\\n  \\u0022status\\u0022: \\u0022proposed\\u0022,\\n  \\u0022revision\\u0022: 1,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022text\\\\u0022: \\\\u0022<\\\\\\\\uD83D\\\\\\\\uDE00×8192>\\\\u0022,\\\\n  \\\\u0022category\\\\u0022: \\\\u0022semantic\\\\u0022,\\\\n  \\\\u0022volatility\\\\u0022: \\\\u0022evolving\\\\u0022,\\\\n  \\\\u0022lastVerified\\\\u0022: null,\\\\n  \\\\u0022reviewAfter\\\\u0022: null\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022local-user\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n      \"reason\": \"create\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    },\n    {\n      \"sequence\": 7,\n      \"objectId\": \"<g3>\",\n      \"scopeId\": \"workspace\",\n      \"previousState\": \"{\\n  \\u0022id\\u0022: \\u0022<g3>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022claim\\u0022,\\n  \\u0022status\\u0022: \\u0022proposed\\u0022,\\n  \\u0022revision\\u0022: 1,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022text\\\\u0022: \\\\u0022<\\\\\\\\uD83D\\\\\\\\uDE00×8192>\\\\u0022,\\\\n  \\\\u0022category\\\\u0022: \\\\u0022semantic\\\\u0022,\\\\n  \\\\u0022volatility\\\\u0022: \\\\u0022evolving\\\\u0022,\\\\n  \\\\u0022lastVerified\\\\u0022: null,\\\\n  \\\\u0022reviewAfter\\\\u0022: null\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022local-user\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n      \"newState\": \"{\\n  \\u0022id\\u0022: \\u0022<g3>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022claim\\u0022,\\n  \\u0022status\\u0022: \\u0022invalidated\\u0022,\\n  \\u0022revision\\u0022: 2,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022text\\\\u0022: \\\\u0022<\\\\\\\\uD83D\\\\\\\\uDE00×8192>\\\\u0022,\\\\n  \\\\u0022category\\\\u0022: \\\\u0022semantic\\\\u0022,\\\\n  \\\\u0022volatility\\\\u0022: \\\\u0022evolving\\\\u0022,\\\\n  \\\\u0022lastVerified\\\\u0022: null,\\\\n  \\\\u0022reviewAfter\\\\u0022: null\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022local-user\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n      \"reason\": \"<r×16384>\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "{14}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/records/<g6>.md",
+        "added .sermofur/records/<g7>.md",
+        "changed .sermofur/memory.db",
+        "changed .sermofur/records/<g3>.md"
+      ],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"scope\": \"workspace\",\n  \"claims\": 4,\n  \"evidence\": 1,\n  \"retex\": 1,\n  \"sources\": 0,\n  \"mode\": \"direct\",\n  \"laya\": \"unavailable\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "status"
+        ],
+        "cwd": ""
+      }
+    }
+  ]
+}

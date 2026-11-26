@@ -1,0 +1,59 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json",
+    ".sermofur/records/"
+  ],
+  "projections": {},
+  "steps": [
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"created\": true\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "init"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "remove": ".sermofur/memory.db"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 3,
+        "stderr": "smf: missing_database: Memory database missing.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "status"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 3,
+        "stderr": "smf: missing_database: Memory database missing.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "add",
+          "x",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    }
+  ]
+}

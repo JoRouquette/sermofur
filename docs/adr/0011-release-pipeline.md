@@ -50,3 +50,18 @@ cannot change the published package: `package` reuses an asset only if this work
 it on `main` for that version, and otherwise stops, or builds the tag, which must be on `main`,
 with the packaging script of `main`; `publish` pushes only that package.
 Dependencies are pinned, locked and installed without scripts.
+
+Rust distribution: the same jobs hand the Rust `smf` binaries to the GitHub Release of the tag
+(`package-rust`, then `package-rust-release`, which writes `SHA256SUMS`, attests the archives
+and attaches the archives, the attestation bundle `attestations-X.Y.Z.jsonl` and `SHA256SUMS`).
+Here the GitHub Release is the only source, so a job with `contents: write` could replace
+assets after the fact. The installers (`rust/dist/install.sh`, `install.ps1`) therefore verify
+each archive with `gh attestation verify --bundle` (the bundle is read from the Release, without
+an API call), which accepts only an attestation signed by `ci.yml` on `main`, and refuse the
+install otherwise. An attestation binds bytes, not a version: the installers also require the
+version the binary reports to equal the tag. Accepted risk: without a usable `gh` (absent, or
+without the attestation command), or with `SMF_SKIP_ATTESTATION=1`, an installer checks only the
+checksum of the same Release, so whoever can write to the Release can replace the archive and
+the checksum together; the installer warns, and `SMF_REQUIRE_ATTESTATION=1` refuses the install
+instead. Whether `gh` verifies a bundle without a login is to be confirmed on the first real
+release.

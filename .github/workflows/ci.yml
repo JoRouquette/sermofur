@@ -20,6 +20,15 @@ on:
         description: Existing release tag to build and publish again (for example v0.1.0)
         required: true
         type: string
+      dry_run:
+        # Lot 10, from a feat/** branch only: builds and archives the Rust smf for the three
+        # targets at the version of `tag`, with no tag, no Release and no attestation. The
+        # `republish` job still starts: the `release` environment, limited to main, refuses it.
+        # From main, dry_run skips only the Rust jobs: republish stays real.
+        description: Rust dry run from a feat/** branch only (tag gives the version; republish fails on the environment rule)
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -324,3 +333,311 @@ jobs:
         env:
           NUGET_SOURCE: https://api.nuget.org/v3/index.json
           NUGET_API_KEY: ${{ steps.nuget.outputs.NUGET_API_KEY }}
+
+  package-rust:
+    # Lot 10: builds the Rust `smf` of the released tag for each target, without any npm code,
+    # and hands the archives to `package-rust-release`. From main only, never in a dry run:
+    # a `republish` dispatched from a feature branch stops here. A tag that predates the Rust
+    # port (no rust/Cargo.toml) has nothing to package and is skipped.
+    needs: [release, republish]
+    if: >-
+      !cancelled() && github.ref == 'refs/heads/main' && inputs.dry_run != true
+      && (needs.release.result == 'success' || needs.republish.result == 'success')
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { os: ubuntu-latest, target: linux-x64 }
+          - { os: windows-latest, target: windows-x64 }
+          - { os: macos-latest, target: macos-arm64 }
+    permissions:
+      contents: read
+    outputs:
+      rust: ${{ steps.tag.outputs.rust }}
+    env:
+      TAG: ${{ needs.release.outputs.tag || needs.republish.outputs.tag }}
+      # Keep in step with RUST_TOOLCHAIN in rust.yml (also in install-rust and the dry run).
+      RUST_TOOLCHAIN: "1.99.1"
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+      - id: tag
+        name: Check that the tag is on main, then check it out with the script of main
+        run: |
+          if ! git rev-parse -q --verify "refs/tags/$TAG^{commit}" > /dev/null; then
+            echo "::error::Tag $TAG does not exist."
+            exit 1
+          fi
+          if ! git merge-base --is-ancestor "refs/tags/$TAG" HEAD; then
+            echo "::error::$TAG does not point to a commit of main; refusing to package it."
+            exit 1
+          fi
+          cp .github/scripts/package-rust.sh "$RUNNER_TEMP/package-rust.sh"
+          git checkout --quiet "refs/tags/$TAG"
+          if [[ -f rust/Cargo.toml ]]; then
+            echo "rust=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::$TAG predates the Rust port: no Rust archive to build."
+            echo "rust=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Install the pinned toolchain
+        if: steps.tag.outputs.rust == 'true'
+        run: |
+          rustup toolchain install "$RUST_TOOLCHAIN" --profile minimal --no-self-update
+          rustup default "$RUST_TOOLCHAIN"
+      - name: Build and archive
+        if: steps.tag.outputs.rust == 'true'
+        run: bash "$RUNNER_TEMP/package-rust.sh" "${TAG#v}" "${{ matrix.target }}" artifacts/rust
+      - if: steps.tag.outputs.rust == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: rust-${{ matrix.target }}
+          path: artifacts/rust/*
+          if-no-files-found: error
+
+  package-rust-release:
+    # Lot 10: SHA256SUMS, provenance attestation, then the archives attached to the GitHub
+    # Release of the tag. It waits for `package`, which creates the Release of a republished
+    # tag that has none, but does not depend on its result. No checkout, no npm, no build.
+    needs: [release, republish, package, package-rust]
+    if: ${{ !cancelled() && needs.package-rust.result == 'success' && needs.package-rust.outputs.rust == 'true' }}
+    runs-on: ubuntu-latest
+    concurrency:
+      group: package-rust-release-${{ needs.release.outputs.tag || needs.republish.outputs.tag }}
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+      TAG: ${{ needs.release.outputs.tag || needs.republish.outputs.tag }}
+    steps:
+      - id: existing
+        name: Stop if the Release already carries attested Rust archives
+        # SHA256SUMS is attached last: when present, an earlier run attached everything. Those
+        # assets are kept only if this workflow on main attested them, as `package` does for
+        # the NuGet package: any job with contents: write could have attached them.
+        run: |
+          if ! gh release view "$TAG" > /dev/null; then
+            echo "::error::$TAG has no GitHub Release to attach the Rust archives to."
+            exit 1
+          fi
+          # Read the names first: a failure of gh must stop the job, not read as "no SHA256SUMS".
+          names="$(gh release view "$TAG" --json assets --jq '.assets[].name')"
+          if ! grep -qx SHA256SUMS <<< "$names"; then
+            exit 0
+          fi
+          # An attestation binds the bytes, not the name: the assets must be the three archives
+          # of this version, listed exactly in SHA256SUMS.
+          version="${TAG#v}"
+          # The installers verify the archives offline against this bundle: it must be there.
+          if ! grep -qx "attestations-$version.jsonl" <<< "$names"; then
+            echo "::error::$TAG carries SHA256SUMS but no attestations-$version.jsonl: the installers need it. To repair, delete SHA256SUMS from the Release, then republish the tag."
+            exit 1
+          fi
+          expected="$(printf 'smf-%s-%s\n' "$version" linux-x64.tar.gz "$version" macos-arm64.tar.gz \
+            "$version" windows-x64.zip | sort)"
+          attached="$(grep '^smf-' <<< "$names" | sort || true)"
+          if [[ "$attached" != "$expected" ]]; then
+            echo "::error::$TAG carries unexpected Rust assets: ${attached//$'\n'/ } (expected the archives of $version)."
+            exit 1
+          fi
+          mkdir -p artifacts/attached
+          gh release download "$TAG" --pattern "smf-$version-*" --pattern SHA256SUMS \
+            --pattern "attestations-$version.jsonl" --dir artifacts/attached
+          cd artifacts/attached
+          listed="$(awk '{ sub(/^\*/, "", $2); print $2 }' SHA256SUMS | sort)"
+          if [[ "$listed" != "$expected" ]]; then
+            echo "::error::The SHA256SUMS attached to $TAG does not list exactly the archives of $version."
+            exit 1
+          fi
+          sha256sum -c SHA256SUMS
+          for file in smf-* SHA256SUMS; do
+            gh attestation verify "$file" --repo "$GITHUB_REPOSITORY" \
+              --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/ci.yml" \
+              --source-ref refs/heads/main --deny-self-hosted-runners
+          done
+          # The installers use the attached bundle, not the API: it must cover every archive.
+          for file in smf-*; do
+            gh attestation verify "$file" --repo "$GITHUB_REPOSITORY" \
+              --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/ci.yml" \
+              --source-ref refs/heads/main --deny-self-hosted-runners \
+              --bundle "attestations-$version.jsonl"
+          done
+          echo "::notice::$TAG already carries attested Rust archives: they are left as they are."
+          echo "done=true" >> "$GITHUB_OUTPUT"
+      - if: steps.existing.outputs.done != 'true'
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: rust-*
+          path: artifacts/rust
+          merge-multiple: true
+      - name: Checksums
+        if: steps.existing.outputs.done != 'true'
+        working-directory: artifacts/rust
+        run: |
+          version="${TAG#v}"
+          for target in linux-x64.tar.gz windows-x64.zip macos-arm64.tar.gz; do
+            [[ -f "smf-$version-$target" ]] || { echo "::error::smf-$version-$target is missing."; exit 1; }
+          done
+          sha256sum smf-* > SHA256SUMS
+          cat SHA256SUMS
+      - name: Attest the archives
+        id: attest
+        if: steps.existing.outputs.done != 'true'
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: |
+            artifacts/rust/smf-*
+            artifacts/rust/SHA256SUMS
+      - name: Keep the attestation bundle next to the archives
+        # The installers check an archive against this file, offline, with `gh attestation verify
+        # --bundle`: it carries the signature of this workflow on main and cannot be forged for
+        # another archive. Its name does not start with `smf-`, so the checks above ignore it.
+        if: steps.existing.outputs.done != 'true'
+        env:
+          BUNDLE: ${{ steps.attest.outputs.bundle-path }}
+        run: |
+          [[ -s "$BUNDLE" ]] || { echo "::error::The attestation bundle is missing."; exit 1; }
+          cp "$BUNDLE" "artifacts/rust/attestations-${TAG#v}.jsonl"
+      - name: Check that the bundle covers every archive
+        # What the installers will do, before anything is attached: a bundle that gh cannot read,
+        # or that misses an archive, stops the job here and not at the first install.
+        if: steps.existing.outputs.done != 'true'
+        working-directory: artifacts/rust
+        run: |
+          for file in smf-*; do
+            gh attestation verify "$file" --repo "$GITHUB_REPOSITORY" \
+              --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/ci.yml" \
+              --source-ref refs/heads/main --deny-self-hosted-runners \
+              --bundle "attestations-${TAG#v}.jsonl"
+          done
+      - name: Attach to the GitHub Release
+        if: steps.existing.outputs.done != 'true'
+        # --clobber replaces the assets of an interrupted run, which never attached SHA256SUMS:
+        # it goes last, as the sign that everything else is there.
+        run: |
+          gh release upload "$TAG" artifacts/rust/smf-* --clobber
+          gh release upload "$TAG" "artifacts/rust/attestations-${TAG#v}.jsonl" --clobber
+          gh release upload "$TAG" artifacts/rust/SHA256SUMS --clobber
+
+  install-rust:
+    # Lot 10: builds the Rust archive of this commit with package-rust.sh (test version 0.0.1),
+    # then runs rust/dist/install.sh or install.ps1 against a local server that mimics GitHub
+    # Releases, with a stand-in gh: install by tag, latest Release, wrong checksum, missing line,
+    # attestation of another archive, missing attestation, no gh, gh without the attestation
+    # command, skipped attestation, both switches refused, and a version replay (Linux and macOS:
+    # fake archive). The full list is in the docstring of test-install.py.
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, target: linux-x64 }
+          - { os: windows-latest, target: windows-x64 }
+          - { os: macos-latest, target: macos-arm64 }
+    permissions:
+      contents: read
+    env:
+      RUST_TOOLCHAIN: "1.99.1"
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install the pinned toolchain
+        run: |
+          rustup toolchain install "$RUST_TOOLCHAIN" --profile minimal --no-self-update
+          rustup default "$RUST_TOOLCHAIN"
+      - name: Build and archive
+        run: bash .github/scripts/package-rust.sh 0.0.1 "${{ matrix.target }}" artifacts/rust
+      - name: Install from a local server
+        run: |
+          if [[ "$RUNNER_OS" == Windows ]]; then py=python; else py=python3; fi
+          "$py" .github/scripts/test-install.py artifacts/rust 0.0.1
+
+  package-rust-dry-run:
+    # Lot 10: dry run of `package-rust`, dispatched by hand from a feat/** branch with dry_run.
+    # Same script and targets, built from the dispatched commit at the version of `tag`; no
+    # tag is read or created, nothing is attested or attached to a Release.
+    if: >-
+      github.event_name == 'workflow_dispatch' && inputs.dry_run == true
+      && startsWith(github.ref, 'refs/heads/feat/')
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, target: linux-x64 }
+          - { os: windows-latest, target: windows-x64 }
+          - { os: macos-latest, target: macos-arm64 }
+    permissions:
+      contents: read
+    env:
+      TAG: ${{ inputs.tag }}
+      RUST_TOOLCHAIN: "1.99.1"
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install the pinned toolchain
+        run: |
+          rustup toolchain install "$RUST_TOOLCHAIN" --profile minimal --no-self-update
+          rustup default "$RUST_TOOLCHAIN"
+      - name: Build and archive
+        # Run from RUNNER_TEMP, as `package-rust` does with the script of main.
+        run: |
+          cp .github/scripts/package-rust.sh "$RUNNER_TEMP/package-rust.sh"
+          bash "$RUNNER_TEMP/package-rust.sh" "${TAG#v}" "${{ matrix.target }}" artifacts/rust
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: rust-dry-run-${{ matrix.target }}
+          path: artifacts/rust/*
+          if-no-files-found: error
+
+  package-rust-dry-run-sums:
+    # Lot 10: the checksum step of `package-rust-release`, on the dry-run archives. It stops
+    # there: no attestation and no Release upload, which only the real tag may receive.
+    needs: package-rust-dry-run
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      TAG: ${{ inputs.tag }}
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: rust-dry-run-*
+          path: artifacts/rust
+          merge-multiple: true
+      - name: Checksums
+        working-directory: artifacts/rust
+        run: |
+          version="${TAG#v}"
+          for target in linux-x64.tar.gz windows-x64.zip macos-arm64.tar.gz; do
+            [[ -f "smf-$version-$target" ]] || { echo "::error::smf-$version-$target is missing."; exit 1; }
+          done
+          sha256sum smf-* > SHA256SUMS
+          cat SHA256SUMS
+          echo "::notice::Dry run: attestation and Release upload skipped."
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: rust-dry-run-SHA256SUMS
+          path: artifacts/rust/SHA256SUMS
+          if-no-files-found: error

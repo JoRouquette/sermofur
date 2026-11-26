@@ -1,0 +1,614 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/",
+    ".sermofur/records/<g2>.md",
+    ".sermofur/records/<g3>.md",
+    ".sermofur/records/<g4>.md",
+    ".sermofur/records/<g5>.md",
+    ".sermofur/records/<g6>.md"
+  ],
+  "projections": {
+    "<g2>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Claim <g2>\n\n```json\n{\n  \"text\": \"Fact\",\n  \"category\": \"semantic\",\n  \"volatility\": \"evolving\",\n  \"lastVerified\": null,\n  \"reviewAfter\": null\n}\n```\n",
+    "<g3>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g3>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"retex\",\n  \"status\": \"draft\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Retex <g3>\n\n```json\n{\n  \"event\": \"e\",\n  \"impact\": \"i\",\n  \"nextAction\": \"n\"\n}\n```\n",
+    "<g4>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g4>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"john\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Evidence <g4>\n\n```json\n{\n  \"claimId\": \"<g2>\",\n  \"kind\": \"source_code\",\n  \"reference\": \"ref\",\n  \"lineageId\": \"l\",\n  \"relation\": \"supports\",\n  \"sourceId\": null,\n  \"sourceHash\": null\n}\n```\n",
+    "<g5>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g5>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Evidence <g5>\n\n```json\n{\n  \"claimId\": \"<g2>\",\n  \"kind\": \"source_code\",\n  \"reference\": \"ref\",\n  \"lineageId\": \"l\",\n  \"relation\": \"supports\",\n  \"sourceId\": null,\n  \"sourceHash\": null\n}\n```\n",
+    "<g6>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g6>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"llm\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Evidence <g6>\n\n```json\n{\n  \"claimId\": \"<g2>\",\n  \"kind\": \"llm_assertion\",\n  \"reference\": \"ref\",\n  \"lineageId\": \"l\",\n  \"relation\": \"supports\",\n  \"sourceId\": null,\n  \"sourceHash\": null\n}\n```\n"
+  },
+  "steps": [
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"created\": true\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "init"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022Fact\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "add",
+          "Fact",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g3>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"retex\",\n  \"status\": \"draft\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022event\\u0022: \\u0022e\\u0022,\\n  \\u0022impact\\u0022: \\u0022i\\u0022,\\n  \\u0022nextAction\\u0022: \\u0022n\\u0022\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "retex",
+          "add",
+          "--event",
+          "e",
+          "--impact",
+          "i",
+          "--next",
+          "n",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g4>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022source_code\\u0022,\\n  \\u0022reference\\u0022: \\u0022ref\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022l\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"john\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{1}",
+          "SourceCode",
+          "ref",
+          "--lineage",
+          "l",
+          "--origin",
+          "user",
+          "--actor",
+          "john"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g5>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022source_code\\u0022,\\n  \\u0022reference\\u0022: \\u0022ref\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022l\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{1}",
+          "source-code",
+          "ref",
+          "--lineage",
+          "l",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g6>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022llm_assertion\\u0022,\\n  \\u0022reference\\u0022: \\u0022ref\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022l\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"llm\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{1}",
+          "LLM_ASSERTION",
+          "ref",
+          "--lineage",
+          "l",
+          "--origin",
+          "llm",
+          "--key",
+          "e1"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g6>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022llm_assertion\\u0022,\\n  \\u0022reference\\u0022: \\u0022ref\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022l\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"llm\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{1}",
+          "LLM_ASSERTION",
+          "ref",
+          "--lineage",
+          "l",
+          "--origin",
+          "llm",
+          "--key",
+          "e1"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: idempotency_conflict: Key reused with different content.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{1}",
+          "local_documentation",
+          "ref",
+          "--lineage",
+          "l",
+          "--origin",
+          "llm",
+          "--key",
+          "e1",
+          "--contradicts"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Invalid EvidenceKind value.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{1}",
+          "rumour",
+          "ref",
+          "--lineage",
+          "l",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Invalid EvidenceKind value.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{1}",
+          "",
+          "ref",
+          "--lineage",
+          "l",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_input: Text required, limited to 16,384 characters without NUL.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{1}",
+          "execution",
+          " ",
+          "--lineage",
+          "l",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_input: Text required, limited to 16,384 characters without NUL.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{1}",
+          "execution",
+          "ref",
+          "--lineage",
+          " ",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Option --lineage required.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{1}",
+          "execution",
+          "ref",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Wrong number of arguments.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{1}",
+          "execution",
+          "--lineage",
+          "l",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Option --origin required.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{1}",
+          "execution",
+          "ref",
+          "--lineage",
+          "l"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: GUID identifier required.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "bad",
+          "execution",
+          "ref",
+          "--lineage",
+          "l",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: GUID identifier required.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "bad",
+          "rumour",
+          "ref",
+          "--lineage",
+          "l",
+          "--origin",
+          "user",
+          "--source",
+          "bad"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: not_found: Object missing or inaccessible.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "0f8fad5b-d9cb-469f-a165-70867728950e",
+          "execution",
+          "ref",
+          "--lineage",
+          "l",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 4,
+        "stderr": "smf: scope_boundary: Evidence and claim must share the current scope.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{2}",
+          "execution",
+          "ref",
+          "--lineage",
+          "l",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 4,
+        "stderr": "smf: scope_boundary: Evidence and claim must share the current scope.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{3}",
+          "execution",
+          "ref",
+          "--lineage",
+          "l",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: GUID identifier required.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{1}",
+          "execution",
+          "ref",
+          "--lineage",
+          "l",
+          "--origin",
+          "user",
+          "--source",
+          "bad"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: not_found: Object missing or inaccessible.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{1}",
+          "execution",
+          "ref",
+          "--lineage",
+          "l",
+          "--origin",
+          "user",
+          "--source",
+          "{2}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: not_found: Object missing or inaccessible.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{1}",
+          "execution",
+          "ref",
+          "--lineage",
+          "l",
+          "--origin",
+          "user",
+          "--source",
+          "0f8fad5b-d9cb-469f-a165-70867728950e"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Unknown option for this command.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{1}",
+          "execution",
+          "ref",
+          "--lineage",
+          "l",
+          "--origin",
+          "user",
+          "--frob",
+          "x"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Wrong number of arguments.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{1}",
+          "execution",
+          "ref",
+          "--lineage",
+          "l",
+          "--origin",
+          "user",
+          "--contradicts",
+          "x"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "[\n  {\n    \"id\": \"<g4>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"evidence\",\n    \"status\": \"proposed\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022source_code\\u0022,\\n  \\u0022reference\\u0022: \\u0022ref\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022l\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"john\",\n      \"timestamp\": \"<date>\"\n    }\n  },\n  {\n    \"id\": \"<g5>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"evidence\",\n    \"status\": \"proposed\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022source_code\\u0022,\\n  \\u0022reference\\u0022: \\u0022ref\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022l\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  },\n  {\n    \"id\": \"<g6>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"evidence\",\n    \"status\": \"proposed\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022llm_assertion\\u0022,\\n  \\u0022reference\\u0022: \\u0022ref\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022l\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"llm\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  }\n]\n"
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "list"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g4>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022source_code\\u0022,\\n  \\u0022reference\\u0022: \\u0022ref\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022l\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"john\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "show",
+          "{3}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: not_found: Object missing or inaccessible.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "show",
+          "{1}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"Unknown option for this command.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "show",
+          "{3}",
+          "--json",
+          "--key",
+          "k"
+        ],
+        "cwd": ""
+      }
+    }
+  ]
+}

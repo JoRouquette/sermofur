@@ -1,0 +1,265 @@
+{
+  "generator": "rust/tools/atomic-oracle",
+  "runtime": ".NET 10.0.5",
+  "os": "windows",
+  "scenarios": [
+    {
+      "name": "new_file",
+      "policy": "refuse",
+      "file": "a.txt",
+      "written": "\u003Croot\u003E/a.txt",
+      "after": {
+        "a.txt": "new"
+      }
+    },
+    {
+      "name": "replace_existing",
+      "policy": "refuse",
+      "file": "a.txt",
+      "written": "\u003Croot\u003E/a.txt",
+      "after": {
+        "a.txt": "new"
+      }
+    },
+    {
+      "name": "missing_parent_folders",
+      "policy": "refuse",
+      "file": "sub/dir/a.txt",
+      "written": "\u003Croot\u003E/sub/dir/a.txt",
+      "after": {
+        "sub": "folder",
+        "sub/dir": "folder",
+        "sub/dir/a.txt": "new"
+      }
+    },
+    {
+      "name": "refuse_symlink_to_file",
+      "policy": "refuse",
+      "file": "link",
+      "code": "unsafe_path",
+      "message": "\u003Croot\u003E/link was left untouched: it is a link, and the write would replace the link itself.",
+      "exitCode": 4,
+      "after": {
+        "link": "link",
+        "target": "old"
+      }
+    },
+    {
+      "name": "refuse_dangling_symlink",
+      "policy": "refuse",
+      "file": "link",
+      "code": "unsafe_path",
+      "message": "\u003Croot\u003E/link was left untouched: it is a link, and the write would replace the link itself.",
+      "exitCode": 4,
+      "after": {
+        "link": "link"
+      }
+    },
+    {
+      "name": "refuse_folder",
+      "policy": "refuse",
+      "file": "folder",
+      "code": "unsafe_path",
+      "message": "\u003Croot\u003E/folder was left untouched: it is a folder.",
+      "exitCode": 4,
+      "after": {
+        "folder": "folder"
+      }
+    },
+    {
+      "name": "refuse_junction",
+      "policy": "refuse",
+      "file": "junction",
+      "code": "unsafe_path",
+      "message": "\u003Croot\u003E/junction was left untouched: it is a link, and the write would replace the link itself.",
+      "exitCode": 4,
+      "after": {
+        "dir": "folder",
+        "junction": "link"
+      }
+    },
+    {
+      "name": "follow_no_link",
+      "policy": "follow",
+      "file": "a.txt",
+      "written": "\u003Croot\u003E/a.txt",
+      "after": {
+        "a.txt": "new"
+      }
+    },
+    {
+      "name": "follow_new_file",
+      "policy": "follow",
+      "file": "a.txt",
+      "written": "\u003Croot\u003E/a.txt",
+      "after": {
+        "a.txt": "new"
+      }
+    },
+    {
+      "name": "follow_one_link",
+      "policy": "follow",
+      "file": "link",
+      "written": "\u003Croot\u003E/target",
+      "after": {
+        "link": "link",
+        "target": "new"
+      }
+    },
+    {
+      "name": "follow_relative_link",
+      "policy": "follow",
+      "file": "link",
+      "written": "\u003Croot\u003E/sub/target",
+      "after": {
+        "link": "link",
+        "sub": "folder",
+        "sub/target": "new"
+      }
+    },
+    {
+      "name": "follow_relative_dot_dot",
+      "policy": "follow",
+      "file": "sub/link",
+      "written": "\u003Croot\u003E/target",
+      "after": {
+        "sub": "folder",
+        "sub/link": "link",
+        "target": "new"
+      }
+    },
+    {
+      "name": "follow_chain_10",
+      "policy": "follow",
+      "file": "l0",
+      "written": "\u003Croot\u003E/target",
+      "after": {
+        "l0": "link",
+        "l1": "link",
+        "l2": "link",
+        "l3": "link",
+        "l4": "link",
+        "l5": "link",
+        "l6": "link",
+        "l7": "link",
+        "l8": "link",
+        "l9": "link",
+        "target": "new"
+      }
+    },
+    {
+      "name": "follow_chain_11",
+      "policy": "follow",
+      "file": "l0",
+      "code": "unsafe_path",
+      "message": "\u003Croot\u003E/l0 was left untouched: its links go through more than 10 steps.",
+      "exitCode": 4,
+      "after": {
+        "l0": "link",
+        "l1": "link",
+        "l10": "link",
+        "l2": "link",
+        "l3": "link",
+        "l4": "link",
+        "l5": "link",
+        "l6": "link",
+        "l7": "link",
+        "l8": "link",
+        "l9": "link",
+        "target": "old"
+      }
+    },
+    {
+      "name": "follow_circle",
+      "policy": "follow",
+      "file": "a",
+      "code": "unsafe_path",
+      "message": "\u003Croot\u003E/a was left untouched: its links come back to \u003Croot\u003E/a, in a circle.",
+      "exitCode": 4,
+      "after": {
+        "a": "link",
+        "b": "link"
+      }
+    },
+    {
+      "name": "follow_self",
+      "policy": "follow",
+      "file": "a",
+      "code": "unsafe_path",
+      "message": "\u003Croot\u003E/a was left untouched: its links come back to \u003Croot\u003E/a, in a circle.",
+      "exitCode": 4,
+      "after": {
+        "a": "link"
+      }
+    },
+    {
+      "name": "follow_dangling",
+      "policy": "follow",
+      "file": "link",
+      "code": "unsafe_path",
+      "message": "\u003Croot\u003E/link was left untouched: its links end on \u003Croot\u003E/nowhere, which does not exist.",
+      "exitCode": 4,
+      "after": {
+        "link": "link"
+      }
+    },
+    {
+      "name": "follow_to_folder",
+      "policy": "follow",
+      "file": "link",
+      "code": "unsafe_path",
+      "message": "\u003Croot\u003E/link was left untouched: its links end on the folder \u003Croot\u003E/dir.",
+      "exitCode": 4,
+      "after": {
+        "dir": "folder",
+        "link": "link"
+      }
+    },
+    {
+      "name": "follow_folder_itself",
+      "policy": "follow",
+      "file": "dir",
+      "code": "unsafe_path",
+      "message": "\u003Croot\u003E/dir was left untouched: it is a folder.",
+      "exitCode": 4,
+      "after": {
+        "dir": "folder"
+      }
+    },
+    {
+      "name": "follow_junction",
+      "policy": "follow",
+      "file": "junction",
+      "code": "unsafe_path",
+      "message": "\u003Croot\u003E/junction was left untouched: its links end on the folder \u003Croot\u003E/dir.",
+      "exitCode": 4,
+      "after": {
+        "dir": "folder",
+        "junction": "link"
+      }
+    },
+    {
+      "name": "follow_link_to_link_to_file",
+      "policy": "follow",
+      "file": "l1",
+      "written": "\u003Croot\u003E/target",
+      "after": {
+        "l1": "link",
+        "l2": "link",
+        "target": "new"
+      }
+    },
+    {
+      "name": "follow_case_variant_circle",
+      "policy": "follow",
+      "file": "a",
+      "code": "unsafe_path",
+      "message": "\u003Croot\u003E/a was left untouched: its links come back to \u003Croot\u003E/A, in a circle.",
+      "exitCode": 4,
+      "after": {
+        "a": "link",
+        "b": "link"
+      }
+    }
+  ]
+}

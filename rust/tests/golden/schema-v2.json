@@ -1,0 +1,122 @@
+{
+  "master": [
+    {
+      "name": "metadata",
+      "sql": "CREATE TABLE metadata(key TEXT PRIMARY KEY, value TEXT NOT NULL)",
+      "table": "metadata",
+      "type": "table"
+    },
+    {
+      "name": "sqlite_autoindex_metadata_1",
+      "sql": null,
+      "table": "metadata",
+      "type": "index"
+    },
+    {
+      "name": "scopes",
+      "sql": "CREATE TABLE scopes(id TEXT PRIMARY KEY, kind TEXT NOT NULL, parent_id TEXT REFERENCES scopes(id),\n    relative_path TEXT COLLATE NOCASE)",
+      "table": "scopes",
+      "type": "table"
+    },
+    {
+      "name": "sqlite_autoindex_scopes_1",
+      "sql": null,
+      "table": "scopes",
+      "type": "index"
+    },
+    {
+      "name": "records",
+      "sql": "CREATE TABLE records(id TEXT PRIMARY KEY, scope_id TEXT NOT NULL REFERENCES scopes(id),\n    kind TEXT NOT NULL CHECK(kind IN ('Claim','Evidence','Retex','Source')),\n    claim_id TEXT REFERENCES records(id),\n    payload TEXT NOT NULL CHECK(json_valid(payload)), revision INTEGER NOT NULL CHECK(revision>0),\n    source_path TEXT CHECK(source_path IS NULL OR kind='Source'))",
+      "table": "records",
+      "type": "table"
+    },
+    {
+      "name": "sqlite_autoindex_records_1",
+      "sql": null,
+      "table": "records",
+      "type": "index"
+    },
+    {
+      "name": "history",
+      "sql": "CREATE TABLE history(sequence INTEGER PRIMARY KEY AUTOINCREMENT, object_id TEXT NOT NULL REFERENCES records(id),\n    scope_id TEXT NOT NULL REFERENCES scopes(id), payload TEXT NOT NULL CHECK(json_valid(payload)))",
+      "table": "history",
+      "type": "table"
+    },
+    {
+      "name": "sqlite_sequence",
+      "sql": "CREATE TABLE sqlite_sequence(name,seq)",
+      "table": "sqlite_sequence",
+      "type": "table"
+    },
+    {
+      "name": "idempotency",
+      "sql": "CREATE TABLE idempotency(scope_id TEXT NOT NULL REFERENCES scopes(id), operation TEXT NOT NULL,\n    key TEXT NOT NULL, content_hash TEXT NOT NULL, object_id TEXT NOT NULL REFERENCES records(id),\n    PRIMARY KEY(scope_id,operation,key))",
+      "table": "idempotency",
+      "type": "table"
+    },
+    {
+      "name": "sqlite_autoindex_idempotency_1",
+      "sql": null,
+      "table": "idempotency",
+      "type": "index"
+    },
+    {
+      "name": "records_scope_kind",
+      "sql": "CREATE INDEX records_scope_kind ON records(scope_id,kind)",
+      "table": "records",
+      "type": "index"
+    },
+    {
+      "name": "records_source_path",
+      "sql": "CREATE UNIQUE INDEX records_source_path ON records(source_path) WHERE source_path IS NOT NULL",
+      "table": "records",
+      "type": "index"
+    },
+    {
+      "name": "search",
+      "sql": "CREATE VIRTUAL TABLE search USING fts5(object_id UNINDEXED, scope_id UNINDEXED, kind UNINDEXED,\n    passage UNINDEXED, length UNINDEXED, text, tokenize='unicode61 remove_diacritics 2')",
+      "table": "search",
+      "type": "table"
+    },
+    {
+      "name": "search_data",
+      "sql": "CREATE TABLE 'search_data'(id INTEGER PRIMARY KEY, block BLOB)",
+      "table": "search_data",
+      "type": "table"
+    },
+    {
+      "name": "search_idx",
+      "sql": "CREATE TABLE 'search_idx'(segid, term, pgno, PRIMARY KEY(segid, term)) WITHOUT ROWID",
+      "table": "search_idx",
+      "type": "table"
+    },
+    {
+      "name": "search_content",
+      "sql": "CREATE TABLE 'search_content'(id INTEGER PRIMARY KEY, c0, c1, c2, c3, c4, c5)",
+      "table": "search_content",
+      "type": "table"
+    },
+    {
+      "name": "search_docsize",
+      "sql": "CREATE TABLE 'search_docsize'(id INTEGER PRIMARY KEY, sz BLOB)",
+      "table": "search_docsize",
+      "type": "table"
+    },
+    {
+      "name": "search_config",
+      "sql": "CREATE TABLE 'search_config'(k PRIMARY KEY, v) WITHOUT ROWID",
+      "table": "search_config",
+      "type": "table"
+    },
+    {
+      "name": "search_terms",
+      "sql": "CREATE VIRTUAL TABLE search_terms USING fts5vocab(search, instance)",
+      "table": "search_terms",
+      "type": "table"
+    }
+  ],
+  "scopes": [
+    "workspace|Workspace||"
+  ],
+  "userVersion": 2
+}

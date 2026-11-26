@@ -11,10 +11,11 @@ workflow `.github/workflows/ci.yml` ([ADR 0011](adr/0011-release-pipeline.md)).
 
 | Événement | Jobs |
 |---|---|
-| Pull request vers `main` | `build` sous Windows, Linux et macOS : restauration verrouillée, vérification du formatage, build Release, tests, paquet (Linux) ; `release-notes` : rend des notes de version d'exemple avec l'outillage semantic-release verrouillé |
-| Push sur `main` | `build` et `release-notes`, puis `plan` : simulation semantic-release qui dit si une release est due |
-| Release due | `release` attend l'approbation de l'environnement `release`, puis crée le tag `vX.Y.Z` et la GitHub Release ; `package` construit le tag, atteste le paquet et le joint à la release ; `publish` le pousse sur nuget.org |
-| Lancement manuel avec un tag | `republish` attend la même approbation ; `package` réutilise le paquet joint à cette release si ce workflow l'a attesté sur `main`, sinon construit le tag ; `publish` le pousse sur nuget.org |
+| Pull request vers `main` | `build` sous Windows, Linux et macOS : restauration verrouillée, vérification du formatage, build Release, tests, paquet (Linux) ; `release-notes` : rend des notes de version d'exemple avec l'outillage semantic-release verrouillé ; `install-rust` sur les trois mêmes systèmes : construit le `smf` Rust et teste les installeurs (voir [Binaires Rust](#binaires-rust-smf)) |
+| Push sur `main` | `build`, `release-notes` et `install-rust`, puis `plan` (après `build` et `release-notes` seulement : un `install-rust` en échec ne l'arrête pas) : simulation semantic-release qui dit si une release est due |
+| Release due | `release` attend l'approbation de l'environnement `release`, puis crée le tag `vX.Y.Z` et la GitHub Release ; `package` construit le tag, atteste le paquet et le joint à la release ; `publish` le pousse sur nuget.org ; `package-rust` construit le `smf` Rust du tag sur trois systèmes et `package-rust-release` atteste les archives et les joint à la release |
+| Lancement manuel avec un tag | `republish` attend la même approbation ; `package` réutilise le paquet joint à cette release si ce workflow l'a attesté sur `main`, sinon construit le tag ; `publish` le pousse sur nuget.org ; `package-rust` et `package-rust-release` tournent comme ci-dessus (un tag antérieur au portage Rust n'a rien à construire et est ignoré) |
+| Lancement manuel avec `dry_run`, depuis une branche `feat/**` | `package-rust-dry-run` et `package-rust-dry-run-sums` construisent et archivent le `smf` Rust à la version de `tag`, sans tag, sans release et sans attestation ; `republish` démarre aussi et est refusé aussitôt par la règle de l'environnement `release` |
 
 | Commit sur `main` | Version |
 |---|---|
@@ -38,6 +39,44 @@ jour corrige une vulnérabilité d'une dépendance d'exécution, ajouter à la b
 avant la fusion, un commit `fix(deps): ...` qui nomme l'avis, pour qu'une version corrective livre
 le correctif.
 
+## Binaires Rust (`smf`)
+
+Le portage Rust est distribué sous forme de binaires joints à la GitHub Release du tag,
+construits par `package-rust` (sans code npm) depuis `rust/`, avec la toolchain épinglée dans le
+workflow. Une release porte :
+
+- `smf-X.Y.Z-linux-x64.tar.gz`, `smf-X.Y.Z-macos-arm64.tar.gz` et `smf-X.Y.Z-windows-x64.zip`,
+  chacune avec le binaire, `LICENSE` et `NOTICE` ;
+- `SHA256SUMS`, joint en dernier : sa présence signifie que tout le reste est joint ;
+- `attestations-X.Y.Z.jsonl`, l'attestation de provenance des archives, signée par `ci.yml` sur
+  `main`. `package-rust-release` vérifie avec `gh attestation verify --bundle` qu'elle couvre
+  chaque archive avant de rien joindre.
+
+La version du tag arrive dans le binaire à la compilation (`SMF_BUILD_VERSION`) ; `smf --version`
+affiche `Sermofur X.Y.Z`, et le script de packaging refuse un binaire qui rapporte une autre
+version. Le pipeline ne modifie jamais `Cargo.toml`.
+
+Installation (Linux x64, macOS arm64 ; Windows x64 avec `install.ps1`) :
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/JoRouquette/sermofur/main/rust/dist/install.sh | sh
+sh install.sh v1.0.0        # un tag donné
+```
+
+Les deux installeurs contrôlent l'archive contre `SHA256SUMS`, puis, quand un `gh` récent est
+installé, contre l'attestation, et n'installent rien si l'un des deux contrôles échoue ; la version que
+rapporte le binaire doit égaler le tag. Sans `gh` utilisable, ils avertissent et ne contrôlent que
+la somme, ce qui protège d'un téléchargement corrompu mais pas de qui peut écrire sur la Release.
+Voir l'[ADR 0011](adr/0011-release-pipeline.md). Variables d'environnement : `SMF_INSTALL_DIR`,
+`SMF_RELEASES_URL`, `SMF_VERSION`, `SMF_REQUIRE_ATTESTATION=1` (refuser si `gh` manque),
+`SMF_SKIP_ATTESTATION=1` (installer sur la somme seule, avec un avertissement ; refusée avec la
+précédente), `SMF_GH` (l'exécutable `gh`) et, pour `install.ps1`, `SMF_NO_MODIFY_PATH=1`.
+
+Pour essayer le packaging avant une release : Actions → *CI and release* → *Run workflow*,
+**depuis une branche `feat/**`**, `tag` = la version à construire (par exemple `v1.0.0`),
+`dry_run` coché. Les archives et `SHA256SUMS` sont des artefacts du run. Ne jamais lancer
+`dry_run` depuis `main` : `republish` y serait réel.
+
 ## Réglages initiaux (mainteneur)
 
 Ces réglages vivent hors du dépôt et se font une fois.
@@ -45,8 +84,12 @@ Ces réglages vivent hors du dépôt et se font une fois.
 1. **Protéger `main`** (Settings → Rules → Rulesets → New branch ruleset, cible `main`) : pull
    request obligatoire (0 approbation pour un mainteneur seul, qui ne peut pas approuver sa propre
    pull request) ; checks requis `build (windows-latest)`, `build (ubuntu-latest)`,
-   `build (macos-latest)` et `release-notes` ; force push et suppression interdits. Dans
-   Settings → General, autoriser le merge commit et le rebase, désactiver le squash.
+   `build (macos-latest)`, `release-notes` et les trois checks `install-rust`
+   (`install-rust (ubuntu-latest, linux-x64)`, `install-rust (windows-latest, windows-x64)`,
+   `install-rust (macos-latest, macos-arm64)`) ; force push et suppression interdits. Dans
+   Settings → General, autoriser le merge commit et le rebase, désactiver le squash. Les checks
+   Rust de `rust.yml` sont filtrés par chemin : ne pas les exiger, sinon une pull request qui ne
+   touche pas `rust/` les attendrait indéfiniment.
 2. **Protéger les tags de release** (New tag ruleset, cible `v*`) : mise à jour et suppression
    interdites, pour qu'un tag publié ne puisse jamais être déplacé ni retiré.
 3. **Environnement `release`** (Settings → Environments → New environment) : relecteur requis =
@@ -109,6 +152,11 @@ release.
   job. Sans paquet, le tag est construit, attesté et joint. Le push utilise `--skip-duplicate` :
   une version déjà sur nuget.org n'est pas une erreur. Ne pas relancer le job `release` : le tag
   existe, il ne publierait rien.
+- **`package-rust` ou `package-rust-release` a échoué** : lancer `republish` avec ce tag. Les
+  archives jointes par un run interrompu sont remplacées. Si la release porte déjà `SHA256SUMS`,
+  le job garde les assets seulement quand les trois archives, leurs sommes et leurs attestations
+  (par l'API et par le fichier joint) concordent ; sinon il s'arrête. Pour reconstruire une telle
+  release, supprimer `SHA256SUMS` de la release, puis relancer `republish`.
 - **Ne jamais** supprimer un tag publié ni réutiliser un numéro de version : publier un nouveau
   correctif.
 - Un run de release arrêté avant le tag : rien n'a été publié ; le prochain push sur `main`

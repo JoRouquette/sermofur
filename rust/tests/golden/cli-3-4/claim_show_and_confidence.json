@@ -1,0 +1,416 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/",
+    ".sermofur/records/<g2>.md",
+    ".sermofur/records/<g3>.md",
+    ".sermofur/records/<g4>.md",
+    ".sermofur/records/<g5>.md",
+    ".sermofur/records/<g6>.md",
+    ".sermofur/records/<g7>.md",
+    ".sermofur/records/<g8>.md",
+    ".sermofur/records/<g9>.md"
+  ],
+  "projections": {
+    "<g2>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Claim <g2>\n\n```json\n{\n  \"text\": \"Fact\",\n  \"category\": \"semantic\",\n  \"volatility\": \"evolving\",\n  \"lastVerified\": null,\n  \"reviewAfter\": null\n}\n```\n",
+    "<g3>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g3>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Evidence <g3>\n\n```json\n{\n  \"claimId\": \"<g2>\",\n  \"kind\": \"source_code\",\n  \"reference\": \"src/a.rs\",\n  \"lineageId\": \"repo\",\n  \"relation\": \"supports\",\n  \"sourceId\": null,\n  \"sourceHash\": null\n}\n```\n",
+    "<g4>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g4>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Evidence <g4>\n\n```json\n{\n  \"claimId\": \"<g2>\",\n  \"kind\": \"human_observation\",\n  \"reference\": \"seen\",\n  \"lineageId\": \"repo\",\n  \"relation\": \"supports\",\n  \"sourceId\": null,\n  \"sourceHash\": null\n}\n```\n",
+    "<g5>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g5>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"llm\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Evidence <g5>\n\n```json\n{\n  \"claimId\": \"<g2>\",\n  \"kind\": \"authoritative_documentation\",\n  \"reference\": \"docs\",\n  \"lineageId\": \"vendor\",\n  \"relation\": \"supports\",\n  \"sourceId\": null,\n  \"sourceHash\": null\n}\n```\n",
+    "<g6>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g6>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"llm\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Evidence <g6>\n\n```json\n{\n  \"claimId\": \"<g2>\",\n  \"kind\": \"execution\",\n  \"reference\": \"run\",\n  \"lineageId\": \"ci\",\n  \"relation\": \"contradicts\",\n  \"sourceId\": null,\n  \"sourceHash\": null\n}\n```\n",
+    "<g7>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g7>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Evidence <g7>\n\n```json\n{\n  \"claimId\": \"<g2>\",\n  \"kind\": \"project_decision\",\n  \"reference\": \"adr\",\n  \"lineageId\": \"team\",\n  \"relation\": \"contradicts\",\n  \"sourceId\": null,\n  \"sourceHash\": null\n}\n```\n",
+    "<g8>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g8>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Claim <g8>\n\n```json\n{\n  \"text\": \"Pref\",\n  \"category\": \"preferences\",\n  \"volatility\": \"evolving\",\n  \"lastVerified\": null,\n  \"reviewAfter\": null\n}\n```\n",
+    "<g9>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g9>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Evidence <g9>\n\n```json\n{\n  \"claimId\": \"<g8>\",\n  \"kind\": \"user_assertion\",\n  \"reference\": \"me\",\n  \"lineageId\": \"me\",\n  \"relation\": \"supports\",\n  \"sourceId\": null,\n  \"sourceHash\": null\n}\n```\n"
+  },
+  "steps": [
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"created\": true\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "init"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022Fact\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "add",
+          "Fact",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"claim\": {\n    \"id\": \"<g2>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"claim\",\n    \"status\": \"proposed\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022Fact\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  },\n  \"confidence\": {\n    \"level\": \"low\",\n    \"reasons\": [\n      \"No independent evidence available.\",\n      \"Declared evidence; no controlled execution collector in this version.\"\n    ],\n    \"independentOrigins\": 0\n  },\n  \"evidence\": [],\n  \"history\": [\n    {\n      \"sequence\": 1,\n      \"objectId\": \"<g2>\",\n      \"scopeId\": \"workspace\",\n      \"previousState\": null,\n      \"newState\": \"{\\n  \\u0022id\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022claim\\u0022,\\n  \\u0022status\\u0022: \\u0022proposed\\u0022,\\n  \\u0022revision\\u0022: 1,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022text\\\\u0022: \\\\u0022Fact\\\\u0022,\\\\n  \\\\u0022category\\\\u0022: \\\\u0022semantic\\\\u0022,\\\\n  \\\\u0022volatility\\\\u0022: \\\\u0022evolving\\\\u0022,\\\\n  \\\\u0022lastVerified\\\\u0022: null,\\\\n  \\\\u0022reviewAfter\\\\u0022: null\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022local-user\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n      \"reason\": \"create\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "{1}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g3>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022source_code\\u0022,\\n  \\u0022reference\\u0022: \\u0022src/a.rs\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022repo\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{1}",
+          "source_code",
+          "src/a.rs",
+          "--lineage",
+          "repo",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"claim\": {\n    \"id\": \"<g2>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"claim\",\n    \"status\": \"proposed\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022Fact\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  },\n  \"confidence\": {\n    \"level\": \"high\",\n    \"reasons\": [\n      \"Origin repo: support High; repetitions grouped.\",\n      \"Declared evidence; no controlled execution collector in this version.\"\n    ],\n    \"independentOrigins\": 1\n  },\n  \"evidence\": [\n    {\n      \"id\": \"<g3>\",\n      \"scopeId\": \"workspace\",\n      \"kind\": \"evidence\",\n      \"status\": \"proposed\",\n      \"revision\": 1,\n      \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022source_code\\u0022,\\n  \\u0022reference\\u0022: \\u0022src/a.rs\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022repo\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n      \"provenance\": {\n        \"origin\": \"user\",\n        \"actor\": \"local-user\",\n        \"timestamp\": \"<date>\"\n      }\n    }\n  ],\n  \"history\": [\n    {\n      \"sequence\": 1,\n      \"objectId\": \"<g2>\",\n      \"scopeId\": \"workspace\",\n      \"previousState\": null,\n      \"newState\": \"{\\n  \\u0022id\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022claim\\u0022,\\n  \\u0022status\\u0022: \\u0022proposed\\u0022,\\n  \\u0022revision\\u0022: 1,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022text\\\\u0022: \\\\u0022Fact\\\\u0022,\\\\n  \\\\u0022category\\\\u0022: \\\\u0022semantic\\\\u0022,\\\\n  \\\\u0022volatility\\\\u0022: \\\\u0022evolving\\\\u0022,\\\\n  \\\\u0022lastVerified\\\\u0022: null,\\\\n  \\\\u0022reviewAfter\\\\u0022: null\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022local-user\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n      \"reason\": \"create\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "{1}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g4>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022human_observation\\u0022,\\n  \\u0022reference\\u0022: \\u0022seen\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022repo\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{1}",
+          "human_observation",
+          "seen",
+          "--lineage",
+          "repo",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g5>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022authoritative_documentation\\u0022,\\n  \\u0022reference\\u0022: \\u0022docs\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022vendor\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"llm\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{1}",
+          "authoritative_documentation",
+          "docs",
+          "--lineage",
+          "vendor",
+          "--origin",
+          "llm"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"claim\": {\n    \"id\": \"<g2>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"claim\",\n    \"status\": \"proposed\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022Fact\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  },\n  \"confidence\": {\n    \"level\": \"high\",\n    \"reasons\": [\n      \"Origin repo: support High; repetitions grouped.\",\n      \"LLM assertions excluded from reinforcement, whatever the declared source kind.\",\n      \"Declared evidence; no controlled execution collector in this version.\"\n    ],\n    \"independentOrigins\": 1\n  },\n  \"evidence\": [\n    {\n      \"id\": \"<g3>\",\n      \"scopeId\": \"workspace\",\n      \"kind\": \"evidence\",\n      \"status\": \"proposed\",\n      \"revision\": 1,\n      \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022source_code\\u0022,\\n  \\u0022reference\\u0022: \\u0022src/a.rs\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022repo\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n      \"provenance\": {\n        \"origin\": \"user\",\n        \"actor\": \"local-user\",\n        \"timestamp\": \"<date>\"\n      }\n    },\n    {\n      \"id\": \"<g4>\",\n      \"scopeId\": \"workspace\",\n      \"kind\": \"evidence\",\n      \"status\": \"proposed\",\n      \"revision\": 1,\n      \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022human_observation\\u0022,\\n  \\u0022reference\\u0022: \\u0022seen\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022repo\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n      \"provenance\": {\n        \"origin\": \"user\",\n        \"actor\": \"local-user\",\n        \"timestamp\": \"<date>\"\n      }\n    },\n    {\n      \"id\": \"<g5>\",\n      \"scopeId\": \"workspace\",\n      \"kind\": \"evidence\",\n      \"status\": \"proposed\",\n      \"revision\": 1,\n      \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022authoritative_documentation\\u0022,\\n  \\u0022reference\\u0022: \\u0022docs\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022vendor\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n      \"provenance\": {\n        \"origin\": \"llm\",\n        \"actor\": \"local-user\",\n        \"timestamp\": \"<date>\"\n      }\n    }\n  ],\n  \"history\": [\n    {\n      \"sequence\": 1,\n      \"objectId\": \"<g2>\",\n      \"scopeId\": \"workspace\",\n      \"previousState\": null,\n      \"newState\": \"{\\n  \\u0022id\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022claim\\u0022,\\n  \\u0022status\\u0022: \\u0022proposed\\u0022,\\n  \\u0022revision\\u0022: 1,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022text\\\\u0022: \\\\u0022Fact\\\\u0022,\\\\n  \\\\u0022category\\\\u0022: \\\\u0022semantic\\\\u0022,\\\\n  \\\\u0022volatility\\\\u0022: \\\\u0022evolving\\\\u0022,\\\\n  \\\\u0022lastVerified\\\\u0022: null,\\\\n  \\\\u0022reviewAfter\\\\u0022: null\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022local-user\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n      \"reason\": \"create\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "{1}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g6>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022execution\\u0022,\\n  \\u0022reference\\u0022: \\u0022run\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022ci\\u0022,\\n  \\u0022relation\\u0022: \\u0022contradicts\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"llm\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{1}",
+          "execution",
+          "run",
+          "--lineage",
+          "ci",
+          "--origin",
+          "llm",
+          "--contradicts"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"claim\": {\n    \"id\": \"<g2>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"claim\",\n    \"status\": \"proposed\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022Fact\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  },\n  \"confidence\": {\n    \"level\": \"high\",\n    \"reasons\": [\n      \"Origin repo: support High; repetitions grouped.\",\n      \"LLM assertions excluded from reinforcement, whatever the declared source kind.\",\n      \"Contradicted by an LLM assertion: noted, not an independent refutation.\",\n      \"Declared evidence; no controlled execution collector in this version.\"\n    ],\n    \"independentOrigins\": 1\n  },\n  \"evidence\": [\n    {\n      \"id\": \"<g3>\",\n      \"scopeId\": \"workspace\",\n      \"kind\": \"evidence\",\n      \"status\": \"proposed\",\n      \"revision\": 1,\n      \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022source_code\\u0022,\\n  \\u0022reference\\u0022: \\u0022src/a.rs\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022repo\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n      \"provenance\": {\n        \"origin\": \"user\",\n        \"actor\": \"local-user\",\n        \"timestamp\": \"<date>\"\n      }\n    },\n    {\n      \"id\": \"<g4>\",\n      \"scopeId\": \"workspace\",\n      \"kind\": \"evidence\",\n      \"status\": \"proposed\",\n      \"revision\": 1,\n      \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022human_observation\\u0022,\\n  \\u0022reference\\u0022: \\u0022seen\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022repo\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n      \"provenance\": {\n        \"origin\": \"user\",\n        \"actor\": \"local-user\",\n        \"timestamp\": \"<date>\"\n      }\n    },\n    {\n      \"id\": \"<g5>\",\n      \"scopeId\": \"workspace\",\n      \"kind\": \"evidence\",\n      \"status\": \"proposed\",\n      \"revision\": 1,\n      \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022authoritative_documentation\\u0022,\\n  \\u0022reference\\u0022: \\u0022docs\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022vendor\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n      \"provenance\": {\n        \"origin\": \"llm\",\n        \"actor\": \"local-user\",\n        \"timestamp\": \"<date>\"\n      }\n    },\n    {\n      \"id\": \"<g6>\",\n      \"scopeId\": \"workspace\",\n      \"kind\": \"evidence\",\n      \"status\": \"proposed\",\n      \"revision\": 1,\n      \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022execution\\u0022,\\n  \\u0022reference\\u0022: \\u0022run\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022ci\\u0022,\\n  \\u0022relation\\u0022: \\u0022contradicts\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n      \"provenance\": {\n        \"origin\": \"llm\",\n        \"actor\": \"local-user\",\n        \"timestamp\": \"<date>\"\n      }\n    }\n  ],\n  \"history\": [\n    {\n      \"sequence\": 1,\n      \"objectId\": \"<g2>\",\n      \"scopeId\": \"workspace\",\n      \"previousState\": null,\n      \"newState\": \"{\\n  \\u0022id\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022claim\\u0022,\\n  \\u0022status\\u0022: \\u0022proposed\\u0022,\\n  \\u0022revision\\u0022: 1,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022text\\\\u0022: \\\\u0022Fact\\\\u0022,\\\\n  \\\\u0022category\\\\u0022: \\\\u0022semantic\\\\u0022,\\\\n  \\\\u0022volatility\\\\u0022: \\\\u0022evolving\\\\u0022,\\\\n  \\\\u0022lastVerified\\\\u0022: null,\\\\n  \\\\u0022reviewAfter\\\\u0022: null\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022local-user\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n      \"reason\": \"create\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "{1}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g7>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022project_decision\\u0022,\\n  \\u0022reference\\u0022: \\u0022adr\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022team\\u0022,\\n  \\u0022relation\\u0022: \\u0022contradicts\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{1}",
+          "project_decision",
+          "adr",
+          "--lineage",
+          "team",
+          "--origin",
+          "user",
+          "--contradicts"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"claim\": {\n    \"id\": \"<g2>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"claim\",\n    \"status\": \"proposed\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022Fact\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  },\n  \"confidence\": {\n    \"level\": \"medium\",\n    \"reasons\": [\n      \"Origin repo: support High; repetitions grouped.\",\n      \"LLM assertions excluded from reinforcement, whatever the declared source kind.\",\n      \"Contested by 1 independent origin(s).\",\n      \"LLM contradictions noted, not counted as independent refutations.\",\n      \"Declared evidence; no controlled execution collector in this version.\"\n    ],\n    \"independentOrigins\": 1\n  },\n  \"evidence\": [\n    {\n      \"id\": \"<g3>\",\n      \"scopeId\": \"workspace\",\n      \"kind\": \"evidence\",\n      \"status\": \"proposed\",\n      \"revision\": 1,\n      \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022source_code\\u0022,\\n  \\u0022reference\\u0022: \\u0022src/a.rs\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022repo\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n      \"provenance\": {\n        \"origin\": \"user\",\n        \"actor\": \"local-user\",\n        \"timestamp\": \"<date>\"\n      }\n    },\n    {\n      \"id\": \"<g4>\",\n      \"scopeId\": \"workspace\",\n      \"kind\": \"evidence\",\n      \"status\": \"proposed\",\n      \"revision\": 1,\n      \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022human_observation\\u0022,\\n  \\u0022reference\\u0022: \\u0022seen\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022repo\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n      \"provenance\": {\n        \"origin\": \"user\",\n        \"actor\": \"local-user\",\n        \"timestamp\": \"<date>\"\n      }\n    },\n    {\n      \"id\": \"<g5>\",\n      \"scopeId\": \"workspace\",\n      \"kind\": \"evidence\",\n      \"status\": \"proposed\",\n      \"revision\": 1,\n      \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022authoritative_documentation\\u0022,\\n  \\u0022reference\\u0022: \\u0022docs\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022vendor\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n      \"provenance\": {\n        \"origin\": \"llm\",\n        \"actor\": \"local-user\",\n        \"timestamp\": \"<date>\"\n      }\n    },\n    {\n      \"id\": \"<g6>\",\n      \"scopeId\": \"workspace\",\n      \"kind\": \"evidence\",\n      \"status\": \"proposed\",\n      \"revision\": 1,\n      \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022execution\\u0022,\\n  \\u0022reference\\u0022: \\u0022run\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022ci\\u0022,\\n  \\u0022relation\\u0022: \\u0022contradicts\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n      \"provenance\": {\n        \"origin\": \"llm\",\n        \"actor\": \"local-user\",\n        \"timestamp\": \"<date>\"\n      }\n    },\n    {\n      \"id\": \"<g7>\",\n      \"scopeId\": \"workspace\",\n      \"kind\": \"evidence\",\n      \"status\": \"proposed\",\n      \"revision\": 1,\n      \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022project_decision\\u0022,\\n  \\u0022reference\\u0022: \\u0022adr\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022team\\u0022,\\n  \\u0022relation\\u0022: \\u0022contradicts\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n      \"provenance\": {\n        \"origin\": \"user\",\n        \"actor\": \"local-user\",\n        \"timestamp\": \"<date>\"\n      }\n    }\n  ],\n  \"history\": [\n    {\n      \"sequence\": 1,\n      \"objectId\": \"<g2>\",\n      \"scopeId\": \"workspace\",\n      \"previousState\": null,\n      \"newState\": \"{\\n  \\u0022id\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022claim\\u0022,\\n  \\u0022status\\u0022: \\u0022proposed\\u0022,\\n  \\u0022revision\\u0022: 1,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022text\\\\u0022: \\\\u0022Fact\\\\u0022,\\\\n  \\\\u0022category\\\\u0022: \\\\u0022semantic\\\\u0022,\\\\n  \\\\u0022volatility\\\\u0022: \\\\u0022evolving\\\\u0022,\\\\n  \\\\u0022lastVerified\\\\u0022: null,\\\\n  \\\\u0022reviewAfter\\\\u0022: null\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022local-user\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n      \"reason\": \"create\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "{1}",
+          "--json"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g8>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"claim\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022Pref\\u0022,\\n  \\u0022category\\u0022: \\u0022preferences\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "add",
+          "Pref",
+          "--origin",
+          "user",
+          "--category",
+          "preferences"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g9>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"evidence\",\n  \"status\": \"proposed\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g8>\\u0022,\\n  \\u0022kind\\u0022: \\u0022user_assertion\\u0022,\\n  \\u0022reference\\u0022: \\u0022me\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022me\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "add",
+          "{12}",
+          "user_assertion",
+          "me",
+          "--lineage",
+          "me",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"claim\": {\n    \"id\": \"<g8>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"claim\",\n    \"status\": \"proposed\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022Pref\\u0022,\\n  \\u0022category\\u0022: \\u0022preferences\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  },\n  \"confidence\": {\n    \"level\": \"low\",\n    \"reasons\": [\n      \"Origin me: support Low; repetitions grouped.\",\n      \"Declared evidence; no controlled execution collector in this version.\",\n      \"User choice authoritative on their intent, not proof of factual truth.\"\n    ],\n    \"independentOrigins\": 1\n  },\n  \"evidence\": [\n    {\n      \"id\": \"<g9>\",\n      \"scopeId\": \"workspace\",\n      \"kind\": \"evidence\",\n      \"status\": \"proposed\",\n      \"revision\": 1,\n      \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g8>\\u0022,\\n  \\u0022kind\\u0022: \\u0022user_assertion\\u0022,\\n  \\u0022reference\\u0022: \\u0022me\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022me\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n      \"provenance\": {\n        \"origin\": \"user\",\n        \"actor\": \"local-user\",\n        \"timestamp\": \"<date>\"\n      }\n    }\n  ],\n  \"history\": [\n    {\n      \"sequence\": 7,\n      \"objectId\": \"<g8>\",\n      \"scopeId\": \"workspace\",\n      \"previousState\": null,\n      \"newState\": \"{\\n  \\u0022id\\u0022: \\u0022<g8>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022claim\\u0022,\\n  \\u0022status\\u0022: \\u0022proposed\\u0022,\\n  \\u0022revision\\u0022: 1,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022text\\\\u0022: \\\\u0022Pref\\\\u0022,\\\\n  \\\\u0022category\\\\u0022: \\\\u0022preferences\\\\u0022,\\\\n  \\\\u0022volatility\\\\u0022: \\\\u0022evolving\\\\u0022,\\\\n  \\\\u0022lastVerified\\\\u0022: null,\\\\n  \\\\u0022reviewAfter\\\\u0022: null\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022local-user\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n      \"reason\": \"create\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "{12}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: not_found: Object missing or inaccessible.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "{3}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: not_found: Object missing or inaccessible.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "0f8fad5b-d9cb-469f-a165-70867728950e"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: GUID identifier required.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "not-a-guid"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Wrong number of arguments.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Wrong number of arguments.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "{1}",
+          "x"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Unknown option for this command.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "show",
+          "{1}",
+          "--actor",
+          "a"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "[\n  {\n    \"id\": \"<g2>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"claim\",\n    \"status\": \"proposed\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022Fact\\u0022,\\n  \\u0022category\\u0022: \\u0022semantic\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  },\n  {\n    \"id\": \"<g8>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"claim\",\n    \"status\": \"proposed\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022text\\u0022: \\u0022Pref\\u0022,\\n  \\u0022category\\u0022: \\u0022preferences\\u0022,\\n  \\u0022volatility\\u0022: \\u0022evolving\\u0022,\\n  \\u0022lastVerified\\u0022: null,\\n  \\u0022reviewAfter\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  }\n]\n"
+      },
+      "step": {
+        "arguments": [
+          "claim",
+          "list"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "[\n  {\n    \"id\": \"<g3>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"evidence\",\n    \"status\": \"proposed\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022source_code\\u0022,\\n  \\u0022reference\\u0022: \\u0022src/a.rs\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022repo\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  },\n  {\n    \"id\": \"<g4>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"evidence\",\n    \"status\": \"proposed\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022human_observation\\u0022,\\n  \\u0022reference\\u0022: \\u0022seen\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022repo\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  },\n  {\n    \"id\": \"<g5>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"evidence\",\n    \"status\": \"proposed\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022authoritative_documentation\\u0022,\\n  \\u0022reference\\u0022: \\u0022docs\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022vendor\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"llm\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  },\n  {\n    \"id\": \"<g6>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"evidence\",\n    \"status\": \"proposed\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022execution\\u0022,\\n  \\u0022reference\\u0022: \\u0022run\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022ci\\u0022,\\n  \\u0022relation\\u0022: \\u0022contradicts\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"llm\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  },\n  {\n    \"id\": \"<g7>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"evidence\",\n    \"status\": \"proposed\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022kind\\u0022: \\u0022project_decision\\u0022,\\n  \\u0022reference\\u0022: \\u0022adr\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022team\\u0022,\\n  \\u0022relation\\u0022: \\u0022contradicts\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  },\n  {\n    \"id\": \"<g9>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"evidence\",\n    \"status\": \"proposed\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022claimId\\u0022: \\u0022<g8>\\u0022,\\n  \\u0022kind\\u0022: \\u0022user_assertion\\u0022,\\n  \\u0022reference\\u0022: \\u0022me\\u0022,\\n  \\u0022lineageId\\u0022: \\u0022me\\u0022,\\n  \\u0022relation\\u0022: \\u0022supports\\u0022,\\n  \\u0022sourceId\\u0022: null,\\n  \\u0022sourceHash\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  }\n]\n"
+      },
+      "step": {
+        "arguments": [
+          "evidence",
+          "list"
+        ],
+        "cwd": ""
+      }
+    }
+  ]
+}

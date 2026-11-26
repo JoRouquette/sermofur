@@ -1,0 +1,131 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/",
+    ".sermofur/records/<g2>.md",
+    ".sermofur/records/<g3>.md",
+    "forged.md"
+  ],
+  "projections": {
+    "<g2>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 2,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"john\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Source <g2>\n\n```json\n{\n  \"relativePath\": \"forged.md\",\n  \"status\": \"indexed\",\n  \"hash\": \"ae403c9ec0d112b3bdbe62efea13f566ba7a4bd10416b68d1e1dd85dd93b98ef\",\n  \"size\": 12,\n  \"indexedAt\": \"<date>\",\n  \"passages\": 1,\n  \"rejection\": null\n}\n```\n",
+    "<g3>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g3>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 1,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"john\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Source <g3>\n\n```json\n{\n  \"relativePath\": \"absent.md\",\n  \"status\": \"missing\",\n  \"hash\": \"9F86D081884C7D659A2FEAA0C55AD015A3BF4F1B2B0B822CD15D6C15B0F00A08\",\n  \"size\": 4,\n  \"indexedAt\": null,\n  \"passages\": 1,\n  \"rejection\": null\n}\n```\n"
+  },
+  "steps": [
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"created\": true\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "init"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "file": "forged.md"
+      }
+    },
+    {
+      "output": "{\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022forged.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u00229F86D081884C7D659A2FEAA0C55AD015A3BF4F1B2B0B822CD15D6C15B0F00A08\\u0022,\\n  \\u0022size\\u0022: 4,\\n  \\u0022indexedAt\\u0022: null,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"john\",\n    \"timestamp\": \"<date>\"\n  }\n}",
+      "step": {
+        "indexed": true,
+        "scope": "workspace",
+        "source": "forged.md"
+      }
+    },
+    {
+      "output": "{\n  \"id\": \"<g3>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022absent.md\\u0022,\\n  \\u0022status\\u0022: \\u0022missing\\u0022,\\n  \\u0022hash\\u0022: \\u00229F86D081884C7D659A2FEAA0C55AD015A3BF4F1B2B0B822CD15D6C15B0F00A08\\u0022,\\n  \\u0022size\\u0022: 4,\\n  \\u0022indexedAt\\u0022: null,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"john\",\n    \"timestamp\": \"<date>\"\n  }\n}",
+      "step": {
+        "indexed": false,
+        "scope": "workspace",
+        "source": "absent.md"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"query\": \"forge\",\n  \"results\": [],\n  \"excluded\": 0\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "forge"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"indexed\": 1,\n  \"changedSources\": 1\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "index",
+          "rebuild"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/instance.json",
+        "added .sermofur/memory.db",
+        "added .sermofur/records/<g2>.md",
+        "added .sermofur/records/<g3>.md"
+      ],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": "[\n  {\n    \"sequence\": 1,\n    \"objectId\": \"<g2>\",\n    \"scopeId\": \"workspace\",\n    \"previousState\": null,\n    \"newState\": \"{\\n  \\u0022id\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022source\\u0022,\\n  \\u0022status\\u0022: \\u0022active\\u0022,\\n  \\u0022revision\\u0022: 1,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022relativePath\\\\u0022: \\\\u0022forged.md\\\\u0022,\\\\n  \\\\u0022status\\\\u0022: \\\\u0022indexed\\\\u0022,\\\\n  \\\\u0022hash\\\\u0022: \\\\u00229F86D081884C7D659A2FEAA0C55AD015A3BF4F1B2B0B822CD15D6C15B0F00A08\\\\u0022,\\\\n  \\\\u0022size\\\\u0022: 4,\\\\n  \\\\u0022indexedAt\\\\u0022: null,\\\\n  \\\\u0022passages\\\\u0022: 1,\\\\n  \\\\u0022rejection\\\\u0022: null\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022john\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n    \"reason\": \"create\",\n    \"actor\": \"john\",\n    \"timestamp\": \"<date>\"\n  },\n  {\n    \"sequence\": 3,\n    \"objectId\": \"<g2>\",\n    \"scopeId\": \"workspace\",\n    \"previousState\": \"{\\n  \\u0022id\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022source\\u0022,\\n  \\u0022status\\u0022: \\u0022active\\u0022,\\n  \\u0022revision\\u0022: 1,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022relativePath\\\\u0022: \\\\u0022forged.md\\\\u0022,\\\\n  \\\\u0022status\\\\u0022: \\\\u0022indexed\\\\u0022,\\\\n  \\\\u0022hash\\\\u0022: \\\\u00229F86D081884C7D659A2FEAA0C55AD015A3BF4F1B2B0B822CD15D6C15B0F00A08\\\\u0022,\\\\n  \\\\u0022size\\\\u0022: 4,\\\\n  \\\\u0022indexedAt\\\\u0022: null,\\\\n  \\\\u0022passages\\\\u0022: 1,\\\\n  \\\\u0022rejection\\\\u0022: null\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022john\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n    \"newState\": \"{\\n  \\u0022id\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022source\\u0022,\\n  \\u0022status\\u0022: \\u0022active\\u0022,\\n  \\u0022revision\\u0022: 2,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022relativePath\\\\u0022: \\\\u0022forged.md\\\\u0022,\\\\n  \\\\u0022status\\\\u0022: \\\\u0022indexed\\\\u0022,\\\\n  \\\\u0022hash\\\\u0022: \\\\u0022ae403c9ec0d112b3bdbe62efea13f566ba7a4bd10416b68d1e1dd85dd93b98ef\\\\u0022,\\\\n  \\\\u0022size\\\\u0022: 12,\\\\n  \\\\u0022indexedAt\\\\u0022: \\\\u0022<date>\\\\u0022,\\\\n  \\\\u0022passages\\\\u0022: 1,\\\\n  \\\\u0022rejection\\\\u0022: null\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022john\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n    \"reason\": \"modified\",\n    \"actor\": \"sermofur\",\n    \"timestamp\": \"<date>\"\n  }\n]",
+      "step": {
+        "history": 2
+      }
+    },
+    {
+      "output": "[\n  {\n    \"sequence\": 2,\n    \"objectId\": \"<g3>\",\n    \"scopeId\": \"workspace\",\n    \"previousState\": null,\n    \"newState\": \"{\\n  \\u0022id\\u0022: \\u0022<g3>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022source\\u0022,\\n  \\u0022status\\u0022: \\u0022active\\u0022,\\n  \\u0022revision\\u0022: 1,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022relativePath\\\\u0022: \\\\u0022absent.md\\\\u0022,\\\\n  \\\\u0022status\\\\u0022: \\\\u0022missing\\\\u0022,\\\\n  \\\\u0022hash\\\\u0022: \\\\u00229F86D081884C7D659A2FEAA0C55AD015A3BF4F1B2B0B822CD15D6C15B0F00A08\\\\u0022,\\\\n  \\\\u0022size\\\\u0022: 4,\\\\n  \\\\u0022indexedAt\\\\u0022: null,\\\\n  \\\\u0022passages\\\\u0022: 1,\\\\n  \\\\u0022rejection\\\\u0022: null\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022john\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n    \"reason\": \"create\",\n    \"actor\": \"john\",\n    \"timestamp\": \"<date>\"\n  }\n]",
+      "step": {
+        "history": 3
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"query\": \"forge\",\n  \"results\": [\n    {\n      \"kind\": \"source\",\n      \"id\": \"<g2>\",\n      \"scopeId\": \"workspace\",\n      \"status\": \"active\",\n      \"applicable\": true,\n      \"confidence\": null,\n      \"excerpt\": \"texte forgé\",\n      \"matchedTerms\": [\n        \"forge\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": \"<date>\",\n        \"hash\": \"ae403c9ec0d112b3bdbe62efea13f566ba7a4bd10416b68d1e1dd85dd93b98ef\",\n        \"sourceStatus\": \"indexed\"\n      },\n      \"score\": 0.287682,\n      \"path\": \"forged.md\"\n    }\n  ],\n  \"excluded\": 0\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "forge"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "[\n  {\n    \"id\": \"<g2>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"source\",\n    \"status\": \"active\",\n    \"revision\": 2,\n    \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022forged.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u0022ae403c9ec0d112b3bdbe62efea13f566ba7a4bd10416b68d1e1dd85dd93b98ef\\u0022,\\n  \\u0022size\\u0022: 12,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"john\",\n      \"timestamp\": \"<date>\"\n    }\n  },\n  {\n    \"id\": \"<g3>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"source\",\n    \"status\": \"active\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022absent.md\\u0022,\\n  \\u0022status\\u0022: \\u0022missing\\u0022,\\n  \\u0022hash\\u0022: \\u00229F86D081884C7D659A2FEAA0C55AD015A3BF4F1B2B0B822CD15D6C15B0F00A08\\u0022,\\n  \\u0022size\\u0022: 4,\\n  \\u0022indexedAt\\u0022: null,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"john\",\n      \"timestamp\": \"<date>\"\n    }\n  }\n]\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "list"
+        ],
+        "cwd": ""
+      }
+    }
+  ]
+}

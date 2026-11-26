@@ -1,0 +1,189 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/",
+    "client/",
+    "long folder name/",
+    "Été/"
+  ],
+  "projections": {},
+  "steps": [
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"created\": true\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "init"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": "client"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"c\",\n  \"kind\": \"client\",\n  \"parentId\": \"workspace\",\n  \"relativePath\": \"client\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "c",
+          "client",
+          "workspace",
+          "CLIENT"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "Sermofur Doctor\n  ok: instance — Compatible configuration and version.\n  ok: schema — Consistent SQLite schema and identity.\n  ok: storage — SQLite integrity check.\n  ok: orphan_records — 0 inconsistent references.\n  ok: scopes — Valid scope tree.\n  ok: scope_mappings — 0 missing mappings.\n  ok: scope_overlap — 0 conflicting mapping pairs.\n  ok: memory_consistency — 0 inconsistencies detected.\n  ok: projections — 0 missing or diverging projections; run export to rebuild.\n  ok: record_columns — 0 inconsistent metadata rows.\n  ok: fts5 — SQLite full-text search engine.\n  ok: search_index — 0 objects missing from the index or misplaced, 0 entries without object; run index rebuild.\n  ok: source_scopes — 0 sources attached to a broader scope than their file.\n  ok: sqlite — Native version <sqlite>; journal delete.\n  warning: daemon — absent: commands run directly.\n  warning: laya — Capability not delivered in this version.\n  warning: model — Capability not delivered in this version.\n  warning: mcp — Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\nOverall: healthy_with_warnings\n"
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "sql": "UPDATE scopes SET relative_path='CLIENT' WHERE id='c'"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "Sermofur Doctor\n  ok: instance — Compatible configuration and version.\n  ok: schema — Consistent SQLite schema and identity.\n  ok: storage — SQLite integrity check.\n  ok: orphan_records — 0 inconsistent references.\n  ok: scopes — Valid scope tree.\n  ok: scope_mappings — 0 missing mappings.\n  ok: scope_overlap — 0 conflicting mapping pairs.\n  ok: memory_consistency — 0 inconsistencies detected.\n  ok: projections — 0 missing or diverging projections; run export to rebuild.\n  ok: record_columns — 0 inconsistent metadata rows.\n  ok: fts5 — SQLite full-text search engine.\n  ok: search_index — 0 objects missing from the index or misplaced, 0 entries without object; run index rebuild.\n  ok: source_scopes — 0 sources attached to a broader scope than their file.\n  ok: sqlite — Native version <sqlite>; journal delete.\n  warning: daemon — absent: commands run directly.\n  warning: laya — Capability not delivered in this version.\n  warning: model — Capability not delivered in this version.\n  warning: mcp — Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\nOverall: healthy_with_warnings\n"
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": "Été"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"e\",\n  \"kind\": \"client\",\n  \"parentId\": \"workspace\",\n  \"relativePath\": \"Été\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "e",
+          "client",
+          "workspace",
+          "Été"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "sql": "UPDATE scopes SET relative_path='Été' WHERE id='e'"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "Sermofur Doctor\n  ok: instance — Compatible configuration and version.\n  ok: schema — Consistent SQLite schema and identity.\n  ok: storage — SQLite integrity check.\n  ok: orphan_records — 0 inconsistent references.\n  ok: scopes — Valid scope tree.\n  warning: scope_mappings — 1 missing mappings.\n  ok: scope_overlap — 0 conflicting mapping pairs.\n  ok: memory_consistency — 0 inconsistencies detected.\n  ok: projections — 0 missing or diverging projections; run export to rebuild.\n  ok: record_columns — 0 inconsistent metadata rows.\n  ok: fts5 — SQLite full-text search engine.\n  ok: search_index — 0 objects missing from the index or misplaced, 0 entries without object; run index rebuild.\n  ok: source_scopes — 0 sources attached to a broader scope than their file.\n  ok: sqlite — Native version <sqlite>; journal delete.\n  warning: daemon — absent: commands run directly.\n  warning: laya — Capability not delivered in this version.\n  warning: model — Capability not delivered in this version.\n  warning: mcp — Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\nOverall: healthy_with_warnings\n"
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "sql": "DELETE FROM scopes WHERE id='e'"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": "long folder name"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"l\",\n  \"kind\": \"client\",\n  \"parentId\": \"workspace\",\n  \"relativePath\": \"long folder name\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "l",
+          "client",
+          "workspace",
+          "long folder name"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "sql": "UPDATE scopes SET relative_path='LONGFO~1' WHERE id='l'"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "Sermofur Doctor\n  ok: instance — Compatible configuration and version.\n  ok: schema — Consistent SQLite schema and identity.\n  ok: storage — SQLite integrity check.\n  ok: orphan_records — 0 inconsistent references.\n  ok: scopes — Valid scope tree.\n  ok: scope_mappings — 0 missing mappings.\n  ok: scope_overlap — 0 conflicting mapping pairs.\n  ok: memory_consistency — 0 inconsistencies detected.\n  ok: projections — 0 missing or diverging projections; run export to rebuild.\n  ok: record_columns — 0 inconsistent metadata rows.\n  ok: fts5 — SQLite full-text search engine.\n  ok: search_index — 0 objects missing from the index or misplaced, 0 entries without object; run index rebuild.\n  ok: source_scopes — 0 sources attached to a broader scope than their file.\n  ok: sqlite — Native version <sqlite>; journal delete.\n  warning: daemon — absent: commands run directly.\n  warning: laya — Capability not delivered in this version.\n  warning: model — Capability not delivered in this version.\n  warning: mcp — Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\nOverall: healthy_with_warnings\n"
+      },
+      "step": {
+        "arguments": [
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"overall\": \"healthy_with_warnings\",\n  \"checks\": [\n    {\n      \"name\": \"instance\",\n      \"status\": \"ok\",\n      \"detail\": \"Compatible configuration and version.\"\n    },\n    {\n      \"name\": \"schema\",\n      \"status\": \"ok\",\n      \"detail\": \"Consistent SQLite schema and identity.\"\n    },\n    {\n      \"name\": \"storage\",\n      \"status\": \"ok\",\n      \"detail\": \"SQLite integrity check.\"\n    },\n    {\n      \"name\": \"orphan_records\",\n      \"status\": \"ok\",\n      \"detail\": \"0 inconsistent references.\"\n    },\n    {\n      \"name\": \"scopes\",\n      \"status\": \"ok\",\n      \"detail\": \"Valid scope tree.\"\n    },\n    {\n      \"name\": \"scope_mappings\",\n      \"status\": \"ok\",\n      \"detail\": \"0 missing mappings.\"\n    },\n    {\n      \"name\": \"scope_overlap\",\n      \"status\": \"ok\",\n      \"detail\": \"0 conflicting mapping pairs.\"\n    },\n    {\n      \"name\": \"memory_consistency\",\n      \"status\": \"ok\",\n      \"detail\": \"0 inconsistencies detected.\"\n    },\n    {\n      \"name\": \"projections\",\n      \"status\": \"ok\",\n      \"detail\": \"0 missing or diverging projections; run export to rebuild.\"\n    },\n    {\n      \"name\": \"record_columns\",\n      \"status\": \"ok\",\n      \"detail\": \"0 inconsistent metadata rows.\"\n    },\n    {\n      \"name\": \"fts5\",\n      \"status\": \"ok\",\n      \"detail\": \"SQLite full-text search engine.\"\n    },\n    {\n      \"name\": \"search_index\",\n      \"status\": \"ok\",\n      \"detail\": \"0 objects missing from the index or misplaced, 0 entries without object; run index rebuild.\"\n    },\n    {\n      \"name\": \"source_scopes\",\n      \"status\": \"ok\",\n      \"detail\": \"0 sources attached to a broader scope than their file.\"\n    },\n    {\n      \"name\": \"sqlite\",\n      \"status\": \"ok\",\n      \"detail\": \"Native version <sqlite>; journal delete.\"\n    },\n    {\n      \"name\": \"daemon\",\n      \"status\": \"warning\",\n      \"detail\": \"absent: commands run directly.\"\n    },\n    {\n      \"name\": \"laya\",\n      \"status\": \"warning\",\n      \"detail\": \"Capability not delivered in this version.\"\n    },\n    {\n      \"name\": \"model\",\n      \"status\": \"warning\",\n      \"detail\": \"Capability not delivered in this version.\"\n    },\n    {\n      \"name\": \"mcp\",\n      \"status\": \"warning\",\n      \"detail\": \"Not declared to an MCP host: smf mcp install, or smf mcp install --host codex.\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "doctor"
+        ],
+        "cwd": ""
+      }
+    }
+  ]
+}

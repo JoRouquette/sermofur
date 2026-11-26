@@ -1,0 +1,475 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/",
+    ".sermofur/records/<g2>.md",
+    "doc.md"
+  ],
+  "projections": {
+    "<g2>.md": "---\n{\n  \"schemaVersion\": 1,\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 8,\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n---\n\n# Source <g2>\n\n```json\n{\n  \"relativePath\": \"doc.md\",\n  \"status\": \"indexed\",\n  \"hash\": \"91d9c947c7c5d69c00369042d07480573a993709f7e49ac8440a215de51613f8\",\n  \"size\": 11,\n  \"indexedAt\": \"<date>\",\n  \"passages\": 1,\n  \"rejection\": null\n}\n```\n"
+  },
+  "steps": [
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"created\": true\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "init"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "file": "doc.md"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022doc.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u00223016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\\u0022,\\n  \\u0022size\\u0022: 7,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "source",
+          "add",
+          "doc.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/instance.json",
+        "added .sermofur/memory.db",
+        "added .sermofur/records/<g2>.md"
+      ],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 1,\n  \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022doc.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u00223016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\\u0022,\\n  \\u0022size\\u0022: 7,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "doc.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"Option --origin required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "source",
+          "add",
+          "doc.md"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "[\n  {\n    \"id\": \"<g2>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"source\",\n    \"status\": \"active\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022doc.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u00223016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\\u0022,\\n  \\u0022size\\u0022: 7,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  }\n]\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "list"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"source\": {\n    \"id\": \"<g2>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"source\",\n    \"status\": \"active\",\n    \"revision\": 1,\n    \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022doc.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u00223016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\\u0022,\\n  \\u0022size\\u0022: 7,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  },\n  \"history\": [\n    {\n      \"sequence\": 1,\n      \"objectId\": \"<g2>\",\n      \"scopeId\": \"workspace\",\n      \"previousState\": null,\n      \"newState\": \"{\\n  \\u0022id\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022source\\u0022,\\n  \\u0022status\\u0022: \\u0022active\\u0022,\\n  \\u0022revision\\u0022: 1,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022relativePath\\\\u0022: \\\\u0022doc.md\\\\u0022,\\\\n  \\\\u0022status\\\\u0022: \\\\u0022indexed\\\\u0022,\\\\n  \\\\u0022hash\\\\u0022: \\\\u00223016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\\\\u0022,\\\\n  \\\\u0022size\\\\u0022: 7,\\\\n  \\\\u0022indexedAt\\\\u0022: \\\\u0022<date>\\\\u0022,\\\\n  \\\\u0022passages\\\\u0022: 1,\\\\n  \\\\u0022rejection\\\\u0022: null\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022local-user\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n      \"reason\": \"create\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "show",
+          "{2}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"sources\": [\n    {\n      \"id\": \"<g2>\",\n      \"path\": \"doc.md\",\n      \"outcome\": \"unchanged\",\n      \"previousHash\": \"3016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\",\n      \"hash\": \"3016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "reindex"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"sources\": [\n    {\n      \"id\": \"<g2>\",\n      \"path\": \"doc.md\",\n      \"outcome\": \"unchanged\",\n      \"previousHash\": \"3016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\",\n      \"hash\": \"3016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "source",
+          "reindex",
+          "--actor",
+          "tester"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "file": "doc.md"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"sources\": [\n    {\n      \"id\": \"<g2>\",\n      \"path\": \"doc.md\",\n      \"outcome\": \"modified\",\n      \"previousHash\": \"3016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\",\n      \"hash\": \"5dfbb32f925c88c46409e11fcdc9dd9ee882ba12335b78040e67e072efe4bf8f\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "reindex",
+          "--actor",
+          "tester"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [
+        "changed .sermofur/memory.db",
+        "changed .sermofur/records/<g2>.md"
+      ],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"source\": {\n    \"id\": \"<g2>\",\n    \"scopeId\": \"workspace\",\n    \"kind\": \"source\",\n    \"status\": \"active\",\n    \"revision\": 2,\n    \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022doc.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u00225dfbb32f925c88c46409e11fcdc9dd9ee882ba12335b78040e67e072efe4bf8f\\u0022,\\n  \\u0022size\\u0022: 16,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n    \"provenance\": {\n      \"origin\": \"user\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    }\n  },\n  \"history\": [\n    {\n      \"sequence\": 1,\n      \"objectId\": \"<g2>\",\n      \"scopeId\": \"workspace\",\n      \"previousState\": null,\n      \"newState\": \"{\\n  \\u0022id\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022source\\u0022,\\n  \\u0022status\\u0022: \\u0022active\\u0022,\\n  \\u0022revision\\u0022: 1,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022relativePath\\\\u0022: \\\\u0022doc.md\\\\u0022,\\\\n  \\\\u0022status\\\\u0022: \\\\u0022indexed\\\\u0022,\\\\n  \\\\u0022hash\\\\u0022: \\\\u00223016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\\\\u0022,\\\\n  \\\\u0022size\\\\u0022: 7,\\\\n  \\\\u0022indexedAt\\\\u0022: \\\\u0022<date>\\\\u0022,\\\\n  \\\\u0022passages\\\\u0022: 1,\\\\n  \\\\u0022rejection\\\\u0022: null\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022local-user\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n      \"reason\": \"create\",\n      \"actor\": \"local-user\",\n      \"timestamp\": \"<date>\"\n    },\n    {\n      \"sequence\": 2,\n      \"objectId\": \"<g2>\",\n      \"scopeId\": \"workspace\",\n      \"previousState\": \"{\\n  \\u0022id\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022source\\u0022,\\n  \\u0022status\\u0022: \\u0022active\\u0022,\\n  \\u0022revision\\u0022: 1,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022relativePath\\\\u0022: \\\\u0022doc.md\\\\u0022,\\\\n  \\\\u0022status\\\\u0022: \\\\u0022indexed\\\\u0022,\\\\n  \\\\u0022hash\\\\u0022: \\\\u00223016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\\\\u0022,\\\\n  \\\\u0022size\\\\u0022: 7,\\\\n  \\\\u0022indexedAt\\\\u0022: \\\\u0022<date>\\\\u0022,\\\\n  \\\\u0022passages\\\\u0022: 1,\\\\n  \\\\u0022rejection\\\\u0022: null\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022local-user\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n      \"newState\": \"{\\n  \\u0022id\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022source\\u0022,\\n  \\u0022status\\u0022: \\u0022active\\u0022,\\n  \\u0022revision\\u0022: 2,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022relativePath\\\\u0022: \\\\u0022doc.md\\\\u0022,\\\\n  \\\\u0022status\\\\u0022: \\\\u0022indexed\\\\u0022,\\\\n  \\\\u0022hash\\\\u0022: \\\\u00225dfbb32f925c88c46409e11fcdc9dd9ee882ba12335b78040e67e072efe4bf8f\\\\u0022,\\\\n  \\\\u0022size\\\\u0022: 16,\\\\n  \\\\u0022indexedAt\\\\u0022: \\\\u0022<date>\\\\u0022,\\\\n  \\\\u0022passages\\\\u0022: 1,\\\\n  \\\\u0022rejection\\\\u0022: null\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022local-user\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n      \"reason\": \"modified\",\n      \"actor\": \"tester\",\n      \"timestamp\": \"<date>\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "show",
+          "{2}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"query\": \"modifie\",\n  \"results\": [\n    {\n      \"kind\": \"source\",\n      \"id\": \"<g2>\",\n      \"scopeId\": \"workspace\",\n      \"status\": \"active\",\n      \"applicable\": true,\n      \"confidence\": null,\n      \"excerpt\": \"contenu modifié\",\n      \"matchedTerms\": [\n        \"modifie\"\n      ],\n      \"freshness\": {\n        \"createdAt\": \"<date>\",\n        \"lastVerified\": null,\n        \"reviewAfter\": null,\n        \"indexedAt\": \"<date>\",\n        \"hash\": \"5dfbb32f925c88c46409e11fcdc9dd9ee882ba12335b78040e67e072efe4bf8f\",\n        \"sourceStatus\": \"indexed\"\n      },\n      \"score\": 0.287682,\n      \"path\": \"doc.md\"\n    }\n  ],\n  \"excluded\": 0\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "modifie"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "remove": "doc.md"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"sources\": [\n    {\n      \"id\": \"<g2>\",\n      \"path\": \"doc.md\",\n      \"outcome\": \"missing\",\n      \"previousHash\": \"5dfbb32f925c88c46409e11fcdc9dd9ee882ba12335b78040e67e072efe4bf8f\",\n      \"hash\": \"5dfbb32f925c88c46409e11fcdc9dd9ee882ba12335b78040e67e072efe4bf8f\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "reindex",
+          "{2}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"sources\": [\n    {\n      \"id\": \"<g2>\",\n      \"path\": \"doc.md\",\n      \"outcome\": \"unchanged\",\n      \"previousHash\": \"5dfbb32f925c88c46409e11fcdc9dd9ee882ba12335b78040e67e072efe4bf8f\",\n      \"hash\": \"5dfbb32f925c88c46409e11fcdc9dd9ee882ba12335b78040e67e072efe4bf8f\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "reindex",
+          "{2:N}"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"query\": \"modifie\",\n  \"results\": [],\n  \"excluded\": 0\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "recall",
+          "modifie"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "file": "doc.md"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"sources\": [\n    {\n      \"id\": \"<g2>\",\n      \"path\": \"doc.md\",\n      \"outcome\": \"restored\",\n      \"previousHash\": \"5dfbb32f925c88c46409e11fcdc9dd9ee882ba12335b78040e67e072efe4bf8f\",\n      \"hash\": \"5dfbb32f925c88c46409e11fcdc9dd9ee882ba12335b78040e67e072efe4bf8f\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "reindex"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "file": "doc.md"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"sources\": [\n    {\n      \"id\": \"<g2>\",\n      \"path\": \"doc.md\",\n      \"outcome\": \"rejected\",\n      \"previousHash\": \"5dfbb32f925c88c46409e11fcdc9dd9ee882ba12335b78040e67e072efe4bf8f\",\n      \"hash\": \"5dfbb32f925c88c46409e11fcdc9dd9ee882ba12335b78040e67e072efe4bf8f\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "reindex"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "file": "doc.md"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"sources\": [\n    {\n      \"id\": \"<g2>\",\n      \"path\": \"doc.md\",\n      \"outcome\": \"rejected\",\n      \"previousHash\": \"5dfbb32f925c88c46409e11fcdc9dd9ee882ba12335b78040e67e072efe4bf8f\",\n      \"hash\": \"5dfbb32f925c88c46409e11fcdc9dd9ee882ba12335b78040e67e072efe4bf8f\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "reindex"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "bytes": "doc.md"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"sources\": [\n    {\n      \"id\": \"<g2>\",\n      \"path\": \"doc.md\",\n      \"outcome\": \"unchanged\",\n      \"previousHash\": \"5dfbb32f925c88c46409e11fcdc9dd9ee882ba12335b78040e67e072efe4bf8f\",\n      \"hash\": \"5dfbb32f925c88c46409e11fcdc9dd9ee882ba12335b78040e67e072efe4bf8f\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "reindex"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "bytes": "doc.md"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"sources\": [\n    {\n      \"id\": \"<g2>\",\n      \"path\": \"doc.md\",\n      \"outcome\": \"rejected\",\n      \"previousHash\": \"5dfbb32f925c88c46409e11fcdc9dd9ee882ba12335b78040e67e072efe4bf8f\",\n      \"hash\": \"5dfbb32f925c88c46409e11fcdc9dd9ee882ba12335b78040e67e072efe4bf8f\"\n    }\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "reindex"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: source_rejected: Source larger than 1 MiB.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "doc.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [
+        "changed .sermofur/memory.db",
+        "changed .sermofur/records/<g2>.md"
+      ],
+      "step": {
+        "changes": true
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "file": "doc.md"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 8,\n  \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022doc.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u002291d9c947c7c5d69c00369042d07480573a993709f7e49ac8440a215de51613f8\\u0022,\\n  \\u0022size\\u0022: 11,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "doc.md",
+          "--origin",
+          "llm",
+          "--actor",
+          "claude"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"<g2>\",\n  \"scopeId\": \"workspace\",\n  \"kind\": \"source\",\n  \"status\": \"active\",\n  \"revision\": 8,\n  \"contentJson\": \"{\\n  \\u0022relativePath\\u0022: \\u0022doc.md\\u0022,\\n  \\u0022status\\u0022: \\u0022indexed\\u0022,\\n  \\u0022hash\\u0022: \\u002291d9c947c7c5d69c00369042d07480573a993709f7e49ac8440a215de51613f8\\u0022,\\n  \\u0022size\\u0022: 11,\\n  \\u0022indexedAt\\u0022: \\u0022<date>\\u0022,\\n  \\u0022passages\\u0022: 1,\\n  \\u0022rejection\\u0022: null\\n}\",\n  \"provenance\": {\n    \"origin\": \"user\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  }\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "doc.md",
+          "--origin",
+          "llm",
+          "--actor",
+          "claude"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": "[\n  {\n    \"sequence\": 1,\n    \"objectId\": \"<g2>\",\n    \"scopeId\": \"workspace\",\n    \"previousState\": null,\n    \"newState\": \"{\\n  \\u0022id\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022source\\u0022,\\n  \\u0022status\\u0022: \\u0022active\\u0022,\\n  \\u0022revision\\u0022: 1,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022relativePath\\\\u0022: \\\\u0022doc.md\\\\u0022,\\\\n  \\\\u0022status\\\\u0022: \\\\u0022indexed\\\\u0022,\\\\n  \\\\u0022hash\\\\u0022: \\\\u00223016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\\\\u0022,\\\\n  \\\\u0022size\\\\u0022: 7,\\\\n  \\\\u0022indexedAt\\\\u0022: \\\\u0022<date>\\\\u0022,\\\\n  \\\\u0022passages\\\\u0022: 1,\\\\n  \\\\u0022rejection\\\\u0022: null\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022local-user\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n    \"reason\": \"create\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  },\n  {\n    \"sequence\": 2,\n    \"objectId\": \"<g2>\",\n    \"scopeId\": \"workspace\",\n    \"previousState\": \"{\\n  \\u0022id\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022source\\u0022,\\n  \\u0022status\\u0022: \\u0022active\\u0022,\\n  \\u0022revision\\u0022: 1,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022relativePath\\\\u0022: \\\\u0022doc.md\\\\u0022,\\\\n  \\\\u0022status\\\\u0022: \\\\u0022indexed\\\\u0022,\\\\n  \\\\u0022hash\\\\u0022: \\\\u00223016ef88e3166466281c563b984abed5412a2de823d37ed99c2af39be422fab1\\\\u0022,\\\\n  \\\\u0022size\\\\u0022: 7,\\\\n  \\\\u0022indexedAt\\\\u0022: \\\\u0022<date>\\\\u0022,\\\\n  \\\\u0022passages\\\\u0022: 1,\\\\n  \\\\u0022rejection\\\\u0022: null\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022local-user\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n    \"newState\": \"{\\n  \\u0022id\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022source\\u0022,\\n  \\u0022status\\u0022: \\u0022active\\u0022,\\n  \\u0022revision\\u0022: 2,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022relativePath\\\\u0022: \\\\u0022doc.md\\\\u0022,\\\\n  \\\\u0022status\\\\u0022: \\\\u0022indexed\\\\u0022,\\\\n  \\\\u0022hash\\\\u0022: \\\\u00225dfbb32f925c88c46409e11fcdc9dd9ee882ba12335b78040e67e072efe4bf8f\\\\u0022,\\\\n  \\\\u0022size\\\\u0022: 16,\\\\n  \\\\u0022indexedAt\\\\u0022: \\\\u0022<date>\\\\u0022,\\\\n  \\\\u0022passages\\\\u0022: 1,\\\\n  \\\\u0022rejection\\\\u0022: null\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022local-user\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n    \"reason\": \"modified\",\n    \"actor\": \"tester\",\n    \"timestamp\": \"<date>\"\n  },\n  {\n    \"sequence\": 3,\n    \"objectId\": \"<g2>\",\n    \"scopeId\": \"workspace\",\n    \"previousState\": \"{\\n  \\u0022id\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022source\\u0022,\\n  \\u0022status\\u0022: \\u0022active\\u0022,\\n  \\u0022revision\\u0022: 2,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022relativePath\\\\u0022: \\\\u0022doc.md\\\\u0022,\\\\n  \\\\u0022status\\\\u0022: \\\\u0022indexed\\\\u0022,\\\\n  \\\\u0022hash\\\\u0022: \\\\u00225dfbb32f925c88c46409e11fcdc9dd9ee882ba12335b78040e67e072efe4bf8f\\\\u0022,\\\\n  \\\\u0022size\\\\u0022: 16,\\\\n  \\\\u0022indexedAt\\\\u0022: \\\\u0022<date>\\\\u0022,\\\\n  \\\\u0022passages\\\\u0022: 1,\\\\n  \\\\u0022rejection\\\\u0022: null\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022local-user\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n    \"newState\": \"{\\n  \\u0022id\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022source\\u0022,\\n  \\u0022status\\u0022: \\u0022active\\u0022,\\n  \\u0022revision\\u0022: 3,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022relativePath\\\\u0022: \\\\u0022doc.md\\\\u0022,\\\\n  \\\\u0022status\\\\u0022: \\\\u0022missing\\\\u0022,\\\\n  \\\\u0022hash\\\\u0022: \\\\u00225dfbb32f925c88c46409e11fcdc9dd9ee882ba12335b78040e67e072efe4bf8f\\\\u0022,\\\\n  \\\\u0022size\\\\u0022: 16,\\\\n  \\\\u0022indexedAt\\\\u0022: \\\\u0022<date>\\\\u0022,\\\\n  \\\\u0022passages\\\\u0022: 0,\\\\n  \\\\u0022rejection\\\\u0022: null\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022local-user\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n    \"reason\": \"missing\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  },\n  {\n    \"sequence\": 4,\n    \"objectId\": \"<g2>\",\n    \"scopeId\": \"workspace\",\n    \"previousState\": \"{\\n  \\u0022id\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022source\\u0022,\\n  \\u0022status\\u0022: \\u0022active\\u0022,\\n  \\u0022revision\\u0022: 3,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022relativePath\\\\u0022: \\\\u0022doc.md\\\\u0022,\\\\n  \\\\u0022status\\\\u0022: \\\\u0022missing\\\\u0022,\\\\n  \\\\u0022hash\\\\u0022: \\\\u00225dfbb32f925c88c46409e11fcdc9dd9ee882ba12335b78040e67e072efe4bf8f\\\\u0022,\\\\n  \\\\u0022size\\\\u0022: 16,\\\\n  \\\\u0022indexedAt\\\\u0022: \\\\u0022<date>\\\\u0022,\\\\n  \\\\u0022passages\\\\u0022: 0,\\\\n  \\\\u0022rejection\\\\u0022: null\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022local-user\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n    \"newState\": \"{\\n  \\u0022id\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022source\\u0022,\\n  \\u0022status\\u0022: \\u0022active\\u0022,\\n  \\u0022revision\\u0022: 4,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022relativePath\\\\u0022: \\\\u0022doc.md\\\\u0022,\\\\n  \\\\u0022status\\\\u0022: \\\\u0022indexed\\\\u0022,\\\\n  \\\\u0022hash\\\\u0022: \\\\u00225dfbb32f925c88c46409e11fcdc9dd9ee882ba12335b78040e67e072efe4bf8f\\\\u0022,\\\\n  \\\\u0022size\\\\u0022: 16,\\\\n  \\\\u0022indexedAt\\\\u0022: \\\\u0022<date>\\\\u0022,\\\\n  \\\\u0022passages\\\\u0022: 1,\\\\n  \\\\u0022rejection\\\\u0022: null\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022local-user\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n    \"reason\": \"restored\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  },\n  {\n    \"sequence\": 5,\n    \"objectId\": \"<g2>\",\n    \"scopeId\": \"workspace\",\n    \"previousState\": \"{\\n  \\u0022id\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022source\\u0022,\\n  \\u0022status\\u0022: \\u0022active\\u0022,\\n  \\u0022revision\\u0022: 4,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022relativePath\\\\u0022: \\\\u0022doc.md\\\\u0022,\\\\n  \\\\u0022status\\\\u0022: \\\\u0022indexed\\\\u0022,\\\\n  \\\\u0022hash\\\\u0022: \\\\u00225dfbb32f925c88c46409e11fcdc9dd9ee882ba12335b78040e67e072efe4bf8f\\\\u0022,\\\\n  \\\\u0022size\\\\u0022: 16,\\\\n  \\\\u0022indexedAt\\\\u0022: \\\\u0022<date>\\\\u0022,\\\\n  \\\\u0022passages\\\\u0022: 1,\\\\n  \\\\u0022rejection\\\\u0022: null\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022local-user\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n    \"newState\": \"{\\n  \\u0022id\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022source\\u0022,\\n  \\u0022status\\u0022: \\u0022active\\u0022,\\n  \\u0022revision\\u0022: 5,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022relativePath\\\\u0022: \\\\u0022doc.md\\\\u0022,\\\\n  \\\\u0022status\\\\u0022: \\\\u0022rejected\\\\u0022,\\\\n  \\\\u0022hash\\\\u0022: \\\\u00225dfbb32f925c88c46409e11fcdc9dd9ee882ba12335b78040e67e072efe4bf8f\\\\u0022,\\\\n  \\\\u0022size\\\\u0022: 16,\\\\n  \\\\u0022indexedAt\\\\u0022: \\\\u0022<date>\\\\u0022,\\\\n  \\\\u0022passages\\\\u0022: 0,\\\\n  \\\\u0022rejection\\\\u0022: \\\\u0022empty\\\\u0022\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022local-user\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n    \"reason\": \"rejected\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  },\n  {\n    \"sequence\": 6,\n    \"objectId\": \"<g2>\",\n    \"scopeId\": \"workspace\",\n    \"previousState\": \"{\\n  \\u0022id\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022source\\u0022,\\n  \\u0022status\\u0022: \\u0022active\\u0022,\\n  \\u0022revision\\u0022: 5,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022relativePath\\\\u0022: \\\\u0022doc.md\\\\u0022,\\\\n  \\\\u0022status\\\\u0022: \\\\u0022rejected\\\\u0022,\\\\n  \\\\u0022hash\\\\u0022: \\\\u00225dfbb32f925c88c46409e11fcdc9dd9ee882ba12335b78040e67e072efe4bf8f\\\\u0022,\\\\n  \\\\u0022size\\\\u0022: 16,\\\\n  \\\\u0022indexedAt\\\\u0022: \\\\u0022<date>\\\\u0022,\\\\n  \\\\u0022passages\\\\u0022: 0,\\\\n  \\\\u0022rejection\\\\u0022: \\\\u0022empty\\\\u0022\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022local-user\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n    \"newState\": \"{\\n  \\u0022id\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022source\\u0022,\\n  \\u0022status\\u0022: \\u0022active\\u0022,\\n  \\u0022revision\\u0022: 6,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022relativePath\\\\u0022: \\\\u0022doc.md\\\\u0022,\\\\n  \\\\u0022status\\\\u0022: \\\\u0022rejected\\\\u0022,\\\\n  \\\\u0022hash\\\\u0022: \\\\u00225dfbb32f925c88c46409e11fcdc9dd9ee882ba12335b78040e67e072efe4bf8f\\\\u0022,\\\\n  \\\\u0022size\\\\u0022: 16,\\\\n  \\\\u0022indexedAt\\\\u0022: \\\\u0022<date>\\\\u0022,\\\\n  \\\\u0022passages\\\\u0022: 0,\\\\n  \\\\u0022rejection\\\\u0022: \\\\u0022binary\\\\u0022\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022local-user\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n    \"reason\": \"rejected\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  },\n  {\n    \"sequence\": 7,\n    \"objectId\": \"<g2>\",\n    \"scopeId\": \"workspace\",\n    \"previousState\": \"{\\n  \\u0022id\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022source\\u0022,\\n  \\u0022status\\u0022: \\u0022active\\u0022,\\n  \\u0022revision\\u0022: 6,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022relativePath\\\\u0022: \\\\u0022doc.md\\\\u0022,\\\\n  \\\\u0022status\\\\u0022: \\\\u0022rejected\\\\u0022,\\\\n  \\\\u0022hash\\\\u0022: \\\\u00225dfbb32f925c88c46409e11fcdc9dd9ee882ba12335b78040e67e072efe4bf8f\\\\u0022,\\\\n  \\\\u0022size\\\\u0022: 16,\\\\n  \\\\u0022indexedAt\\\\u0022: \\\\u0022<date>\\\\u0022,\\\\n  \\\\u0022passages\\\\u0022: 0,\\\\n  \\\\u0022rejection\\\\u0022: \\\\u0022binary\\\\u0022\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022local-user\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n    \"newState\": \"{\\n  \\u0022id\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022source\\u0022,\\n  \\u0022status\\u0022: \\u0022active\\u0022,\\n  \\u0022revision\\u0022: 7,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022relativePath\\\\u0022: \\\\u0022doc.md\\\\u0022,\\\\n  \\\\u0022status\\\\u0022: \\\\u0022rejected\\\\u0022,\\\\n  \\\\u0022hash\\\\u0022: \\\\u00225dfbb32f925c88c46409e11fcdc9dd9ee882ba12335b78040e67e072efe4bf8f\\\\u0022,\\\\n  \\\\u0022size\\\\u0022: 16,\\\\n  \\\\u0022indexedAt\\\\u0022: \\\\u0022<date>\\\\u0022,\\\\n  \\\\u0022passages\\\\u0022: 0,\\\\n  \\\\u0022rejection\\\\u0022: \\\\u0022too_large\\\\u0022\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022local-user\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n    \"reason\": \"rejected\",\n    \"actor\": \"local-user\",\n    \"timestamp\": \"<date>\"\n  },\n  {\n    \"sequence\": 8,\n    \"objectId\": \"<g2>\",\n    \"scopeId\": \"workspace\",\n    \"previousState\": \"{\\n  \\u0022id\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022source\\u0022,\\n  \\u0022status\\u0022: \\u0022active\\u0022,\\n  \\u0022revision\\u0022: 7,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022relativePath\\\\u0022: \\\\u0022doc.md\\\\u0022,\\\\n  \\\\u0022status\\\\u0022: \\\\u0022rejected\\\\u0022,\\\\n  \\\\u0022hash\\\\u0022: \\\\u00225dfbb32f925c88c46409e11fcdc9dd9ee882ba12335b78040e67e072efe4bf8f\\\\u0022,\\\\n  \\\\u0022size\\\\u0022: 16,\\\\n  \\\\u0022indexedAt\\\\u0022: \\\\u0022<date>\\\\u0022,\\\\n  \\\\u0022passages\\\\u0022: 0,\\\\n  \\\\u0022rejection\\\\u0022: \\\\u0022too_large\\\\u0022\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022local-user\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n    \"newState\": \"{\\n  \\u0022id\\u0022: \\u0022<g2>\\u0022,\\n  \\u0022scopeId\\u0022: \\u0022workspace\\u0022,\\n  \\u0022kind\\u0022: \\u0022source\\u0022,\\n  \\u0022status\\u0022: \\u0022active\\u0022,\\n  \\u0022revision\\u0022: 8,\\n  \\u0022contentJson\\u0022: \\u0022{\\\\n  \\\\u0022relativePath\\\\u0022: \\\\u0022doc.md\\\\u0022,\\\\n  \\\\u0022status\\\\u0022: \\\\u0022indexed\\\\u0022,\\\\n  \\\\u0022hash\\\\u0022: \\\\u002291d9c947c7c5d69c00369042d07480573a993709f7e49ac8440a215de51613f8\\\\u0022,\\\\n  \\\\u0022size\\\\u0022: 11,\\\\n  \\\\u0022indexedAt\\\\u0022: \\\\u0022<date>\\\\u0022,\\\\n  \\\\u0022passages\\\\u0022: 1,\\\\n  \\\\u0022rejection\\\\u0022: null\\\\n}\\u0022,\\n  \\u0022provenance\\u0022: {\\n    \\u0022origin\\u0022: \\u0022user\\u0022,\\n    \\u0022actor\\u0022: \\u0022local-user\\u0022,\\n    \\u0022timestamp\\u0022: \\u0022<date>\\u0022\\n  }\\n}\",\n    \"reason\": \"restored\",\n    \"actor\": \"claude\",\n    \"timestamp\": \"<date>\"\n  }\n]",
+      "step": {
+        "history": 2
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"scope\": \"workspace\",\n  \"claims\": 0,\n  \"evidence\": 0,\n  \"retex\": 0,\n  \"sources\": 1,\n  \"mode\": \"direct\",\n  \"laya\": \"unavailable\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "status"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [
+        "changed .sermofur/memory.db",
+        "changed .sermofur/records/<g2>.md"
+      ],
+      "step": {
+        "changes": true
+      }
+    }
+  ]
+}

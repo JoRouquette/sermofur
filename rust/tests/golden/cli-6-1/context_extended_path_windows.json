@@ -1,0 +1,117 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/",
+    "a/",
+    "b/",
+    "b/doc.md"
+  ],
+  "projections": {},
+  "steps": [
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"created\": true\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "init"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": "a"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": "b"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "file": "b/doc.md"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 4,
+        "stderr": "smf: unsafe_path: An instance requires a local disk.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "--path",
+          "\\\\?\\<root>\\a\\..\\b",
+          "status"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 4,
+        "stderr": "{\n  \"code\": \"unsafe_path\",\n  \"message\": \"An instance requires a local disk.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "--path",
+          "\\\\?\\<root>\\a\\..\\b",
+          "--json",
+          "root"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 4,
+        "stderr": "smf: unsafe_path: An instance requires a local disk.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "--path",
+          "\\\\?\\<root>\\b\\.",
+          "status"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 4,
+        "stderr": "smf: scope_boundary: Source outside the instance.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "source",
+          "add",
+          "\\\\?\\<root>\\a\\..\\b\\doc.md",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/instance.json",
+        "added .sermofur/memory.db"
+      ],
+      "step": {
+        "changes": true
+      }
+    }
+  ]
+}

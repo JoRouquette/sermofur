@@ -1,0 +1,5 @@
+{
+  "exitCode": 1,
+  "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"Option value required.\"\n}\n",
+  "stdout": ""
+}

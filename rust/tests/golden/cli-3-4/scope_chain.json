@@ -1,0 +1,219 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/",
+    "c/",
+    "c/p/",
+    "c/p/t/"
+  ],
+  "projections": {},
+  "steps": [
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"created\": true\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "init"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": "c/p/t"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"c\",\n  \"kind\": \"client\",\n  \"parentId\": \"workspace\",\n  \"relativePath\": \"c\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "c",
+          "client",
+          "workspace",
+          "c"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"p\",\n  \"kind\": \"project\",\n  \"parentId\": \"c\",\n  \"relativePath\": \"c/p\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "p",
+          "project",
+          "c",
+          "c/p"
+        ],
+        "cwd": "c"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"r\",\n  \"kind\": \"repository\",\n  \"parentId\": \"p\",\n  \"relativePath\": \"c/p\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "r",
+          "repository",
+          "p",
+          "c/p"
+        ],
+        "cwd": "c/p"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"scope\": \"r\",\n  \"visible\": [\n    \"c\",\n    \"p\",\n    \"r\",\n    \"workspace\"\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "current"
+        ],
+        "cwd": "c/p"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"id\": \"t\",\n  \"kind\": \"task\",\n  \"parentId\": \"r\",\n  \"relativePath\": \"c/p/t\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "add",
+          "t",
+          "task",
+          "r",
+          "c/p/t"
+        ],
+        "cwd": "c/p"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"scope\": \"t\",\n  \"visible\": [\n    \"c\",\n    \"p\",\n    \"r\",\n    \"t\",\n    \"workspace\"\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "current"
+        ],
+        "cwd": "c/p/t"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "[\n  {\n    \"id\": \"c\",\n    \"kind\": \"client\",\n    \"parentId\": \"workspace\",\n    \"relativePath\": \"c\"\n  },\n  {\n    \"id\": \"p\",\n    \"kind\": \"project\",\n    \"parentId\": \"c\",\n    \"relativePath\": \"c/p\"\n  },\n  {\n    \"id\": \"r\",\n    \"kind\": \"repository\",\n    \"parentId\": \"p\",\n    \"relativePath\": \"c/p\"\n  },\n  {\n    \"id\": \"t\",\n    \"kind\": \"task\",\n    \"parentId\": \"r\",\n    \"relativePath\": \"c/p/t\"\n  },\n  {\n    \"id\": \"workspace\",\n    \"kind\": \"workspace\",\n    \"parentId\": null,\n    \"relativePath\": null\n  }\n]\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "list"
+        ],
+        "cwd": "c/p/t"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "[\n  {\n    \"id\": \"c\",\n    \"kind\": \"client\",\n    \"parentId\": \"workspace\",\n    \"relativePath\": \"c\"\n  },\n  {\n    \"id\": \"p\",\n    \"kind\": \"project\",\n    \"parentId\": \"c\",\n    \"relativePath\": \"c/p\"\n  },\n  {\n    \"id\": \"r\",\n    \"kind\": \"repository\",\n    \"parentId\": \"p\",\n    \"relativePath\": \"c/p\"\n  },\n  {\n    \"id\": \"t\",\n    \"kind\": \"task\",\n    \"parentId\": \"r\",\n    \"relativePath\": \"c/p/t\"\n  },\n  {\n    \"id\": \"workspace\",\n    \"kind\": \"workspace\",\n    \"parentId\": null,\n    \"relativePath\": null\n  }\n]\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "tree"
+        ],
+        "cwd": "c/p/t"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "[\n  {\n    \"id\": \"c\",\n    \"kind\": \"client\",\n    \"parentId\": \"workspace\",\n    \"relativePath\": \"c\"\n  },\n  {\n    \"id\": \"workspace\",\n    \"kind\": \"workspace\",\n    \"parentId\": null,\n    \"relativePath\": null\n  }\n]\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "list"
+        ],
+        "cwd": "c"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "[\n  {\n    \"id\": \"workspace\",\n    \"kind\": \"workspace\",\n    \"parentId\": null,\n    \"relativePath\": null\n  }\n]\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "list"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"scope\": \"t\",\n  \"visible\": [\n    \"c\",\n    \"p\",\n    \"r\",\n    \"t\",\n    \"workspace\"\n  ]\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "scope",
+          "current",
+          "--path",
+          "c/p/t"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"scope\": \"t\",\n  \"claims\": 0,\n  \"evidence\": 0,\n  \"retex\": 0,\n  \"sources\": 0,\n  \"mode\": \"direct\",\n  \"laya\": \"unavailable\"\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "status",
+          "--json"
+        ],
+        "cwd": "c/p/t"
+      }
+    }
+  ]
+}

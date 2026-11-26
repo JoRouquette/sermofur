@@ -1,0 +1,766 @@
+{
+  "generator": "rust/tools/localpaths-oracle",
+  "runtime": ".NET 10.0.5",
+  "os": "windows",
+  "shortName": "LONGFO~1",
+  "calls": [
+    {
+      "function": "Contains",
+      "arguments": [
+        "\u003Croot\u003E",
+        "\u003Croot\u003E"
+      ],
+      "result": true
+    },
+    {
+      "function": "Contains",
+      "arguments": [
+        "\u003Croot\u003E",
+        "\u003Croot\u003E/a"
+      ],
+      "result": true
+    },
+    {
+      "function": "Contains",
+      "arguments": [
+        "\u003Croot\u003E/a",
+        "\u003Croot\u003E/ab"
+      ],
+      "result": false
+    },
+    {
+      "function": "Contains",
+      "arguments": [
+        "\u003Croot\u003E/a/",
+        "\u003Croot\u003E/a/b"
+      ],
+      "result": true
+    },
+    {
+      "function": "Contains",
+      "arguments": [
+        "\u003Croot\u003E/A",
+        "\u003Croot\u003E/a/b"
+      ],
+      "result": true
+    },
+    {
+      "function": "Contains",
+      "arguments": [
+        "\u003Croot\u003E/a",
+        "\u003Croot\u003E"
+      ],
+      "result": false
+    },
+    {
+      "function": "Contains",
+      "arguments": [
+        "\u003Croot\u003E/a/b",
+        "\u003Croot\u003E/a"
+      ],
+      "result": false
+    },
+    {
+      "function": "Contains",
+      "arguments": [
+        "\u003Croot\u003E/is",
+        "\u003Croot\u003E/\u0131s/x"
+      ],
+      "result": false
+    },
+    {
+      "function": "Contains",
+      "arguments": [
+        "\u003Croot\u003E/S",
+        "\u003Croot\u003E/\u017F/x"
+      ],
+      "result": false
+    },
+    {
+      "function": "Contains",
+      "arguments": [
+        "\u003Croot\u003E/\uD801\uDC00",
+        "\u003Croot\u003E/\uD801\uDC28/x"
+      ],
+      "result": true
+    },
+    {
+      "function": "Contains",
+      "arguments": [
+        "\u003Cvolume\u003E",
+        "\u003Croot\u003E/x"
+      ],
+      "result": true
+    },
+    {
+      "function": "NormalizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "Alpha/Beta"
+      ],
+      "result": "\u003Croot\u003E/Alpha/Beta"
+    },
+    {
+      "function": "ResolveMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "Alpha/Beta"
+      ],
+      "result": "\u003Croot\u003E/Alpha/Beta"
+    },
+    {
+      "function": "NormalizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "Alpha/Beta"
+      ],
+      "result": "\u003Croot\u003E/Alpha/Beta"
+    },
+    {
+      "function": "ResolveMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "Alpha/Beta"
+      ],
+      "result": "\u003Croot\u003E/Alpha/Beta"
+    },
+    {
+      "function": "NormalizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "alpha/beta"
+      ],
+      "result": "\u003Croot\u003E/alpha/beta"
+    },
+    {
+      "function": "ResolveMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "alpha/beta"
+      ],
+      "result": "\u003Croot\u003E/alpha/beta"
+    },
+    {
+      "function": "NormalizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "/abs"
+      ],
+      "code": "unsafe_path",
+      "message": "Relative mapping required.",
+      "exitCode": 4
+    },
+    {
+      "function": "ResolveMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "/abs"
+      ],
+      "code": "unsafe_path",
+      "message": "Relative mapping required.",
+      "exitCode": 4
+    },
+    {
+      "function": "NormalizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "/abs"
+      ],
+      "code": "unsafe_path",
+      "message": "Relative mapping required.",
+      "exitCode": 4
+    },
+    {
+      "function": "ResolveMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "/abs"
+      ],
+      "code": "unsafe_path",
+      "message": "Relative mapping required.",
+      "exitCode": 4
+    },
+    {
+      "function": "NormalizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "C:x"
+      ],
+      "code": "unsafe_path",
+      "message": "Relative mapping required.",
+      "exitCode": 4
+    },
+    {
+      "function": "ResolveMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "C:x"
+      ],
+      "code": "unsafe_path",
+      "message": "Relative mapping required.",
+      "exitCode": 4
+    },
+    {
+      "function": "NormalizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "a:b"
+      ],
+      "code": "unsafe_path",
+      "message": "Relative mapping required.",
+      "exitCode": 4
+    },
+    {
+      "function": "ResolveMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "a:b"
+      ],
+      "code": "unsafe_path",
+      "message": "Relative mapping required.",
+      "exitCode": 4
+    },
+    {
+      "function": "NormalizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "../x"
+      ],
+      "code": "scope_boundary",
+      "message": "Mapping outside the instance.",
+      "exitCode": 4
+    },
+    {
+      "function": "ResolveMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "../x"
+      ],
+      "code": "scope_boundary",
+      "message": "Mapping outside the instance.",
+      "exitCode": 4
+    },
+    {
+      "function": "NormalizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "a/../.."
+      ],
+      "code": "scope_boundary",
+      "message": "Mapping outside the instance.",
+      "exitCode": 4
+    },
+    {
+      "function": "ResolveMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "a/../.."
+      ],
+      "code": "scope_boundary",
+      "message": "Mapping outside the instance.",
+      "exitCode": 4
+    },
+    {
+      "function": "NormalizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "a/../b"
+      ],
+      "result": "\u003Croot\u003E/b"
+    },
+    {
+      "function": "ResolveMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "a/../b"
+      ],
+      "code": "invalid_path",
+      "message": "The context directory must exist.",
+      "exitCode": 1
+    },
+    {
+      "function": "NormalizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        ""
+      ],
+      "result": "\u003Croot\u003E"
+    },
+    {
+      "function": "ResolveMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        ""
+      ],
+      "result": "\u003Croot\u003E"
+    },
+    {
+      "function": "NormalizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "."
+      ],
+      "result": "\u003Croot\u003E"
+    },
+    {
+      "function": "ResolveMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "."
+      ],
+      "result": "\u003Croot\u003E"
+    },
+    {
+      "function": "NormalizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "a/./b/"
+      ],
+      "result": "\u003Croot\u003E/a/b"
+    },
+    {
+      "function": "ResolveMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "a/./b/"
+      ],
+      "code": "invalid_path",
+      "message": "The context directory must exist.",
+      "exitCode": 1
+    },
+    {
+      "function": "NormalizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "a/b "
+      ],
+      "result": "\u003Croot\u003E/a/b"
+    },
+    {
+      "function": "ResolveMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "a/b "
+      ],
+      "code": "invalid_path",
+      "message": "The context directory must exist.",
+      "exitCode": 1
+    },
+    {
+      "function": "NormalizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "a/b."
+      ],
+      "result": "\u003Croot\u003E/a/b"
+    },
+    {
+      "function": "ResolveMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "a/b."
+      ],
+      "code": "invalid_path",
+      "message": "The context directory must exist.",
+      "exitCode": 1
+    },
+    {
+      "function": "NormalizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "LONGFO~1/y"
+      ],
+      "result": "\u003Croot\u003E/Long Folder Name/y"
+    },
+    {
+      "function": "ResolveMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "LONGFO~1/y"
+      ],
+      "code": "invalid_path",
+      "message": "The context directory must exist.",
+      "exitCode": 1
+    },
+    {
+      "function": "NormalizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "missing"
+      ],
+      "result": "\u003Croot\u003E/missing"
+    },
+    {
+      "function": "ResolveMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "missing"
+      ],
+      "code": "invalid_path",
+      "message": "The context directory must exist.",
+      "exitCode": 1
+    },
+    {
+      "function": "NormalizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "Alpha/file.txt"
+      ],
+      "result": "\u003Croot\u003E/Alpha/file.txt"
+    },
+    {
+      "function": "ResolveMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "Alpha/file.txt"
+      ],
+      "code": "invalid_path",
+      "message": "The context directory must exist.",
+      "exitCode": 1
+    },
+    {
+      "function": "NormalizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "../sermofur-localpaths-oracle-\u0131s-\u003Cguid\u003E/x"
+      ],
+      "code": "scope_boundary",
+      "message": "Mapping outside the instance.",
+      "exitCode": 4
+    },
+    {
+      "function": "ResolveMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "../sermofur-localpaths-oracle-\u0131s-\u003Cguid\u003E/x"
+      ],
+      "code": "scope_boundary",
+      "message": "Mapping outside the instance.",
+      "exitCode": 4
+    },
+    {
+      "function": "NormalizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "../sermofur-localpaths-oracle-i\u017F-\u003Cguid\u003E/x"
+      ],
+      "code": "scope_boundary",
+      "message": "Mapping outside the instance.",
+      "exitCode": 4
+    },
+    {
+      "function": "ResolveMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "../sermofur-localpaths-oracle-i\u017F-\u003Cguid\u003E/x"
+      ],
+      "code": "scope_boundary",
+      "message": "Mapping outside the instance.",
+      "exitCode": 4
+    },
+    {
+      "function": "RelativizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "\u003Croot\u003E/a/b"
+      ],
+      "result": "a/b"
+    },
+    {
+      "function": "RelativizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "\u003Croot\u003E"
+      ],
+      "result": "."
+    },
+    {
+      "function": "RelativizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "\u003Croot\u003E/"
+      ],
+      "result": "."
+    },
+    {
+      "function": "RelativizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "\u003Croot\u003E/A/b"
+      ],
+      "result": "A/b"
+    },
+    {
+      "function": "RelativizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "\u003Ctemp\u003E"
+      ],
+      "result": ".."
+    },
+    {
+      "function": "RelativizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "\u003Ctemp\u003E/sibling/x"
+      ],
+      "result": "../sibling/x"
+    },
+    {
+      "function": "RelativizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "\u003Croot\u003E/a/../b"
+      ],
+      "result": "b"
+    },
+    {
+      "function": "RelativizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "\u003Croot\u003E/a//b"
+      ],
+      "result": "a/b"
+    },
+    {
+      "function": "RelativizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "\u003Ctemp\u003E/sermofur-localpaths-oracle-\u0131s-\u003Cguid\u003E/x"
+      ],
+      "result": "../sermofur-localpaths-oracle-\u0131s-\u003Cguid\u003E/x"
+    },
+    {
+      "function": "RelativizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "\u003Ctemp\u003E/sermofur-localpaths-oracle-i\u017F-\u003Cguid\u003E/x"
+      ],
+      "result": "x"
+    },
+    {
+      "function": "RelativizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "\u003Ctemp\u003E/SERMOFUR-LOCALPATHS-ORACLE-IS-\u003CGUID\u003E/x"
+      ],
+      "result": "x"
+    },
+    {
+      "function": "RelativizeMapping",
+      "arguments": [
+        "\u003Croot\u003E",
+        "Q:/elsewhere/x"
+      ],
+      "result": "Q:/elsewhere/x"
+    },
+    {
+      "function": "CanonicalCase",
+      "arguments": [
+        "\u003Croot\u003E",
+        "Alpha/Beta"
+      ],
+      "result": "Alpha/Beta"
+    },
+    {
+      "function": "CanonicalCase",
+      "arguments": [
+        "\u003Croot\u003E",
+        "alpha/beta"
+      ],
+      "result": "Alpha/Beta"
+    },
+    {
+      "function": "CanonicalCase",
+      "arguments": [
+        "\u003Croot\u003E",
+        "ALPHA/BETA/missing/x"
+      ],
+      "result": "Alpha/Beta/missing/x"
+    },
+    {
+      "function": "CanonicalCase",
+      "arguments": [
+        "\u003Croot\u003E",
+        "Alpha/FILE.TXT"
+      ],
+      "result": "Alpha/file.txt"
+    },
+    {
+      "function": "CanonicalCase",
+      "arguments": [
+        "\u003Croot\u003E",
+        "caf\u00E9"
+      ],
+      "result": "caf\u00E9"
+    },
+    {
+      "function": "CanonicalCase",
+      "arguments": [
+        "\u003Croot\u003E",
+        "CAF\u00C9"
+      ],
+      "result": "caf\u00E9"
+    },
+    {
+      "function": "CanonicalCase",
+      "arguments": [
+        "\u003Croot\u003E",
+        "cafe\u0301"
+      ],
+      "result": "cafe\u0301"
+    },
+    {
+      "function": "CanonicalCase",
+      "arguments": [
+        "\u003Croot\u003E",
+        "nfd-\u00E9"
+      ],
+      "result": "nfd-\u00E9"
+    },
+    {
+      "function": "CanonicalCase",
+      "arguments": [
+        "\u003Croot\u003E",
+        "kelvin"
+      ],
+      "result": "kelvin"
+    },
+    {
+      "function": "CanonicalCase",
+      "arguments": [
+        "\u003Croot\u003E",
+        "\u212Aelvin"
+      ],
+      "result": "\u212Aelvin"
+    },
+    {
+      "function": "CanonicalCase",
+      "arguments": [
+        "\u003Croot\u003E",
+        "locked"
+      ],
+      "result": "Locked"
+    },
+    {
+      "function": "CanonicalCase",
+      "arguments": [
+        "\u003Croot\u003E",
+        "locked/inner"
+      ],
+      "code": "invalid_path",
+      "message": "A folder of the path cannot be listed; its names on disk cannot be checked.",
+      "exitCode": 1
+    },
+    {
+      "function": "CanonicalCase",
+      "arguments": [
+        "\u003Croot\u003E",
+        "Alpha/../alpha"
+      ],
+      "code": "unsafe_path",
+      "message": "Path reached through an alias (short name) or an ambiguous name.",
+      "exitCode": 4
+    },
+    {
+      "function": "CanonicalCase",
+      "arguments": [
+        "\u003Croot\u003E",
+        "./alpha"
+      ],
+      "result": "./Alpha"
+    },
+    {
+      "function": "CanonicalCase",
+      "arguments": [
+        "\u003Croot\u003E",
+        ""
+      ],
+      "result": ""
+    },
+    {
+      "function": "CanonicalCase",
+      "arguments": [
+        "\u003Croot\u003E",
+        "alpha//beta"
+      ],
+      "result": "Alpha/Beta"
+    },
+    {
+      "function": "CanonicalCase",
+      "arguments": [
+        "\u003Croot\u003E",
+        "a*b"
+      ],
+      "result": "a*b"
+    },
+    {
+      "function": "CanonicalCase",
+      "arguments": [
+        "\u003Croot\u003E",
+        "missing/x"
+      ],
+      "result": "missing/x"
+    },
+    {
+      "function": "CanonicalCase",
+      "arguments": [
+        "\u003Croot\u003E",
+        "STATE"
+      ],
+      "result": "STATE"
+    },
+    {
+      "function": "CanonicalCase",
+      "arguments": [
+        "\u003Croot\u003E",
+        "\u017Ftate"
+      ],
+      "result": "\u017Ftate"
+    },
+    {
+      "function": "CanonicalCase",
+      "arguments": [
+        "\u003Croot\u003E",
+        "\uD801\uDC00x"
+      ],
+      "result": "\uD801\uDC00x"
+    },
+    {
+      "function": "CanonicalCase",
+      "arguments": [
+        "\u003Croot\u003E",
+        "\uD801\uDC28x"
+      ],
+      "result": "\uD801\uDC28x"
+    },
+    {
+      "function": "CanonicalCase",
+      "arguments": [
+        "\u003Croot\u003E",
+        "dangle"
+      ],
+      "result": "Dangle"
+    },
+    {
+      "function": "CanonicalCase",
+      "arguments": [
+        "\u003Croot\u003E",
+        "DUP-\u00C9"
+      ],
+      "code": "unsafe_path",
+      "message": "Path reached through an alias (short name) or an ambiguous name.",
+      "exitCode": 4
+    },
+    {
+      "function": "CanonicalCase",
+      "arguments": [
+        "\u003Croot\u003E",
+        "LONGFO~1/x"
+      ],
+      "code": "unsafe_path",
+      "message": "Path reached through an alias (short name) or an ambiguous name.",
+      "exitCode": 4
+    }
+  ]
+}

@@ -1,0 +1,156 @@
+{
+  "entries": [
+    ".sermofur/",
+    ".sermofur/instance.json",
+    ".sermofur/memory.db",
+    ".sermofur/records/",
+    "sub/"
+  ],
+  "projections": {},
+  "steps": [
+    {
+      "output": {
+        "exitCode": 2,
+        "stderr": "smf: no_instance: No .sermofur instance in the parent folders.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "migrate"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 2,
+        "stderr": "{\n  \"code\": \"no_instance\",\n  \"message\": \"No .sermofur instance in the parent folders.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "migrate"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"root\": \"<root>\",\n  \"configuration\": {\n    \"schemaVersion\": 2,\n    \"instanceId\": \"<g1>\",\n    \"createdAt\": \"<date>\"\n  },\n  \"created\": true\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "init"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"migrated\": false,\n  \"from\": 2,\n  \"to\": 2,\n  \"backup\": null\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "migrate"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Wrong number of arguments.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "migrate",
+          "extra"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "smf: invalid_arguments: Unknown option for this command.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "migrate",
+          "--origin",
+          "user"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": {
+        "exitCode": 1,
+        "stderr": "{\n  \"code\": \"invalid_arguments\",\n  \"message\": \"Option value required.\"\n}\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "--json",
+          "migrate",
+          "--limit"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "mkdir": "sub"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 0,
+        "stderr": "",
+        "stdout": "{\n  \"migrated\": false,\n  \"from\": 2,\n  \"to\": 2,\n  \"backup\": null\n}\n"
+      },
+      "step": {
+        "arguments": [
+          "migrate"
+        ],
+        "cwd": "sub"
+      }
+    },
+    {
+      "output": null,
+      "step": {
+        "file": ".sermofur/instance.json"
+      }
+    },
+    {
+      "output": {
+        "exitCode": 3,
+        "stderr": "smf: unsupported_schema: Unsupported instance identity or version.\n",
+        "stdout": ""
+      },
+      "step": {
+        "arguments": [
+          "migrate"
+        ],
+        "cwd": ""
+      }
+    },
+    {
+      "output": [
+        "added .sermofur/instance.json",
+        "added .sermofur/memory.db"
+      ],
+      "step": {
+        "changes": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,367 @@
+{
+  "generator": "rust/tools/discovery-oracle",
+  "runtime": ".NET 10.0.5",
+  "os": "windows",
+  "scenarios": [
+    {
+      "name": "instance_at_start",
+      "start": "",
+      "owners": "real",
+      "discover": {
+        "root": "\u003Croot\u003E"
+      },
+      "diagnosis": {
+        "root": "\u003Croot\u003E"
+      }
+    },
+    {
+      "name": "instance_above",
+      "start": "a/b",
+      "owners": "real",
+      "discover": {
+        "root": "\u003Croot\u003E"
+      },
+      "diagnosis": {
+        "root": "\u003Croot\u003E"
+      }
+    },
+    {
+      "name": "start_with_dot_dot",
+      "start": "a/..",
+      "owners": "real",
+      "discover": {
+        "root": "\u003Croot\u003E"
+      },
+      "diagnosis": {
+        "root": "\u003Croot\u003E"
+      }
+    },
+    {
+      "name": "start_with_trailing_separator",
+      "start": "a/",
+      "owners": "real",
+      "discover": {
+        "root": "\u003Croot\u003E"
+      },
+      "diagnosis": {
+        "root": "\u003Croot\u003E"
+      }
+    },
+    {
+      "name": "no_instance",
+      "start": "",
+      "owners": "real",
+      "discover": {
+        "code": "no_instance",
+        "message": "No .sermofur instance in the parent folders.",
+        "exitCode": 2
+      },
+      "diagnosis": {
+        "code": "no_instance",
+        "message": "No .sermofur instance in the parent folders.",
+        "exitCode": 2
+      }
+    },
+    {
+      "name": "start_missing",
+      "start": "missing",
+      "owners": "real",
+      "discover": {
+        "code": "invalid_path",
+        "message": "The context directory must exist.",
+        "exitCode": 1
+      },
+      "diagnosis": {
+        "code": "invalid_path",
+        "message": "The context directory must exist.",
+        "exitCode": 1
+      }
+    },
+    {
+      "name": "start_is_file",
+      "start": "file",
+      "owners": "real",
+      "discover": {
+        "code": "invalid_path",
+        "message": "The context directory must exist.",
+        "exitCode": 1
+      },
+      "diagnosis": {
+        "code": "invalid_path",
+        "message": "The context directory must exist.",
+        "exitCode": 1
+      }
+    },
+    {
+      "name": "marker_is_file",
+      "start": "",
+      "owners": "real",
+      "discover": {
+        "code": "invalid_instance",
+        "message": "A .sermofur entry that is not a Sermofur instance stops the search for an instance; rename or move it away.",
+        "exitCode": 3
+      },
+      "diagnosis": {
+        "root": "\u003Croot\u003E"
+      }
+    },
+    {
+      "name": "marker_empty",
+      "start": "",
+      "owners": "real",
+      "discover": {
+        "code": "invalid_instance",
+        "message": "A .sermofur entry that is not a Sermofur instance stops the search for an instance; rename or move it away.",
+        "exitCode": 3
+      },
+      "diagnosis": {
+        "root": "\u003Croot\u003E"
+      }
+    },
+    {
+      "name": "marker_unrelated_entry",
+      "start": "",
+      "owners": "real",
+      "discover": {
+        "code": "invalid_instance",
+        "message": "A .sermofur entry that is not a Sermofur instance stops the search for an instance; rename or move it away.",
+        "exitCode": 3
+      },
+      "diagnosis": {
+        "root": "\u003Croot\u003E"
+      }
+    },
+    {
+      "name": "damaged_database_only",
+      "start": "",
+      "owners": "real",
+      "discover": {
+        "code": "invalid_instance",
+        "message": "Damaged Sermofur instance: .sermofur holds Sermofur data but no instance.json; run smf doctor and restore instance.json from a backup.",
+        "exitCode": 3
+      },
+      "diagnosis": {
+        "root": "\u003Croot\u003E"
+      }
+    },
+    {
+      "name": "damaged_records_only",
+      "start": "",
+      "owners": "real",
+      "discover": {
+        "code": "invalid_instance",
+        "message": "Damaged Sermofur instance: .sermofur holds Sermofur data but no instance.json; run smf doctor and restore instance.json from a backup.",
+        "exitCode": 3
+      },
+      "diagnosis": {
+        "root": "\u003Croot\u003E"
+      }
+    },
+    {
+      "name": "damaged_backups_only",
+      "start": "",
+      "owners": "real",
+      "discover": {
+        "code": "invalid_instance",
+        "message": "Damaged Sermofur instance: .sermofur holds Sermofur data but no instance.json; run smf doctor and restore instance.json from a backup.",
+        "exitCode": 3
+      },
+      "diagnosis": {
+        "root": "\u003Croot\u003E"
+      }
+    },
+    {
+      "name": "configuration_upper_case",
+      "start": "",
+      "owners": "real",
+      "discover": {
+        "root": "\u003Croot\u003E"
+      },
+      "diagnosis": {
+        "root": "\u003Croot\u003E"
+      }
+    },
+    {
+      "name": "configuration_dotless_i",
+      "start": "",
+      "owners": "real",
+      "discover": {
+        "code": "invalid_instance",
+        "message": "A .sermofur entry that is not a Sermofur instance stops the search for an instance; rename or move it away.",
+        "exitCode": 3
+      },
+      "diagnosis": {
+        "root": "\u003Croot\u003E"
+      }
+    },
+    {
+      "name": "backups_long_s",
+      "start": "",
+      "owners": "real",
+      "discover": {
+        "code": "invalid_instance",
+        "message": "A .sermofur entry that is not a Sermofur instance stops the search for an instance; rename or move it away.",
+        "exitCode": 3
+      },
+      "diagnosis": {
+        "root": "\u003Croot\u003E"
+      }
+    },
+    {
+      "name": "configuration_is_folder",
+      "start": "",
+      "owners": "real",
+      "discover": {
+        "root": "\u003Croot\u003E"
+      },
+      "diagnosis": {
+        "root": "\u003Croot\u003E"
+      }
+    },
+    {
+      "name": "nearest_marker_wins",
+      "start": "a",
+      "owners": "real",
+      "discover": {
+        "code": "invalid_instance",
+        "message": "A .sermofur entry that is not a Sermofur instance stops the search for an instance; rename or move it away.",
+        "exitCode": 3
+      },
+      "diagnosis": {
+        "root": "\u003Croot\u003E/a"
+      }
+    },
+    {
+      "name": "marker_link",
+      "start": "",
+      "owners": "real",
+      "discover": {
+        "code": "unsafe_path",
+        "message": "Links and junctions are not supported in this version.",
+        "exitCode": 4
+      },
+      "diagnosis": {
+        "code": "unsafe_path",
+        "message": "Links and junctions are not supported in this version.",
+        "exitCode": 4
+      }
+    },
+    {
+      "name": "start_through_link",
+      "start": "link",
+      "owners": "real",
+      "discover": {
+        "code": "unsafe_path",
+        "message": "Links and junctions are not supported in this version.",
+        "exitCode": 4
+      },
+      "diagnosis": {
+        "code": "unsafe_path",
+        "message": "Links and junctions are not supported in this version.",
+        "exitCode": 4
+      }
+    },
+    {
+      "name": "foreign_owner",
+      "start": "",
+      "owners": "foreign",
+      "discover": {
+        "code": "foreign_owner",
+        "message": "The .sermofur entry belongs to another user account; it is not read. Use your own instance.",
+        "exitCode": 4
+      },
+      "diagnosis": {
+        "root": "\u003Croot\u003E"
+      }
+    },
+    {
+      "name": "owner_unreadable",
+      "start": "",
+      "owners": "throwing",
+      "discover": {
+        "code": "invalid_instance",
+        "message": "A .sermofur entry, or whether one exists, cannot be read in this folder or a parent; check permissions, then run smf doctor.",
+        "exitCode": 3
+      },
+      "diagnosis": {
+        "root": "\u003Croot\u003E"
+      }
+    },
+    {
+      "name": "owner_unknown",
+      "start": "",
+      "owners": "absent",
+      "discover": {
+        "root": "\u003Croot\u003E"
+      },
+      "diagnosis": {
+        "root": "\u003Croot\u003E"
+      }
+    },
+    {
+      "name": "marker_unlistable",
+      "start": "",
+      "owners": "real",
+      "discover": {
+        "code": "invalid_instance",
+        "message": "A .sermofur entry, or whether one exists, cannot be read in this folder or a parent; check permissions, then run smf doctor.",
+        "exitCode": 3
+      },
+      "diagnosis": {
+        "root": "\u003Croot\u003E"
+      }
+    },
+    {
+      "name": "unc_path",
+      "start": "\\\\localhost\\c$\\sermofur-none",
+      "owners": "real",
+      "discover": {
+        "code": "unsafe_path",
+        "message": "An instance requires a local disk.",
+        "exitCode": 4
+      },
+      "diagnosis": {
+        "code": "unsafe_path",
+        "message": "An instance requires a local disk.",
+        "exitCode": 4
+      }
+    },
+    {
+      "name": "device_path",
+      "start": "\\\\?\\C:\\sermofur-none",
+      "owners": "real",
+      "discover": {
+        "code": "unsafe_path",
+        "message": "An instance requires a local disk.",
+        "exitCode": 4
+      },
+      "diagnosis": {
+        "code": "unsafe_path",
+        "message": "An instance requires a local disk.",
+        "exitCode": 4
+      }
+    },
+    {
+      "name": "nt_path_missing",
+      "start": "\\??\\C:\\sermofur-none",
+      "owners": "real",
+      "discover": {
+        "exception": "System.ArgumentException"
+      },
+      "diagnosis": {
+        "exception": "System.ArgumentException"
+      }
+    },
+    {
+      "name": "nt_path_instance",
+      "start": "\\??\\\u003Croot\u003E",
+      "owners": "real",
+      "discover": {
+        "exception": "System.ArgumentException"
+      },
+      "diagnosis": {
+        "exception": "System.ArgumentException"
+      }
+    }
+  ]
+}
